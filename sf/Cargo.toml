@@ -5,4 +5,12 @@ authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+libc = "*"
 libm = "*"
+num = "*"
+num-bigint = "*"
+num-complex = "*"
+num-integer = "*"
+num-iter = "*"
+num-rational = "*"
+num-traits = "*"
