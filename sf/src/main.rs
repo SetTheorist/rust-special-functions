@@ -7,6 +7,8 @@ mod trig;
 mod util;
 mod value;
 
+use num::complex::{Complex};
+
 fn main() {
   let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
   println!("{:?}", q_pi);
@@ -41,10 +43,17 @@ fn main() {
   println!("{}", exp::sf_exp(5.00));
   println!("{}", (5.00_f64).exp());
   println!("-----");
-  println!("{}", exp::sf_exp(1.0/16.0)-1.0);
-  println!("{}", exp::sf_exp_m1(1.0/16.0));
-  println!("{}", (1.0/16.0_f64).exp_m1());
+  println!("{}", exp::sf_exp(Complex::new(0.25,0.25)));
+  println!("{}", (Complex::new(0.25,0.25)).exp());
+  println!("{}", exp::sf_exp(Complex::new(-2.5,2.5)));
+  println!("{}", (Complex::new(-2.5,2.5)).exp());
+  println!("{}", exp::sf_exp(Complex::new(-22.5,12.5)));
+  println!("{}", (Complex::new(-22.5,12.5)).exp());
   println!("-----");
-  println!("{}", exp::sf_ln(1.0 + 1.0/16.0));
-  println!("{}", exp::sf_ln_p1(1.0/16.0));
+  //println!("{}", exp::sf_exp(1.0/16.0)-1.0);
+  //println!("{}", exp::sf_exp_m1(1.0/16.0));
+  //println!("{}", (1.0/16.0_f64).exp_m1());
+  //println!("-----");
+  //println!("{}", exp::sf_ln(1.0 + 1.0/16.0));
+  //println!("{}", exp::sf_ln_p1(1.0/16.0));
 }
