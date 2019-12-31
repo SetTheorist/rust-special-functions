@@ -1,20 +1,31 @@
 use crate::util::{Kahan};
-use crate::value::{Embed,Value};
+use crate::value::{ComplexKind,Embed,Value};
 use num::traits::real::{Real};
 use num::{Zero};
+use specialize::{constrain};
 
 ////////////////////////////////////////////////////////////////////////////////
 
-pub fn sf_exp<V:Value+std::fmt::Debug>(x:V) -> V {
+pub fn sf_exp<V:Value>(x:V) -> V {
   // positive
-  if x.real()<V::RT::zero() { return V::one()/sf_exp(-x); }
-  // range-reduce
-  let ln2 = V::RT::embed(0.69314718055994530941723212145817656807_f64);
-  let n = (x.rabs()/ln2).floor();
-  let r = x - V::from_real(n*ln2);
-  // sum
-  let s = exp__powser(r, V::one());
-  s.ldexp(n.dabs() as i32)
+  if constrain!(type [V:ComplexKind]) {
+    let er = sf_exp(x.real());
+    if x.imag()!=V::RT::zero() {
+      let ei = V::RT::embed(0.0);
+      V::to_complex(er, ei)
+    } else {
+      V::to_complex(er, V::RT::embed(0.0))
+    }
+  } else {
+    if x<V::zero() { return V::one()/sf_exp(-x); }
+    // range-reduce
+    let ln2 = V::embed(0.69314718055994530941723212145817656807_f64);
+    let n = (x.rabs()/ln2).floor();
+    let r = x - V::embed(n*ln2);
+    // sum
+    let s = exp__powser(r, V::one());
+    s.ldexp(n.dabs() as i32)
+  }
 }
 
 fn exp__powser<V:Value>(x:V, t0:V) -> V {

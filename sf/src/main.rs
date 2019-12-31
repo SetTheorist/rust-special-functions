@@ -1,5 +1,7 @@
+#![feature(specialization)]
 extern crate num;
 extern crate num_traits;
+extern crate specialize;
 
 mod exp;
 mod quad;
@@ -8,6 +10,22 @@ mod util;
 mod value;
 
 use num::complex::{Complex};
+use specialize::{constrain};
+
+trait Cx { type R; fn mk(x:Self::R,y:Self::R)->Self; }
+trait Foo { fn foo(self) -> Self; }
+impl<T> Foo for T {
+  fn foo(self) -> Self {
+    if constrain!(type [T:Cx]) {
+      println!("c");
+      self
+    } else {
+      println!("r");
+      self
+    }
+  }
+}
+
 
 fn main() {
   let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
