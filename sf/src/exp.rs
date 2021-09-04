@@ -1,32 +1,34 @@
 use crate::util::{Kahan};
-use crate::value::{ComplexKind,Embed,Value};
+use crate::value::{Value,ι};
+use num::complex::{Complex};
 use num::traits::real::{Real};
 use num::{Zero};
-use specialize::{constrain};
 
 ////////////////////////////////////////////////////////////////////////////////
 
-pub fn sf_exp<V:Value>(x:V) -> V {
-  // positive
-  if constrain!(type [V:ComplexKind]) {
-    let er = sf_exp(x.real());
-    if x.imag()!=V::RT::zero() {
-      let ei = V::RT::embed(0.0);
-      V::to_complex(er, ei)
-    } else {
-      V::to_complex(er, V::RT::embed(0.0))
-    }
-  } else {
-    if x<V::zero() { return V::one()/sf_exp(-x); }
-    // range-reduce
-    let ln2 = V::embed(0.69314718055994530941723212145817656807_f64);
-    let n = (x.rabs()/ln2).floor();
-    let r = x - V::embed(n*ln2);
-    // sum
-    let s = exp__powser(r, V::one());
-    s.ldexp(n.dabs() as i32)
-  }
+pub trait Exp : Value {
+  fn exp(self) -> Self;
+  fn exp_m1(self) -> Self { self.exp() - ι(1.0) }
 }
+pub fn exp<E:Exp>(x:E) -> E { x.exp() }
+pub fn exp_m1<E:Exp>(x:E) -> E { x.exp_m1() }
+
+impl Exp for f64 {
+  fn exp(self) -> Self { sf_exp_real(self) }
+  fn exp_m1(self) -> Self { sf_exp_m1_real(self) }
+}
+
+impl Exp for Complex<f64> {
+  fn exp(self) -> Self { sf_exp_complex(self) }
+  fn exp_m1(self) -> Self { sf_exp_complex(self)-1.0 }
+}
+
+trait Ln {
+  fn ln(self) -> Self;
+  fn ln_1p(self) -> Self;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 fn exp__powser<V:Value>(x:V, t0:V) -> V {
   let mut t = V::one();
@@ -34,7 +36,7 @@ fn exp__powser<V:Value>(x:V, t0:V) -> V {
   let mut n = 1;
   loop {
     let oldv = s;
-    t *= x/V::embed(n);
+    t *= x/ι(n);
     s += t;
     if (s-oldv).dabs() <= V::epsilon()*s.dabs() { break; }
     n += 1;
@@ -42,15 +44,39 @@ fn exp__powser<V:Value>(x:V, t0:V) -> V {
   s
 }
 
-/*
-pub fn sf_exp_m1(x:f64) -> f64 {
-  if x < -0.5 || 0.70 < x { 
-    sf_exp(x) - 1.0
+////////////////////////////////////////////////////////////////////////////////
+
+fn sf_exp_real<V:Value>(x:V) -> V
+{
+  // positive real-part
+  if x.real()<V::RT::zero() { return V::one()/sf_exp_real(-x); }
+  // range-reduce
+  let ln2 = ι(0.69314718055994530941723212145817656807_f64);
+  let n = (x.rabs()/ln2).floor();
+  let r = x - ι(n*ln2);
+  // sum
+  let s = exp__powser(r, V::one());
+  s.ldexp(n.dabs() as i32)
+}
+
+fn sf_exp_complex<V:Value>(x:V) -> V {
+  let er = sf_exp_real(x.real());
+  if x.imag()!=V::RT::zero() {
+    let eic = x.imag().cos();
+    let eis = x.imag().sin();
+    V::complex_retract(er*eic, er*eis)
   } else {
-    exp__powser(x, 0.0)
+    V::complex_retract(er, ι(0.0))
   }
 }
-*/
+
+pub fn sf_exp_m1_real<V:Value>(x:V) -> V {
+  if x.dabs() < 0.70 {
+    exp__powser(x, V::zero())
+  } else {
+    sf_exp_real(x) - V::one()
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
