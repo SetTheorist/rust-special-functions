@@ -1,3 +1,44 @@
+use crate::value::{Value};
+
+trait Trig : Value {
+  fn cos(self) -> Self;
+  fn acos(self) -> Self;
+  fn vcos(self) -> Self;
+  fn hvcos(self) -> Self;
+
+  fn sin(self) -> Self;
+  fn asin(self) -> Self;
+  fn vsin(self) -> Self;
+  fn hvsin(self) -> Self;
+
+  fn sec(self) -> Self;
+  fn exsec(self) -> Self;
+  fn csc(self) -> Self;
+
+  fn tan(self) -> Self;
+  fn atan(self) -> Self;
+  fn cot(self) -> Self;
+
+
+  fn cosh(self) -> Self;
+  fn acosh(self) -> Self;
+
+  fn sinh(self) -> Self;
+  fn asinh(self) -> Self;
+
+  fn tanh(self) -> Self;
+  fn atanh(self) -> Self;
+  
+  fn sech(self) -> Self;
+  fn asech(self) -> Self;
+
+  fn gud(self) -> Self;
+  fn agud(self) -> Self;
+
+
+  fn cosh_m1(self) -> Self;
+  fn sinh_mx(self) -> Self;
+}
 
 // cos(x)
 // TODO: range reduce

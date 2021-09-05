@@ -1,24 +1,36 @@
-#![allow(non_snake_case)]
-#![allow(dead_code)]
 #![allow(confusable_idents)]
+#![allow(dead_code)]
 #![allow(mixed_script_confusables)]
-
+#![allow(non_snake_case)]
+#![allow(unused_parens)]
 
 extern crate num;
 extern crate num_traits;
 
+mod embed;
 mod exp;
+mod kahan;
+mod numbers;
 mod quad;
+mod traits;
 mod trig;
 mod util;
 mod value;
 
-use num::complex::{Complex};
-use exp::{exp,exp_m1};
+use std::time::{Instant};
+
+use crate::num::complex::{Complex};
+use crate::exp::{exp,exp_m1,ln,ln_1p,exp__powser,exp__powser2,exp__powserk};
+use crate::util::{power_i};
+use crate::numbers::{factorial};
+
+fn rel(ex:f64, ap:f64) -> f64 {
+  ((ex-ap).abs()/ex.abs()).ln()/10.0_f64.ln()
+}
 
 fn main() {
   // quad
-  if false {
+  if true {
     let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
     println!("{:?}", quad::qtos(q_pi));
@@ -67,7 +79,55 @@ fn main() {
     println!("{}", exp_m1(1.0/256.0));
     println!("{}", (1.0/256.0_f64).exp_m1());
     println!("-----");
-    //println!("{}", exp::sf_ln(1.0 + 1.0/16.0));
-    //println!("{}", exp::sf_ln_p1(1.0/16.0));
+    println!("{}", ln(1.0 + 1.0/16.0));
+    println!("{}", ln_1p(1.0/16.0));
+    println!("{}", (1.0_f64 + 1.0/16.0).ln());
+    println!("-----");
+    for n in -5..5 {
+      println!("  {}", power_i(3.0,n));
+    }
+  }
+
+  if true {
+    println!("-----");
+    let x = 2.0_f64;
+    println!("{:e}", f64::EPSILON);
+    println!("{:.16e}", x.exp());
+    println!("{:.16e}  {}", exp(x), rel(x.exp(),exp(x)));
+    println!("{:.16e}  {}", exp__powser(x,1.0), rel(x.exp(),exp__powser(x,1.0)));
+    println!("{:.16e}  {}", exp__powser2(x,1.0), rel(x.exp(),exp__powser2(x,1.0)));
+    println!("{:.16e}  {}", exp__powserk(x,1.0), rel(x.exp(),exp__powserk(x,1.0)));
+
+    let mut t = 0.0;
+    let st = Instant::now();
+    for n in 0..1000000 { t += (x + ((n%13) as f64)/26.0).exp(); }
+    let en = Instant::now();
+    println!("{}\t{}", en.duration_since(st).as_micros(), t);
+    let mut t = 0.0;
+    let st = Instant::now();
+    for n in 0..1000000 { t += exp((x + ((n%13) as f64)/26.0)); }
+    let en = Instant::now();
+    println!("{}\t{}", en.duration_since(st).as_micros(), t);
+    let mut t = 0.0;
+    let st = Instant::now();
+    for n in 0..1000000 { t += exp__powser((x + ((n%13) as f64)/26.0),1.0); }
+    let en = Instant::now();
+    println!("{}\t{}", en.duration_since(st).as_micros(), t);
+    let mut t = 0.0;
+    let st = Instant::now();
+    for n in 0..1000000 { t += exp__powser2((x + ((n%13) as f64)/26.0),1.0); }
+    let en = Instant::now();
+    println!("{}\t{}", en.duration_since(st).as_micros(), t);
+    let mut t = 0.0;
+    let st = Instant::now();
+    for n in 0..1000000 { t += exp__powserk((x + ((n%13) as f64)/26.0),1.0); }
+    let en = Instant::now();
+    println!("{}\t{}", en.duration_since(st).as_micros(), t);
+  }
+
+  if true {
+    for i in 0..10 {
+      println!("{} {}", 3*i, factorial(3*i));
+    }
   }
 }

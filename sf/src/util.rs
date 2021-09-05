@@ -1,61 +1,24 @@
-use std::ops::{Add,AddAssign,Sub,SubAssign};
+use crate::traits::*;
 
 //pub fn relerr(exact:f64, approx:f64) -> f64 {
 //  re logBase 10 (abs ((approx-exact)/exact))
 //}
 
-#[derive(Clone,Copy,Debug,Default,PartialEq)]
-pub struct Kahan(pub f64, pub f64);
+////////////////////////////////////////////////////////////////////////////////
 
-impl Kahan {
-  pub fn new(t0:f64) -> Kahan { Kahan(t0,0.0) }
-}
-
-impl Add<f64> for Kahan {
-  type Output = Self;
-  #[inline]
-  fn add(self,t:f64) -> Self {
-    let y = t - self.1;
-    let s = self.0 + y;
-    let e = (s - self.0) - y;
-    Kahan(s,e)
+pub fn power_i<T:Multiplicative>(mut x:T,mut n:isize) -> T {
+  if n<0 {
+    power_i(x,-n).recip()
+  } else {
+    let mut v = T::ONE;
+    while n != 0 {
+      if n%2 == 1 { v *= x; }
+      x = x.sqr();
+      n >>= 1;
+    }
+    v
   }
 }
-impl AddAssign<f64> for Kahan {
-  #[inline]
-  fn add_assign(&mut self,t:f64) {
-    *self = *self + t;
-  }
-}
-impl Sub<f64> for Kahan {
-  type Output = Self;
-  #[inline]
-  fn sub(self,t:f64) -> Self {
-    self.add(-t)
-  }
-}
-impl SubAssign<f64> for Kahan {
-  #[inline]
-  fn sub_assign(&mut self,t:f64) {
-    self.add_assign(-t);
-  }
-}
-
-/*
-ksum' :: (Value v) => [v] -> (v -> v -> a) -> a
-ksum' terms k = f 0 0 terms
-  where
-    f !s !e [] = k s e
-    f !s !e (t:terms) =
-      let !y  = t - e
-          !s' = s + y
-          !e' = (s' - s) - y
-      in if s' == s
-         then k s' e'
-         else f s' e' terms
-\end{code}
-\end{titled-frame}
-*/
 
 
 /*
