@@ -1,3 +1,4 @@
+#![feature(type_ascription)]
 #![allow(confusable_idents)]
 #![allow(dead_code)]
 #![allow(mixed_script_confusables)]
@@ -6,6 +7,7 @@
 
 extern crate num;
 extern crate num_traits;
+extern crate once_cell;
 
 mod embed;
 mod exp;
@@ -20,9 +22,9 @@ mod value;
 use std::time::{Instant};
 
 use crate::num::complex::{Complex};
-use crate::exp::{exp,exp_m1,ln,ln_1p,exp__powser,exp__powser2,exp__powserk};
+use crate::exp::{sf_exp,sf_exp_m1,sf_ln,sf_ln_1p,exp__powser,exp__powser2,exp__powserk};
 use crate::util::{power_i};
-use crate::numbers::{factorial};
+use crate::numbers::{*};
 
 fn rel(ex:f64, ap:f64) -> f64 {
   ((ex-ap).abs()/ex.abs()).ln()/10.0_f64.ln()
@@ -60,30 +62,30 @@ fn main() {
 
   if true {
     println!("-----");
-    println!("{}", exp(0.25));
+    println!("{}", sf_exp(0.25));
     println!("{}", (0.25_f64).exp());
-    println!("{}", exp(1.00));
+    println!("{}", sf_exp(1.00));
     println!("{}", (1.00_f64).exp());
-    println!("{}", exp(5.00));
+    println!("{}", sf_exp(5.00));
     println!("{}", (5.00_f64).exp());
     println!("-----");
-    println!("{:e}", exp(Complex::new(0.00,3.1415926535897932384626/2.0)));
-    println!("{}", exp(Complex::new(0.25,0.25)));
+    println!("{:e}", sf_exp(Complex::new(0.00,3.1415926535897932384626/2.0)));
+    println!("{}", sf_exp(Complex::new(0.25,0.25)));
     println!("{}", (Complex::new(0.25,0.25)).exp());
-    println!("{}", exp(Complex::new(-2.5,2.5)));
+    println!("{}", sf_exp(Complex::new(-2.5,2.5)));
     println!("{}", (Complex::new(-2.5,2.5)).exp());
-    println!("{}", exp(Complex::new(-22.5,12.5)));
+    println!("{}", sf_exp(Complex::new(-22.5,12.5)));
     println!("{}", (Complex::new(-22.5,12.5)).exp());
     println!("-----");
-    println!("{}", exp(1.0/256.0)-1.0);
-    println!("{}", exp_m1(1.0/256.0));
+    println!("{}", sf_exp(1.0/256.0)-1.0);
+    println!("{}", sf_exp_m1(1.0/256.0));
     println!("{}", (1.0/256.0_f64).exp_m1());
     println!("-----");
-    println!("{}", ln(1.0 + 1.0/16.0));
-    println!("{}", ln_1p(1.0/16.0));
+    println!("{}", sf_ln(1.0 + 1.0/16.0));
+    println!("{}", sf_ln_1p(1.0/16.0));
     println!("{}", (1.0_f64 + 1.0/16.0).ln());
     println!("-----");
-    for n in -5..5 {
+    for n in 0..5 {
       println!("  {}", power_i(3.0,n));
     }
   }
@@ -93,7 +95,7 @@ fn main() {
     let x = 2.0_f64;
     println!("{:e}", f64::EPSILON);
     println!("{:.16e}", x.exp());
-    println!("{:.16e}  {}", exp(x), rel(x.exp(),exp(x)));
+    println!("{:.16e}  {}", sf_exp(x), rel(x.exp(),sf_exp(x)));
     println!("{:.16e}  {}", exp__powser(x,1.0), rel(x.exp(),exp__powser(x,1.0)));
     println!("{:.16e}  {}", exp__powser2(x,1.0), rel(x.exp(),exp__powser2(x,1.0)));
     println!("{:.16e}  {}", exp__powserk(x,1.0), rel(x.exp(),exp__powserk(x,1.0)));
@@ -105,7 +107,7 @@ fn main() {
     println!("{}\t{}", en.duration_since(st).as_micros(), t);
     let mut t = 0.0;
     let st = Instant::now();
-    for n in 0..1000000 { t += exp((x + ((n%13) as f64)/26.0)); }
+    for n in 0..1000000 { t += sf_exp((x + ((n%13) as f64)/26.0)); }
     let en = Instant::now();
     println!("{}\t{}", en.duration_since(st).as_micros(), t);
     let mut t = 0.0;
@@ -124,10 +126,30 @@ fn main() {
     let en = Instant::now();
     println!("{}\t{}", en.duration_since(st).as_micros(), t);
   }
-
   if true {
-    for i in 0..10 {
-      println!("{} {}", 3*i, factorial(3*i));
+    for i in 0..=10 {
+      println!("{} {}", 3*i, sf_factorial_exact(3*i));
     }
+    for i in 0..=10 {
+      println!("{} {}", 10*i, sf_fibonacci_number_exact(10*i));
+    }
+    println!("{} {}", 1000, sf_fibonacci_number_exact(1000));
+
+    for n in 0..=5 {
+      print!("{} : ", n);
+      for k in 0..=n { print!("{}  ", sf_binomial_exact(n,k)); }
+      println!();
+    }
+
+    println!("=====");
+    for i in 0..=30 { print!("{}  ", sf_bernoulli_number_exact(i)); }
+    println!();
+    println!("=====");
+    for i in 0..=10 { print!("{}  ", sf_harmonic_number_exact(i)); }
+    println!();
+    for i in 0..=10 { print!("{}  ", sf_tangent_number_exact(i)); }
+    println!();
+    for i in 0..=10 { print!("{}  ", sf_genocchi_number_exact(i)); }
+    println!();
   }
 }

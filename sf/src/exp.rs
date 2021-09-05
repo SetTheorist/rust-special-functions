@@ -1,10 +1,9 @@
 use crate::embed::*;
 use crate::kahan::{Kahan};
-use crate::traits::{Float};
-use crate::value::{Value};
+use crate::value::{Value,RealValue,ComplexValue};
+use crate::trig::{Trig};
 use num::{Zero};
 use num::complex::{Complex};
-use num::traits::real::{Real};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -19,16 +18,26 @@ pub trait Exp : Value {
   fn exp_m1vx(self) -> Self { self.exp_m1()/self }
 
   // $\sum_{k=0}^n\frac{x^k}{k!}$
-  fn expn(self,_n:isize) -> Self { unimplemented!() } // TODO
+  fn expn(self, _n:isize) -> Self { unimplemented!() } // TODO
 
   // $ e^x - \sum_{k=0}^n\frac{x^k}{k!}$
-  fn exp_men(self,_n:isize) -> Self { unimplemented!() } // TODO
+  fn exp_men(self, _n:isize) -> Self { unimplemented!() } // TODO
 
   // $ \frac{e^x - \sum_{k=0}^n\frac{x^k}{k!}}{x^n}$
-  fn exp_menx(self,_n:isize) -> Self { unimplemented!() } // TODO
+  fn exp_menx(self, _n:isize) -> Self { unimplemented!() } // TODO
 }
-pub fn exp<E:Exp>(x:E) -> E { x.exp() }
-pub fn exp_m1<E:Exp>(x:E) -> E { x.exp_m1() }
+#[must_use = "method returns a new number and does not mutate the original value"]
+pub fn sf_exp<V:Exp>(x:V) -> V { x.exp() }
+#[must_use = "method returns a new number and does not mutate the original value"]
+pub fn sf_exp_m1<V:Exp>(x:V) -> V { x.exp_m1() }
+#[must_use = "method returns a new number and does not mutate the original value"]
+pub fn sf_exp_m1vx<V:Exp>(x:V) -> V { x.exp_m1vx() }
+#[must_use = "method returns a new number and does not mutate the original value"]
+pub fn sf_expn<V:Exp>(x:V, n:isize) -> V { x.expn(n) }
+#[must_use = "method returns a new number and does not mutate the original value"]
+pub fn sf_exp_men<V:Exp>(x:V, n:isize) -> V { x.exp_men(n) }
+#[must_use = "method returns a new number and does not mutate the original value"]
+pub fn sf_exp_menx<V:Exp>(x:V, n:isize) -> V { x.exp_menx(n) }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -45,8 +54,8 @@ pub trait Ln : Value {
   fn logb(self,_b:Self) -> Self { unimplemented!() } // TODO
 }
 
-pub fn ln<L:Ln>(x:L) -> L { x.ln() }
-pub fn ln_1p<L:Ln>(x:L) -> L { x.ln_1p() }
+pub fn sf_ln<V:Ln>(x:V) -> V { x.ln() }
+pub fn sf_ln_1p<V:Ln>(x:V) -> V { x.ln_1p() }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -68,19 +77,19 @@ impl Ln for f64 {
 ////////////////////////////////////////////////////////////////////////////////
 
 #[inline]
-pub fn sum_iter<V:Value,I:Iterator<Item=V>>(mut it:I,eps:V::RT) -> V {
+pub fn sum_iter<V:Value,I:Iterator<Item=V>>(mut it:I,eps:f64) -> V {
   let mut sum = V::ZERO;
   while let Some(t) = it.next() {
     let old = sum;
     sum += t;
-    if (sum - old).rabs() <= sum.rabs()*eps { break; }
+    if (sum - old).dabs() <= sum.dabs()*eps { break; }
   }
   sum
 }
 
 pub fn exp__powser2<V:Value>(x:V, t0:V) -> V {
   let terms = (1..).scan(ι(1),|s,n|{*s*=x/ι(n);Some(*s)});
-  t0+sum_iter(terms,V::RT::EPSILON)
+  t0+sum_iter(terms,V::epsilon())
 }
 
 pub fn exp__powserk<V:Value>(x:V, t0:V) -> V {
@@ -112,31 +121,30 @@ pub fn exp__powser<V:Value>(x:V, t0:V) -> V {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-fn sf_exp_real<V:Value>(x:V) -> V
+fn sf_exp_real<V:RealValue>(x:V) -> V
 {
   // positive real-part
-  if x.real()<V::RT::zero() { return V::one()/sf_exp_real(-x); }
+  if x<V::zero() { return V::one()/sf_exp_real(-x); }
   // range-reduce
   let ln2 = ι(0.69314718055994530941723212145817656807_f64);
-  let n = (x.rabs()/ln2).floor();
+  let n = (x.vabs()/ln2).floor();
   let r = x - ι(n*ln2);
   // sum
   let s = exp__powser(r, V::one());
   s.ldexp(n.dabs() as i32)
 }
 
-fn sf_exp_complex<V:Value>(x:V) -> V {
+fn sf_exp_complex<V:ComplexValue>(x:V) -> V where V::RT:Trig {
   let er = sf_exp_real(x.real());
   if x.imag()!=V::RT::zero() {
-    let eic = x.imag().cos();
-    let eis = x.imag().sin();
-    V::complex_retract(er*eic, er*eis)
+    let (eic,eis) = x.imag().cos_sin();
+    V::make_complex(er*eic, er*eis)
   } else {
-    V::complex_retract(er, ι(0.0))
+    ι(er)
   }
 }
 
-pub fn sf_exp_m1_real<V:Value>(x:V) -> V {
+pub fn sf_exp_m1_real<V:RealValue>(x:V) -> V {
   if x.dabs() < 0.70 {
     exp__powser(x, V::zero())
   } else {

@@ -29,8 +29,7 @@ pub trait Ordered : PartialOrd<Self> {
   const MAX : Self;
 }
 
-pub trait Float
-{
+pub trait Float {
   const EPSILON : Self;
   const NAN : Self;
   const INFINITY : Self;
@@ -38,6 +37,19 @@ pub trait Float
   fn is_infinite(self) -> bool;
   fn is_finite(self) -> bool;
 }
+
+/*
+pub trait Constants {
+  // $\pi$
+  const PI : Self;
+  // $1/\pi$
+  const ONE_PI : Self;
+  // $\ln(2)$
+  const LN2 : Self;
+  // $e^{1}$
+  const E : Self;
+}
+*/
 
 pub trait Field : Additive + Multiplicative + Float {}
 
