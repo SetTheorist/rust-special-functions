@@ -23,9 +23,11 @@ pub trait Value :
 pub trait RealValue :
   Value + PartialOrd
 {
+  type CT : ComplexValue;
   fn floor(self) -> Self;
   fn ceil(self) -> Self;
   fn round(self) -> Self;
+  fn rint(self) -> isize;
 }
 
 pub trait ComplexValue : Value
@@ -52,9 +54,11 @@ impl Value for f64 {
 }
 
 impl RealValue for f64 {
+  type CT = Complex<f64>;
   fn floor(self) -> Self { self.floor() }
   fn ceil(self) -> Self { self.ceil() }
   fn round(self) -> Self { self.round() }
+  fn rint(self) -> isize { self.round() as isize }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

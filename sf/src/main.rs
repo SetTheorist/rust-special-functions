@@ -9,7 +9,9 @@ extern crate num;
 extern crate num_traits;
 extern crate once_cell;
 
+mod dawson;
 mod embed;
+mod erf;
 mod exp;
 mod kahan;
 mod numbers;
@@ -25,6 +27,9 @@ use crate::num::complex::{Complex};
 use crate::exp::{sf_exp,sf_exp_m1,sf_ln,sf_ln_1p,exp__powser,exp__powser2,exp__powserk};
 use crate::util::{power_i};
 use crate::numbers::{*};
+use crate::dawson::{*};
+use crate::erf::{*};
+use crate::embed::{ι};
 
 fn rel(ex:f64, ap:f64) -> f64 {
   ((ex-ap).abs()/ex.abs()).ln()/10.0_f64.ln()
@@ -32,7 +37,7 @@ fn rel(ex:f64, ap:f64) -> f64 {
 
 fn main() {
   // quad
-  if true {
+  if false {
     let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
     println!("{:?}", quad::qtos(q_pi));
@@ -60,7 +65,7 @@ fn main() {
     println!("{:?}", quad::qtos(quad::Quad::new(0.1,0.0)));
   }
 
-  if true {
+  if false {
     println!("-----");
     println!("{}", sf_exp(0.25));
     println!("{}", (0.25_f64).exp());
@@ -90,7 +95,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("-----");
     let x = 2.0_f64;
     println!("{:e}", f64::EPSILON);
@@ -126,7 +131,7 @@ fn main() {
     let en = Instant::now();
     println!("{}\t{}", en.duration_since(st).as_micros(), t);
   }
-  if true {
+  if false {
     for i in 0..=10 {
       println!("{} {}", 3*i, sf_factorial_exact(3*i));
     }
@@ -151,5 +156,34 @@ fn main() {
     println!();
     for i in 0..=10 { print!("{}  ", sf_genocchi_number_exact(i)); }
     println!();
+  }
+
+  if false {
+    for x in &vec![-9.0, -1.0, 0.0, 1.0, 5.0, 13.0] {
+      let x = *x;
+      println!("{}  {:.16e}  {:.16e}  {:.16e}  {:.16e}",
+        x, dawson_contfrac(x), dawson_contfrac2(x), dawson_seres(x), dawson_rybicki(x));
+    }
+    for z in &vec![Complex::new(0.0,1.0), Complex::new(1.0,1.0), Complex::new(5.0,5.0)] {
+      let z = *z;
+      println!("{}  {:.16e}  {:.16e}  {:.16e}  {:.16e}",
+        z, dawson_contfrac(z), dawson_contfrac2(z), dawson_seres(z), dawson_rybicki(z));
+    }
+  }
+
+  if true {
+    for x in &vec![-2.0, -1.0, 0.0, 0.5, 1.0, 3.0] {
+      let x = *x;
+      println!("{}  {:.16e}", x, erf_series(x));
+    }
+    for z in &vec![Complex::new(0.0,1.0), Complex::new(1.0,1.0), Complex::new(5.0,5.0)] {
+      let z = *z;
+      println!("{}  {:.16e}", z, erf_series(z));
+    }
+  }
+
+  if true {
+    let terms = (1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)});
+    for t in terms { print!("  {}", t); }
   }
 }
