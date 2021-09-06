@@ -13,10 +13,10 @@ impl<T:Additive> Add<T> for Kahan<T> {
   type Output = Self;
   #[inline]
   fn add(self,t:T) -> Self {
-    let y = t - self.1;
-    let s = self.0 + y;
-    let e = (s - self.0) - y;
-    Kahan(s,e)
+    let x = self.0;
+    let y = t + self.1;
+    let sum = x + y;
+    Kahan(sum, (x - sum) + y)
   }
 }
 
@@ -45,6 +45,16 @@ impl<T:Additive> Sub<Kahan<T>> for Kahan<T> {
   #[inline]
   fn sub(self,t:Kahan<T>) -> Self {
     self - t.0
+  }
+}
+
+pub trait KSum<A> {
+    fn ksum(self) -> A;
+}
+
+impl<A:Additive+Default,I:Iterator<Item=A>+Sized> KSum<A> for I {
+  fn ksum(self) -> A {
+    self.fold(Kahan::<A>::default(), |a, b| a + b).0
   }
 }
 

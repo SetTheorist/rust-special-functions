@@ -13,6 +13,7 @@ pub trait Value :
   +NumAssign+Neg<Output=Self>
   +Embed<isize>+Embed<f64>
   +Field
+  +std::fmt::Debug
 {
   fn epsilon() -> f64;
   fn vabs(self) -> Self;

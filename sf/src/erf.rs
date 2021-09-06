@@ -31,8 +31,8 @@ pub fn erf_series<V:Value+Exp>(x:V) -> V {
 }
 
 pub fn erfc_series<V:Value+Exp>(x:V) -> V {
-  let tqp : V = ι(1.1283791670955125738961589031215451716881012586579977136881714434); // 2/sqrt(pi)
-  unimplemented!()
+  //let tqp : V = ι(1.1283791670955125738961589031215451716881012586579977136881714434); // 2/sqrt(pi)
+  unimplemented!("{:?}",x)
 }
 
 /*

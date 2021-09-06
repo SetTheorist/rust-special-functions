@@ -13,6 +13,7 @@ mod dawson;
 mod embed;
 mod erf;
 mod exp;
+mod gamma;
 mod kahan;
 mod numbers;
 mod quad;
@@ -29,11 +30,19 @@ use crate::util::{power_i};
 use crate::numbers::{*};
 use crate::dawson::{*};
 use crate::erf::{*};
-use crate::embed::{ι};
+use crate::embed::{*};
+use crate::gamma::{*};
+
+use crate::kahan::{*};
+
+mod real;
+use crate::real::{*};
 
 fn rel(ex:f64, ap:f64) -> f64 {
   ((ex-ap).abs()/ex.abs()).ln()/10.0_f64.ln()
 }
+
+pub fn emb<A,B:From<A>>(a:A) -> B { B::from(a) }
 
 fn main() {
   // quad
@@ -95,7 +104,7 @@ fn main() {
     }
   }
 
-  if false {
+  if true {
     println!("-----");
     let x = 2.0_f64;
     println!("{:e}", f64::EPSILON);
@@ -158,6 +167,14 @@ fn main() {
     println!();
   }
 
+  if true {
+    println!("=====");
+    for i in 0..=10 { print!("{}  ", sf_bernoulli_number_exact(i)); }
+    println!();
+    for i in 0..=10 { print!("{}  ", sf_bernoulli_number_approx(i)); }
+    println!();
+  }
+
   if false {
     for x in &vec![-9.0, -1.0, 0.0, 1.0, 5.0, 13.0] {
       let x = *x;
@@ -171,7 +188,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     for x in &vec![-2.0, -1.0, 0.0, 0.5, 1.0, 3.0] {
       let x = *x;
       println!("{}  {:.16e}", x, erf_series(x));
@@ -184,6 +201,43 @@ fn main() {
 
   if true {
     let terms = (1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)});
-    for t in terms { print!("  {}", t); }
+    for t in terms { print!("  {}", t); } println!();
+    println!("sum:  {:.16e}", 
+      ((1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)})).sum():f64);
+    println!("ksum: {:.16e}", 
+      ((1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)})).ksum():f64);
+    println!("sum:  {:.16e}", [1.0_f64,1e-12,-1.0,1e-22].iter().sum():f64);
+    //println!("ksum: {:.16e}", [1.0_f64,1e-12,-1.0,1e-22].iter().ksum():f64);
+    println!("ksum: {:.16e}", [1.0_f64,1e-12,-1.0,1e-22].iter().cloned().ksum():f64);
+    let mut k = Kahan::default();
+    for &x in &[1.0_f64,1e-12,-1.0,1e-22] {
+      k += x;
+    }
+    println!("{:.16e}", k.0);
   }
+
+  if true {
+    //let x = 2 + 3*r(1.0) + 0.5 + 3 + (3.5 % 1.0);
+    let x = 2 - 2*(r64(1.0) + 0.5)*3;
+    println!("{:?}", x);
+    println!("{:?}", eps(r64(1.0)));
+    println!("{:?}", eps2(r64(1.0)));
+    println!("{:?}", dss(r64(1.0)));
+  }
+  if true {
+    println!("=====");
+    println!("{}", sf_factorial_approx(4));
+    println!("{} {:.16e} {}", 3.0, gamma_asympt(3.0), sf_factorial_exact(2));
+    println!("{} {:.16e} {}", 13.0, gamma_asympt(13.0), sf_factorial_exact(12));
+    println!("{} {:.16e} {}", 20.0, gamma_asympt(20.0), sf_factorial_exact(19));
+    println!("{} {:.16e} {}", 21.0, gamma_asympt(21.0), sf_factorial_exact(20));
+    println!("{} {:.16e} {}", 51.0, gamma_asympt(51.0), sf_factorial_exact(50));
+    println!("-----");
+    println!("{} {:.16e} {}", 3.0, gamma_spouge(11,3.0), sf_factorial_exact(2));
+    println!("{} {:.16e} {}", 13.0, gamma_spouge(11,13.0), sf_factorial_exact(12));
+    println!("{} {:.16e} {}", 40.0, gamma_spouge(11,40.0), sf_factorial_exact(39));
+    println!("{} {:.16e} {}", 100.0, gamma_spouge(11,100.0), sf_factorial_exact(99));
+    println!("{} {:.16e} {}", 40.0, gamma_spouge(11,40.0), sf_factorial_exact(39));
+  }
+  //println!("{:e}", {let x:f64 = 2.5_f64 + ι(3);x});
 }

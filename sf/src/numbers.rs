@@ -38,6 +38,18 @@ trait NumbersGeneral {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/*
+impl NumbersRational for BigRational {
+  fn bernoulli(n:isize) -> Self { sf_bernoulli_number_exact(n) }
+  fn harmonic(n:isize) -> Self { sf_harmonic_number_exact(n) }
+}
+impl NumbersRational for f64 {
+  fn bernoulli(n:isize) -> Self { 
+  fn harmonic(n:isize) -> Self { unimplemented!() }
+}
+*/
+
+////////////////////////////////////////////////////////////////////////////////
 
 impl Embed<isize> for BigInt {
   fn embed(i:isize) -> Self {
@@ -53,6 +65,11 @@ impl Embed<isize> for BigRational {
 pub fn sf_factorial_exact(n:isize) -> BigInt {
   if n==0 { return ι(1); }
   (1..=n).map(|i|ι(i):BigInt).product()
+}
+
+pub fn sf_factorial_approx(n:isize) -> f64 {
+  if n==0 { return 1.0; }
+  (1..=n).map(|i|ι(i):f64).product()
 }
 
 #[derive(Clone)]
@@ -87,7 +104,10 @@ pub fn sf_fibonacci_number_exact(n:isize) -> BigInt {
 }
 
 
-pub fn sf_catalan_number_exact(_n:isize) -> BigInt { unimplemented!() }
+pub fn sf_catalan_number_exact(n:isize) -> BigInt {
+  sf_binomial_exact(2*n, n) / ι(n+1):BigInt
+}
+
 pub fn sf_bell_number_exact(_n:isize) -> BigInt { unimplemented!() }
 pub fn sf_euler_number_exact(_n:isize) -> BigInt { unimplemented!() }
 pub fn sf_binomial_exact(n:isize, k:isize) -> BigInt {
@@ -100,16 +120,26 @@ pub fn sf_binomial_exact(n:isize, k:isize) -> BigInt {
   }
   val
 }
+pub fn sf_binomial_approx(n:isize, k:isize) -> f64 {
+  //sf_factorial_exact(n) / sf_factorial_exact(k) / sf_factorial_exact(n-k)
+  let k = k.min(n-k);
+  let mut val = 1.0;
+  for i in 0..k {
+    val *= (n-i) as f64;
+    val /= (i+1) as f64
+  }
+  val
+}
 // \sum_{k=0}^{n}\binom{n+1}{k}B_k = 0 \]
 // not the best implementation at the moment, but quick placeholder for now
-static BERNOULLI_CACHE: Lazy<Mutex<HashMap<isize,BigRational>>> = Lazy::new(||Mutex::new(HashMap::new()));
+static BERNOULLI_EXACT_CACHE: Lazy<Mutex<HashMap<isize,BigRational>>> = Lazy::new(||Mutex::new(HashMap::new()));
 pub fn sf_bernoulli_number_exact(n:isize) -> BigRational {
   if n == 0 { ι(1) }
   else if n == 1 { BigRational::new(ι(-1),ι(2)) }
   else if n%2 == 1 { ι(0) }
   else {
     {
-      let cache = BERNOULLI_CACHE.lock().unwrap();
+      let cache = BERNOULLI_EXACT_CACHE.lock().unwrap();
       if let Some(x) = cache.get(&n) {
         return x.clone();
       }
@@ -119,7 +149,28 @@ pub fn sf_bernoulli_number_exact(n:isize) -> BigRational {
       sum += sf_bernoulli_number_exact(k) * BigRational::from_integer(sf_binomial_exact(n+1,k));
     }
     let val = -sum * BigRational::new(ι(1),ι(n+1));
-    BERNOULLI_CACHE.lock().unwrap().insert(n,val.clone());
+    BERNOULLI_EXACT_CACHE.lock().unwrap().insert(n,val.clone());
+    val
+  }
+}
+static BERNOULLI_FLOAT_CACHE: Lazy<Mutex<HashMap<isize,f64>>> = Lazy::new(||Mutex::new(HashMap::new()));
+pub fn sf_bernoulli_number_approx(n:isize) -> f64 {
+  if n == 0 { 1.0 }
+  else if n == 1 { -0.5 }
+  else if n%2 == 1 { 0.0 }
+  else {
+    {
+      let cache = BERNOULLI_FLOAT_CACHE.lock().unwrap();
+      if let Some(x) = cache.get(&n) {
+        return *x;
+      }
+    }
+    let mut sum = 0.0;
+    for k in 0..n {
+      sum += sf_bernoulli_number_approx(k) * sf_binomial_approx(n+1,k);
+    }
+    let val = -sum / ((n+1) as f64);
+    BERNOULLI_FLOAT_CACHE.lock().unwrap().insert(n,val);
     val
   }
 }
