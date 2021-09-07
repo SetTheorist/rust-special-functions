@@ -103,7 +103,6 @@ pub fn sf_fibonacci_number_exact(n:isize) -> BigInt {
   (x.1*2) >> (n as usize)
 }
 
-
 pub fn sf_catalan_number_exact(n:isize) -> BigInt {
   sf_binomial_exact(2*n, n) / ι(n+1):BigInt
 }

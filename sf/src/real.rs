@@ -84,12 +84,50 @@ pub fn eps(x:r64) -> r64 {
 #[inline]
 pub fn sumit<I:Iterator<Item=r64>>(mut it:I,eps:f64) -> r64 {
   let mut sum = r64(0.0);
-  while let Some(t) = it.next() {
+  for t in it {
     let old = sum;
     sum += t;
     if abs(sum - old) <= abs(sum)*eps { break; }
   }
   sum
+}
+
+// given the sequence (ai,bi) evaluates the continued fraction
+// b0 + a1/(b1 + a2/(b2 + a3/(b3 + ...)))
+#[inline]
+pub fn contfrac<I:Iterator<Item=(r64,r64)>>(mut it:I, eps:f64) -> r64 {
+  let zeta = ι(eps*eps);
+  let (_a0,b0) = it.next().unwrap();
+  let mut fj = b0; if b0==ι(0) {fj=zeta;}
+  let mut cj = fj;
+  let mut dj = ι(0);
+  let mut n = 1;
+  for (aj,bj) in it {
+    dj = bj + aj*dj; if dj==ι(0) {dj=zeta;}
+    cj = bj + aj/cj; if cj==ι(0) {cj=zeta;}
+    dj = 1 / dj;
+    let deltaj = cj * dj;
+    fj *= deltaj;
+    if (deltaj - 1).0.abs() < eps {print!("~{}~",n);break;}
+    n += 1;
+  }
+  fj
+}
+
+// ln(1+x) for |arg(1+x)|<pi
+pub fn ln_1p_cf(x:r64) -> r64 {
+  let terms = (1..).map(|n|(x*(n/2)*(n/2),ι(n)));
+  x / contfrac(terms, 1e-16)
+}
+
+pub fn exp_cf(x:r64) -> r64 {
+  let terms = (0..).map(|n| if n%2==0{ (x,ι(2)) }else{ (-x,ι(n)) });
+  1.0 / (-1.0 + contfrac(terms, 1e-16))
+}
+pub fn exp_cf2(x:r64) -> r64 {
+  let terms = (1..).map(|n| if n%2==0{ (x,ι(2)) }else{ (-x,ι(n)) });
+  let terms = std::iter::once((ι(0),ι(1))).chain(terms);
+  1.0 / contfrac(terms, 1e-16)
 }
 
 pub fn eps2(x:r64) -> r64 {
@@ -109,4 +147,8 @@ pub fn dss(x:r64) -> r64 {
   res * eps(-x*x)
 }
 
-
+pub fn erf_ss(x:r64) -> r64 {
+  let tqp = r64(1.1283791670955125738961589031215451716881012586579977136881714434); // 2/sqrt(pi)
+  let terms = (1..1000).scan(x,|s,n|{*s*=2*x*x/(2*n+1);Some(*s)});
+  (x+sumit(terms,1e-16)) * eps2(-x*x) * tqp
+}

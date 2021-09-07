@@ -240,4 +240,31 @@ fn main() {
     println!("{} {:.16e} {}", 40.0, gamma_spouge(11,40.0), sf_factorial_exact(39));
   }
   //println!("{:e}", {let x:f64 = 2.5_f64 + ι(3);x});
+  if true {
+    println!("{:?}", eps2(r64(1.0)));
+    println!("{:?}", erf_series(1.0));
+    println!("{:?}", erf_ss(r64(1.0)));
+  }
+  if true {
+    println!("-----");
+    let x = 30.0;
+    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
+    let x = 8.0;
+    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
+    let x = 0.5;
+    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
+    let x = 0.01;
+    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
+    let x = 1e-8;
+    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
+    println!("--");
+    for &x in &[-1.0, 0.1, 1.0, 9.0_f64] {
+      println!("{} {:.16e} {:.16e} {:.16e}",
+        x, (x).exp(), exp_cf(r64(x)).0, exp_cf2(r64(x)).0);
+    }
+    println!("--");
+    println!("{:.16e} {:.16e}",
+      (1.0+5.0_f64.sqrt())*0.5,
+      contfrac((0..).map(|_|(r64(1.0),r64(1.0))),1e-12).0);
+  }
 }
