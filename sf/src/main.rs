@@ -16,6 +16,7 @@ mod exp;
 mod gamma;
 mod kahan;
 mod numbers;
+mod orthopoly;
 mod quad;
 mod traits;
 mod trig;
@@ -24,16 +25,15 @@ mod value;
 
 use std::time::{Instant};
 
-use crate::num::complex::{Complex};
-use crate::exp::{sf_exp,sf_exp_m1,sf_ln,sf_ln_1p,exp__powser,exp__powser2,exp__powserk};
-use crate::util::{power_i};
-use crate::numbers::{*};
 use crate::dawson::{*};
-use crate::erf::{*};
 use crate::embed::{*};
+use crate::erf::{*};
+use crate::exp::{*};
 use crate::gamma::{*};
-
 use crate::kahan::{*};
+use crate::num::complex::{Complex};
+use crate::numbers::{*};
+use crate::util::{power_i};
 
 mod real;
 use crate::real::{*};
@@ -224,7 +224,7 @@ fn main() {
     println!("{:?}", eps2(r64(1.0)));
     println!("{:?}", dss(r64(1.0)));
   }
-  if true {
+  if false {
     println!("=====");
     println!("{}", sf_factorial_approx(4));
     println!("{} {:.16e} {}", 3.0, gamma_asympt(3.0), sf_factorial_exact(2));
@@ -240,31 +240,50 @@ fn main() {
     println!("{} {:.16e} {}", 40.0, gamma_spouge(11,40.0), sf_factorial_exact(39));
   }
   //println!("{:e}", {let x:f64 = 2.5_f64 + ι(3);x});
-  if true {
+  if false {
     println!("{:?}", eps2(r64(1.0)));
     println!("{:?}", erf_series(1.0));
     println!("{:?}", erf_ss(r64(1.0)));
   }
   if true {
     println!("-----");
-    let x = 30.0;
-    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
-    let x = 8.0;
-    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
-    let x = 0.5;
-    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
-    let x = 0.01;
-    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
-    let x = 1e-8;
-    println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
+    for &x in &[30.0, 8.0, 0.5, 0.01, 1e-8] {
+      println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
+    }
     println!("--");
     for &x in &[-1.0, 0.1, 1.0, 9.0_f64] {
       println!("{} {:.16e} {:.16e} {:.16e}",
-        x, (x).exp(), exp_cf(r64(x)).0, exp_cf2(r64(x)).0);
+        x, (x).exp(), exp_cf(r64(x)).0, eps2(r64(x)).0);
     }
     println!("--");
     println!("{:.16e} {:.16e}",
       (1.0+5.0_f64.sqrt())*0.5,
-      contfrac((0..).map(|_|(r64(1.0),r64(1.0))),1e-12).0);
+      contfrac(r64(1.0), (1..).map(|_|(r64(1.0),r64(1.0))),1e-12).0);
+  }
+
+  if (false) {
+    println!("-----");
+    for n in 2..=10 {
+      println!("{}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}", n,
+        zeta_m1_directseries(r64(n as f64)).0,
+        zeta_directseries(r64(n as f64)).0,
+        zeta_directseries2(r64(n as f64)).0,
+        zeta_directseries_em1(r64(n as f64)).0,
+        zeta_directseries_em2(r64(n as f64)).0
+      );
+    }
+    println!("{:.16e} {:.16e}", 
+      zeta_directseries_em1(r64(2.0)).0,
+      (zeta_directseries_em1(r64(4.0)).0*2.5).sqrt()
+    );
+    for n in 2..=100 {
+      print!("  {:.16e}", zeta_directseries_em2(r64(n as f64)).0);
+      if zeta_directseries_em2(r64(n as f64)).0 == 1.0 {
+        println!("  {}",n);break; }
+    }
+    for n in 5..=100 {
+      print!("  {:.16e}", zeta_m1_directseries(r64(n as f64)).0);
+    }
+    println!();
   }
 }

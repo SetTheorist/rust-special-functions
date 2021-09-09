@@ -57,7 +57,6 @@ impl<A:Additive+Default,I:Iterator<Item=A>+Sized> KSum<A> for I {
     self.fold(Kahan::<A>::default(), |a, b| a + b).0
   }
 }
-
 /*
 ksum' :: (Value v) => [v] -> (v -> v -> a) -> a
 ksum' terms k = f 0 0 terms

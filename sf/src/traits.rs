@@ -4,6 +4,10 @@ use num::complex::{Complex};
 use crate::util::{power_i};
 
 /*
+// we assume for convenience that our basic values
+// are all Copy-able.
+// This excludes, for example, arbitrary-precision floats,
+// but we are not targeting such use cases...
 pub trait Base : Copy+Sized
 { }
 
@@ -60,10 +64,41 @@ pub trait MultiplicativeGroup
 {
 }
 
+pub trait Embeds<T>
+  : Copy+Sized
+  + Add<T,Output=Self> + AddAssign<T>
+  + Sub<T,Output=Self> + SubAssign<T>
+  + Mul<T,Output=Self> + MulAssign<T>
+  + Div<T,Output=Self> + DivAssign<T>
+  + Rem<T,Output=Self> + RemAssign<T>
+  + From<T>
+  where
+    T : Add<Self,Output=Self> //... etc.
+{
+}
+
+pub trait Roots
+: Field
+{
+  fn sqrt(self) -> Self;
+  fn cbrt(self) -> Self;
+  fn sqrt_recip(self) -> Self { self.sqrt().recip() }
+  fn cbrt_recip(self) -> Self { self.cbrt().recip() }
+  fn nth_root(self, n:isize) -> Self;
+}
+
+pub trait Field
+  : AdditiveGroup + MultiplicativeGroup
+  + Embeds<isize> + Embeds<f64>
+{
+}
+
 pub trait Signed
 {
   fn signum(self) -> Self;
-  fn (self) -> Self;
+  fn abs?(self) -> Self;
+  // (-1)^e  (+/- 1 depending on parity of e)
+  fn minus_one(e:isize) -> Self;
 }
 
 pub trait Bounded
@@ -92,29 +127,28 @@ pub trait Normed
 }
 
 pub trait Complex
+: Base
+  + Normed<RT=Self::RT>
+  + Embeds<isize> + Embeds<f64> + Embeds<Complex<f64>>
 {
-  type RT;
+  type RT : Ordered;
   fn real(self) -> Self::RT;
   fn imag(self) -> Self::RT;
-  fn make(re:Self::RT,im:Self::RT) -> Self;
+  fn arg(self) -> Self::RT;
+  fn rect(re:Self::RT,im:Self::RT) -> Self;
   fn polar(r:Self::RT,arg:Self::RT) -> Self;
 }
 
-pub trait Value : AdditiveGroup + MultiplicativeGroup
+pub trait Value
+  : Field + Normed
 {
-}
-
-pub trait ??? : ...
-{
-  fn sqrt(self) -> Self;
-  fn cbrt(self) -> Self;
 }
 
 pub trait ExpLog : ...
 {
-  fn exp(self) -> Self;
-  fn log(self) -> Self;
   fn powf(self,e:Self) -> Self { (e*self.log()).exp() }
+  fn exp(self) -> Self; // etc.
+  fn log(self) -> Self; // etc.
 }
 
 pub trait Constants

@@ -7,7 +7,7 @@ pub trait Dawson {
 }
 
 pub fn dawson<V:RealValue>(x:V) -> V {
-  unimplemented!()
+  unimplemented!("dawson({:?})", x)
 }
 
 // maybe use for small |z|:
