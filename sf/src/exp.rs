@@ -102,6 +102,7 @@ pub fn exp__powserk<V:Value>(x:V, t0:V) -> V {
     s += t;
     if (s-oldv).0.dabs() <= V::epsilon()*s.0.dabs() { break; }
     n += 1;
+    if n>1000 { break; }
   }
   s.0
 }
@@ -115,6 +116,7 @@ pub fn exp__powser<V:Value>(x:V, t0:V) -> V {
     s += t;
     if (s-oldv).dabs() <= V::epsilon()*s.dabs() { break; }
     n += 1;
+    if n>1000 { break; }
   }
   s
 }

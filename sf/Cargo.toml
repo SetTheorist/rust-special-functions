@@ -14,5 +14,8 @@ num-traits = "*"
 num-rational = "*"
 once_cell = "*"
 
+#plotlib = "*"
+plotters = "*"
+
 #num-bigint = "*"
 #num-iter = "*"

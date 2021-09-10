@@ -39,12 +39,80 @@ mod real;
 use crate::real::{*};
 
 fn rel(ex:f64, ap:f64) -> f64 {
-  ((ex-ap).abs()/ex.abs()).ln()/10.0_f64.ln()
+  if ex==ap { return -17.0; }
+  ((ex-ap).abs()/(1e-20+ex.abs())).ln()/10.0_f64.ln()
 }
 
 pub fn emb<A,B:From<A>>(a:A) -> B { B::from(a) }
 
+
+/*
+extern crate plotlib;
+fn doplots() {
+  let lo = -10.0;
+  let hi = 10.0;
+  let f1 = plotlib::repr::Plot::from_function(
+      |x|(rel(x.exp(),exp_cf(r64(x)).0)), lo, hi)
+    .line_style(plotlib::style::LineStyle::new().colour("black"));
+  let f2 = plotlib::repr::Plot::from_function(
+      |x|(rel(x.exp(),sf_exp(x))), lo, hi)
+    .line_style(plotlib::style::LineStyle::new().colour("red"));
+  let f3 = plotlib::repr::Plot::from_function(
+      |x|(rel(x.exp(),exp__powserk(x, 1.0))), lo, hi)
+    .line_style(plotlib::style::LineStyle::new().colour("blue"));
+  let v = plotlib::view::ContinuousView::new().add(f3).add(f2).add(f1).
+    y_range(-18.0, -8.0);
+  plotlib::page::Page::single(&v).save("plot1.svg").expect("saving svg");
+}
+*/
+extern crate plotters;
+use plotters::prelude::*;
+fn doplots() -> Result<(),Box<dyn std::error::Error>> {
+    //let root = BitMapBackend::new("0.png", (1280, 960)).into_drawing_area();
+    let root = SVGBackend::new("0.svg", (1280, 960)).into_drawing_area();
+    root.fill(&WHITE)?;
+    let mut chart = ChartBuilder::on(&root)
+        .caption("y=e^x", ("sans-serif", 50).into_font())
+        .margin(5)
+        .x_label_area_size(30)
+        .y_label_area_size(30)
+        .build_cartesian_2d(-10f64..10f64, -18f64..-8f64)?;
+    chart.configure_mesh().draw()?;
+    chart.draw_series(LineSeries::new(
+            (-1000..=1000).map(|x| x as f64/100.0).map(|x|
+            (x, rel(x.exp(),exp__powserk(x,1.0)))
+            ),
+            &GREEN,
+        ))?
+        .label("power series")
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &GREEN));
+    chart.draw_series(LineSeries::new(
+            (-1000..=1000).map(|x| x as f64/100.0).map(|x|
+            (x, rel(x.exp(),exp_cf(r64(x)).0))
+            ),
+            &RED,
+        ))?
+        .label("continued fraction")
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &RED));
+    chart.draw_series(LineSeries::new(
+            (-1000..=1000).map(|x| x as f64/100.0).map(|x|
+            (x, rel(x.exp(),sf_exp(x)))
+            ),
+            &BLUE,
+        ))?
+        .label("range-reduction + power series")
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &BLUE));
+    chart.configure_series_labels()
+        .background_style(&WHITE.mix(0.8))
+        .border_style(&BLACK)
+        .draw()?;
+    Ok(())
+}
+
 fn main() {
+  if true {
+    doplots();
+  }
   // quad
   if false {
     let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
