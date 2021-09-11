@@ -1,3 +1,4 @@
+/*
 use crate::embed::*;
 use crate::exp::{*};
 use crate::kahan::{Kahan};
@@ -55,3 +56,4 @@ pub fn gamma_spouge<V:Value+Exp+Ln>(a:isize, z:V) -> V {
   res * sm.0
 }
 
+*/

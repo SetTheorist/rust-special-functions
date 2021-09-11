@@ -1,4 +1,5 @@
-use crate::value::{Value};
+/*
+use crate::traits::{Value};
 use crate::embed::{ι};
 
 // NB lots TODO here
@@ -70,6 +71,9 @@ pub trait Trig : Value {
   // = atanh(sin(z)) = sinh(tan(x))
   fn agud(self) -> Self { self.tan().asinh() }
 }
+*/
+
+/*
 
 pub fn sf_cos<V:Trig>(x:V) -> V { x.cos() }
 pub fn sf_acos<V:Trig>(x:V) -> V { x.acos() }
@@ -119,3 +123,4 @@ impl Trig for f64 {
   fn atanh(self) -> Self { self.atanh() }
   fn asech(self) -> Self { self.recip().acosh() }
 }
+*/

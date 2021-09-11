@@ -3,12 +3,14 @@
 #![allow(dead_code)]
 #![allow(mixed_script_confusables)]
 #![allow(non_snake_case)]
+#![allow(non_upper_case_globals)]
 #![allow(unused_parens)]
 
 extern crate num;
 extern crate num_traits;
 extern crate once_cell;
 
+mod algorithm;
 mod dawson;
 mod embed;
 mod erf;
@@ -22,21 +24,24 @@ mod traits;
 mod trig;
 mod util;
 mod value;
-
-use std::time::{Instant};
-
-use crate::dawson::{*};
-use crate::embed::{*};
-use crate::erf::{*};
-use crate::exp::{*};
-use crate::gamma::{*};
-use crate::kahan::{*};
-use crate::num::complex::{Complex};
-use crate::numbers::{*};
-use crate::util::{power_i};
-
 mod real;
+
+
+// idea: auto-differentiation (using "dual" numbers) ?
+
+//use std::time::{Instant};
+
 use crate::real::{*};
+use crate::algorithm::{*};
+//use crate::dawson::{*};
+use crate::embed::{ι};
+//use crate::erf::{*};
+//use crate::exp::{*};
+//use crate::gamma::{*};
+//use crate::kahan::{*};
+//use crate::num::complex::{Complex};
+//use crate::numbers::{*};
+
 
 fn rel(ex:f64, ap:f64) -> f64 {
   if ex==ap { return -17.0; }
@@ -45,6 +50,7 @@ fn rel(ex:f64, ap:f64) -> f64 {
 
 pub fn emb<A,B:From<A>>(a:A) -> B { B::from(a) }
 
+// literate programming?〚 〛
 
 /*
 extern crate plotlib;
@@ -65,6 +71,7 @@ fn doplots() {
   plotlib::page::Page::single(&v).save("plot1.svg").expect("saving svg");
 }
 */
+/*
 extern crate plotters;
 use plotters::prelude::*;
 fn doplots() -> Result<(),Box<dyn std::error::Error>> {
@@ -108,11 +115,23 @@ fn doplots() -> Result<(),Box<dyn std::error::Error>> {
         .draw()?;
     Ok(())
 }
+*/
 
 fn main() {
+  //if true { doplots(); }
+
   if true {
-    doplots();
+    let x = r64(1.0);
+    println!("exact: {:.16e}", x.0.exp());
+    let terms = (1..).scan(r64(1.0),|s,n|{*s*=x/n;Some(*s)});
+    println!("sum:   {:.16e}", (1+sum_series(terms, 1e-10)).0);
+    let terms = (1..).map(|n| if n%2==0{ (x,ι(2)) }else{ (-x,ι(n)) });
+    println!("contf: {:.16e}", (1/contfrac_modlentz(ι(1), terms, 1e-10)).0);
+
+    //println!("ksum: {:.16e}", [1.0_f64,1e-12,-1.0,1e-22].iter().ksum():f64);
   }
+
+/*
   // quad
   if false {
     let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
@@ -172,7 +191,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("-----");
     let x = 2.0_f64;
     println!("{:e}", f64::EPSILON);
@@ -235,7 +254,7 @@ fn main() {
     println!();
   }
 
-  if true {
+  if false {
     println!("=====");
     for i in 0..=10 { print!("{}  ", sf_bernoulli_number_exact(i)); }
     println!();
@@ -267,7 +286,8 @@ fn main() {
     }
   }
 
-  if true {
+
+  if false {
     let terms = (1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)});
     for t in terms { print!("  {}", t); } println!();
     println!("sum:  {:.16e}", 
@@ -284,7 +304,7 @@ fn main() {
     println!("{:.16e}", k.0);
   }
 
-  if true {
+  if false {
     //let x = 2 + 3*r(1.0) + 0.5 + 3 + (3.5 % 1.0);
     let x = 2 - 2*(r64(1.0) + 0.5)*3;
     println!("{:?}", x);
@@ -313,7 +333,7 @@ fn main() {
     println!("{:?}", erf_series(1.0));
     println!("{:?}", erf_ss(r64(1.0)));
   }
-  if true {
+  if false {
     println!("-----");
     for &x in &[30.0, 8.0, 0.5, 0.01, 1e-8] {
       println!("{:.16e} {:.16e}", (1.0_f64+x).ln(), ln_1p_cf(r64(x)).0);
@@ -354,4 +374,5 @@ fn main() {
     }
     println!();
   }
+  */
 }

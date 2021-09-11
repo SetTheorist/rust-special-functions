@@ -1,22 +1,22 @@
 use core::ops::{Add,Sub,Mul,Div,Rem,Neg};
 use core::ops::{AddAssign,SubAssign,MulAssign,DivAssign,RemAssign};
+use core::ops::{Shl,ShlAssign,Shr,ShrAssign};
 use num::complex::{Complex};
-use crate::util::{power_i};
+use crate::algorithm::{power_i, power_u};
 
-/*
 // we assume for convenience that our basic values
 // are all Copy-able.
 // This excludes, for example, arbitrary-precision floats,
 // but we are not targeting such use cases...
-pub trait Base : Copy+Sized
+pub trait Base
+  : Copy + Sized
+  + PartialEq
+  + Default + std::fmt::Debug
 { }
+
 
 pub trait Zero : Base {
   const zero : Self;
-}
-
-pub trait One : Base {
-  const one : Self;
 }
 
 pub trait Addition
@@ -26,55 +26,72 @@ pub trait Addition
 }
 
 pub trait Subtraction
-  : Base
+  : Base + Addition
   + Sub<Self,Output=Self> + SubAssign<Self>
   + Neg<Output=Self>
 {
 }
 
-pub trait AdditiveGroup
+pub trait Additive
   : Addition + Subtraction
 {
 }
 
+pub trait One : Base {
+  const one : Self;
+}
+
 // absorb isize & f64 into operations also...
 
-pub trait Multiplicative
+pub trait Multiplication
   : Base + One
   + Mul<Self,Output=Self> + MulAssign<Self>
 {
   fn sqr(self) -> Self { self*self }
-  fn powu(self,n:usize) -> Self { power_u(self,n) }
+  fn powu(self, n:usize) -> Self { power_u(self,n) }
 }
-
-
-  fn ldexp(self,n:isize) -> Self; // (maybe also << for this?)
+//pub fn sqr<M:Multiplication>(x:M) -> M { x.sqr() }
+//pub fn powu<M:Multiplication>(x:M, n:usize) -> M { x.powu(n) }
+//pub fn ldexp<M:Multiplication>(x:M, n:isize) -> M { x.ldexp(n) }
 
 pub trait Division
-  : Base
+  : Base + Multiplication
   + Div<Self,Output=Self> + DivAssign<Self>
   + Rem<Self,Output=Self> + RemAssign<Self>
+  + Shl<isize,Output=Self> + ShlAssign<isize>
+  + Shr<isize,Output=Self> + ShrAssign<isize>
 {
-  fn recip(self) -> Self;
-  fn powi(self,n:isize) -> Self { power_i(self,n) }
+  fn recip(self) -> Self { Self::one / self }
+  fn powi(self, n:isize) -> Self { power_i(self,n) }
+  fn ldexp(self, n:isize) -> Self { self << n }
 }
+//pub fn recip<M:Division>(x:M) -> M { x.recip() }
+//pub fn powi<M:Division>(x:M, n:isize) -> M { x.powi(n) }
 
-pub trait MultiplicativeGroup
+pub trait Multiplicative
   : Multiplication +  Division
 {
 }
 
 pub trait Embeds<T>
-  : Copy+Sized
+  : Base
   + Add<T,Output=Self> + AddAssign<T>
   + Sub<T,Output=Self> + SubAssign<T>
   + Mul<T,Output=Self> + MulAssign<T>
   + Div<T,Output=Self> + DivAssign<T>
   + Rem<T,Output=Self> + RemAssign<T>
   + From<T>
-  where
-    T : Add<Self,Output=Self> //... etc.
+  //where T:Add<Self,Output=Self> // ?!
 {
+}
+// need swapped versions also, but weird compiler issues
+
+pub trait Field
+  : Additive + Multiplicative
+  + Embeds<isize> + Embeds<f64>
+{
+  // self * (-1)^n
+  fn pari(self, n:isize) -> Self { if n%2==0 {Self::one} else {-Self::one} }
 }
 
 pub trait Roots
@@ -87,19 +104,6 @@ pub trait Roots
   fn nth_root(self, n:isize) -> Self;
 }
 
-pub trait Field
-  : AdditiveGroup + MultiplicativeGroup
-  + Embeds<isize> + Embeds<f64>
-{
-}
-
-pub trait Signed
-{
-  fn signum(self) -> Self;
-  fn abs?(self) -> Self;
-  // (-1)^e  (+/- 1 depending on parity of e)
-  fn minus_one(e:isize) -> Self;
-}
 
 pub trait Bounded
 {
@@ -108,6 +112,7 @@ pub trait Bounded
 }
 
 pub trait Ordered
+  : Base + PartialOrd<Self>
 {
   fn min(self,b:Self) -> Self { if self<b {self} else {b} }
   fn max(self,b:Self) -> Self { if self>b {self} else {b} }
@@ -120,18 +125,24 @@ pub trait Ordered
 }
 
 pub trait Normed
+  : Base
 {
-  type RT : Ordered;
-  fn abs(self) -> Self::RT;
+  type NT : Ordered;
+  fn abs(self) -> Self::NT;
   fn fabs(self) -> f64;
+  // self/|self|
+  fn signum(self) -> Self;
 }
+pub fn abs<T:Normed>(x:T) -> T::NT { x.abs() }
+pub fn fabs<T:Normed>(x:T) -> f64 { x.fabs() }
 
-pub trait Complex
+pub trait ComplexType
 : Base
-  + Normed<RT=Self::RT>
-  + Embeds<isize> + Embeds<f64> + Embeds<Complex<f64>>
+  + Normed<NT=Self::RT>
+  + Embeds<Self::RT>
+  + Embeds<Complex<f64>>
 {
-  type RT : Ordered;
+  type RT : Field+Ordered;
   fn real(self) -> Self::RT;
   fn imag(self) -> Self::RT;
   fn arg(self) -> Self::RT;
@@ -139,11 +150,20 @@ pub trait Complex
   fn polar(r:Self::RT,arg:Self::RT) -> Self;
 }
 
+pub trait RealType
+: Base
+  + Normed<NT=Self>
+{
+}
+
 pub trait Value
   : Field + Normed
 {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+/*
 pub trait ExpLog : ...
 {
   fn powf(self,e:Self) -> Self { (e*self.log()).exp() }
@@ -180,39 +200,6 @@ pub trait Constants
   // $log(2\pi)/2$
   const FRAC_LOG2PI_2 : Self;
 }
-
-
-*/
-
-
-pub trait Additive
-  : Add<Self,Output=Self> + AddAssign<Self>
-  + Sub<Self,Output=Self> + SubAssign<Self>
-  + Neg<Output=Self>
-  + Copy+Sized
-{
-  const ZERO : Self;
-}
-
-pub trait Multiplicative
-  : Mul<Self,Output=Self> + MulAssign<Self>
-  + Div<Self,Output=Self> + DivAssign<Self>
-  + Rem<Self,Output=Self> + RemAssign<Self>
-  + Copy+Sized
-{
-  const ONE : Self;
-  fn recip(self) -> Self;
-  fn sqr(self) -> Self { self*self }
-  fn powi(self,n:isize) -> Self { power_i(self,n) }
-}
-
-pub trait Ordered : PartialOrd<Self>+Sized {
-  const MIN : Self;
-  const MAX : Self;
-  fn min(self,b:Self) -> Self { if self<b {self} else {b} }
-  fn max(self,b:Self) -> Self { if self>b {self} else {b} }
-}
-
 pub trait Float {
   const EPSILON : Self;
   const NAN : Self;
@@ -222,70 +209,7 @@ pub trait Float {
   fn is_finite(self) -> bool;
 }
 
-/*
-pub trait Constants {
-  // $\pi$
-  const PI : Self;
-  // $1/\pi$
-  const ONE_PI : Self;
-  // $\ln(2)$
-  const LN2 : Self;
-  // $e^{1}$
-  const E : Self;
-}
 */
-
-pub trait Field : Additive + Multiplicative + Float {}
-
-////////////////////////////////////////////////////////////////////////////////
-
-impl Additive for f64 {
-  const ZERO : Self = 0.0;
-}
-
-impl Multiplicative for f64 {
-  const ONE : Self = 1.0;
-  fn recip(self) -> Self { 1.0/self }
-}
-
-impl Float for f64 {
-  const EPSILON : Self = f64::EPSILON;
-  const NAN : Self = f64::NAN;
-  const INFINITY : Self = f64::INFINITY;
-  fn is_nan(self) -> bool { self.is_nan() }
-  fn is_infinite(self) -> bool { self.is_infinite() }
-  fn is_finite(self) -> bool { self.is_finite() }
-}
-
-impl Ordered for f64 {
-  const MIN : Self = f64::MIN_POSITIVE;
-  const MAX : Self = f64::MAX;
-}
-
-impl Field for f64 {}
-
-////////////////////////////////////////////////////////////////////////////////
-
-impl Additive for Complex<f64> {
-  const ZERO : Self = Complex{re:0.0,im:0.0};
-}
-
-impl Multiplicative for Complex<f64> {
-  const ONE : Self = Complex{re:1.0,im:0.0};
-  fn recip(self) -> Self { 1.0/self }
-}
-
-impl Float for Complex<f64> {
-  const EPSILON : Self = Complex{re:f64::EPSILON,im:0.0};
-  const NAN : Self = Complex{re:f64::NAN,im:f64::NAN};
-  const INFINITY : Self = Complex{re:f64::INFINITY,im:f64::INFINITY};
-  fn is_nan(self) -> bool { self.re.is_nan() || self.im.is_nan() }
-  fn is_infinite(self) -> bool { self.re.is_infinite() || self.im.is_infinite() }
-  fn is_finite(self) -> bool { self.re.is_finite() && self.im.is_finite() }
-}
-
-impl Field for Complex<f64> {}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 

@@ -1,5 +1,6 @@
-use crate::embed::*;
 use crate::kahan::{Kahan};
+/*
+use crate::embed::*;
 use crate::value::{Value,RealValue,ComplexValue};
 use crate::trig::{Trig};
 use num::{Zero};
@@ -154,8 +155,10 @@ pub fn sf_exp_m1_real<V:RealValue>(x:V) -> V {
   }
 }
 
+*/
 ////////////////////////////////////////////////////////////////////////////////
 
+/*
 pub fn sf_ln_real(x:f64) -> f64 {
   x.ln()
 }
@@ -179,6 +182,5 @@ pub fn sf_ln_1p_real(x:f64) -> f64 {
     2.0 * s.0
   }
 }
-
-
+*/
 

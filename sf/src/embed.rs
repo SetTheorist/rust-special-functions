@@ -1,5 +1,9 @@
-use num::complex::{Complex};
+//use num::complex::{Complex};
 
+#[inline]
+pub fn ι<A,B:From<A>>(a:A) -> B { B::from(a) }
+
+/*
 // T embedded into Self
 pub trait Embed<T> {
   fn embed(t:T) -> Self;
@@ -28,4 +32,4 @@ impl Embed<f64> for Complex<f64> {
 }
 
 //impl<T:Default+Num> Embed<T> for Complex<T> { fn embed(t:T) -> Self { Complex::new(t,T::default) } }
-
+*/

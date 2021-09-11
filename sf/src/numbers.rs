@@ -1,8 +1,9 @@
-use num::bigint::{BigInt,ToBigInt};
+/*
+use num::bigint::{BigInt};
 use num::rational::{BigRational};
 use num::{Signed};
 use std::ops::{Mul,MulAssign};
-use crate::embed::{Embed,ι};
+use crate::embed::{ι};
 
 use std::collections::HashMap;
 //use std::vec::Vec;
@@ -51,6 +52,7 @@ impl NumbersRational for f64 {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+/*
 impl Embed<isize> for BigInt {
   fn embed(i:isize) -> Self {
     i.to_bigint().unwrap()
@@ -61,6 +63,7 @@ impl Embed<isize> for BigRational {
     BigRational::from_integer(BigInt::embed(i))
   }
 }
+*/
 
 pub fn sf_factorial_exact(n:isize) -> BigInt {
   if n==0 { return ι(1); }
@@ -143,7 +146,7 @@ pub fn sf_bernoulli_number_exact(n:isize) -> BigRational {
         return x.clone();
       }
     }
-    let mut sum = BigRational::embed(0);
+    let mut sum = BigRational::from(0);
     for k in 0..n {
       sum += sf_bernoulli_number_exact(k) * BigRational::from_integer(sf_binomial_exact(n+1,k));
     }
@@ -194,3 +197,4 @@ pub fn sf_genocchi_number_exact(n:isize) -> BigInt {
   (bn * BigRational::new(t1, ι(1))).to_integer()
 }
 
+*/

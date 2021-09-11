@@ -52,9 +52,9 @@ pub trait KSum<A> {
     fn ksum(self) -> A;
 }
 
-impl<A:Additive+Default,I:Iterator<Item=A>+Sized> KSum<A> for I {
+impl<A:Additive+Default,I:IntoIterator<Item=A>+Sized> KSum<A> for I {
   fn ksum(self) -> A {
-    self.fold(Kahan::<A>::default(), |a, b| a + b).0
+    self.into_iter().fold(Kahan::<A>::default(), |a, b| a + b).0
   }
 }
 /*

@@ -1,16 +1,17 @@
 use core::ops::{Add,Sub,Mul,Div,Rem,Neg};
 use core::ops::{AddAssign,SubAssign,MulAssign,DivAssign,RemAssign};
-//use core::ops::{BitXor,BitXorAssign};
+use core::ops::{Shl,ShlAssign,Shr,ShrAssign};
 
-use crate::embed::*;
-//use crate::util::{power_i};
+use crate::embed::{ι};
+
+use crate::traits::{*};
 
 #[derive(Debug,Default,Clone,Copy,PartialOrd,PartialEq)]
 #[allow(non_camel_case_types)]
 pub struct r64(pub f64);
 
-impl Embed<f64> for r64 { fn embed(x:f64) -> r64 { r64(x) } }
-impl Embed<isize> for r64 { fn embed(x:isize) -> r64 { r64(x as f64) } }
+impl From<f64> for r64 { fn from(x:f64) -> r64 { r64(x) } }
+impl From<isize> for r64 { fn from(x:isize) -> r64 { r64(x as f64) } }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -68,25 +69,62 @@ impl Neg for r64 {
   #[inline]
   fn neg(self) -> r64 { r64(-self.0) }
 }
-/*
-// cute idea, but extremely low precedence for ^
-// makes it too misleading to use in formulae
-impl BitXor<isize> for r64 {
+
+// TODO: ldexp style implementations
+impl Shl<isize> for r64 {
   type Output = r64;
   #[inline]
-  fn bitxor(self, i:isize) -> r64 {
-    r64(power_i(self.0, i))
-  }
+  fn shl(self, n:isize) -> r64 { self * (2.0_f64.powi(n as i32)) }
 }
-impl BitXorAssign<isize> for r64 {
+impl ShlAssign<isize> for r64 {
   #[inline]
-  fn bitxor_assign(&mut self, i:isize) {
-    *self = *self ^ i;
-  }
+  fn shl_assign(&mut self, n:isize) { *self *= 2.0_f64.powi(n as i32); }
 }
-*/
+impl Shr<isize> for r64 {
+  type Output = r64;
+  #[inline]
+  fn shr(self, n:isize) -> r64 { self / (2.0_f64.powi(n as i32)) }
+}
+impl ShrAssign<isize> for r64 {
+  #[inline]
+  fn shr_assign(&mut self, n:isize) { *self /= 2.0_f64.powi(n as i32); }
+}
 
-fn abs(x:r64) -> r64 { r64(x.0.abs()) }
+////////////////////////////////////////////////////////////////////////////////
+
+impl Base for r64 { }
+impl Zero for r64 { const zero : r64 = r64(0.0); }
+impl Addition for r64 { }
+impl Subtraction for r64 { }
+impl Additive for r64 { }
+impl One for r64 { const one : r64 = r64(1.0); }
+impl Multiplication for r64 { }
+impl Division for r64 { }
+impl Multiplicative for r64 { }
+impl Embeds<isize> for r64 { }
+impl Embeds<f64> for r64 { }
+impl Field for r64 { }
+impl Ordered for r64 {
+  fn floor(self) -> Self { unimplemented!("r64::floor") }
+  fn ceil(self) -> Self { unimplemented!("r64::ceil()") }
+  fn round(self) -> Self { unimplemented!("r64::round()") }
+  fn trunc(self) -> Self { unimplemented!("r64::trunc()") }
+  fn rint(self) -> isize { unimplemented!("r64::rint()") }
+}
+impl Normed for r64 {
+  type NT = Self;
+  fn abs(self) -> Self::NT { r64(self.0.abs()) }
+  fn fabs(self) -> f64 { self.0.abs() }
+  // self/|self|
+  fn signum(self) -> Self { r64(self.0.signum()) }
+}
+impl RealType for r64 { }
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+/*
+pub fn abs(x:r64) -> r64 { r64(x.0.abs()) }
 
 pub fn eps(x:r64) -> r64 {
   let mut t : r64 = ι(1);
@@ -219,3 +257,4 @@ pub fn erf_ss(x:r64) -> r64 {
   let terms = (1..1000).scan(x,|s,n|{*s*=2*x*x/(2*n+1);Some(*s)});
   (x+sumit(terms,1e-16)) * eps2(-x*x) * tqp
 }
+*/

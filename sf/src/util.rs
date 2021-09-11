@@ -1,24 +1,9 @@
-use crate::traits::*;
 
 //pub fn relerr(exact:f64, approx:f64) -> f64 {
 //  re logBase 10 (abs ((approx-exact)/exact))
 //}
 
 ////////////////////////////////////////////////////////////////////////////////
-
-pub fn power_i<T:Multiplicative>(mut x:T,mut n:isize) -> T {
-  if n<0 {
-    power_i(x,-n).recip()
-  } else {
-    let mut v = T::ONE;
-    while n != 0 {
-      if n%2 == 1 { v *= x; }
-      x = x.sqr();
-      n >>= 1;
-    }
-    v
-  }
-}
 
 
 /*

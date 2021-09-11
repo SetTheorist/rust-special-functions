@@ -15,7 +15,7 @@ num-rational = "*"
 once_cell = "*"
 
 #plotlib = "*"
-plotters = "*"
+#plotters = "*"
 
 #num-bigint = "*"
 #num-iter = "*"
