@@ -1,4 +1,3 @@
-use crate::embed::{ι};
 use crate::traits::*;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -23,19 +22,82 @@ pub fn power_i<T:Multiplication+Division>(x:T, n:isize) -> T {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// TODO: "wrapped" version (generic over Kahan, e.g.)
+/*
 #[inline]
-pub fn sum_series<T,I>(it:I,eps:f64) -> T
+pub fn powers<T>() -> impl Iterator<Item=T>
+  where
+    T:Multiplicative
+{
+  it.scan(
+}
+*/
+
+
+#[inline]
+pub fn cum_prods<T,I>(it:I) -> impl Iterator<Item=T>
+  where
+    T:Multiplicative,
+    I:Iterator<Item=T>
+{
+  it.scan(T::one, |s,a|{*s*=a;Some(*s)})
+}
+
+#[inline]
+pub fn cum_prods_1<T,I>(it:I) -> impl Iterator<Item=T>
+  where
+    T:Multiplicative,
+    I:Iterator<Item=T>
+{
+  std::iter::once(T::one).chain(cum_prods(it))
+}
+
+#[inline]
+pub fn cum_sums<T,I>(it:I) -> impl Iterator<Item=T>
+  where
+    T:Additive,
+    I:Iterator<Item=T>
+{
+  it.scan(T::zero, |s,a|{*s+=a;Some(*s)})
+}
+
+#[inline]
+pub fn cum_sums_0<T,I>(it:I) -> impl Iterator<Item=T>
+  where
+    T:Additive,
+    I:Iterator<Item=T>
+{
+  std::iter::once(T::zero).chain(cum_sums(it))
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#[inline]
+pub fn sum_series_<T,I>(it:I,eps:T::NT) -> T
   where
     T:Field+Normed,
-    I:IntoIterator<Item=T>
+    I:Iterator<Item=T>
+{
+  //cum_sums(it)
+  it.scan(T::zero, |s,a|{*s+=a;Some(*s)})
+    .scan(ι(0.0/0.0):T, |s,t|if abs(*s-t)<=abs(*s)*eps{None}else{*s=t;Some(t)})
+    .take(1000)
+    .last().unwrap()
+}
+
+// TODO: "wrapped" version (generic over Kahan, e.g.)
+#[inline]
+pub fn sum_series<T,I>(it:I,eps:T::NT) -> T
+  where
+    T:Field+Normed,
+    I:Iterator<Item=T>
 {
   let mut sum = ι(0); // = T::zero;
   let mut n = 1;
   for t in it {
     let old = sum;
     sum += t;
-    if fabs(sum - old) <= fabs(sum)*eps || n>1000 { /*eprint!("^{}^",n);*/break; }
+    if abs(sum - old) <= abs(sum)*eps { /*eprint!("^{}^",n);*/break; }
+    if n>999 { break; }
     n += 1;
   }
   sum
@@ -45,7 +107,7 @@ pub fn sum_series<T,I>(it:I,eps:f64) -> T
 // b0 + a1/(b1 + a2/(b2 + a3/(b3 + ...)))
 // (based on modified Lentz)
 #[inline]
-pub fn contfrac_modlentz<T,I>(b0:T, it:I, eps:f64) -> T
+pub fn contfrac_modlentz<T,I>(b0:T, it:I, eps:T::NT) -> T
   where
     T:Field+Normed,
     I:IntoIterator<Item=(T,T)>
@@ -53,15 +115,15 @@ pub fn contfrac_modlentz<T,I>(b0:T, it:I, eps:f64) -> T
   let zeta = ι(eps*eps);
   let mut fj = b0; if b0==ι(0) {fj=zeta;}
   let mut cj = fj;
-  let mut dj = ι(0);
+  let mut dj : T = ι(0);
   let mut n = 1;
   for (aj,bj) in it {
     dj = bj + aj*dj; if dj==ι(0) {dj=zeta;}
     cj = bj + aj/cj; if cj==ι(0) {cj=zeta;}
-    dj = dj.recip(); // 1/dj
+    dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
-    if fabs(deltaj - 1) < eps || n>1000 { /*print!("~{}~",n);*/break; }
+    if abs(deltaj - 1) < eps || n>1000 { /*print!("~{}~",n);*/break; }
     n += 1;
   }
   fj

@@ -1,9 +1,11 @@
+#![feature(trait_alias)]
 #![feature(type_ascription)]
 #![allow(confusable_idents)]
 #![allow(dead_code)]
 #![allow(mixed_script_confusables)]
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
+#![allow(unused_imports)]
 #![allow(unused_parens)]
 
 extern crate num;
@@ -11,44 +13,42 @@ extern crate num_traits;
 extern crate once_cell;
 
 mod algorithm;
+mod complex;
 mod dawson;
-mod embed;
 mod erf;
 mod exp;
 mod gamma;
 mod kahan;
+mod log;
 mod numbers;
 mod orthopoly;
 mod quad;
+mod real;
 mod traits;
 mod trig;
 mod util;
-mod value;
-mod real;
-
 
 // idea: auto-differentiation (using "dual" numbers) ?
 
-//use std::time::{Instant};
+use std::time::{Instant};
 
-use crate::real::{*};
-use crate::algorithm::{*};
-//use crate::dawson::{*};
-use crate::embed::{ι};
 //use crate::erf::{*};
-//use crate::exp::{*};
 //use crate::gamma::{*};
 //use crate::kahan::{*};
 //use crate::num::complex::{Complex};
 //use crate::numbers::{*};
-
+use crate::algorithm::{*};
+use crate::complex::{*};
+use crate::dawson::{*};
+use crate::exp::{*};
+use crate::log::{*};
+use crate::real::{*};
+use crate::traits::{ι};
 
 fn rel(ex:f64, ap:f64) -> f64 {
   if ex==ap { return -17.0; }
   ((ex-ap).abs()/(1e-20+ex.abs())).ln()/10.0_f64.ln()
 }
-
-pub fn emb<A,B:From<A>>(a:A) -> B { B::from(a) }
 
 // literate programming?〚 〛
 
@@ -120,15 +120,129 @@ fn doplots() -> Result<(),Box<dyn std::error::Error>> {
 fn main() {
   //if true { doplots(); }
 
-  if true {
-    let x = r64(1.0);
-    println!("exact: {:.16e}", x.0.exp());
-    let terms = (1..).scan(r64(1.0),|s,n|{*s*=x/n;Some(*s)});
-    println!("sum:   {:.16e}", (1+sum_series(terms, 1e-10)).0);
-    let terms = (1..).map(|n| if n%2==0{ (x,ι(2)) }else{ (-x,ι(n)) });
-    println!("contf: {:.16e}", (1/contfrac_modlentz(ι(1), terms, 1e-10)).0);
+  let cc = c64{re:ι(1), im:ι(1)};
+  println!("{}", cc);
+  println!("{}", cc/2);
+  println!("{}", cc*cc);
 
+  if true {
+    println!("Exp:");
+    let x = r64(1.0);
+    println!("exact: {}", r64(x.0.exp()));
+    println!("e:ps:  {}", exp::impls::exp_power_series(x, 0));
+    println!("e:cf:  {}", exp::impls::exp_continued_fraction(x));
+    println!("e:RR:  {:?}", exp::impls::range_reduce_ln2(x*2));
+
+    println!("---");
+    let terms = (1..).scan(ι(1):r64, |s,n|{let o=*s; *s*=x/n; Some(o)});
+    let terms = cum_sums(terms);
+    let terms = terms.scan(ι(0):r64, |s,t|{if*s==t{None}else{*s=t;Some(t)}});
+    println!("{:.16e}", terms.last().unwrap().0);
+    //for t in terms.take(100) { println!("{:.16e}", t.0); }
+
+
+    println!("Log1p:");
+    let x = r64(0.10);
+    println!("l1p:na {:.16e}", (x.0+1.0).ln());
+    println!("l1p:ps {:.16e}", log::impls::ln1p_power_series(x).0);
+    println!("l1p:xx {:.16e}", log::sf_ln_1p_real(x.0));
+    println!("l1p:cf {:.16e}", log::impls::ln1p_contfrac(x).0);
+    println!("l1p:mp {:.16e}", log::impls::sf_ln_1p_macroseries(x.0));
     //println!("ksum: {:.16e}", [1.0_f64,1e-12,-1.0,1e-22].iter().ksum():f64);
+
+    println!("---");
+    for x in cum_prods((1..).map(|n|r64(n as f64))).take(10) { print!("{:?}", x); }
+    println!();
+    for x in cum_sums((0..).map(|n|r64(n as f64))).take(10) { print!("{:?}", x); }
+    println!();
+  }
+  
+  if true {
+    println!("Dawson:");
+    println!("{:.16e}", dawson::impls::dawson_contfrac(r64(1.0)).0);
+    println!("{:.16e}", dawson::impls::dawson_contfrac2(r64(1.0)).0);
+    println!("{:.16e}", dawson::impls::dawson_series(r64(1.0)).0);
+    println!("{:.16e}", dawson::impls::dawson_rybicki(r64(1.0)).0);
+  }
+
+  if true { 
+    println!("Erf:");
+    println!("{:.16e}  {:.16e}",
+      erf::impls::erf_series(r64(1.0)).0,
+      1.0-erf::impls::erf_series(r64(1.0)).0);
+    println!("{:.16e}  {:.16e}",
+      1.0-erf::impls::erfc_contfrac(r64(1.0)).0,
+      erf::impls::erfc_contfrac(r64(1.0)).0);
+    println!("{:.16e}  {:.16e}",
+      1.0-erf::impls::erfc_contfrac2(r64(1.0)).0,
+      erf::impls::erfc_contfrac2(r64(1.0)).0);
+  }
+
+  if true {
+    let scale = 0.25;
+    println!("-----");
+    {
+      let mut t = (0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = ((n%1000) as f64/1000.0)*scale;
+        t += log::impls::sf_ln_1p_macroseries(x);
+      }
+      let en = Instant::now();
+      println!("{}\t{}", en.duration_since(st).as_micros(), t);
+    }
+    {
+      let mut t = (0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = ((n%1000) as f64/1000.0)*scale;
+        t += log::sf_ln_1p_real(x);
+      }
+      let en = Instant::now();
+      println!("{}\t{}", en.duration_since(st).as_micros(), t);
+    }
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = r64((n%1000) as f64/1000.0)*scale;
+        t += log::impls::ln1p_power_series(x);
+      }
+      let en = Instant::now();
+      println!("{}\t{}", en.duration_since(st).as_micros(), t.0);
+    }
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = r64((n%1000) as f64/1000.0)*scale;
+        t += log::impls::ln1p_contfrac(x);
+      }
+      let en = Instant::now();
+      println!("{}\t{}", en.duration_since(st).as_micros(), t.0);
+    }
+  }
+  if false {
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = r64((n%1000) as f64/1000.0);
+        t += exp::impls::exp_power_series(x, 0);
+      }
+      let en = Instant::now();
+      println!("{}\t{}", en.duration_since(st).as_micros(), t.0);
+    }
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = r64((n%1000) as f64/1000.0);
+        t += exp::impls::exp_power_series_(x, 0);
+      }
+      let en = Instant::now();
+      println!("{}\t{}", en.duration_since(st).as_micros(), t.0);
+    }
   }
 
 /*

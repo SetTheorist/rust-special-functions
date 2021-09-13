@@ -4,6 +4,9 @@ use core::ops::{Shl,ShlAssign,Shr,ShrAssign};
 use num::complex::{Complex};
 use crate::algorithm::{power_i, power_u};
 
+#[inline]
+pub fn ι<A,B:From<A>>(a:A) -> B { B::from(a) }
+
 // we assume for convenience that our basic values
 // are all Copy-able.
 // This excludes, for example, arbitrary-precision floats,
@@ -12,6 +15,7 @@ pub trait Base
   : Copy + Sized
   + PartialEq
   + Default + std::fmt::Debug
+  + 'static
 { }
 
 
@@ -47,7 +51,9 @@ pub trait Multiplication
   : Base + One
   + Mul<Self,Output=Self> + MulAssign<Self>
 {
+  #[inline]
   fn sqr(self) -> Self { self*self }
+  #[inline]
   fn powu(self, n:usize) -> Self { power_u(self,n) }
 }
 //pub fn sqr<M:Multiplication>(x:M) -> M { x.sqr() }
@@ -61,8 +67,11 @@ pub trait Division
   + Shl<isize,Output=Self> + ShlAssign<isize>
   + Shr<isize,Output=Self> + ShrAssign<isize>
 {
+  #[inline]
   fn recip(self) -> Self { Self::one / self }
+  #[inline]
   fn powi(self, n:isize) -> Self { power_i(self,n) }
+  #[inline]
   fn ldexp(self, n:isize) -> Self { self << n }
 }
 //pub fn recip<M:Division>(x:M) -> M { x.recip() }
@@ -73,6 +82,8 @@ pub trait Multiplicative
 {
 }
 
+// left-embedding has issues due to current compiler constraints
+// c.f. https://github.com/rust-lang/rust/issues/86635
 pub trait Embeds<T>
   : Base
   + Add<T,Output=Self> + AddAssign<T>
@@ -81,17 +92,16 @@ pub trait Embeds<T>
   + Div<T,Output=Self> + DivAssign<T>
   + Rem<T,Output=Self> + RemAssign<T>
   + From<T>
-  //where T:Add<Self,Output=Self> // ?!
 {
 }
-// need swapped versions also, but weird compiler issues
 
 pub trait Field
   : Additive + Multiplicative
   + Embeds<isize> + Embeds<f64>
 {
   // self * (-1)^n
-  fn pari(self, n:isize) -> Self { if n%2==0 {Self::one} else {-Self::one} }
+  #[inline]
+  fn pari(self, n:isize) -> Self { if n%2==0 {self} else {-self} }
 }
 
 pub trait Roots
@@ -99,7 +109,9 @@ pub trait Roots
 {
   fn sqrt(self) -> Self;
   fn cbrt(self) -> Self;
+  #[inline]
   fn sqrt_recip(self) -> Self { self.sqrt().recip() }
+  #[inline]
   fn cbrt_recip(self) -> Self { self.cbrt().recip() }
   fn nth_root(self, n:isize) -> Self;
 }
@@ -114,7 +126,9 @@ pub trait Bounded
 pub trait Ordered
   : Base + PartialOrd<Self>
 {
+  #[inline]
   fn min(self,b:Self) -> Self { if self<b {self} else {b} }
+  #[inline]
   fn max(self,b:Self) -> Self { if self>b {self} else {b} }
 
   fn floor(self) -> Self;
@@ -125,19 +139,24 @@ pub trait Ordered
 }
 
 pub trait Normed
-  : Base
+  : Base+From<Self::NT>
 {
-  type NT : Ordered;
+  type NT : Field+Ordered;
+  const epsilon : Self::NT;
   fn abs(self) -> Self::NT;
   fn fabs(self) -> f64;
   // self/|self|
   fn signum(self) -> Self;
 }
+#[inline]
 pub fn abs<T:Normed>(x:T) -> T::NT { x.abs() }
+#[inline]
 pub fn fabs<T:Normed>(x:T) -> f64 { x.fabs() }
+#[inline]
+pub fn signum<T:Normed>(x:T) -> T { x.signum() }
 
 pub trait ComplexType
-: Base
+  : Base
   + Normed<NT=Self::RT>
   + Embeds<Self::RT>
   + Embeds<Complex<f64>>
@@ -151,15 +170,22 @@ pub trait ComplexType
 }
 
 pub trait RealType
-: Base
+  : Base
   + Normed<NT=Self>
+  + Ordered
 {
 }
 
 pub trait Value
-  : Field + Normed
+  : Field + Normed + Roots
 {
 }
+
+pub trait RealValue : Value + RealType { }
+impl<T> RealValue for T where T:Value + RealType { }
+
+pub trait ComplexValue : Value + ComplexType { }
+impl<T> ComplexValue for T where T:Value + ComplexType { }
 
 ////////////////////////////////////////////////////////////////////////////////
 

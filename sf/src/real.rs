@@ -2,16 +2,20 @@ use core::ops::{Add,Sub,Mul,Div,Rem,Neg};
 use core::ops::{AddAssign,SubAssign,MulAssign,DivAssign,RemAssign};
 use core::ops::{Shl,ShlAssign,Shr,ShrAssign};
 
-use crate::embed::{ι};
-
 use crate::traits::{*};
 
 #[derive(Debug,Default,Clone,Copy,PartialOrd,PartialEq)]
 #[allow(non_camel_case_types)]
 pub struct r64(pub f64);
 
-impl From<f64> for r64 { fn from(x:f64) -> r64 { r64(x) } }
-impl From<isize> for r64 { fn from(x:isize) -> r64 { r64(x as f64) } }
+impl std::fmt::Display for r64 {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "ρ{:.16e}", self.0)
+    }
+}
+
+impl From<f64> for r64 { #[inline] fn from(x:f64) -> r64 { r64(x) } }
+impl From<isize> for r64 { #[inline] fn from(x:isize) -> r64 { r64(x as f64) } }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -92,6 +96,13 @@ impl ShrAssign<isize> for r64 {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+macro_rules! lift1 {
+  ($r:ident, $f:ident) => {
+    #[inline]
+    fn $r(self) -> Self { r64(self.0.$f()) }
+  }
+}
+
 impl Base for r64 { }
 impl Zero for r64 { const zero : r64 = r64(0.0); }
 impl Addition for r64 { }
@@ -105,130 +116,44 @@ impl Embeds<isize> for r64 { }
 impl Embeds<f64> for r64 { }
 impl Field for r64 { }
 impl Ordered for r64 {
-  fn floor(self) -> Self { unimplemented!("r64::floor") }
-  fn ceil(self) -> Self { unimplemented!("r64::ceil()") }
-  fn round(self) -> Self { unimplemented!("r64::round()") }
-  fn trunc(self) -> Self { unimplemented!("r64::trunc()") }
-  fn rint(self) -> isize { unimplemented!("r64::rint()") }
+  lift1!(floor, floor);
+  lift1!(ceil, ceil);
+  lift1!(round, round);
+  lift1!(trunc, trunc);
+  #[inline]
+  fn rint(self) -> isize { self.0.round() as isize }
 }
 impl Normed for r64 {
   type NT = Self;
-  fn abs(self) -> Self::NT { r64(self.0.abs()) }
-  fn fabs(self) -> f64 { self.0.abs() }
-  // self/|self|
-  fn signum(self) -> Self { r64(self.0.signum()) }
+  const epsilon : Self = r64(f64::EPSILON);
+  lift1!(abs, abs);
+  lift1!(signum, signum);
+  #[inline]
+  fn fabs(self) -> f64 { self.abs().0 }
 }
 impl RealType for r64 { }
+impl Bounded for r64 {
+  const MIN_VALUE : r64 = r64(f64::MIN);
+  const MAX_VALUE : r64 = r64(f64::MAX);
+}
+impl Roots for r64 {
+  lift1!(sqrt, sqrt);
+  lift1!(cbrt, cbrt);
+  #[inline]
+  fn nth_root(self, n:isize) -> Self {
+    r64(self.0.powf(1.0/(n as f64)))
+  }
+}
+impl Value for r64 { }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+use crate::exp::{Exp};
+impl Exp for r64 {
+  lift1!(exp, exp);
+}
 
 /*
-pub fn abs(x:r64) -> r64 { r64(x.0.abs()) }
-
-pub fn eps(x:r64) -> r64 {
-  let mut t : r64 = ι(1);
-  let mut s = r64(1.0);
-  for n in 1..1000 {
-    let oldv = s;
-    t *= x/n;
-    s += t;
-    if abs(s-oldv) <= 1e-16*abs(s) { break; }
-  }
-  s
-}
-
-#[inline]
-pub fn sumit<I:Iterator<Item=r64>>(it:I,eps:f64) -> r64 {
-  let mut sum = r64(0.0);
-  let mut n = 1;
-  for t in it {
-    let old = sum;
-    sum += t;
-    if abs(sum - old) <= abs(sum)*eps { print!("^{}^",n);break; }
-    n += 1;
-  }
-  sum
-}
-
-pub fn zeta_directseries(s:r64) -> r64 {
-  let terms = (1..).map(|n|r64((n as f64).powf(-s.0)));
-  sumit(terms, 1e-16)
-}
-// ~half as many terms needed...
-pub fn zeta_directseries2(s:r64) -> r64 {
-  let terms = (0..).map(|n|r64(((2*n+1) as f64).powf(-s.0)));
-  sumit(terms, 1e-16)/(1.0 - 2.0_f64.powf(-s.0))
-}
-pub fn zeta_directseries_em1(s:r64) -> r64 {
-  let terms = (1..).map(|n|r64((n as f64).powf(-s.0)));
-  let mut sum = r64(0.0);
-  let mut n = 1;
-  let mut old_res = ι(0);
-  for t in terms {
-    sum += t;
-    let res = sum + (n as f64).powf(1.0 - s.0)/(s.0 - 1.0);
-    if abs(res - old_res) <= abs(res)*1e-16 { print!("${}$",n);break; }
-    old_res = res;
-    n += 1;
-  }
-  old_res
-}
-pub fn zeta_directseries_em2(s:r64) -> r64 {
-  let terms = (1..).map(|n|r64((n as f64).powf(-s.0)));
-  let mut sum = r64(0.0);
-  let mut n = 1;
-  let mut old_res = ι(0);
-  for t in terms {
-    sum += t;
-    let res = sum
-      + (n as f64).powf(1.0 - s.0)/(s.0 - 1.0)
-      - (n as f64).powf(-s.0)/2.0
-      + (n as f64).powf(-s.0-1.0)*(s.0/12.0)
-      - (n as f64).powf(-s.0-3.0)*(s.0*(s.0+1.0)*(s.0+2.0)/720.0)
-      + (n as f64).powf(-s.0-5.0)*(s.0*(s.0+1.0)*(s.0+2.0)*(s.0+3.0)*(s.0+4.0)/30240.0)
-      - (n as f64).powf(-s.0-7.0)*(s.0*(s.0+1.0)*(s.0+2.0)*(s.0+3.0)*(s.0+4.0)*(s.0+5.0)*(s.0+6.0)/1209600.0)
-      + (n as f64).powf(-s.0-9.0)*(s.0*(s.0+1.0)*(s.0+2.0)*(s.0+3.0)*(s.0+4.0)*(s.0+5.0)*(s.0+6.0)*(s.0+7.0)*(s.0+8.0)/239500800.0)
-      ;
-    if abs(res - old_res) <= abs(res)*1e-16 && n>2 { print!("${}$",n);break; }
-    old_res = res;
-    n += 1;
-  }
-  old_res
-}
-
-pub fn zeta_m1_directseries(s:r64) -> r64 {
-  let terms = (2..).map(|n|r64((n as f64).powf(-s.0)));
-  sumit(terms, 1e-16)
-}
-
-// given the sequence (ai,bi) evaluates the continued fraction
-// b0 + a1/(b1 + a2/(b2 + a3/(b3 + ...)))
-// (modified Lentz)
-#[inline]
-pub fn contfrac<I:Iterator<Item=(r64,r64)>>(b0:r64, it:I, eps:f64) -> r64 {
-  let zeta = ι(eps*eps);
-  let mut fj = b0; if b0==ι(0) {fj=zeta;}
-  let mut cj = fj;
-  let mut dj = ι(0);
-  let mut n = 1;
-  for (aj,bj) in it {
-    dj = bj + aj*dj; if dj==ι(0) {dj=zeta;}
-    cj = bj + aj/cj; if cj==ι(0) {cj=zeta;}
-    dj = 1 / dj;
-    let deltaj = cj * dj;
-    fj *= deltaj;
-    if (deltaj - 1).0.abs() < eps {print!("~{}~",n);break;}
-    n += 1;
-  }
-  fj
-}
-
-// ln(1+x) for |arg(1+x)|<pi
-pub fn ln_1p_cf(x:r64) -> r64 {
-  let terms = (2..).map(|n|(x*(n/2)*(n/2),ι(n)));
-  x / contfrac(ι(1), terms, 1e-16)
-}
 
 pub fn exp_cf(x:r64) -> r64 {
   let terms = (1..).map(|n| if n%2==0{ (x,ι(2)) }else{ (-x,ι(n)) });

@@ -1,10 +1,6 @@
-use crate::kahan::{Kahan};
-/*
-use crate::embed::*;
-use crate::value::{Value,RealValue,ComplexValue};
-use crate::trig::{Trig};
-use num::{Zero};
-use num::complex::{Complex};
+use crate::traits::{*};
+//use crate::kahan::{Kahan};
+//use crate::algorithm::{sum_series,sum_series_};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -13,7 +9,7 @@ pub trait Exp : Value {
   fn exp(self) -> Self;
 
   // $e^x-1$
-  fn exp_m1(self) -> Self { self.exp() - ι(1.0) }
+  fn exp_m1(self) -> Self { self.exp() - ι(1):Self }
 
   // $\frac{e^x-1}{x}$
   fn exp_m1vx(self) -> Self { self.exp_m1()/self }
@@ -27,8 +23,60 @@ pub trait Exp : Value {
   // $ \frac{e^x - \sum_{k=0}^n\frac{x^k}{k!}}{x^n}$
   fn exp_menx(self, _n:isize) -> Self { unimplemented!() } // TODO
 }
+
 #[must_use = "method returns a new number and does not mutate the original value"]
 pub fn sf_exp<V:Exp>(x:V) -> V { x.exp() }
+
+////////////////////////////////////////////////////////////////////////////////
+
+pub mod impls {
+use crate::traits::{*};
+use crate::algorithm::{contfrac_modlentz, sum_series, sum_series_};
+
+#[inline]
+pub fn exp_power_series_terms<V:Value>(x:V) -> impl Iterator<Item=V> {
+  (1..).scan(ι(1):V, move|s,n|{let o=*s; *s*=x/n; Some(o)})
+}
+
+#[inline]
+pub fn exp_power_series<V:Value>(x:V, n0:usize) -> V {
+  let terms = exp_power_series_terms(x).skip(n0);
+  sum_series(terms, V::epsilon)
+}
+
+#[inline]
+pub fn exp_power_series_<V:Value>(x:V, n0:usize) -> V {
+  let terms = exp_power_series_terms(x).skip(n0);
+  sum_series_(terms,V::epsilon)
+}
+
+#[inline]
+pub fn exp_continued_fraction<V:Value>(x:V) -> V {
+  let terms = (1..).map(|n| if n%2==0{ (x,ι(2)) }else{ (-x,ι(n)) });
+  contfrac_modlentz(ι(1), terms, V::epsilon).recip()
+}
+
+#[inline]
+pub fn range_reduce_ln2<V:RealValue+Ordered>(x:V) -> (V,isize) {
+  // range-reduce
+  let ln2 : V = ι(0.69314718055994530941723212145817656807_f64); // TODO: use constants
+  let n : isize = (x.abs()/ln2).floor().rint();
+  let r : V = x - ln2 * n;
+  (r,n)
+}
+
+}
+
+
+/*
+use crate::embed::*;
+use crate::value::{Value,RealValue,ComplexValue};
+use crate::trig::{Trig};
+use num::{Zero};
+use num::complex::{Complex};
+
+////////////////////////////////////////////////////////////////////////////////
+
 #[must_use = "method returns a new number and does not mutate the original value"]
 pub fn sf_exp_m1<V:Exp>(x:V) -> V { x.exp_m1() }
 #[must_use = "method returns a new number and does not mutate the original value"]
@@ -39,24 +87,6 @@ pub fn sf_expn<V:Exp>(x:V, n:isize) -> V { x.expn(n) }
 pub fn sf_exp_men<V:Exp>(x:V, n:isize) -> V { x.exp_men(n) }
 #[must_use = "method returns a new number and does not mutate the original value"]
 pub fn sf_exp_menx<V:Exp>(x:V, n:isize) -> V { x.exp_menx(n) }
-
-////////////////////////////////////////////////////////////////////////////////
-
-pub trait Ln : Value {
-  // $\ln(x)$
-  fn ln(self) -> Self;
-
-  // $\ln(1+x)$
-  fn ln_1p(self) -> Self;
-
-  // $\log_2(x)$
-  fn log2(self) -> Self { unimplemented!() } // TODO
-  // $\log_b(x)$
-  fn logb(self,_b:Self) -> Self { unimplemented!() } // TODO
-}
-
-pub fn sf_ln<V:Ln>(x:V) -> V { x.ln() }
-pub fn sf_ln_1p<V:Ln>(x:V) -> V { x.ln_1p() }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -77,50 +107,6 @@ impl Ln for f64 {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#[inline]
-pub fn sum_iter<V:Value,I:Iterator<Item=V>>(mut it:I,eps:f64) -> V {
-  let mut sum = V::ZERO;
-  while let Some(t) = it.next() {
-    let old = sum;
-    sum += t;
-    if (sum - old).dabs() <= sum.dabs()*eps { break; }
-  }
-  sum
-}
-
-pub fn exp__powser2<V:Value>(x:V, t0:V) -> V {
-  let terms = (1..).scan(ι(1),|s,n|{*s*=x/ι(n);Some(*s)});
-  t0+sum_iter(terms,V::epsilon())
-}
-
-pub fn exp__powserk<V:Value>(x:V, t0:V) -> V {
-  let mut t = V::one();
-  let mut s = Kahan::new(t0);
-  let mut n = 1;
-  loop {
-    let oldv = s;
-    t *= x/ι(n);
-    s += t;
-    if (s-oldv).0.dabs() <= V::epsilon()*s.0.dabs() { break; }
-    n += 1;
-    if n>1000 { break; }
-  }
-  s.0
-}
-pub fn exp__powser<V:Value>(x:V, t0:V) -> V {
-  let mut t = V::one();
-  let mut s = t0;
-  let mut n = 1;
-  loop {
-    let oldv = s;
-    t *= x/ι(n);
-    s += t;
-    if (s-oldv).dabs() <= V::epsilon()*s.dabs() { break; }
-    n += 1;
-    if n>1000 { break; }
-  }
-  s
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -157,30 +143,3 @@ pub fn sf_exp_m1_real<V:RealValue>(x:V) -> V {
 
 */
 ////////////////////////////////////////////////////////////////////////////////
-
-/*
-pub fn sf_ln_real(x:f64) -> f64 {
-  x.ln()
-}
-
-pub fn sf_ln_1p_real(x:f64) -> f64 {
-  if x>0.25 {
-    sf_ln_real(1.0 + x)
-  } else {
-    let xx = x/(x+2.0);
-    let x2 = xx.powi(2);
-    let mut s = Kahan::default();
-    let mut t = xx;
-    let mut n = 0;
-    loop {
-      let oldv = s.0;
-      s += t;
-      if oldv==s.0 { break; }
-      n += 1;
-      t *= x2 / ((2*n+1) as f64);
-    }
-    2.0 * s.0
-  }
-}
-*/
-
