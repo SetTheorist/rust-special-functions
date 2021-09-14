@@ -136,6 +136,7 @@ fn main() {
   println!("{}", (cc*cc*cc).cbrt());
   println!("{}", exp::impls::exp_power_series(cc, 0));
   println!("{} {}", (1.0_f64.exp()*1.0_f64.cos()), (1.0_f64.exp()*1.0_f64.sin()));
+  println!("{}", erf::impls::erf_series(cc));
 
   if true {
     println!("Exp:");

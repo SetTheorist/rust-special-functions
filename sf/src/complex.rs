@@ -5,12 +5,15 @@ use core::ops::{Shl,ShlAssign,Shr,ShrAssign};
 use crate::real::{r64};
 use crate::traits::{*};
 
+
+// TODO: Make generic on any RealValue type?
+
 #[derive(Debug,Default,Clone,Copy,PartialOrd,PartialEq)]
 #[allow(non_camel_case_types)]
 pub struct c64{pub re:r64, pub im:r64}
 
 impl c64 {
-  const I : c64 = c64 { re:r64(0.0), im:r64(1.0) };
+  const I : c64 = c64 { re:r64::zero, im:r64::one };
 
   #[inline]
   pub fn new(re:r64, im:r64) -> c64 { c64 { re, im } }
@@ -287,4 +290,13 @@ impl ComplexType for c64 {
 }
 
 impl Value for c64 { }
+
+////////////////////////////////////////////////////////////////////////////////
+
+use crate::exp::{Exp,sf_exp};
+impl Exp for c64 {
+  fn exp(self) -> c64 {
+    c64::polar(sf_exp(self.re), self.im)
+  }
+}
 
