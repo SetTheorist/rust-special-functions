@@ -41,19 +41,19 @@ pub fn exp_power_series_terms<V:Value>(x:V) -> impl Iterator<Item=V> {
 #[inline]
 pub fn exp_power_series<V:Value>(x:V, n0:usize) -> V {
   let terms = exp_power_series_terms(x).skip(n0);
-  sum_series(terms, V::epsilon)
+  sum_series(terms, V::mu_epsilon)
 }
 
 #[inline]
 pub fn exp_power_series_<V:Value>(x:V, n0:usize) -> V {
   let terms = exp_power_series_terms(x).skip(n0);
-  sum_series_(terms,V::epsilon)
+  sum_series_(terms,V::mu_epsilon)
 }
 
 #[inline]
 pub fn exp_continued_fraction<V:Value>(x:V) -> V {
   let terms = (1..).map(|n| if n%2==0{ (x,ι(2)) }else{ (-x,ι(n)) });
-  contfrac_modlentz(ι(1), terms, V::epsilon).recip()
+  contfrac_modlentz(ι(1), terms, V::mu_epsilon).recip()
 }
 
 #[inline]

@@ -72,21 +72,21 @@ pub fn cum_sums_0<T,I>(it:I) -> impl Iterator<Item=T>
 ////////////////////////////////////////////////////////////////////////////////
 
 #[inline]
-pub fn sum_series_<T,I>(it:I,eps:T::NT) -> T
+pub fn sum_series_<T,I>(it:I,meps:T::NT) -> T
   where
     T:Field+Normed,
     I:Iterator<Item=T>
 {
   //cum_sums(it)
   it.scan(T::zero, |s,a|{*s+=a;Some(*s)})
-    .scan(ι(0.0/0.0):T, |s,t|if abs(*s-t)<=abs(*s)*eps{None}else{*s=t;Some(t)})
+    .scan(ι(0.0/0.0):T, |s,t|if μ(*s-t)<=μ(*s)*meps{None}else{*s=t;Some(t)})
     .take(1000)
     .last().unwrap()
 }
 
 // TODO: "wrapped" version (generic over Kahan, e.g.)
 #[inline]
-pub fn sum_series<T,I>(it:I,eps:T::NT) -> T
+pub fn sum_series<T,I>(it:I,meps:T::NT) -> T
   where
     T:Field+Normed,
     I:Iterator<Item=T>
@@ -96,7 +96,7 @@ pub fn sum_series<T,I>(it:I,eps:T::NT) -> T
   for t in it {
     let old = sum;
     sum += t;
-    if abs(sum - old) <= abs(sum)*eps { /*eprint!("^{}^",n);*/break; }
+    if μ(sum - old) <= μ(sum)*meps { /*eprint!("^{}^",n);*/break; }
     if n>999 { break; }
     n += 1;
   }
@@ -107,12 +107,12 @@ pub fn sum_series<T,I>(it:I,eps:T::NT) -> T
 // b0 + a1/(b1 + a2/(b2 + a3/(b3 + ...)))
 // (based on modified Lentz)
 #[inline]
-pub fn contfrac_modlentz<T,I>(b0:T, it:I, eps:T::NT) -> T
+pub fn contfrac_modlentz<T,I>(b0:T, it:I, meps:T::NT) -> T
   where
     T:Field+Normed,
     I:IntoIterator<Item=(T,T)>
 {
-  let zeta = ι(eps*eps);
+  let zeta = ι(T::epsilon.sqr());
   let mut fj = b0; if b0==ι(0) {fj=zeta;}
   let mut cj = fj;
   let mut dj : T = ι(0);
@@ -123,7 +123,7 @@ pub fn contfrac_modlentz<T,I>(b0:T, it:I, eps:T::NT) -> T
     dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
-    if abs(deltaj - 1) < eps || n>1000 { /*print!("~{}~",n);*/break; }
+    if μ(deltaj - 1) < meps || n>1000 { /*print!("~{}~",n);*/break; }
     n += 1;
   }
   fj

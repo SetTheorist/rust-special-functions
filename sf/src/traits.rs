@@ -147,6 +147,9 @@ pub trait Normed
   fn fabs(self) -> f64;
   // self/|self|
   fn signum(self) -> Self;
+
+  fn mu(self) -> Self::NT;
+  const mu_epsilon : Self::NT;
 }
 #[inline]
 pub fn abs<T:Normed>(x:T) -> T::NT { x.abs() }
@@ -154,19 +157,29 @@ pub fn abs<T:Normed>(x:T) -> T::NT { x.abs() }
 pub fn fabs<T:Normed>(x:T) -> f64 { x.fabs() }
 #[inline]
 pub fn signum<T:Normed>(x:T) -> T { x.signum() }
+#[inline]
+pub fn mu<T:Normed>(x:T) -> T::NT { x.mu() }
+pub fn μ<T:Normed>(x:T) -> T::NT { x.mu() }
 
 pub trait ComplexType
   : Base
   + Normed<NT=Self::RT>
   + Embeds<Self::RT>
-  + Embeds<Complex<f64>>
+  //+ Embeds<Complex<f64>>
 {
   type RT : Field+Ordered;
   fn real(self) -> Self::RT;
   fn imag(self) -> Self::RT;
   fn arg(self) -> Self::RT;
+  fn conj(self) -> Self;
   fn rect(re:Self::RT,im:Self::RT) -> Self;
   fn polar(r:Self::RT,arg:Self::RT) -> Self;
+  fn to_rect(self) -> (Self::RT,Self::RT) { (self.real(), self.imag()) }
+  fn to_polar(self) -> (Self::RT,Self::RT) {
+    let a = self.abs();
+    if a == ι(0) { (a,a) }
+    else { (a, self.arg()) }
+  }
 }
 
 pub trait RealType

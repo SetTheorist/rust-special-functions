@@ -130,6 +130,9 @@ impl Normed for r64 {
   lift1!(signum, signum);
   #[inline]
   fn fabs(self) -> f64 { self.abs().0 }
+
+  fn mu(self) -> Self { self.abs() }
+  const mu_epsilon : Self = Self::epsilon;
 }
 impl RealType for r64 { }
 impl Bounded for r64 {

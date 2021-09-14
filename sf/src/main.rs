@@ -43,7 +43,7 @@ use crate::dawson::{*};
 use crate::exp::{*};
 use crate::log::{*};
 use crate::real::{*};
-use crate::traits::{ι};
+use crate::traits::{*};
 
 fn rel(ex:f64, ap:f64) -> f64 {
   if ex==ap { return -17.0; }
@@ -122,8 +122,20 @@ fn main() {
 
   let cc = c64{re:ι(1), im:ι(1)};
   println!("{}", cc);
-  println!("{}", cc/2);
   println!("{}", cc*cc);
+  println!("{}", cc/2);
+  println!("{}", cc/2.0);
+  println!("{}", cc/r64(2.0));
+  println!("{}  {}", cc.arg(), 3.1415926535897932384626/4.0);
+  println!("{}  {}", (cc.sqr()).arg(), 3.1415926535897932384626/2.0);
+  println!("{}", μ(cc));
+  println!("{}", μ(cc.sqr()));
+  println!("{}", abs(cc));
+  println!("{}", abs(cc.sqr()));
+  println!("{}", (cc*cc).sqrt());
+  println!("{}", (cc*cc*cc).cbrt());
+  println!("{}", exp::impls::exp_power_series(cc, 0));
+  println!("{} {}", (1.0_f64.exp()*1.0_f64.cos()), (1.0_f64.exp()*1.0_f64.sin()));
 
   if true {
     println!("Exp:");
