@@ -156,6 +156,11 @@ impl Exp for r64 {
   lift1!(exp, exp);
 }
 
+use crate::log::{Log};
+impl Log for r64 {
+  lift1!(log, ln);
+}
+
 /*
 
 pub fn exp_cf(x:r64) -> r64 {

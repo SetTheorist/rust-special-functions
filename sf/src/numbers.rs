@@ -1,3 +1,17 @@
+use crate::traits::{ι};
+
+pub fn sf_factorial_approx(n:isize) -> f64 {
+  //if n==0 { return 1.0; }
+  (1..=n).map(|i|i as f64).product()
+}
+
+use num::bigint::{BigInt};
+pub fn sf_factorial_exact(n:isize) -> BigInt {
+  if n==0 { return ι(1); }
+  (1..=n).map(|i|ι(i):BigInt).product()
+}
+
+
 /*
 use num::bigint::{BigInt};
 use num::rational::{BigRational};
@@ -65,15 +79,7 @@ impl Embed<isize> for BigRational {
 }
 */
 
-pub fn sf_factorial_exact(n:isize) -> BigInt {
-  if n==0 { return ι(1); }
-  (1..=n).map(|i|ι(i):BigInt).product()
-}
 
-pub fn sf_factorial_approx(n:isize) -> f64 {
-  if n==0 { return 1.0; }
-  (1..=n).map(|i|ι(i):f64).product()
-}
 
 #[derive(Clone)]
 struct Fib(BigInt,BigInt);

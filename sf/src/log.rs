@@ -3,20 +3,21 @@ use crate::traits::{*};
 use crate::algorithm::{sum_series};
 
 pub trait Log : Value {
-  // $\ln(x)$
-  fn ln(self) -> Self;
+  // $\log(x)$
+  fn log(self) -> Self;
 
-  // $\ln(1+x)$
-  fn ln_1p(self) -> Self;
+  // $\log(1+x)$
+  fn log_1p(self) -> Self { (self + ι(1):Self).log() }
 
   // $\log_2(x)$
   fn log2(self) -> Self { unimplemented!() } // TODO
+  // $\log_10(x)$
+  fn log10(self) -> Self { unimplemented!() } // TODO
   // $\log_b(x)$
   fn logb(self,_b:Self) -> Self { unimplemented!() } // TODO
 }
-
-//pub fn sf_ln<V:Ln>(x:V) -> V { x.ln() }
-//pub fn sf_ln_1p<V:Ln>(x:V) -> V { x.ln_1p() }
+pub fn sf_log<V:Log>(x:V) -> V { x.log() }
+pub fn sf_log_1p<V:Log>(x:V) -> V { x.log_1p() }
 
 ////////////////////////////////////////////////////////////////////////////////
 

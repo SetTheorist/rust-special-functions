@@ -1,5 +1,6 @@
 #![feature(trait_alias)]
 #![feature(type_ascription)]
+
 #![allow(confusable_idents)]
 #![allow(dead_code)]
 #![allow(mixed_script_confusables)]
@@ -7,10 +8,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 #![allow(unused_parens)]
-
-extern crate num;
-extern crate num_traits;
-extern crate once_cell;
 
 mod algorithm;
 mod complex;
@@ -33,15 +30,15 @@ mod util;
 use std::time::{Instant};
 
 //use crate::erf::{*};
-//use crate::gamma::{*};
 //use crate::kahan::{*};
 //use crate::num::complex::{Complex};
-//use crate::numbers::{*};
 use crate::algorithm::{*};
 use crate::complex::{*};
 use crate::dawson::{*};
 use crate::exp::{*};
+use crate::gamma::{*};
 use crate::log::{*};
+use crate::numbers::{*};
 use crate::real::{*};
 use crate::traits::{*};
 
@@ -258,6 +255,50 @@ fn main() {
     }
   }
 
+  if true {
+    println!("=====");
+    println!("{}", sf_factorial_approx(4));
+    //println!("{} {:.16e} {}", 3.0, gamma_asympt(3.0), sf_factorial_exact(2));
+    //println!("{} {:.16e} {}", 13.0, gamma_asympt(13.0), sf_factorial_exact(12));
+    //println!("{} {:.16e} {}", 20.0, gamma_asympt(20.0), sf_factorial_exact(19));
+    //println!("{} {:.16e} {}", 21.0, gamma_asympt(21.0), sf_factorial_exact(20));
+    //println!("{} {:.16e} {}", 51.0, gamma_asympt(51.0), sf_factorial_exact(50));
+    //println!("-----");
+    println!("{} {:.16e} {}", 0.5, gamma::impls::gamma_spouge(11,r64(0.5)).0, 3.1415926535897932384626433_f64.sqrt());
+    println!("{} {:.16e} {}", 3.0, gamma::impls::gamma_spouge(11,r64(3.0)).0, sf_factorial_exact(2));
+    println!("{} {:.16e} {}", 13.0, gamma::impls::gamma_spouge(11,r64(13.0)).0, sf_factorial_exact(12));
+    println!("{} {:.16e} {}", 40.0, gamma::impls::gamma_spouge(11,r64(40.0)).0, sf_factorial_exact(39));
+    //println!("{} {:.16e} {}", 100.0, gamma::impls::gamma_spouge(11,r64(100.0)).0, sf_factorial_exact(99));
+    println!("-----");
+    println!("{} {:.16e} {}", 0.5, gamma::impls::lngamma_lanczos_7(r64(0.5)).exp().0, 3.1415926535897932384626433_f64.sqrt());
+    println!("{} {:.16e} {}", 3.0, gamma::impls::lngamma_lanczos_7(r64(3.0)).exp().0, sf_factorial_exact(2));
+    println!("{} {:.16e} {}", 13.0, gamma::impls::lngamma_lanczos_7(r64(13.0)).exp().0, sf_factorial_exact(12));
+    println!("{} {:.16e} {}", 40.0, gamma::impls::lngamma_lanczos_7(r64(40.0)).exp().0, sf_factorial_exact(39));
+    //println!("{} {:.16e} {}", 100.0, gamma::impls::lngamma_lanczos_7(r64(100.0)).exp().0, sf_factorial_exact(99));
+    let z = c64::rect(ι(0),ι(1)); println!("z = {}  1/z={}", z, ι(1):c64/z);
+    let z = c64::rect(ι(2),ι(0)); println!("z = {}  1/z={}", z, ι(1):c64/z);
+    let z = c64::rect(ι(1),ι(1)); println!("z = {}  1/z={}", z, ι(1):c64/z);
+    let z = c64::rect(ι(3),ι(1));
+    println!("z = {}", z);
+    println!("1/z = {}", ι(1):c64/z);
+    println!("log(z) = {}", sf_log(z));
+    println!("exp(z) = {}", sf_exp(z));
+    println!("exp(log(z)) = {}", sf_exp(sf_log(z)));
+    println!("log(exp(z)) = {}", sf_log(sf_exp(z)));
+    println!("lngamma(z) = {}", gamma::impls::lngamma_lanczos_7(z));
+    println!("gamma(z) = {}", gamma::impls::lngamma_lanczos_7(z).exp());
+    println!("gamma(z) = {}", gamma::impls::lngamma_lanczos_15(z).exp());
+    let z = c64::rect(ι(1),ι(1));
+    println!("z = {}", z);
+    println!("gamma(z) = {}", gamma::impls::lngamma_lanczos_15(z).exp());
+    println!("-----");
+    println!("{} {:.16e} {}", 0.5, gamma::impls::lngamma_lanczos_15(r64(0.5)).exp().0, 3.1415926535897932384626433_f64.sqrt());
+    println!("{} {:.16e} {}", 3.0, gamma::impls::lngamma_lanczos_15(r64(3.0)).exp().0, sf_factorial_exact(2));
+    println!("{} {:.16e} {}", 13.0, gamma::impls::lngamma_lanczos_15(r64(13.0)).exp().0, sf_factorial_exact(12));
+    println!("{} {:.16e} {}", 40.0, gamma::impls::lngamma_lanczos_15(r64(40.0)).exp().0, sf_factorial_exact(39));
+    //println!("{} {:.16e} {}", 100.0, gamma::impls::lngamma_lanczos_15(r64(100.0)).exp().0, sf_factorial_exact(99));
+  }
+
 /*
   // quad
   if false {
@@ -438,21 +479,6 @@ fn main() {
     println!("{:?}", eps(r64(1.0)));
     println!("{:?}", eps2(r64(1.0)));
     println!("{:?}", dss(r64(1.0)));
-  }
-  if false {
-    println!("=====");
-    println!("{}", sf_factorial_approx(4));
-    println!("{} {:.16e} {}", 3.0, gamma_asympt(3.0), sf_factorial_exact(2));
-    println!("{} {:.16e} {}", 13.0, gamma_asympt(13.0), sf_factorial_exact(12));
-    println!("{} {:.16e} {}", 20.0, gamma_asympt(20.0), sf_factorial_exact(19));
-    println!("{} {:.16e} {}", 21.0, gamma_asympt(21.0), sf_factorial_exact(20));
-    println!("{} {:.16e} {}", 51.0, gamma_asympt(51.0), sf_factorial_exact(50));
-    println!("-----");
-    println!("{} {:.16e} {}", 3.0, gamma_spouge(11,3.0), sf_factorial_exact(2));
-    println!("{} {:.16e} {}", 13.0, gamma_spouge(11,13.0), sf_factorial_exact(12));
-    println!("{} {:.16e} {}", 40.0, gamma_spouge(11,40.0), sf_factorial_exact(39));
-    println!("{} {:.16e} {}", 100.0, gamma_spouge(11,100.0), sf_factorial_exact(99));
-    println!("{} {:.16e} {}", 40.0, gamma_spouge(11,40.0), sf_factorial_exact(39));
   }
   //println!("{:e}", {let x:f64 = 2.5_f64 + ι(3);x});
   if false {

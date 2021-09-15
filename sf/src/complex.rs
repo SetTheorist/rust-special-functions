@@ -74,9 +74,9 @@ impl Div<c64> for c64 {
       c64 { re, im }
     } else {
       // TODO: robustify for extreme cases
-      let den = self.re*rhs.re + self.im*rhs.im;
+      let den = rhs.re*rhs.re + rhs.im*rhs.im;
       let re = (self.re*rhs.re + self.im*rhs.im) / den;
-      let im = (self.re*rhs.im - self.im*rhs.re) / den;
+      let im = (self.im*rhs.re - self.re*rhs.im) / den;
       c64 { re, im }
     }
   }
@@ -296,7 +296,19 @@ impl Value for c64 { }
 use crate::exp::{Exp,sf_exp};
 impl Exp for c64 {
   fn exp(self) -> c64 {
+    // TODO: temporary quick implementation
     c64::polar(sf_exp(self.re), self.im)
   }
 }
+
+use crate::log::{Log};
+impl Log for c64 {
+  fn log(self) -> c64 {
+    // TODO: temporary quick implementation
+    let r = self.abs();
+    let th = self.arg();
+    c64::rect(r.log(), th)
+  }
+}
+
 
