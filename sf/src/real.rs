@@ -10,7 +10,8 @@ pub struct r64(pub f64);
 
 impl std::fmt::Display for r64 {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "ρ{:.16e}", self.0)
+    write!(f, "ρ")?;
+    self.0.fmt(f)
   }
 }
 

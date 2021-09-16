@@ -19,7 +19,7 @@ impl<T> std::fmt::Display for Poly<T>
     let mut i = 0;
     for c in &self.0 {
       if i == 0 {
-        write!(f, "{}", c)?;
+        std::fmt::Display::fmt(&c, f)?;
       } else {
         if c != &T::zero {
           write!(f, "+{}*x^{}", c, i)?;

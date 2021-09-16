@@ -320,6 +320,16 @@ fn main() {
     //println!("{} {:.16e} {}", 100.0, gamma::impls::lngamma_lanczos_15(r64(100.0)).exp().0, sf_factorial_exact(99));
   }
 
+  let pz = 0.0_f64;
+  let mz = -0.0_f64;
+  println!("{} {}", pz, mz);
+  println!("{} {}", pz+mz, mz+pz);
+  println!("{} {}", 1.0*0.0, -1.0*0.0);
+  println!("{} {}", pz.ln(), mz.ln());
+  let x = r64(3.15);
+  println!("{}", x);
+  println!("{:.16}", x);
+
 /*
   // quad
   if false {

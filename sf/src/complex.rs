@@ -22,9 +22,14 @@ impl c64 {
 impl std::fmt::Display for c64 {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
     if self.im < ι(0) {
-      write!(f, "{}{}ι", self.re, self.im)
+      self.re.fmt(f)?;
+      self.im.fmt(f)?;
+      write!(f, "ι")
     } else {
-      write!(f, "{}+{}ι", self.re, self.im)
+      self.re.fmt(f)?;
+      write!(f, "+")?;
+      self.im.fmt(f)?;
+      write!(f, "ι")
     }
   }
 }
