@@ -2,6 +2,8 @@
 use crate::traits::{Value};
 use crate::embed::{ι};
 
+// TODO: split into Trig and TrigExtra (TrigObscure?)
+
 // NB lots TODO here
 pub trait Trig : Value {
   // cosine

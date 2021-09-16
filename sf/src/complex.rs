@@ -20,13 +20,13 @@ impl c64 {
 }
 
 impl std::fmt::Display for c64 {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.im < ι(0) {
-          write!(f, "{}{}ι", self.re, self.im)
-        } else {
-          write!(f, "{}+{}ι", self.re, self.im)
-        }
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    if self.im < ι(0) {
+      write!(f, "{}{}ι", self.re, self.im)
+    } else {
+      write!(f, "{}+{}ι", self.re, self.im)
     }
+  }
 }
 
 impl From<r64> for c64 { #[inline] fn from(x:r64) -> c64 { c64{re:x, im:ι(0)} } }
@@ -64,11 +64,11 @@ impl Div<c64> for c64 {
   type Output = c64;
   #[inline]
   fn div(self, rhs:c64) -> c64 {
-    if rhs.im == ι(0) {
+    if rhs.im == 0 {
       let re = self.re / rhs.re;
       let im = self.im / rhs.re;
       c64 { re, im }
-    } else if rhs.re == ι(0) {
+    } else if rhs.re == 0 {
       let re = self.im / rhs.im;
       let im = -self.re / rhs.im;
       c64 { re, im }
@@ -205,6 +205,24 @@ assign_impls!(r64);
 assign_impls!(f64);
 assign_impls!(isize);
 
+impl PartialEq<isize> for c64 {
+  fn eq(&self, rhs:&isize) -> bool {
+    self.eq(&(ι(*rhs):c64))
+  }
+}
+
+impl PartialEq<f64> for c64 {
+  fn eq(&self, rhs:&f64) -> bool {
+    self.eq(&(ι(*rhs):c64))
+  }
+}
+
+impl PartialEq<r64> for c64 {
+  fn eq(&self, rhs:&r64) -> bool {
+    self.eq(&(ι(*rhs):c64))
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 impl Base for c64 { }
@@ -290,6 +308,34 @@ impl ComplexType for c64 {
 }
 
 impl Value for c64 { }
+
+impl Power<r64> for c64 {
+  fn pow(self, p:r64) -> c64 {
+    // TODO: temporary quick implementation
+    let r = self.abs();
+    let th = self.arg();
+    c64::polar(r.pow(p), th * p)
+  }
+}
+
+impl Power for c64 {
+  fn pow(self, p:c64) -> c64 {
+    // TODO: temporary quick implementation
+    if p.im == 0 {
+      let r = self.abs();
+      let th = self.arg();
+      c64::polar(r.pow(p.im), th * p.im)
+    } else if p.re == 0 {
+      let r = self.abs();
+      let th = self.arg();
+      c64::polar((-th*p.im).exp(), r.log()*p.im)
+    } else {
+      let r = self.abs();
+      let th = self.arg();
+      c64::polar(r.pow(p.re-th*p.im), r.log()*p.im + th*p.re)
+    }
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -1,3 +1,4 @@
+#![feature(let_chains)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
 
@@ -10,6 +11,7 @@
 #![allow(unused_parens)]
 
 mod algorithm;
+mod bessel;
 mod complex;
 mod dawson;
 mod erf;
@@ -19,6 +21,7 @@ mod kahan;
 mod log;
 mod numbers;
 mod orthopoly;
+mod poly;
 mod quad;
 mod real;
 mod traits;
@@ -39,6 +42,7 @@ use crate::exp::{*};
 use crate::gamma::{*};
 use crate::log::{*};
 use crate::numbers::{*};
+use crate::poly::{*};
 use crate::real::{*};
 use crate::traits::{*};
 
@@ -118,22 +122,39 @@ fn main() {
   //if true { doplots(); }
 
   let cc = c64{re:ι(1), im:ι(1)};
-  println!("{}", cc);
-  println!("{}", cc*cc);
-  println!("{}", cc/2);
+  println!("cc={}", cc);
+  println!("cc^2={}", cc*cc);
+  println!("cc/2={}", cc/2);
   println!("{}", cc/2.0);
   println!("{}", cc/r64(2.0));
   println!("{}  {}", cc.arg(), 3.1415926535897932384626/4.0);
   println!("{}  {}", (cc.sqr()).arg(), 3.1415926535897932384626/2.0);
-  println!("{}", μ(cc));
+  println!("μcc={}", μ(cc));
   println!("{}", μ(cc.sqr()));
-  println!("{}", abs(cc));
-  println!("{}", abs(cc.sqr()));
-  println!("{}", (cc*cc).sqrt());
+  println!("|cc|={}", abs(cc));
+  println!("|cc^2|={}", abs(cc.sqr()));
+  println!("(cc*cc).sqrt()={}", (cc*cc).sqrt());
   println!("{}", (cc*cc*cc).cbrt());
   println!("{}", exp::impls::exp_power_series(cc, 0));
   println!("{} {}", (1.0_f64.exp()*1.0_f64.cos()), (1.0_f64.exp()*1.0_f64.sin()));
   println!("{}", erf::impls::erf_series(cc));
+
+  let mut p = Poly(vec![ι(1),ι(0),ι(3),ι(-4),ι(6),ι(0):r64]);
+  println!("{}", p);
+  println!("{:?}", p);
+  p.reduce();
+  println!("{}", p);
+  println!("{:?}", p);
+  let mut p = Poly(vec![ι(0),ι(0):r64]);
+  println!("{}", p);
+  println!("{:?}", p);
+  p.reduce();
+  println!("{}", p);
+  println!("{:?}", p);
+  let p = Poly(vec![ι(1),ι(1):r64]);
+  println!("p={}", p);
+  println!("p*p={}", &p*&p);
+  println!("p*p*p={}", &(&p*&p)*&p);
 
   if true {
     println!("Exp:");

@@ -92,6 +92,7 @@ pub trait Embeds<T>
   + Div<T,Output=Self> + DivAssign<T>
   + Rem<T,Output=Self> + RemAssign<T>
   + From<T>
+  + PartialEq<T>
 {
 }
 
@@ -121,6 +122,24 @@ pub trait Bounded
 {
   const MIN_VALUE : Self;
   const MAX_VALUE : Self;
+}
+
+pub trait Power<P=Self>
+  : Base
+{
+  fn pow(self, p:P) -> Self;
+}
+
+impl<T:Multiplication> Power<usize> for T {
+  fn pow(self, p:usize) -> Self {
+    self.powu(p)
+  }
+}
+
+impl<T:Division> Power<isize> for T {
+  fn pow(self, p:isize) -> Self {
+    self.powi(p)
+  }
 }
 
 pub trait Ordered
@@ -177,7 +196,7 @@ pub trait ComplexType
   fn to_rect(self) -> (Self::RT,Self::RT) { (self.real(), self.imag()) }
   fn to_polar(self) -> (Self::RT,Self::RT) {
     let a = self.abs();
-    if a == ι(0) { (a,a) }
+    if a == 0 { (a,a) }
     else { (a, self.arg()) }
   }
 }

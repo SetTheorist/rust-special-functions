@@ -14,15 +14,15 @@ use crate::numbers::{sf_factorial_approx};
 use crate::traits::{*};
 
 #[inline]
-fn spouge_c<V:Value+Exp+Log>(k:isize, a:V) -> V {
+fn spouge_c<V:Value+Exp+Power>(k:isize, a:V) -> V {
   let x1 : V = (ι(1):V/sf_factorial_approx(k-1)).pari(k+1);
-  let x2 : V = sf_exp(sf_log(a-k) * (ι(k):V - 0.5));
+  let x2 : V = (a-k).pow(ι(k):V - 0.5);
   let x3 : V = sf_exp(a-k);
   x1 * x2 * x3
 }
-pub fn gamma_spouge<V:Value+Exp+Log>(a:isize, z:V) -> V {
+pub fn gamma_spouge<V:Value+Exp+Power>(a:isize, z:V) -> V {
   let z = z - 1;
-  let res : V = sf_exp((z+0.5)*sf_log(z+a))*sf_exp(-(z+a));
+  let res : V = (z+a).pow(z+0.5)*sf_exp(-(z+a));
   let mut sm : V = 
     ι(2.5066282746310005024157652848110452530069867406099383166299235763); // sqrt(2*\pi)
   for k in 1..=(a-1) {

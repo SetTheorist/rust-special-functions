@@ -9,9 +9,9 @@ use crate::traits::{*};
 pub struct r64(pub f64);
 
 impl std::fmt::Display for r64 {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "ρ{:.16e}", self.0)
-    }
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "ρ{:.16e}", self.0)
+  }
 }
 
 impl From<f64> for r64 { #[inline] fn from(x:f64) -> r64 { r64(x) } }
@@ -67,6 +67,17 @@ add_ops!(Sub, sub; SubAssign, sub_assign);
 add_ops!(Mul, mul; MulAssign, mul_assign);
 add_ops!(Div, div; DivAssign, div_assign);
 add_ops!(Rem, rem; RemAssign, rem_assign);
+
+impl PartialEq<isize> for r64 {
+  fn eq(&self, rhs:&isize) -> bool {
+    self.eq(&(ι(*rhs):r64))
+  }
+}
+impl PartialEq<f64> for r64 {
+  fn eq(&self, rhs:&f64) -> bool {
+    self.eq(&(ι(*rhs):r64))
+  }
+}
 
 impl Neg for r64 {
   type Output = r64;
@@ -148,6 +159,12 @@ impl Roots for r64 {
   }
 }
 impl Value for r64 { }
+
+impl Power for r64 {
+  fn pow(self, p:r64) -> r64 {
+    r64(self.0.powf(p.0))
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

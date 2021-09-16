@@ -113,13 +113,13 @@ pub fn contfrac_modlentz<T,I>(b0:T, it:I, meps:T::NT) -> T
     I:IntoIterator<Item=(T,T)>
 {
   let zeta = ι(T::epsilon.sqr());
-  let mut fj = b0; if b0==ι(0) {fj=zeta;}
+  let mut fj = b0; if b0==0 {fj=zeta;}
   let mut cj = fj;
   let mut dj : T = ι(0);
   let mut n = 1;
   for (aj,bj) in it {
-    dj = bj + aj*dj; if dj==ι(0) {dj=zeta;}
-    cj = bj + aj/cj; if cj==ι(0) {cj=zeta;}
+    dj = bj + aj*dj; if dj==0 {dj=zeta;}
+    cj = bj + aj/cj; if cj==0 {cj=zeta;}
     dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
