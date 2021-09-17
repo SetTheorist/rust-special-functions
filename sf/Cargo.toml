@@ -14,6 +14,8 @@ num-traits = "*"
 num-rational = "*"
 once_cell = "*"
 
+#nalgebra = "*"
+
 #plotlib = "*"
 #plotters = "*"
 

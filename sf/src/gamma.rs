@@ -15,10 +15,8 @@ use crate::traits::{*};
 
 #[inline]
 fn spouge_c<V:Value+Exp+Power>(k:isize, a:V) -> V {
-  let x1 : V = (ι(1):V/sf_factorial_approx(k-1)).pari(k+1);
-  let x2 : V = (a-k).pow(ι(k):V - 0.5);
-  let x3 : V = sf_exp(a-k);
-  x1 * x2 * x3
+  (ι(1):V/sf_factorial_approx(k-1)).pari(k+1)
+    * (a-k).pow(ι(k):V - 0.5) * sf_exp(a-k)
 }
 pub fn gamma_spouge<V:Value+Exp+Power>(a:isize, z:V) -> V {
   let z = z - 1;

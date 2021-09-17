@@ -6,6 +6,38 @@ use crate::traits::{*};
 #[derive(Clone,Debug)]
 pub struct Poly<T>(pub Vec<T>);
 
+impl<T:Zero> Poly<T> {
+  pub fn shift(&mut self, n:usize) {
+    self.0.reserve(n);
+    for _ in 0..n {
+      self.0.insert(0, T::zero);
+    }
+  }
+}
+
+impl <T:Zero+Multiplication+Embeds<isize>> Poly<T> {
+  pub fn diff(&self) -> Poly<T> {
+    let l = self.0.len();
+    let mut dv = vec![T::zero; l];
+    for i in 1..l {
+      dv[i-1] = self.0[i] * ι(i as isize):T;
+    }
+    let mut res = Poly(dv);
+    res.reduce();
+    res
+  }
+}
+
+impl <T:Ring> Poly<T> {
+  pub fn value(&self, x:T) -> T {
+    let mut sum = T::zero;
+    for i in (0..self.0.len()).rev() {
+      sum = sum*x + self.0[i];
+    }
+    sum
+  }
+}
+
 impl<T:Default> Default for Poly<T> {
   fn default() -> Self {
     Poly(vec![T::default()])
@@ -22,7 +54,9 @@ impl<T> std::fmt::Display for Poly<T>
         std::fmt::Display::fmt(&c, f)?;
       } else {
         if c != &T::zero {
-          write!(f, "+{}*x^{}", c, i)?;
+          write!(f, "+")?;
+          std::fmt::Display::fmt(&c, f)?;
+          write!(f, "*x^{}", i)?;
         }
       }
       i += 1;

@@ -1,7 +1,7 @@
 use core::ops::{Add,Sub,Mul,Div,Rem,Neg};
 use core::ops::{AddAssign,SubAssign,MulAssign,DivAssign,RemAssign};
 use core::ops::{Shl,ShlAssign,Shr,ShrAssign};
-use num::complex::{Complex};
+//use num::complex::{Complex};
 use crate::algorithm::{power_i, power_u};
 
 #[inline]
@@ -18,6 +18,11 @@ pub trait Base
   + 'static
 { }
 
+pub trait Power<P=Self>
+  : Base
+{
+  fn pow(self, p:P) -> Self;
+}
 
 pub trait Zero : Base {
   const zero : Self;
@@ -53,12 +58,16 @@ pub trait Multiplication
 {
   #[inline]
   fn sqr(self) -> Self { self*self }
-  #[inline]
-  fn powu(self, n:usize) -> Self { power_u(self,n) }
 }
 //pub fn sqr<M:Multiplication>(x:M) -> M { x.sqr() }
-//pub fn powu<M:Multiplication>(x:M, n:usize) -> M { x.powu(n) }
 //pub fn ldexp<M:Multiplication>(x:M, n:isize) -> M { x.ldexp(n) }
+
+impl<T:Multiplication> Power<usize> for T {
+  #[inline]
+  fn pow(self, u:usize) -> Self {
+    power_u(self, u)
+  }
+}
 
 pub trait Division
   : Base + Multiplication
@@ -70,12 +79,24 @@ pub trait Division
   #[inline]
   fn recip(self) -> Self { Self::one / self }
   #[inline]
-  fn powi(self, n:isize) -> Self { power_i(self,n) }
-  #[inline]
   fn ldexp(self, n:isize) -> Self { self << n }
 }
-//pub fn recip<M:Division>(x:M) -> M { x.recip() }
-//pub fn powi<M:Division>(x:M, n:isize) -> M { x.powi(n) }
+
+impl<T:Division> Power<isize> for T {
+  #[inline]
+  fn pow(self, i:isize) -> Self {
+    power_i(self, i)
+  }
+}
+
+pub trait Ring
+  : Base + Addition + Multiplication
+{
+}
+
+impl<T:Base+Addition+Multiplication> Ring for T
+{
+}
 
 pub trait Multiplicative
   : Multiplication +  Division
@@ -122,24 +143,6 @@ pub trait Bounded
 {
   const MIN_VALUE : Self;
   const MAX_VALUE : Self;
-}
-
-pub trait Power<P=Self>
-  : Base
-{
-  fn pow(self, p:P) -> Self;
-}
-
-impl<T:Multiplication> Power<usize> for T {
-  fn pow(self, p:usize) -> Self {
-    self.powu(p)
-  }
-}
-
-impl<T:Division> Power<isize> for T {
-  fn pow(self, p:isize) -> Self {
-    self.powi(p)
-  }
 }
 
 pub trait Ordered
@@ -221,10 +224,21 @@ impl<T> ComplexValue for T where T:Value + ComplexType { }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+impl Base for isize { }
+impl Zero for isize { const zero : isize = 0; }
+impl Addition for isize { }
+impl Subtraction for isize { }
+impl Additive for isize { }
+impl One for isize { const one : isize = 1; }
+impl Multiplication for isize { }
+impl Division for isize { }
+impl Multiplicative for isize { }
+impl Embeds<isize> for isize { }
+
+
 /*
 pub trait ExpLog : ...
 {
-  fn powf(self,e:Self) -> Self { (e*self.log()).exp() }
   fn exp(self) -> Self; // etc.
   fn log(self) -> Self; // etc.
 }

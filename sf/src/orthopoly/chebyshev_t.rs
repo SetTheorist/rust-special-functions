@@ -1,16 +1,6 @@
 use crate::traits::{*};
 use crate::orthopoly::{*};
-
-// TODO: sort out how to import this macro
-macro_rules! empty_type {
-  ($t:ident) => {
-    #[derive(Clone,Copy,Debug,Eq,PartialEq)]
-    struct $t<V:Value> { _phantom : PhantomData<*const V> }
-    impl <V:Value> $t<V> {
-      pub fn new() -> Self { $t{_phantom:PhantomData} }
-    }
-  }
-}
+use crate::poly::{Poly};
 
 empty_type!(ChebyshevT);
 
@@ -52,9 +42,32 @@ impl<V:Value> OrthogonalPolynomial<V> for ChebyshevT<V> {
     unimplemented!()
   }
 
-  fn coeffs(&self, n:usize) -> Vec<V> {
-    unimplemented!()
+  fn poly(&self, n:usize) -> Poly<V> {
+    if n == 0 {
+      Poly(vec![ι(1)])
+    } else if n == 1 {
+      Poly(vec![ι(0), ι(1)])
+    } else {
+      let mut t0 : Poly<V> = Poly(vec![ι(1)]);
+      let mut t1 : Poly<V> = Poly(vec![ι(0), ι(1)]);
+      for _ in 2..=n {
+        // let t2 = t1.shift(1)*2 - t0;
+        let mut t2 : Poly<V> = t1.clone();
+        t2.shift(1);
+        t2 *= ι(2);
+        t2 -= &t0;
+
+        t0 = t1;
+        t1 = t2;
+      }
+      t1
+    }
   }
+
+  fn coeffs(&self, n:usize) -> Vec<V> {
+    self.poly(n).0
+  }
+
   fn weights(&self, n:usize) -> Vec<V> {
     unimplemented!()
   }

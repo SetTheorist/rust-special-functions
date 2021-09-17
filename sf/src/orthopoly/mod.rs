@@ -1,9 +1,29 @@
 use crate::traits::{*};
+use crate::poly::{Poly};
 use std::marker::PhantomData;
 
-pub mod chebyshev_t;
+macro_rules! empty_type {
+  ($t:ident) => {
+    #[derive(Clone,Copy,Debug,Eq,PartialEq)]
+    pub struct $t<V:Value> { _phantom : PhantomData<*const V> }
+    impl <V:Value> $t<V> {
+      pub fn new() -> Self { $t{_phantom:PhantomData} }
+    }
+  }
+}
 
-trait OrthogonalPolynomial<V:Value> {
+pub mod chebyshev_t;
+empty_type!(ChebyshevU);
+struct Gegenbauer<V:Value>{alpha:V}
+empty_type!(HermiteH);
+empty_type!(HermiteHe);
+struct Jacobi<V:Value>{a:V,b:V}
+struct Laguerre<V:Value>{alpha:V}
+empty_type!(Legendre);
+
+// NB use nalgebra for eigenvalues ...
+
+pub trait OrthogonalPolynomial<V:Value> {
   fn domain(&self) -> (V,V);
   fn coeff(&self, n:usize, k:usize) -> V;
   fn scale(&self, n:usize) -> V; // and scale_squared?
@@ -17,6 +37,8 @@ trait OrthogonalPolynomial<V:Value> {
   fn zeros(&self, n:usize) -> Vec<V>;
   // (also variants for j'th derivative)
 
+  fn poly(&self, n:usize) -> Poly<V>;
+
   // TODO: maybe return more information...
   //fn integrate<F:Fn(V)->V>(&self, n:usize, f:F) -> V;
   // TODO: maybe do this kind of thing instead?
@@ -29,23 +51,5 @@ trait Integrator<V> {
   fn integrate<F:Fn(V)->V>(&self, n:usize, f:F) -> V;
 }
 */
-
-macro_rules! empty_type {
-  ($t:ident) => {
-    #[derive(Clone,Copy,Debug,Eq,PartialEq)]
-    struct $t<V:Value> { _phantom : PhantomData<*const V> }
-    impl <V:Value> $t<V> {
-      pub fn new() -> Self { $t{_phantom:PhantomData} }
-    }
-  }
-}
-
-empty_type!(ChebyshevU);
-struct Gegenbauer<V:Value>{alpha:V}
-empty_type!(HermiteH);
-empty_type!(HermiteHe);
-struct Jacobi<V:Value>{a:V,b:V}
-struct Laguerre<V:Value>{alpha:V}
-empty_type!(Legendre);
 
 ////////////////////////////////////////////////////////////////////////////////

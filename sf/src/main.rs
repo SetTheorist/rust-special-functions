@@ -9,6 +9,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 #![allow(unused_parens)]
+#![allow(unused_variables)]
 
 mod algorithm;
 mod bessel;
@@ -42,6 +43,8 @@ use crate::exp::{*};
 use crate::gamma::{*};
 use crate::log::{*};
 use crate::numbers::{*};
+use crate::orthopoly::{*};
+use crate::orthopoly::chebyshev_t::{*};
 use crate::poly::{*};
 use crate::real::{*};
 use crate::traits::{*};
@@ -75,6 +78,36 @@ fn doplots() {
 /*
 extern crate plotters;
 use plotters::prelude::*;
+fn make_plot<C:Color>(fs:&[(C, &str, Vec<(f64,f64)>)], filename:&str, caption:&str,
+    xrange:(f64,f64), yrange:(f64,f64))
+  -> Result<(),Box<dyn std::error::Error>>
+{
+    //let root = BitMapBackend::new("0.png", (1280, 960)).into_drawing_area();
+    //let root = SVGBackend::new(filename, (640, 480)).into_drawing_area();
+    let root = SVGBackend::new(filename, (960, 720)).into_drawing_area();
+    root.fill(&WHITE)?;
+    let mut chart = ChartBuilder::on(&root)
+        .caption(caption, ("sans-serif", 50).into_font())
+        .margin(5)
+        .x_label_area_size(30)
+        .y_label_area_size(30)
+        .build_cartesian_2d(xrange.0..xrange.1, yrange.0..yrange.1)?;
+    chart.configure_mesh().draw()?;
+    for (color,label,pts) in fs.iter() {
+      chart.draw_series(LineSeries::new((*pts).iter().cloned(), &color,))?
+        .label(*label);
+        //.legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &color));
+    }
+    /*
+    chart.configure_series_labels()
+        .background_style(&WHITE.mix(0.8))
+        .border_style(&BLACK)
+        .draw()?;
+    */
+    Ok(())
+}
+*/
+/*
 fn doplots() -> Result<(),Box<dyn std::error::Error>> {
     //let root = BitMapBackend::new("0.png", (1280, 960)).into_drawing_area();
     let root = SVGBackend::new("0.svg", (1280, 960)).into_drawing_area();
@@ -119,7 +152,59 @@ fn doplots() -> Result<(),Box<dyn std::error::Error>> {
 */
 
 fn main() {
+  if true {
+    let ch : ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
+    for i in 0..10 {
+      println!("{:?}", ch.coeffs(i).iter().map(|x|x.0).collect::<Vec<_>>());
+    }
+    for i in 0..10 {
+      println!("{}", ch.poly(i));
+    }
+    println!("{} {}", ch.poly(3).value(ι(0.3)), ch.value(3, ι(0.3)));
+    println!("{} {}", ch.poly(37).value(ι(0.1)), ch.value(37, ι(0.1)));
+  }
+/*
   //if true { doplots(); }
+  let ch : ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
+  if true {
+    let fxrange = (-1.0,1.0);
+    let num_points = 200; // 5000;
+    let dx = (fxrange.1 - fxrange.0) / ((num_points - 1) as f64);
+    let xrange = (-1.01,1.01);
+    let yrange = (-1.05,1.05);
+    make_plot(
+      &(0..11)
+        .map(|n|
+          (BLACK, "T",
+            (0..num_points).map(|ix| (ix as f64)*dx + fxrange.0)
+              .map(|x|(x, ch.value(n,r64(x)).0)).collect::<Vec<_>>()))
+        .collect::<Vec<_>>(),
+      "chebyshev_t.svg", "Chebyshev T", xrange, yrange).unwrap();
+    /*
+    make_plot(&[
+      (GREEN, "T1",
+        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+          .map(|x|(x, ch.value(1,r64(x)).0)).collect::<Vec<_>>()),
+      (BLUE, "T2",
+        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+          .map(|x|(x, ch.value(2,r64(x)).0)).collect::<Vec<_>>()),
+      (RED, "T3",
+        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+          .map(|x|(x, ch.value(3,r64(x)).0)).collect::<Vec<_>>()),
+      (CYAN, "T4",
+        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+          .map(|x|(x, ch.value(4,r64(x)).0)).collect::<Vec<_>>()),
+      (MAGENTA, "T5",
+        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+          .map(|x|(x, ch.value(5,r64(x)).0)).collect::<Vec<_>>()),
+      (BLACK, "T11",
+        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+          .map(|x|(x, ch.value(11,r64(x)).0)).collect::<Vec<_>>()),
+      ], "chebyshev_t.svg", "Chebyshev T", xrange, yrange).unwrap();
+      */
+  }
+*/
+
 
   let cc = c64{re:ι(1), im:ι(1)};
   println!("cc={}", cc);
@@ -155,6 +240,20 @@ fn main() {
   println!("p={}", p);
   println!("p*p={}", &p*&p);
   println!("p*p*p={}", &(&p*&p)*&p);
+
+  println!("-----");
+  let mut p = Poly(vec![ι(1),ι(0),ι(3),ι(-4),ι(6),ι(0):r64]);
+  println!("{}", p);
+  for _ in 0..6 {
+    p = p.diff();
+    println!("{}", p);
+  }
+  println!("-----");
+  let p = Poly(vec![ι(1),ι(0),ι(3):r64]);
+  println!("p={}", p);
+  println!("p(0)={}", p.value(ι(0)));
+  println!("p(1)={}", p.value(ι(1)));
+  println!("p(2)={}", p.value(ι(2)));
 
   if true {
     println!("Exp:");
