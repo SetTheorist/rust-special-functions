@@ -90,11 +90,11 @@ impl<T:Division> Power<isize> for T {
 }
 
 pub trait Ring
-  : Base + Addition + Multiplication
+  : Base + Additive + Multiplication
 {
 }
 
-impl<T:Base+Addition+Multiplication> Ring for T
+impl<T:Base+Additive+Multiplication> Ring for T
 {
 }
 
@@ -234,6 +234,17 @@ impl Multiplication for isize { }
 impl Division for isize { }
 impl Multiplicative for isize { }
 impl Embeds<isize> for isize { }
+
+impl Base for f64 { }
+impl Zero for f64 { const zero : f64 = 0.0; }
+impl Addition for f64 { }
+impl Subtraction for f64 { }
+impl Additive for f64 { }
+impl One for f64 { const one : f64 = 1.0; }
+impl Multiplication for f64 { }
+//impl Division for f64 { }
+//impl Multiplicative for f64 { }
+impl Embeds<f64> for f64 { }
 
 
 /*

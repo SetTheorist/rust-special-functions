@@ -192,32 +192,39 @@ pub fn stoq(s:&str) -> Quad {
   if neg { -q } else { q }
 }
 
-pub fn qtos(q:Quad) -> String {
-  if q.0==0.0 { return "0.0".to_string(); }
-  let mut q = q;
-  let mut s = String::new();
-  if q.0<0.0 { q=-q; s.push('-'); }
+impl std::fmt::Display for Quad {
+  fn fmt(&self, f:&mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f,  "ξ")?;
+    if self.0==0.0 { return write!(f,  "0.0"); }
+    let mut q = *self;
+    if q.0<0.0 { q=-q; write!(f, "-")?; }
 
-  let mut e = 0;
-  while q.0>=10.0 {
-    e += 1;
-    q /= 10.0;
-  }
-  while q.0<1.0 {
-    e -= 1;
-    q *= 10.0;
-  }
+    let mut e = 0;
+    while q.0>=10.0 {
+      e += 1;
+      q /= 10.0;
+    }
+    while q.0<1.0 {
+      e -= 1;
+      q *= 10.0;
+    }
 
-  for n in 0..33 {
-    if n==1 { s.push('.'); }
-    let d = q.0.floor();
-    let dd = ((d as u8) + ('0' as u8)) as char;
-    s.push(dd);
-    q = (q - d)*10.0;
-  }
+    // TODO: there seems to be a bug here, but it may be a symptom
+    // of a bug above (perhaps in qdmul()?)
+    // with floor() instead of trunc() this displays invalid characters
+    // and with trunc() it is not displaying all significant digits
+    // AHA: probably an issue with negative LO part moving to significance!?
+    for n in 0..33 {
+      if n==1 { write!(f, ".")?; }
+      let d = q.0.trunc();
+      let dd = ((d as u8) + ('0' as u8)) as char;
+      write!(f, "{}", dd)?;
+      q = (q - d)*10.0;
+    }
 
-  if e!=0 { s = format!("{}e{}", s, e); }
-  s
+    if e!=0 { write!(f, "e{}", e)?; }
+    write!(f, "")
+  }
 }
 
 /*

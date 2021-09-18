@@ -13,6 +13,14 @@ impl<T:Zero> Poly<T> {
       self.0.insert(0, T::zero);
     }
   }
+
+  pub fn degree(&self) -> usize {
+    let mut n = self.0.len()-1;
+    while (n > 0) && (self.0[n] == T::zero) {
+      n -= 1;
+    }
+    n
+  }
 }
 
 impl <T:Zero+Multiplication+Embeds<isize>> Poly<T> {
@@ -35,6 +43,18 @@ impl <T:Ring> Poly<T> {
       sum = sum*x + self.0[i];
     }
     sum
+  }
+
+  pub fn substitute(&self, x:Poly<T>) -> Poly<T> {
+    let mut res : Poly<T> = Poly(vec![T::zero]);
+    let mut xn : Poly<T> = Poly(vec![T::one]);
+    for i in 0..self.0.len() {
+      let mut cxi = xn.clone();
+      cxi *= self.0[i];
+      res += &cxi;
+      xn = &xn * &x;
+    }
+    res
   }
 }
 
@@ -80,7 +100,7 @@ impl<T:Addition> AddAssign<&Poly<T>> for Poly<T> {
     let ll = self.0.len();
     let lr = rhs.0.len();
     self.0.resize(ll.max(lr), T::zero);
-    for i in 0..ll.min(lr) {
+    for i in 0..rhs.0.len() {
       self.0[i] += rhs.0[i];
     }
     self.reduce();
@@ -92,7 +112,7 @@ impl<T:Subtraction> SubAssign<&Poly<T>> for Poly<T> {
     let ll = self.0.len();
     let lr = rhs.0.len();
     self.0.resize(ll.max(lr), T::zero);
-    for i in 0..ll.min(lr) {
+    for i in 0..rhs.0.len() {
       self.0[i] -= rhs.0[i];
     }
     self.reduce();
@@ -116,7 +136,13 @@ impl<T:Addition+Multiplication> Mul<&Poly<T>> for &Poly<T> {
   }
 }
 
-// division requires remainder...
+// division with remainder...
+impl<T:Additive+Multiplicative> Div<&Poly<T>> for &Poly<T> {
+  type Output = (Poly<T>,Poly<T>);
+  fn div(self, _rhs:&Poly<T>) -> (Poly<T>,Poly<T>) {
+    unimplemented!()
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // scalars

@@ -11,6 +11,19 @@
 #![allow(unused_parens)]
 #![allow(unused_variables)]
 
+/*
+  	    0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+U+037x 	Ͱ 	ͱ 	Ͳ 	ͳ 	ʹ 	͵ 	Ͷ 	ͷ 			ͺ 	ͻ 	ͼ 	ͽ 	; 	Ϳ
+U+038x 					΄ 	΅ 	Ά 	· 	Έ 	Ή 	Ί 		Ό 		Ύ 	Ώ
+U+039x 	ΐ 	Α 	Β 	Γ 	Δ 	Ε 	Ζ 	Η 	Θ 	Ι 	Κ 	Λ 	Μ 	Ν 	Ξ 	Ο
+U+03Ax 	Π 	Ρ 		Σ 	Τ 	Υ 	Φ 	Χ 	Ψ 	Ω 	Ϊ 	Ϋ 	ά 	έ 	ή 	ί
+U+03Bx 	ΰ 	α 	β 	γ 	δ 	ε 	ζ 	η 	θ 	ι 	κ 	λ 	μ 	ν 	ξ 	ο
+U+03Cx 	π 	ρ 	ς 	σ 	τ 	υ 	φ 	χ 	ψ 	ω 	ϊ 	ϋ 	ό 	ύ 	ώ 	Ϗ
+U+03Dx 	ϐ 	ϑ 	ϒ 	ϓ 	ϔ 	ϕ 	ϖ 	ϗ 	Ϙ 	ϙ 	Ϛ 	ϛ 	Ϝ 	ϝ 	Ϟ 	ϟ
+U+03Ex 	Ϡ 	ϡ 	Ϣ 	ϣ 	Ϥ 	ϥ 	Ϧ 	ϧ 	Ϩ 	ϩ 	Ϫ 	ϫ 	Ϭ 	ϭ 	Ϯ 	ϯ
+U+03Fx 	ϰ 	ϱ 	ϲ 	ϳ 	ϴ 	ϵ 	϶ 	Ϸ 	ϸ 	Ϲ 	Ϻ 	ϻ 	ϼ 	Ͻ 	Ͼ 	Ͽ
+*/
+
 mod algorithm;
 mod bessel;
 mod complex;
@@ -429,24 +442,43 @@ fn main() {
   println!("{}", x);
   println!("{:.16}", x);
 
-/*
   // quad
-  if false {
+  if true {
     let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
-    println!("{:?}", quad::qtos(q_pi));
+    println!("{}", q_pi);
     let q_eulergamma = quad::stoq("0.57721566490153286060651209008240243104215933593992");
     println!("{:?}", q_eulergamma);
     let q_ln2 = quad::stoq("0.69314718055994530941723212145817656807");
+    {
+        let mut dsum = 1.0;
+        let mut dt = 1.0;
+        let dln2 = q_ln2.hi();
+        let mut qsum = quad::Quad::new(1.0,0.0);
+        let mut t = quad::Quad::new(1.0,0.0);
+        for i in 1..25 {
+            dt = dt * dln2 / (i as f64);
+            dsum += dt;
+            t = t * q_ln2 / (i as f64);
+            qsum += t;
+            println!("{:4}  {}  {:?}  {}", i, qsum, qsum, dsum);
+            println!("\t{:?}", (qsum - 2.0)*10.0);
+        }
+    }
+
     println!("{:?}", q_ln2);
     println!("-----");
     let x = quad::Quad::new(1.0,0.0); 
     let y = quad::Quad::new(0.0,0.1); 
-    println!("{:?}", x);
-    println!("{:?}", y);
-    println!("{:?}", quad::Quad::new(1.0,0.1));
+    println!("{}", x);
+    println!("{}", y);
+    println!("{}", quad::Quad::new(1.0,0.1));
+    println!("{}", x+y);
+    println!("11/10:{}", quad::Quad::new(11.0,0.0)/10.0);
     println!("{:?}", (x+y)*(x+y));
+    println!("{}", (x+y)*(x+y));
     println!("{:?}", (x*y)+(x*y));
+    println!("{}", (x*y)+(x*y));
     println!("{:?}", (x+y)*10.0);
     println!("{:?}", quad::Quad::new(1.0,0.0)/10.0);
     println!("{:?}", (quad::Quad::new(1.0,0.0)/10.0)*10.0);
@@ -454,10 +486,10 @@ fn main() {
     println!("-----");
     let mut z = quad::Quad::new(1.0,0.0);
     z /= 10.0;
-    println!("{:?}", z);
-    println!("{:?}", quad::qtos(z));
-    println!("{:?}", quad::qtos(quad::Quad::new(0.1,0.0)));
+    println!("{}  {:?}", z, z);
+    println!("{}", quad::Quad::new(0.1,0.0));
   }
+/*
 
   if false {
     println!("-----");
@@ -658,4 +690,14 @@ fn main() {
     println!();
   }
   */
+
+  let p = Poly(vec![1.0, 0.0, 1.0_f64]);
+  let q = Poly(vec![1.0, 1.0_f64]);
+  println!("p={} q={}", p, q);
+  println!("p(q)={}", p.substitute(q));
+
+  let p = Poly(vec![1, 0, 1_isize]);
+  let q = Poly(vec![1, 1_isize]);
+  println!("p={} q={}", p, q);
+  println!("p(q)={}", p.substitute(q));
 }
