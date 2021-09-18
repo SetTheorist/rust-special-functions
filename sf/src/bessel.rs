@@ -30,11 +30,8 @@ pub trait BesselY<N:Additive+Embeds<isize>> : Value+Embeds<N> {
   }
 }
 
-pub trait BesselSpherI1<N:Additive+Embeds<isize>> : Value+Embeds<N> {
+pub trait BesselSpherI<N:Additive+Embeds<isize>> : Value+Embeds<N> {
   fn bessel_spher_i1(self, nu:N) -> Self;
-}
-
-pub trait BesselSpherI2<N:Additive+Embeds<isize>> : Value+Embeds<N> {
   fn bessel_spher_i2(self, nu:N) -> Self;
 }
 
