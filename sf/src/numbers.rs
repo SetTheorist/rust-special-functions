@@ -1,16 +1,58 @@
 use crate::traits::{ι};
 
-pub fn sf_factorial_approx(n:isize) -> f64 {
+pub fn sf_factorial_approx(n:usize) -> f64 {
   //if n==0 { return 1.0; }
   (1..=n).map(|i|i as f64).product()
 }
 
 use num::bigint::{BigInt};
-pub fn sf_factorial_exact(n:isize) -> BigInt {
+pub fn sf_factorial_exact(n:usize) -> BigInt {
   if n==0 { return ι(1); }
   (1..=n).map(|i|ι(i):BigInt).product()
 }
 
+pub fn sf_binomial_approx(n:usize, k:usize) -> f64 {
+  //sf_factorial_exact(n) / sf_factorial_exact(k) / sf_factorial_exact(n-k)
+  let k = k.min(n-k);
+  let mut val = 1.0;
+  for i in 0..k {
+    val *= (n-i) as f64;
+    val /= (i+1) as f64
+  }
+  val
+}
+
+use std::collections::HashMap;
+use once_cell::sync::Lazy; // 1.3.1
+use std::sync::Mutex;
+static BERNOULLI_FLOAT_CACHE: Lazy<Mutex<HashMap<usize,f64>>> = Lazy::new(||Mutex::new(HashMap::new()));
+pub fn sf_bernoulli_number_approx(n:usize) -> f64 {
+  if n == 0 { 1.0 }
+  else if n == 1 { -0.5 }
+  else if n%2 == 1 { 0.0 }
+  else {
+    if let Ok(c) = BERNOULLI_FLOAT_CACHE.lock() {
+      if let Some(x) = c.get(&(n/2)) {
+        return *x;
+      }
+    }
+    // Better is: 2 * (2*Pi)^(-n) * n! * zeta(n) * (-1)^(1+n/2)
+    // (or use scaled * n!)
+    let mut sum = 0.0;
+    for k in 0..n {
+      sum += sf_bernoulli_number_approx(k) * sf_binomial_approx(n+1,k);
+    }
+    let val = -sum / ((n+1) as f64);
+    BERNOULLI_FLOAT_CACHE.lock().unwrap().insert(n/2,val);
+    val
+  }
+}
+pub fn sf_bernoulli_number_scaled_approx(n:usize) -> f64 {
+  // TODO: super hacky temporary approach here
+  // (defeats the purpose of have scaled variant...)
+  // Better is: 2 * (2*Pi)^(-n) * zeta(n) * (-1)^(1+n/2)
+  sf_bernoulli_number_approx(n) / sf_factorial_approx(n)
+}
 
 /*
 use num::bigint::{BigInt};
@@ -19,10 +61,6 @@ use num::{Signed};
 use std::ops::{Mul,MulAssign};
 use crate::embed::{ι};
 
-use std::collections::HashMap;
-//use std::vec::Vec;
-use once_cell::sync::Lazy; // 1.3.1
-use std::sync::Mutex;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,16 +166,6 @@ pub fn sf_binomial_exact(n:isize, k:isize) -> BigInt {
   }
   val
 }
-pub fn sf_binomial_approx(n:isize, k:isize) -> f64 {
-  //sf_factorial_exact(n) / sf_factorial_exact(k) / sf_factorial_exact(n-k)
-  let k = k.min(n-k);
-  let mut val = 1.0;
-  for i in 0..k {
-    val *= (n-i) as f64;
-    val /= (i+1) as f64
-  }
-  val
-}
 // \sum_{k=0}^{n}\binom{n+1}{k}B_k = 0 \]
 // not the best implementation at the moment, but quick placeholder for now
 static BERNOULLI_EXACT_CACHE: Lazy<Mutex<HashMap<isize,BigRational>>> = Lazy::new(||Mutex::new(HashMap::new()));
@@ -158,27 +186,6 @@ pub fn sf_bernoulli_number_exact(n:isize) -> BigRational {
     }
     let val = -sum * BigRational::new(ι(1),ι(n+1));
     BERNOULLI_EXACT_CACHE.lock().unwrap().insert(n,val.clone());
-    val
-  }
-}
-static BERNOULLI_FLOAT_CACHE: Lazy<Mutex<HashMap<isize,f64>>> = Lazy::new(||Mutex::new(HashMap::new()));
-pub fn sf_bernoulli_number_approx(n:isize) -> f64 {
-  if n == 0 { 1.0 }
-  else if n == 1 { -0.5 }
-  else if n%2 == 1 { 0.0 }
-  else {
-    {
-      let cache = BERNOULLI_FLOAT_CACHE.lock().unwrap();
-      if let Some(x) = cache.get(&n) {
-        return *x;
-      }
-    }
-    let mut sum = 0.0;
-    for k in 0..n {
-      sum += sf_bernoulli_number_approx(k) * sf_binomial_approx(n+1,k);
-    }
-    let val = -sum / ((n+1) as f64);
-    BERNOULLI_FLOAT_CACHE.lock().unwrap().insert(n,val);
     val
   }
 }

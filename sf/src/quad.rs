@@ -107,7 +107,10 @@ fn qddivide(Quad(xhi,xlo):Quad, y:f64) -> Quad {
 impl Quad {
   // construction
   #[inline]
-  pub fn new(a:f64, b:f64) -> Quad { let (hi,lo) = ddsum(a, b); Quad(hi,lo) }
+  pub fn new(a:f64, b:f64) -> Quad {
+    let (hi,lo) = ddsum(a, b);
+    Quad(hi,lo)
+  }
 
   // deconstruction
   #[inline]
@@ -213,10 +216,12 @@ impl std::fmt::Display for Quad {
     // of a bug above (perhaps in qdmul()?)
     // with floor() instead of trunc() this displays invalid characters
     // and with trunc() it is not displaying all significant digits
-    // AHA: probably an issue with negative LO part moving to significance!?
+    // HMMM: probably an issue with negative LO part moving to significance!?
     for n in 0..33 {
+      //dbg!(q);
       if n==1 { write!(f, ".")?; }
-      let d = q.0.trunc();
+      //let d = q.0.trunc();
+      let d = q.0.floor();
       let dd = ((d as u8) + ('0' as u8)) as char;
       write!(f, "{}", dd)?;
       q = (q - d)*10.0;

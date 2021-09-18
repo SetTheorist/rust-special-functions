@@ -167,7 +167,7 @@ fn doplots() -> Result<(),Box<dyn std::error::Error>> {
 */
 
 fn main() {
-  if true {
+  if false {
     let ch : ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
     for i in 0..10 {
       println!("{:?}", ch.coeffs(i).iter().map(|x|x.0).collect::<Vec<_>>());
@@ -221,56 +221,61 @@ fn main() {
 */
 
 
-  let cc = c64{re:ι(1), im:ι(1)};
-  println!("cc={}", cc);
-  println!("cc^2={}", cc*cc);
-  println!("cc/2={}", cc/2);
-  println!("{}", cc/2.0);
-  println!("{}", cc/r64(2.0));
-  println!("{}  {}", cc.arg(), 3.1415926535897932384626/4.0);
-  println!("{}  {}", (cc.sqr()).arg(), 3.1415926535897932384626/2.0);
-  println!("μcc={}", μ(cc));
-  println!("{}", μ(cc.sqr()));
-  println!("|cc|={}", abs(cc));
-  println!("|cc^2|={}", abs(cc.sqr()));
-  println!("(cc*cc).sqrt()={}", (cc*cc).sqrt());
-  println!("{}", (cc*cc*cc).cbrt());
-  println!("{}", exp::impls::exp_power_series(cc, 0));
-  println!("{} {}", (1.0_f64.exp()*1.0_f64.cos()), (1.0_f64.exp()*1.0_f64.sin()));
-  println!("{}", erf::impls::erf_series(cc));
-
-  let mut p = Poly(vec![ι(1),ι(0),ι(3),ι(-4),ι(6),ι(0):r64]);
-  println!("{}", p);
-  println!("{:?}", p);
-  p.reduce();
-  println!("{}", p);
-  println!("{:?}", p);
-  let mut p = Poly(vec![ι(0),ι(0):r64]);
-  println!("{}", p);
-  println!("{:?}", p);
-  p.reduce();
-  println!("{}", p);
-  println!("{:?}", p);
-  let p = Poly(vec![ι(1),ι(1):r64]);
-  println!("p={}", p);
-  println!("p*p={}", &p*&p);
-  println!("p*p*p={}", &(&p*&p)*&p);
-
-  println!("-----");
-  let mut p = Poly(vec![ι(1),ι(0),ι(3),ι(-4),ι(6),ι(0):r64]);
-  println!("{}", p);
-  for _ in 0..6 {
-    p = p.diff();
-    println!("{}", p);
+  if false {
+    let cc = c64{re:ι(1), im:ι(1)};
+    println!("cc={}", cc);
+    println!("cc^2={}", cc*cc);
+    println!("cc/2={}", cc/2);
+    println!("{}", cc/2.0);
+    println!("{}", cc/r64(2.0));
+    println!("{}  {}", cc.arg(), 3.1415926535897932384626/4.0);
+    println!("{}  {}", (cc.sqr()).arg(), 3.1415926535897932384626/2.0);
+    println!("μcc={}", μ(cc));
+    println!("{}", μ(cc.sqr()));
+    println!("|cc|={}", abs(cc));
+    println!("|cc^2|={}", abs(cc.sqr()));
+    println!("(cc*cc).sqrt()={}", (cc*cc).sqrt());
+    println!("{}", (cc*cc*cc).cbrt());
+    println!("{}", exp::impls::exp_power_series(cc, 0));
+    println!("{} {}", (1.0_f64.exp()*1.0_f64.cos()), (1.0_f64.exp()*1.0_f64.sin()));
+    println!("{}", erf::impls::erf_series(cc));
   }
-  println!("-----");
-  let p = Poly(vec![ι(1),ι(0),ι(3):r64]);
-  println!("p={}", p);
-  println!("p(0)={}", p.value(ι(0)));
-  println!("p(1)={}", p.value(ι(1)));
-  println!("p(2)={}", p.value(ι(2)));
 
-  if true {
+  if false {
+    let mut p = Poly(vec![ι(1),ι(0),ι(3),ι(-4),ι(6),ι(0):r64]);
+    println!("{}", p);
+    println!("{:?}", p);
+    p.reduce();
+    println!("{}", p);
+    println!("{:?}", p);
+    let mut p = Poly(vec![ι(0),ι(0):r64]);
+    println!("{}", p);
+    println!("{:?}", p);
+    p.reduce();
+    println!("{}", p);
+    println!("{:?}", p);
+    let p = Poly(vec![ι(1),ι(1):r64]);
+    println!("p={}", p);
+    println!("p*p={}", &p*&p);
+    println!("p*p*p={}", &(&p*&p)*&p);
+
+    println!("-----");
+    let mut p = Poly(vec![ι(1),ι(0),ι(3),ι(-4),ι(6),ι(0):r64]);
+    println!("{}", p);
+    for _ in 0..6 {
+      p = p.diff();
+      println!("{}", p);
+    }
+    println!("-----");
+    let p = Poly(vec![ι(1),ι(0),ι(3):r64]);
+    println!("p={}", p);
+    println!("p(0)={}", p.value(ι(0)));
+    println!("p(1)={}", p.value(ι(1)));
+    println!("p(2)={}", p.value(ι(2)));
+  }
+
+  if false {
+    println!("-----");
     println!("Exp:");
     let x = r64(1.0);
     println!("exact: {}", r64(x.0.exp()));
@@ -303,6 +308,20 @@ fn main() {
   }
   
   if true {
+    println!("-----");
+    println!("Debye:");
+    println!("{}  {}", debye::impls::debye_series_1(1, r64(0.1)),
+      debye::impls::debye_coint(1, r64(0.1)));
+    println!("{}  {}", debye::impls::debye_series_1(1, r64(1.0)),
+      debye::impls::debye_coint(1, r64(1.0)));
+    println!("{}  {}", debye::impls::debye_series_1(2, r64(1.0)),
+      debye::impls::debye_coint(2, r64(1.0)));
+    println!("{}  {}", debye::impls::debye_series_1(1, r64(10.0)),
+      debye::impls::debye_coint(1, r64(10.0)));
+  }
+
+  if false {
+    println!("-----");
     println!("Dawson:");
     println!("{:.16e}", dawson::impls::dawson_contfrac(r64(1.0)).0);
     println!("{:.16e}", dawson::impls::dawson_contfrac2(r64(1.0)).0);
@@ -310,7 +329,8 @@ fn main() {
     println!("{:.16e}", dawson::impls::dawson_rybicki(r64(1.0)).0);
   }
 
-  if true { 
+  if false { 
+    println!("-----");
     println!("Erf:");
     println!("{:.16e}  {:.16e}",
       erf::impls::erf_series(r64(1.0)).0,
@@ -323,7 +343,7 @@ fn main() {
       erf::impls::erfc_contfrac2(r64(1.0)).0);
   }
 
-  if true {
+  if false {
     let scale = 0.25;
     println!("-----");
     {
@@ -390,7 +410,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("=====");
     println!("{}", sf_factorial_approx(4));
     //println!("{} {:.16e} {}", 3.0, gamma_asympt(3.0), sf_factorial_exact(2));
@@ -434,18 +454,22 @@ fn main() {
     //println!("{} {:.16e} {}", 100.0, gamma::impls::lngamma_lanczos_15(r64(100.0)).exp().0, sf_factorial_exact(99));
   }
 
-  let pz = 0.0_f64;
-  let mz = -0.0_f64;
-  println!("{} {}", pz, mz);
-  println!("{} {}", pz+mz, mz+pz);
-  println!("{} {}", 1.0*0.0, -1.0*0.0);
-  println!("{} {}", pz.ln(), mz.ln());
-  let x = r64(3.15);
-  println!("{}", x);
-  println!("{:.16}", x);
+  if false {
+    let pz = 0.0_f64;
+    let mz = -0.0_f64;
+    println!("{} {}", pz, mz);
+    println!("{} {}", pz+mz, mz+pz);
+    println!("{} {}", 1.0*0.0, -1.0*0.0);
+    println!("{} {}", pz.ln(), mz.ln());
+    let x = r64(3.15);
+    println!("{}", x);
+    println!("{:.16}", x);
+  }
 
   // quad
-  if true {
+  let qq = quad::Quad::new(11.0,0.0)/10.0;
+  println!("11/10:{}", qq);
+  if false {
     let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
     println!("{}", q_pi);
@@ -463,8 +487,7 @@ fn main() {
             dsum += dt;
             t = t * q_ln2 / (i as f64);
             qsum += t;
-            println!("{:4}  {}  {:?}  {}", i, qsum, qsum, dsum);
-            println!("\t{:?}", (qsum - 2.0)*10.0);
+            println!("{:4}  {}  {:?}  {}  {:?}", i, qsum, qsum, dsum, (qsum - 2.0)*10.0);
         }
     }
 
@@ -693,13 +716,15 @@ fn main() {
   }
   */
 
-  let p = Poly(vec![1.0, 0.0, 1.0_f64]);
-  let q = Poly(vec![1.0, 1.0_f64]);
-  println!("p={} q={}", p, q);
-  println!("p(q)={}", p.substitute(q));
+  if false {
+    let p = Poly(vec![1.0, 0.0, 1.0_f64]);
+    let q = Poly(vec![1.0, 1.0_f64]);
+    println!("p={} q={}", p, q);
+    println!("p(q)={}", p.substitute(q));
 
-  let p = Poly(vec![1, 0, 1_isize]);
-  let q = Poly(vec![1, 1_isize]);
-  println!("p={} q={}", p, q);
-  println!("p(q)={}", p.substitute(q));
+    let p = Poly(vec![1, 0, 1_isize]);
+    let q = Poly(vec![1, 1_isize]);
+    println!("p={} q={}", p, q);
+    println!("p(q)={}", p.substitute(q));
+  }
 }
