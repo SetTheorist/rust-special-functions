@@ -50,6 +50,29 @@ pub trait BesselSpherY<N:Additive+Embeds<isize>> : Value+Embeds<N> {
   fn bessel_spher_y(self, nu:N) -> Self;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+use crate::real::{*};
+impl BesselJ<isize> for r64 {
+  fn bessel_j(self, nu:isize) -> Self {
+    // for n integral, J_n(-z) = (-)^n J(z)
+    if self < r64::zero { return (-self).bessel_j(nu).pari(nu); }
+    // J_{-n}(z) = (-)^n J_n(z)
+    if nu < 0 { return self.bessel_j(-nu).pari(nu); }
+
+    // TODO: clean this up (rough sketch for now)
+    if self <= ι(2) {
+      impls::bessel_j_series(ι(nu), self)
+    } else if self >= ι(15) {
+      impls::bessel_j_asymp_z(ι(nu), self)
+    } else {
+      impls::bessel_j_recur_back(20+2*nu+(self.abs().rint()), nu, self)
+    }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 pub mod impls {
 use crate::traits::{*};
 use crate::algorithm::{sum_series};
