@@ -1,0 +1,3018 @@
+\documentclass[10pt,dvipdfm,letterpaper,twoside]{article}
+\usepackage{marginnote}
+\usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{framed}
+\usepackage{color}
+%\usepackage{cite}
+%\usepackage{accents}
+
+\newcommand{\F}[1]{{\mathtt{#1}}}
+
+\DeclareMathOperator{\erf}{erf}
+\DeclareMathOperator{\erfc}{erfc}
+\DeclareMathOperator{\acos}{acos}
+\DeclareMathOperator{\asin}{asin}
+\DeclareMathOperator{\atan}{atan}
+\DeclareMathOperator{\acosh}{acosh}
+\DeclareMathOperator{\asinh}{asinh}
+\DeclareMathOperator{\atanh}{atanh}
+\let\O=\operatorname
+\newcommand{\Ob}[1]{\operatorname{\mathbf{#1}}}
+
+\newcommand{\RR}{{\mathbb{R}}}
+\newcommand{\CC}{{\mathbb{C}}}
+\newcommand{\ZZ}{{\mathbb{Z}}}
+\newcommand{\NN}{{\mathbb{N}}}
+\newcommand{\NNo}{{\mathbb{N}_0}}
+\newcommand{\ii}{{\hat{\imath}}}
+\newcommand{\Hyper}[5]{{\mathop{{}_{#1}\!\O{F\!}_{#2}\left({\genfrac{}{}{0pt}{}{#3}{#4}}\middle|{#5}\right)}}}
+
+%\newenvironment{implementation}{\noindent\begin{framebox}\begin{minipage}{0.98\textwidth}}{\end{minipage}\end{framebox}}
+\newenvironment{implementation}{\noindent\begin{framed}}{\end{framed}}
+\let\DEF=\marginnote
+
+\def\Xint#1{\mathchoice
+{\XXint\displaystyle\textstyle{#1}} 
+{\XXint\textstyle\scriptstyle{#1}} 
+{\XXint\scriptstyle\scriptscriptstyle{#1}} 
+{\XXint\scriptscriptstyle\scriptscriptstyle{#1}} 
+\!\int}
+\def\XXint#1#2#3{{\setbox0=\hbox{$#1{#2#3}{\int}$ }
+\vcenter{\hbox{$#2#3$ }}\kern-.5\wd0}}
+\def\ddashint{\Xint=}
+\def\dashint{\Xint-}
+
+\let\Beta=B
+\let\al=\alpha
+\let\gam=\gamma
+\let\Gam=\Gamma
+\let\eps=\varepsilon
+\let\kap=\kappa
+\let\lam=\lambda
+\let\sig=\sigma
+\let\theta=\vartheta
+\let\phi=\varphi
+\let\om=\omega
+
+\DeclareMathAccent{\wtilde}{\mathord}{largesymbols}{"65}
+
+% to use titled-frame, must define TFFrameColor and TFTitleColor
+\definecolor{TFFrameColor}{rgb}{0.9,0.9,0.9}
+\definecolor{TFTitleColor}{rgb}{0.0,0.0,0.0}
+
+\begin{document}
+
+{\LARGE Special Functions}\hfill Apollo Hogan\hfill\today
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Constants, Basic definitions}
+
+INDEX
+GLOSSARY
+SYMBOLS
+(MARGIN NOTES)
+EQUATION NUMBERING?
+
+[Generally need {\em zeros} as well as {\em derivatives} of all functions... and possibly {\em integrals}!]
+
+\begin{itemize}
+\item Mathematics
+  \begin{itemize}
+  \item definitions
+  \item relations / expansions / extensions / etc.
+  \item discussion of contxt, usage, other notations, etc.
+  \item graphics
+  \end{itemize}
+\item Computer science
+  \begin{itemize}
+  \item routines (API)
+  \item implementation notes
+  \item pseudo-code / code
+  \item example usage
+  \item error plots, etc.
+  \end{itemize}
+\end{itemize}
+Coding style: CamelCase as basic function names, but underscore to separate modifications?
+For example, Exp, Exp\_m1, StruveH, StruveH\_ddx; double underscore for internal variations
+(e.g. different methods, etc.), e.g. Exp\_m1\_\_naive, Exp\_m1\_\_series.
+
+%\[3 + \underaccent{\tilde}{\Sigma} - 100 \qquad 3 + {\underaccent{\tilde}{\Sigma}}^0_n - 100\]
+%Test out this $\underaccent{\tilde}{\Sigma}$ and stuff ${\underaccent{\tilde}{\Sigma}}^0_n$ fooferah.
+%\[ \O{\mathbf{H}}_\nu(x) = \underaccent{\tilde}{\O{H}}_\nu(x) = \mathbf{H}_\nu(x) \]
+%\[ \O{\mathbf{H}}_\nu(x) = \underaccent{\wtilde}{\O{H}}_\nu(x) = \mathbf{H}_\nu(x) \]
+%\[ \O{\mathbf{H}}_\nu(x) = \undertilde{\O{H}}_\nu(x) = \mathbf{H}_\nu(x) \]
+
+\begin{itemize}
+\item $\NN = \{ 1, 2, \dots \}$
+\item $\NNo = \{ 0, 1, 2, \dots \} = \NN\cup\{0\}$
+\item $\ZZ = \{ \dots, -2, -1, 0, 1, 2, \dots \}$
+\end{itemize}
+
+\begin{itemize}
+\item Pi%
+  \[ \pi = 3.1415926535897932384626433\dots  \DEF{$\pi$}\]
+  \[ \frac1\pi = 12\sum_{k=0}^\infty(-)^k\frac{(6k)!(13591409+545140134k)}{(3k)!(k!)^3640320^{3k+3/2}} \qquad\text{Chudnovsky algorithm}\]
+\item Euler's gamma%
+  \[ \gam = \lim_{n\to\infty}\left(\sum_{k=1}^n\frac1k - \log n)\right) = -\int_0^\infty e^{-t}\ln t\,dt = 0.57721566490153286060\dots
+      \DEF{$\gam$}\]
+\item Khintchine constant
+  \[ K_0 = \prod_{k=1}^\infty\left[1 + \frac{1}{k(k+2)}\right]^{\log_2 k} = 2.6854520010\dots
+      \DEF{$K_0$}\]
+\item misc
+  \[ \log(2) = \dots \]
+  \[ \sqrt{2} = \dots \]
+  \[ \zeta(2) = \frac{\pi^2}{6} = \dots \]
+  \[ \Gam(1/3) = 2.6789385347077\dots \]
+\end{itemize}
+
+Basic operations expected of any numeric type:
+$+, -, *, /, +=, -=, *=, /=, ++, --, ==, !=, <, >, <=, >=,
+ \O{pow}, \O{pow_int}, \O{sqrt}, \O{cbrt}, \O{ln}, \O{exp},
+ \O{abs}, \O{arg}, \O{signum}, \O{floor}, \O{ceil}, \O{truncate}, \O{mod}$
+
+Use double-doubles just for more accurate summations (and range-reductions?)
+
+From~\cite{precise-numerical}:
+given a number $x$ and an uncertainty in $x$ of $\delta_x$,
+we define the {\em accuracy} as $\O{Accuracy}(x,\delta_x) = (-\log_{10}|\delta_x|$ (corresponding to the absolute error),
+the {\em precision} as $\O{Precision}(x,\delta_x) = -\log_{10}|\frac{\delta_x}{x}|$ (corresponding to the relative error),
+and the {\em scale} as $\O{Scale} = \O{Precision} - \O{Accuracy}$.  We can visualize different cases as:
+
+If {\em accuracy}, {\em precision}, and {\em scale} are all positive, we have:
+\[ \overbrace{\underbrace{x_{1}x_{2}\cdots x_{s}\vphantom{x_{s+1}}}_{\O{Scale}}.\underbrace{x_{s+1}x_{s+2}\cdots x_{s+m}}_{\O{Accuracy}}}^{\O{Precision}} \]
+If {\em accuracy} and {\em precision} are positive and {\em scale} negative, we have:
+\[ \overbrace{\underbrace{.00\cdots0\vphantom{x_p}}_{\O{Scale}}\underbrace{x_{1}x_{2}\cdots x_{p}}_{\O{Precision}}}^{\O{Accuracy}} \]
+If {\em precision} and {\em scale} are positive and {\em accuracy} negative, we have:
+\[ \overbrace{\underbrace{x_{1}x_{2}\cdots x_{p}}_{\O{Precision}}\underbrace{\vphantom{x_p}00\cdots0.}_{\O{Accuracy}}}^{\O{Scale}} \]
+
+error diagrams; diagrams for techniques (colored nicely) used in 2-parameters, e.g.
+
+test of continued fraction typesetting:
+\[ \cfrac{1}{x + \cfrac{2}{x^2 + \cfrac{3}{x^3 + \cdots }}} \]
+
+\[(1-\cos x)/\sin x = \sin x / (1+\cos x) \]
+\[ e^{a+b} = e^{a}e^{b} = e^{a}(1+(e^{b}-1)) = e^{a} + e^{a}(e^{b}-1) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Existing systems}
+
+[Check Matlab special function support!]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Octave}
+
+IDEA: build out the special function support for Octave!?  Issue is lack of
+long double type to help with getting full precision.
+(Can create objects + overloading to maybe create double-double types?)
+
+Note that Octave includes a gsl package for GSL bindings (but GSL generally has poor support for complex numbers...)
+And, the statistics package includes various probability distributions.
+
+\begin{itemize}
+\item Built-in {\tt version 3.6.2}:
+  \begin{itemize}
+  \item {\tt [a,ierr] = airy(k,z,opt)} --- $\O{Ai}(z), \O{Ai}'(z), \O{Bi}(z), \O{Bi}'(z)$ with optional scaling; $z$ can be real or complex
+  \item {\tt [r,ierr] = besselj(alpha,x,opt)/bessely/besseli/besselk/besselh} --- Bessel functions
+      $\O{J}_\al(x)$, $\O{Y}_\al(x)$, $\O{I}_\al(x)$, $\O{K}_\al(x)$, $\O{H}_\al(x)$ with optional scaling; $\al$ must be real, $x$ can be complex
+  \item {\tt beta(a,b), betaln(a,b)} --- Beta function $B(a,b)$ or natural logarithm of Beta function $\ln(B(a,b))$; with $a, b$ real
+  \item {\tt betainc(x,a,b)} --- incomplete Beta function with $x, a, b$ real
+  \item {\tt bincoeff(n,k)} --- binomial coefficient; $n, k$ integers;
+      [accepts some non-integers but returns suspicious values]
+  \item {\tt erf(z), erfc(z), erfcx(z)} --- error function $\O{erf}(z)$, complementary error function $\O{erfc}(z) = 1-\O{erf}(z)$,
+      scaled complementary error function $e^{z^2}\O{erfc}(z)$; $z$ real
+  \item {\tt erfinv(x)} --- inverse error function; $x$ real
+  \item {\tt gamma(z), lgamma(z)/gammaln(z)} --- gamma function $\Gam(z)$ or natural logarithm of gamma function $\ln\Gam(z)$; $z$ real;
+      [looks like iffy/low precision implementation: {\tt gamma(6)=119.99999999999997}]
+  \item {\tt gammainc(x,a,opt)} --- normalized incomplete gamma function $P(a,x)$ or complementary version; $x, a$ real
+  \item {\tt legendre(n,x,opt)} --- Legendre functions of degree $n$ and order $m=0\dots n$, $P^m_n(x)$ optionally normalized
+  \item elementary functions; $x, y$ real, $z$ real or complex
+    \begin{itemize}
+    \item {\tt exp(z)}, {\tt expm1(z)}, {\tt log(z)}, {\tt reallog(z)}, {\tt log1p(z)}, {\tt log10(z)}, {\tt log2(z)}
+    \item {\tt pow2(z)}, {\tt pow2(f,e)}, {\tt nextpow2(x)}, {\tt realpow(x,y)}, {\tt sqrt(z)}, {\tt cbrt(x)}, {\tt nthroot(x,n)}
+    \item {\tt cos(z)}, {\tt sin(z)}, {\tt tan(z)}, {\tt cosh(z)}, {\tt sinh(z)}, {\tt tanh(z)},
+        {\tt sec(z)}, {\tt csc(z)}, {\tt cot(z)}, {\tt sech(z)}, {\tt csch(z)}, {\tt coth(z)}
+    \item {\tt acos(z)}, {\tt asin(z)}, {\tt atan(z)}, {\tt acosh(z)}, {\tt asinh(z)}, {\tt atanh(z)},
+        {\tt asec(z)}, {\tt acsc(z)}, {\tt acot(z)}, {\tt asech(z)}, {\tt acsch(z)}, {\tt acoth(z)}
+    \item {\tt atan2(y,x)}, {\tt abs(z)}, {\tt arg(z)}, {\tt conj(z)}, {\tt real(z)}, {\tt imag(z)}
+    \item {\tt sind(z)}, {\tt cosd(z)}, {\tt tand(z)}, {\tt secd(z)}, {\tt cscd(z)}, {\tt cotd(z)},
+        {\tt asind(z)}, {\tt acosd(z)}, {\tt atand(z)}, {\tt asecd(z)}, {\tt acscd(z)}, {\tt acotd(z)}
+    \item {\tt ceil(z)}, {\tt fix(z)}, {\tt floor(z)}, {\tt round(z)}, {\tt roundb(z)},
+        {\tt max(z1...zn)}, {\tt min(z1...zn)}, {\tt hypot(z1...zn)}
+    \end{itemize}
+  \end{itemize}
+\item Package {\tt specfun-1.1.0}
+  \begin{itemize}
+  \item {\tt cosint(z) = Ci(z)} --- cosine integral function $\O{Ci}(z)=\int_x^\infty\frac{\cos(t)}{t}\,dt$; $z$ real or complex;
+      [uses expression in terms of exponential integrals $\O{E}_1$ or $\O{Ei}$]
+      [iffy for some cases: {\tt Ci(0) = NaN - NaN*i}]
+  \item {\tt sinint(z) = Si(z)} --- sine integral function $\O{Si}(z)=\int_0^x\frac{\sin(t)}{t}\,dt$; $z$ real or complex;
+      [uses summation of Bessel $\O{J}$ functions]
+      [iffy for some cases: {\tt Si(Inf) = Si(1e10) = NaN + NaN*i}]
+  \item {\tt heaviside(x,threshhold)} --- Heaviside function; $z$ real or complex
+      (but poor behaviour for complex (all non-real give 1) --- this raises the question of what {\it should} be the extension of
+      the heaviside to $\CC$?)
+  \item {\tt dirac(z)} --- Dirac delta function: {\tt Inf} iff $x=0$ else {\tt 0}; $z$ real or complex
+  \item {\tt zeta(z)} --- Riemann zeta function; $z$ real or complex;
+      [uses quadrature $\int_0^\infty\frac{x^{z-1}}{\Gam(z)(e^{x}-1)}\,dx$ for real $z>1$;
+      summation $\frac{1}{1-2^{1-z}}\sum_{k=1}^\infty \frac{(-)^{k-1}}{k^{z}}$ for values with $\Re z\geq0$;
+      and otherwise recursively computes $2^{z}\pi^{z-1}\sin(\pi z/2)\Gam(1-z)\zeta(1-z)$]
+  \item {\tt lambertw(b,z)} --- computes Lambert W function $\O{W}(z)$ for branch $b$; $z$ real or complex, $b$ integer;
+      [uses series around $-1/e$ and asymptotic expansion at $0$ and $\infty$ to get initial guess, then
+      Halley iteration to refine]
+  \item {\tt psi(x)} --- computes $\tfrac{d}{dx}\ln\Gam(x)$; real $x$;
+      [does simple finite centered difference approximation]
+  \item {\tt expint(z)=expint\_E1(z), } --- computes exponential integral $\int_x^\infty e^{t}/t\,dt$; $z$ real or complex;
+      [uses {\tt expint\_Ei(-z)+C}]
+  \item {\tt expint\_Ei(z)} --- computes exponential integral $-\int_{-x}^\infty e^{t}/t\,dt$; $z$ real or complex;
+      [uses quadrature for real $z>2$ or $z<0$; if $|z|\geq10$, $\Im z\leq0$ uses asympotic expansion (with conjugation for $\Im z>0$);
+      otherwise uses series expansion]
+  \item {\tt erfcinv(z)} --- inverse complementary error function; $z$ real or complex;
+      [simply returns {\tt erfinv(1-x)} --- which will have precision issues for $x\sim1$]
+  \item {\tt [y,p] = laguerre(z,n)} --- computes the Laguerre polynomial of order $n$ at $z$; $z$ real or complex, $n>0$ integer;
+      [computes polynomial coefficients via recursion and then evaluates resulting polynomial at $z$;
+      sounds iffy to me...]
+  \item {\tt [k,e] = ellipke(m)} --- returns complete elliptic integrals of first $\O{K}(m)$ and second $\O{E}(m)$ kind; real $m\leq1$;
+      [uses AGM algorithm and a transform for $m<0$]
+  \end{itemize}
+\item Package {\tt miscellaneous-1.1.0}
+  \begin{itemize}
+  \item {\tt chebyshevpoly(kind,order,z)} --- computes first $T_n(x)$ or second $U_n(x)$ Chebyshev polymials
+      (coefficients or value at $z$); $z$ real or complex;
+      [uses recursion for coefficients; value is evaluated from polymomial; seems iffy to me]
+  \item {\tt hermitepoly(order,z)} --- computes Hermite polynomials $H_n(z)$ (coefficients or value at $z$); $z$ real or complex;
+      [uses low-precision (8-digits) table for $0\leq\text{order}\leq50$; otherwise uses recursion to compute polynomial
+      coefficients; value is evaluated from polynomial coefficients; seems iffy]
+  \item {\tt laguerrepoly(order,z)} --- computes Laguerre polynomials $L_n(z)$ (coefficients or value at $z$); $z$ real or complex;
+      [uses recursion to compute polynomial coefficients; value is evaluated from polynomial coefficients; seems iffy]
+  \item {\tt legendrepoly(order,z)} --- computes Legendre polynomials $L_n(z)$ (coefficients or value at $z$); $z$ real or complex;
+      [uses recursion to compute polynomial coefficients; value is evaluated from polynomial coefficients; seems iffy]
+  \end{itemize}
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Elementary functions}
+
+\[\F{ldexp}\] \[\F{frexp}\] \[\F{mod}\] \[\F{abs}\] \[\F{hypot}\] \[\F{hypot3}\]
+
+Also an $\O{fmod}(z,a,b)$ which reduces $z$ with high-accuracy modulo $a+b$ (a ``pseudo-quad-double'' functionality)
+which is useful for trigonometric range-reduction, for example.
+
+A handy function is a multi-precision constant factory: takes decimal string, say, and returns $n$ doubles whose sum
+is equal to the constant.  (Case $n=2$ is just the constructor for qdouble...)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polynomials}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{sqrt}
+Assume that $a<0$ or $b\neq0$, then we have:
+\[ \sqrt{a+b\ii} = \frac{b}{2d} + d\ii \qquad d=\sqrt{\frac{-a\pm\sqrt{a^2+b^2}}{2}} \]
+We could also use a trigonometric approach: $\sqrt{a+b\ii} = \sqrt{\sqrt{a^2+b^2}}\left(\cos(\atan(\tfrac{b}{a})/2) + \ii\sin(\atan(\tfrac{b}{a})/2)\right)$.
+
+\begin{implementation}
+Implementation notes for $\sqrt{z}$ for $z\geq0$:
+\begin{itemize}
+\item Use the Newton iteration $x_{n+1} = \frac12(x_n + \frac{z}{x_n})$
+\item This converges (for doubles) in only a couple more iterations than Halley's method (and each iteration is cheaper)
+\item Gives exact answers (for gcc) in 4 or 5 iterations
+\item For starting value, let $z=2^N\cdot f$ with $N$ even and $f\in[1/2, 2)$ (use {\tt frexp}),
+  and use the starting guess of $2^{N/2}\widehat{f}$ where $\widehat{f}$ is the linearly interpolated value of $\sqrt{\ }$ on $[1/2,2)$
+  for the value $f$.
+\item Brent claims that it is better (optimal?) to use $\sqrt{a} = a/\sqrt{a}$ and compute $a^{-1/2}$ directly via the 3rd-order iteration
+  $x_{n+1} = x_n - \frac{x_n}{2}(\eps_n - \tfrac34 \eps_n^2)$ where $\eps_n = a x_n^2 - 1$.  But for the case of a double, this
+  converges no faster than Newton.
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{cbrt}
+For complex values, use trigonometric approach.  (Use a newton-step to clean digits?)
+Also, note that if $x=z^{1/3}$ is a cube-root, then so are $\zeta x$, $\zeta^2 x$, where $\zeta=-\frac12+\ii\frac{\sqrt{3}}{2}$ is a cube root of unity.
+\begin{implementation}
+Implementation notes for $\sqrt[3]{z}$ for $z\in\RR$:
+\begin{itemize}
+\item Use the Newton iteration $x_{n+1} = \frac{x_n^4 + 2 z x_n}{2 x_n^3 + z}$
+\item This converges (for doubles) in only a couple more iterations than Halley's method (and each iteration is cheaper)
+\item For starting value, let $z=2^N\cdot f$ with $N=3k$ and $f\in[1/2, 4)$ (use {\tt frexp}),
+  and use the starting guess of $2^{N/3}\widehat{f}$ where $\widehat{f}$ is the linearly interpolated value of $\sqrt[3]{\ }$ on $[1/2,4)$
+  for the value $f$.
+\item Gives exact answers (for gcc) in 5 or 6 iterations (Halley takes about 4 iterations)
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{pow}
+\[ \F{pow}(z,r) = z^{r} \qquad z\in\RR, r\in\RR \]
+\[ \F{pow\_int}(z,n) = z^{n} \qquad z\in\RR, r\in\ZZ \]
+integer, real, complex versions (branches?), fully general (integer)
+$x^2$, $x^3$, $x^y-1$, $\sqrt{1+x}-1$, $\sqrt{1+x}-x$
+
+\begin{implementation}
+Implementation notes for $z^n$, $n\in\ZZ$:
+\begin{itemize}
+\item Assume $n>0$ (compute $z^{-n}$ and use $z^n = 1/z^{-n}$)
+\item Use repeated doubling algorithm - takes $\log n$ steps
+\item Gives exact answers
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{polynomial roots}
+\[ \F{solve\_linear}(a,b) = \rho \text{\quad s.t.\quad } a\rho+b=0 \qquad a,b\in\RR \]
+\[ \F{solve\_quadratic}(a,b,c) = \rho \text{\quad s.t.\quad } a\rho^2+b\rho+c=0 \qquad a,b,c\in\RR \]
+\[ \F{solve\_cubic}(a,b,c,d) = \rho \text{\quad s.t.\quad } a\rho^3+b\rho^2+c\rho+d=0 \qquad a,b,c,d\in\RR \]
+\[ \F{solve\_quartic}(a,b,c,d,e) = \rho \text{\quad s.t.\quad } a\rho^4+b\rho^3+c\rho^2+d\rho+e=0 \qquad a,b,c,d,e\in\RR \]
+\[ \F{polynomial\_root}(\vec{a},n) = \rho \text{\quad s.t.\quad } \sum_{k=0}^{n}a^{n-k}\rho^k=0 \qquad \vec{a}\in\RR^{n+1} \]
+Complex versions also...
+
+For $n$-th root of $r$, newton looks like $x_{k+1} = \frac{n-1}{n}x_k + \frac{r}{n x_k^{n-1}}$.
+
+There are direct methods here, trigonometric (using complex numbers), etc.
+
+For general polynomial root-finding, NR recommends ``Laguerre'' method + deflation.  (Which works decently as long as there are not repeated roots...)
+
+Remark: to transform a general monic quadratic $x^4 + bx^3 + cx^2 + dx + e$ to a ``depressed'' quadratic we take $x=y - \tfrac{b}{4}$ and get
+\[ y^4 + (c-\tfrac{3b^2}{8})y^2 + (\tfrac{b^3}{8} - \tfrac{bc}{2} + d)y + (e - \tfrac{3b^4}{256} + \tfrac{b^2c}{16} - \tfrac{bd}{4}) \]
+
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{polynomial\_value}
+\[ \F{polynomial\_value}(\vec{a},n,z) = \sum_{k=0}^{n}a^{n-k}z^k \qquad \vec{a}\in\RR^{n+1}, z\in\RR \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Exponentials}
+Exponential function:
+\[ \exp(z) = e^{z} = \sum_{n=0}^\infty\frac{z^n}{n!} \qquad z\in\CC   \DEF{$\exp(z), e^{z}$}\]
+\[ \F{exp}(z) = e^z \]
+\[ \F{exp\_m1}(z) = e^z-1 \]
+\[ \F{exp\_m1\_dx}(z) = \frac{e^z-1}{z} \]
+$2^x$, $10^x$, $e^z-1-z$, $\frac{e^z-1-z}{z^2}$,
+$e_N(x)=\sum_{n=0}^N\frac{x^n}{n!}$, $e^z - e_N(z)$, $\frac{e^z - e_N(z)}{z^{N+1}}$
+
+Remark: $e^{x+y\ii} = e^x\cos y + \ii e^x\sin y$ for $x,y\in\RR$.
+
+\begin{implementation}
+Implementation notes for $\exp(z)$ for $z\in\RR$:
+\begin{itemize}
+\item For $z<0$, use $\exp(z)=\frac{1}{\exp(-z)}$ and compute $\exp(-z)$ (to avoid negative cancellation in series)
+\item For $|z|>\tfrac12$, use $\exp(2^N\cdot x) = \exp(x)^{2^N}$ and compute $\exp(z\cdot 2^N)$ with $z\cdot 2^N\leq\tfrac12$
+\item Finally, use standard power-series $\exp(z)=\Hyper{0}{0}{}{}{z} = \sum_{n=0}^\infty\frac{z^n}{n!}$ for the argument $0<z\leq\tfrac12$ to compute.
+\item In tests, this gives results which are within 1 ulp of the (gcc math library computed) actual values, many values are exactly the same.
+  (Note that this is actually depending on intermediate values being computed with higher precision!  using the {\tt -fexcess-precision=standard} option
+  in gcc gives much higher error rates!  Explicitly using {\tt long double} variables (20-byte) brings us back to the low error-rate.)
+\item Luke claims that convergence is better for $\Re(z)>-1$ computing:
+  \[ e^{-z} = (1+z)^{-1} \Hyper{1}{1}{z}{2+z}{-z} = \frac{1}{1+z}\sum_{k=0}^\infty \frac{(-z)^k}{k!} \frac{(z)_k}{(2+z)_k} \]
+  (If $\al_n$ is the $n$th term in the sum, then $\al_{n+1}=-\al_{n}\frac{z(z+n)}{(n+1)(z+n+2)}$.)
+\item Another idea: write $z=(\ln2)^N\xi$ so that $e^z=2^N e^\xi$
+\end{itemize}
+
+Implementation notes for $\exp(z)-1$ for $z\in\RR$:
+\begin{itemize}
+\item If $|z|\geq1/2$, just compute $\exp(z) - 1$ directly
+\item Otherwise use a power series $\sum_{n=1}^\infty \frac{x^n}{n!}$
+\item This takes up to 18 terms in the series to converge for double precision
+\item There are sporadic errors of 1 or 2 ulps (vs gcc) in both branches of the above
+\item for the series, this can be ameliorated a lot by using long double
+\item can we use the trick $e^x-1 = (e^{x/2}+1)(e^{x/4}+1)(e^{x/8}+1)(e^{x/8}-1)$ (etc.) somehow?
+\end{itemize}
+
+Note that for $z\in\CC$ there can be cancellation of the real-part away from $z=1$ also
+(in particular when $(\Re z)\cos(\Im z)\sim 1$ ...)
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Logarithms}
+
+\[ \log(z) = \rho \text{\quad s.t. \quad} e^\rho = z \]
+\[ \log_b(z) = \log(z)/\log(b) = \rho \text{\quad s.t. \quad} b^\rho = z \]
+
+\[ \F{log}(z) = \log(z) \]
+\[ \F{Log}(z,w) = \O{Log}_{[w]}(z) \qquad\text{$w$th branch}\]
+\[ \F{log\_b}(z, b) = \log_{b}(z) \]
+\[ \F{log\_p1}(z) = \log(1+z) \]
+\[ \F{log\_p1\_mx}(z) = \log(1+z)-z \]
+\[ \F{log\_2}(z) = \log_{2}(z) \]
+\[ \F{log\_10}(z) = \log_{10}(z) \]
+$z\ln z$, $\frac{\ln(1+z)}{z}$, $\frac{\ln(1+z)-z}{-z^2/2}$, etc.
+partial series, etc.
+
+Remark: $\ln x+y\ii = \ln r + \theta\ii$, where $x,y\in\RR$, $x+y\ii=r e^{\theta\ii}$, thus
+$r=|x+y\ii|=\sqrt{x^2+y^2}$ and $\theta=\arg x+y\ii = \O{atan2}(y,x)$.
+
+\begin{implementation}
+Implementation notes for $\log(z)$ for $z>0$:
+\begin{itemize}
+\item For $z>1$, use $\log(z) = -\log\frac1z$ and compute $\log\frac1z$ (to get $z\leq1$)
+\item Next, use $\log(2^N x) = N\log 2 + \log x$, so can reduce to get $\tfrac12\leq z\leq\tfrac32$
+\item Finally, use series $\log(1+z) = -\sum_{n=1}^\infty(-)^n\frac{z^n}{n}$
+\end{itemize}
+In tests, this gives results which are within 3 ulp of the (gcc math library computed) actual values.
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Trigonometric functions}
+
+polar to/from rectangular, angle, radians to/from degrees to/from gradians, etc.
+
+{\tt
+sin, cos, tan, sec, csc, cot,
+sinh, cosh, tanh, seca, csca, cota,
+asin, acos, atan, asec, acsc, acot,
+asinh, acosh, atanh, aseca, acsca, acota,
+sind, cosd, ..., atan2, gudermannian,
+versine, haversine, coversine, hacoversine, exsecant, excosecant,
+sinc, sinc\_a}
+\[ \O{sinc}(x) = \frac{\sin \pi x}{\pi x} \]
+\[ \O{sin}_\pi(x) = \sin(\pi x) \]
+(and etc.  Allows for reduced rounding error in many usages of $\sin$.)
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Circular}
+\[ \cos(z) = \sum_{n=0}^\infty (-)^n\frac{z^{2n}}{(2n)!} \]
+\[ \sin(z) = \sum_{n=0}^\infty (-)^n\frac{z^{2n+1}}{(2n+1)!} \]
+\[ \tan(z) = \frac{\sin z}{\cos z} = \]
+\[ \sec(z) = \frac{1}{\cos z} \]
+\[ \cot(z) = \frac{1}{\tan z} = \frac{\cos z}{\sin z} \]
+\[ \csc(z) = \frac{1}{\sin z} \]
+
+Remark: $\cos x+y\ii = \cos x \cosh y - \ii \sin x \sinh y$, and 
+$\sin x+y\ii = \sin x \cosh y + \ii \cos x \sinh y$, when $x,y\in\RR$.
+
+\begin{implementation}
+\begin{itemize}
+\item continued fraction $\tan z = \frac{z}{1-} \frac{z}{3-} \frac{z}{5-} \cdots$
+\item $\cot z = \frac12 + 2z\sum_{k=1}^\infty\frac{1}{z^2 - k^2\pi^2}$
+\item $\asin z = z + \frac{1}{2}\frac{z^3}{3} + \frac{1\cdot3}{2\cdot4}\frac{z^5}{5} + \frac{1\cdot3\cdot5}{2\cdot4\cdot6}\frac{z^7}{7} + \cdots$
+\item continued fraction$\frac{\asin z}{\sqrt{1 - z^2}} = \frac{z}{1 - } \frac{1\cdot2 z^2}{3-} \frac{1\cdot2 z^2}{5-} \frac{3\cdot4 z^2}{7-} \frac{3\cdot4 z^2}{9-} \cdots$
+\item Expansions for $\atan z$
+  \begin{itemize}
+  \item continued fraction $\atan z = \frac{z}{1+} \frac{z^2}{3+} \frac{4z^2}{5+} \frac{9z^2}{7+} \cdots$
+  \item for $|z|\leq 1$, $\atan z = z - \frac{z^3}{3} + \frac{z^5}{5} - \frac{z^7}{7} \cdots$
+  \item for $|z|> 1$, $\atan z = \frac{\pi}{2} - \frac{1}{z} + \frac{1}{3z^2} - \frac{1}{5z^5} \cdots$
+  \item for any $z\neq\pm\ii$, $\atan z = \frac{z}{1+z^2}\left(1 + \frac{2}{3}\frac{z^2}{1+z^2} + \frac{2\cdot4}{3\cdot5}(\frac{z^2}{1+z^2})^2+\cdots\right)$
+  \end{itemize}
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Hyperbolic}
+\[ \cosh(z) = \cos(\ii z) = \sum_{n=0}^\infty \frac{z^{2n}}{(2n)!} = \frac{e^{z} + e^{-z}}{2} \]
+\[ \sinh(z) = -\ii\sin(\ii z) = \sum_{n=0}^\infty \frac{z^{2n+1}}{(2n+1)!} = \frac{e^{z} - e^{-z}}{2} \]
+\[ \tanh(z) = -\ii\tan(\ii z) = \frac{\sinh z}{\cosh z} = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}} \]
+\[ \O{sech}(z) = \frac{1}{\cosh z} \]
+\[ \O{coth}(z) = \frac{1}{\tanh z} = \frac{\cosh z}{\sinh z} \]
+\[ \O{csch}(z) = \frac{1}{\sinh z} \]
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Inverse Circular}
+\[ \acos(z) = \rho \text{\quad s.t.\quad} \cos\rho = z \]
+\[ \asin(z) = \rho \text{\quad s.t.\quad} \sin\rho = z \]
+\[ \atan(z) = \rho \text{\quad s.t.\quad} \tan\rho = z \qquad \rho\in(-\pi/2, +\pi/2) \]
+\[ \O{atan2}(y,x) = \atan(y/x) \text{\quad s.t. correct for $x\sim0$ and signs} \]
+
+Remark: $\acos x+y\ii = \acos\beta + \ii\O{sign}_+(y)\ln(\al+\sqrt{\al^2-1})$ and
+$\asin x+y\ii = \asin\beta + \ii\O{sign}_+(y)\ln(\al+\sqrt{\al^2-1})$;
+where $x,y\in\RR$, $\al = \frac{\sqrt{(x+1)^2+y^2} + \sqrt{(x-1)^2+y^2}}{2}$,
+$\beta = \frac{\sqrt{(x+1)^2+y^2} - \sqrt{(x-1)^2+y^2}}{2}$,
+and \[\O{sign}_+(y) = \begin{cases}+1&y\geq0\\-1&y<0\end{cases}\]
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Inverse Hyperbolic}
+\[ \acosh(z) = \rho \text{\quad s.t.\quad} \cosh\rho = z \]
+\[ \asinh(z) = \rho \text{\quad s.t.\quad} \sinh\rho = z \]
+\[ \atanh(z) = \rho \text{\quad s.t.\quad} \tanh\rho = z \]
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Misc}
+\[ \O{gud}(z) = 2\atan e^{z} - \frac\pi2 \qquad\text{Gudermannian} \DEF{$\O{gud}(z)$}\]
+Note: for a function $\O{F}(z)$, we define
+$\O{verF}(z) = 2 \O{F}(z/2)^2$, 
+$\O{coF}(z) = \O{F}(\tfrac{\pi}{2} - z)$, 
+$\O{haF}(z) = \O{F}(z)/2$, 
+$\O{exF}(z) = \O{F}(z) - 1$, giving us
+\[ \O{vsin}(z) = \O{versine}(z) =  2\sin(z/2)^2 = 1 - \cos(z) = \O{excosine}(z) \]
+\[ \O{hvsin}(z) = \O{haversine}(z) = \frac12\O{versine}(z) = \frac{1-\cos(z)}{2} = \sin(z/2)^2 \]
+\[ \O{cvsin}(z) = \O{coversine}(z) = 1 - \sin(z) = \O{versine}(\tfrac\pi2 - z) = 2\sin(\tfrac\pi4 - \tfrac{x}{2}) \]
+\[ \O{chvsin}(z) = \O{hcvsin}(z) = \O{hacoversine}(z) = \O{cohaversine}(z) = \frac12\O{coversine}(z) = \frac{1-\sin(z)}{2} \]
+\[ \O{vcos}(z) = \O{vercosine}(z) =  2\cos(z/2)^2 = 1 + \cos(z) \]
+\[ \O{hvcos}(z) = \O{havercosine}(z) = \frac12\O{vercosine}(z) = \frac{1+\cos(z)}{2} \]
+\[ \O{cvcos}(z) = \O{covercosine}(z) = 1 + \sin(z) = \O{vercosine}(\tfrac\pi2 - z) = 2\sin(\tfrac\pi4 + \tfrac{x}{2}) \]
+\[ \O{hcvcos}(z) = \O{chvcos}(z) = \O{hacovercosine}(z) = \O{cohavercosine}(z) = \frac12\O{covercosine}(z) = \frac{1+\sin(z)}{2} \]
+\[ \O{exsec}(z) = \O{exsecant}(z) = \sec(z) - 1 = \frac{1-\cos(z)}{\cos(z)} = \frac{\O{versine}(z)}{\cos(z)} = 2\sin(z/2)^2\sec(z) \]
+\[ \O{excsc}(z) = \O{excosecant}(z) = \O{exsecant}(\tfrac\pi2 - z) = \csc(z) - 1\]
+[The equalities for $\O{excsc}$ need to be verified... they appear to be incorrect]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Miscellaneous}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{AGM}
+
+{\tt agm(a,b), agm(a,b,out c)}
+
+Given $a_0=\al$, $b_0=\beta$, let 
+\begin{eqnarray*}
+  a_{n+1} &=& (a_n + b_n)/2 \\
+  b_{n+1} &=& (a_n \cdot b_n)^{1/2} \\
+  c_{n+1} &=& (a_n - b_n)/2
+\end{eqnarray*}
+then $\O{agm}(\al,\beta) = \lim_{n\to\infty}a_n = \lim_{n\to\infty}b_n$.
+For complex values, we choose the square-root such that $\O{Ph}b_{n+1} = (\O{Ph}a_n + \O{Ph}b_n)/2$ with
+the phases of $a_n$,~$b_n$ chosen such that the difference is less than $\pi$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Gamma and related functions}
+
+What about computation of {\em ratios} of Gamma functions?
+(To handle cancellation of poles, etc. nicely; avoid scaling issues, etc.)
+$\F{gamma\_ratio}([a_1,...,a_n], [b_1,...,b_m])$
+
+Note that
+\[ \lim_{\eps\to0}\frac{\Gam(-n+\eps)}{\Gam(-m+\eps)} = (-)^{m+n}\frac{m!}{n!} \qquad m,n\in\NN \]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gamma functions}
+\[ \Gam(z) = \int_0^\infty t^{z-1}e^{-t}\,dt \qquad z\in\CC\setminus\NNo  \DEF{$\Gam(z)$}\]
+Note that that integral definition only applies for $\Re z>0$, but the function can be extended
+to a meromorphic function with simple poles at $z=0,-1,-2,\dots$
+\[ \Gam^*(z) = \frac{x^{-x+1/2} e^{x}}{\sqrt{2\pi}} \Gam(z)   \DEF{$\Gam^*(z)$}\]
+\[ \frac{1}{\Gam(z+1)} = e^{\gamma z}\prod_{n=1}^\infty e^{-z/n}(1 + z/n) \]
+
+Binet function:
+\[ \O{J}(z) = \ln\Gam(z) + z - (z-\frac12)\ln z - \frac12\ln2\pi    \DEF{$\O{J}(z)$}\]
+
+\[ \F{gamma}(z) = \Gam(z) \]
+\[ \F{gamma\_p1\_m1}(z) = \Gam(1+z)-1 \]
+\[ \F{log\_gamma}(z) = \log(\Gam(z)) \]
+\[ \F{log\_abs\_gamma}(z) = \log(\Gam(|z|)) \]
+\[ \F{gammastar}(z) = \Gam^*(z) \]
+\[ \F{gamma\_inv}(z) = 1/\Gam(z) \]
+log-gamma+sign also
+
+Amusing fact: $\zeta(3) = \lim_{\eps\to0}\frac{1}{2\eps^3}\frac{\Gam^3(1+\eps)\Gam(1-\eps)}{\Gam(1+\eps)}$ with error~$\sim2\eps$.
+
+Spouge's approximation (a modification of Stirling's):
+\[ \Gam(z+1) = (z+a)^{z+1/2}e^{-(z+a)}\left( c_0 + \sum_{k=1}^{a-1}\frac{c_k}{z+k} + \eps_a(z) \right) \]
+where $a$ is arbitrary positive integer and $c_0=\sqrt{2\pi}$ with (for $k=1,2,\dots,a-1$):
+\[ c_k = \frac{(-)^{k-1}}{(k-1)!}(-k+a)^{k-1/2}e^{-k+a} \]
+If $\Re z>0$ and $a>2$, then the relative error in discarding $\eps_a(z)$ is bounded by $a^{-1/2}(2\pi)^{-(a+1/2)}$.
+(Note that this has controllable error but the large coefficients have cancellative properties...)
+This is a convenient ``work-horse'' algorithm --- it's conveniently modified to directly compute $\Gam^*$ nicely.
+
+The Lanczos approximation (from Wikipedia):
+\[ \Gam(z+1) = \sqrt{2\pi}(z+g+\tfrac12)^{z+1/2} e^{-(z+g+1/2)} A_g(z) \]
+with $g$ an arbitrary constant (with $\Re(z+g+1/2)>0$) and
+\[ A_g(z) = \frac12 p_0(g) + \frac{z}{z+1} p_1(g) + \frac{z(z-1)}{(z+1)(z+2)} p_2(g) + \cdots \]
+... valid only for $\Re z>0$ ... (test of implementation from wikipedia page gives bad results, not clear why)
+
+\begin{implementation}
+A few useful relations
+\begin{itemize}
+\item[\bf(A)] $\Gam(z)\Gam(1-z) = \frac{\pi}{\sin\pi z}$; equivalently, $\ln|\Gam(z)| + \ln|\Gam(1-z)| = \ln\pi - \ln|\sin\pi z|$
+\item[\bf(B)] $\Gam(z+1) = z\Gam(z)$; equivalently $\ln|\Gam(z+1)| = \ln|z| + \ln|\Gam(z)|$
+\item[\bf(C)] Stirling's approximation for large $n$:
+  \[n! \sim \sqrt{2\pi n}\left(\frac{n}{e}\right)^n\left(
+      1 + \frac{1}{12 n} + \frac{1}{288 n^2} - \frac{139}{51840 n^3} - \frac{571}{2488320 n^4} \cdots\right)\]
+\item[\bf(D)] For $|z|<1$ ($<2$?),
+  \[ \ln\Gam(1+z) = -\ln(1+z) + z(1-\gamma) + \sum_{k=2}^\infty(-)^k(\zeta(k)-1)\frac{z^k}{k} \]
+  Use this for tiny $z$, especially to directly compute $\Gam(1+z)-1$ --- it works beautifully.
+\item[\bf(E)] A power-series at zero, $\frac{1}{\Gam(z)} = \sum_{k=1}^\infty c_k z^k$, where $c_1=1$, $c_2=\gamma$,
+  and $(k-1)c_k = \gamma c_{k-1} - \zeta(2) c_{k-2} + \zeta(3) c_{k-3} - \cdots + (-)^k \zeta(k-1) c_1$ for $k\geq3$
+\end{itemize}
+For implementation, we use {\bf(C)} for $x>90$ and {\bf(D)} for $x<2$ and otherwise use {\bf(B)} repeatedly to bring $x<2$.  This seems to
+give 15 digits precision for all $x>0$.  Values of $\zeta(k)-1$ are precomputed at high-precision and stored in a table --- 100 values are enough.
+For $x<0$ we use {\bf(A)} to transform to a positive value, but naive implementation gives poor results for $-90<x<0$.
+
+Note that the above relations apply for complex $z$ also, so can be the basis for complex $\Gam$ implementation.
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Factorial, Pochammer symbol}
+\[ n! = \Gam(n+1) \]
+\[ (\al)_\nu = \al^{\uparrow \nu} = \frac{\Gam(\al+\nu)}{\Gam(\al)} \]
+\[ \al^{\downarrow \nu} = \frac{\Gam(\al)}{\Gam(\al-\nu)} \]
+Thus $(\al)_0 = 1$ and $(\al)_{n+1} = (\al+n)\cdot(\al)_n$.
+n!!, n!!!, \dots (+logs), log-factorial, rising/falling\_factorial, $x^n/n!$,
+ratio of pochhammers $\frac{(a_1)_n\cdots(a_p)_n}{(b_1)_n\cdots(b_q)_n}$,
+integer/general pochhammers, etc.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Incomplete gamma functions}
+
+\[ \gam(z,\xi) = \int_0^\xi t^{z-1}e^{-t}\,dt   \DEF{$\gam(z,\xi)$}\]
+\[ \gam^*(z,\xi) = z^{\dots}\gam(z,\xi) \]
+\[ \O{P}(z,\xi) = \frac{\gam(z,\xi)}{\Gam(z)}   \DEF{$\O{P}(z,\xi)$}\]
+\[ \O{Q}(z,\xi) = 1 - \O{P}(z,\xi) = \frac{\Gam(z,\xi)}{\Gam(z)}    \DEF{$\O{Q}(z,\xi)$}\]
+\[ \Gam(z,\xi) = \Gam(z) - \gam(z,\xi) = \int_\xi^\infty t^{z-1}e^{-t}\,dt \DEF{$\Gam(z,\xi)$}\]
+For a fixed $\xi$, $\gamma(z,\xi)$ is a meromorphic function of $z$ with simple poles at $z=0,-1,-2,\dots$,
+while $\Gam(z,\xi)$ is an entire function of~$z$.
+
+Inverse functions ...
+
+\begin{implementation}
+Various potentially useful relations
+\begin{itemize}
+\item[\bf(A)] For $a\neq-1,-2,\dots$,
+\[ \Gam(a,z) = \Gam(a) - \sum_{n=0}^\infty\frac{\Gam(a)e^{-z}z^{n+a}}{\Gam(a+n+1)} = \Gam(a) - \sum_{n=0}^\infty\frac{(-)^nz^{n+a}}{(a+n)n!} \]
+\item[\bf(B)] As $z\to\infty$,
+\[ \Gam(a,z)\sim z^{a-1}e^{-z}\sum_{n=0}^\infty\frac{\Gam(a)}{\Gam(a-n)z^n} \]
+\item[\bf(C)] Continued fraction expansion: (best when $a>>z$)
+\[ \Gam(a,z) = \frac{e^{-z}z^a}{z+} \frac{1-a}{1+} \frac{1}{z+} \frac{2-a}{1+} \frac{2}{z+} \cdots \]
+\item[\bf(C')] Equivalent fraction (converges for $\Re z>0$), where $v=z^{-1}$
+\[ e^{z}z^{1-a}\Gam(a,z) = \frac{1}{1+} \frac{(1-a)v}{1+} \frac{v}{1+} \frac{(2-a)v}{1+} \frac{2v}{1+} \cdots \]
+\item[\bf(D)] For $n\geq0$; (though claimed to be of limited use unless $a\sim-n$)
+\[ \Gam(a+n+1, z) = \Gam(a+n, z) + \frac{\Gam(a)\exp(-z) z^{n+a}}{\Gam(a+n+1)} \]
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Digamma functions and related}
+The digamma function is defined via
+\[ \psi(z) = \frac{d}{dz}\log\Gam(z) = \frac{\Gam'(z)}{\Gam(z)}   \DEF{$\psi(z)$}\]
+meromorphic with simple poles at $z=0,-1,-2,\dots$
+
+And the polygamma function (for $n=1,2,3,\dots$)
+\[ \psi^{(n)}(z) = \frac{d^n}{dz^n}\psi(z) = \frac{d^{n+1}}{dz^{n+1}}\ln\Gam(z)
+    = (-)^{n+1}\int_0^\infty\frac{t^n e^{-zt}}{1-e^{-t}}\,dt \DEF{$\psi^{(n)}(z)$}\]
+which is meromorphic and single-valued with poles of order $n+1$ at $z=-m$ ($m=0,1,2,\dots$).
+\[ \psi^{(n)}(z+1) = \psi^{(n)}(z) + (-)^n n! z^{-n-1} \]
+\[ \psi^{(n)}(1-z) - (-)^n\psi^{(n)}(z) = (-)^n \pi \frac{d^n}{dz^n}\cot(\pi z) \]
+\[ \psi^{(n)}(1+z) = (-)^{n+1}\sum_{k=n}^\infty (-)^k k!\zeta(k+1)\frac{z^{k-n}}{(k-n)!} \]
+\[ \psi^{(n)}(z) = (-)^{n+1} n! \sum_{k=0}^\infty (z+k)^{-n-1} \qquad(z\neq0,-1,-2,\dots) \]
+Using Euler-Maclaurin summation with this last series works quite well.
+
+\begin{implementation}
+This approach for digamma works pretty well, but get loss of precision as $x\to^-2$ or $x\to^+0$.
+\begin{itemize}
+\item[\bf(A)] Use the following to reduce the (real) argument to get $0.5<z\leq1.5$
+    \[ \psi(z+1) = \frac{1}{z} + \psi(z) \]
+\item[\bf(B)] Then use this series for the resulting $z$.
+    \[ \psi(1+z) = -\gamma + \sum_{k=2}^\infty (-)^k \zeta(k) z^{k-1} \]
+\end{itemize}
+\end{implementation}
+
+Remark: for reflection of polygamma function, we need $\frac{d^n}{dz^n}\cot(\pi z)$.  From Mathematica we have the following table:
+perhaps some pattern can be gleaned for arbitrary $n$... [TODO: solve this puzzle]
+{\small
+\[\begin{array}{r|l}
+n & \frac{(-)^n}{\csc(x)^{n+1}}\frac{d^n}{dx^n}\cot(x) \\\hline
+ 0 & \cos (x) \\
+ 1 & 1 \\
+ 2 & 2 \cos (x) \\
+ 3 & 2 \cos (2 x)+4 \\
+ 4 & 22 \cos (x)+2 \cos (3 x) \\
+ 5 & 52 \cos (2 x)+2 \cos (4 x)+66 \\
+ 6 & 604 \cos (x)+114 \cos (3 x)+2 \cos (5 x) \\
+ 7 & 2382 \cos (2 x)+240 \cos (4 x)+2 \cos (6 x)+2416 \\
+ 8 & 31238 \cos (x)+8586 \cos (3 x)+494 \cos (5 x)+2 \cos (7 x) \\
+ 9 & 176468 \cos (2 x)+29216 \cos (4 x)+1004 \cos (6 x)+2 \cos (8 x)+156190 \\
+ 10 & 2620708 \cos (x)+910384 \cos (3 x)+95680 \cos (5 x)+2026 \cos (7 x)+2 \cos (9 x) \\
+ 11 & 19476228 \cos (2 x)+4406976 \cos (4 x)+305274 \cos (6 x)+4072 \cos (8 x)+2 \cos (10 x)+15724248 \\
+ 12 & 325024572 \cos (x)+132636948 \cos (3 x)+20375370 \cos (5 x)+956542 \cos (7 x)+8166 \cos (9 x)+2 \cos (11 x) \\
+\end{array}\]
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Beta functions}
+
+\[ \Beta(a,b) = \int_0^1 t^{a-1}(1-t)^{b-1}\,dt = \frac{\Gam(a) \Gam(b)}{\Gam(a+b)}     \DEF{$\Beta(a,b)$}\]
+{\tt beta}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Incomplete beta functions}
+
+\[ \Beta_\xi(a,b) = \int_0^\xi t^{a-1}(1-t)^{b-1}\,dt     \DEF{$\Beta_\xi(a,b)$}\]
+\[ \O{I}_\xi(a,b) = \frac{\Beta_\xi(a,b)}{\Beta(a,b)}     \DEF{$\O{I}_\xi(a,b)$}\]
++complementary incomplete beta (\& scaled)
+
+Gil-Segura-Temme book gives the continued fraction
+\[ \Beta_x(p,q) = \frac{x^p(1-x)^q}{p}\left( \frac{1}{1+} \frac{d_1}{1+} \frac{d_2}{1+} \frac{d_3}{1+} \cdots \right) \]
+where
+\[ d_{2n+1} = -x\frac{(p+n)(p+q+n)}{(p+2n)(p+2n+1)} \qquad d_{2n+2} = x\frac{(n+1)(q-n-1)}{(p+2n+1)(p+2n+2)} \]
+with the note that when $p,q>1$ the best numerical results are obtained when $x\leq x_0 = (p-1)/(p+q-2)$ and for $x_0<x\leq1$
+you should use the reflection $\Beta_x(p,q) = \Beta(p,q) - \Beta_{1-x}(q,p)$.
+Note also that for this continued fraction,
+the convergents $C_{4n}$ and $C_{4n+1}$ are less than
+and the convergents $C_{4n+2}$ and $C_{4n+3}$ are greater than
+the value of the continued fraction.
+[This works quite well (with a few domain issues for complex/negative parameters).]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Error and related functions}
+Dawson's integral, Fadeeva function (zeros?) [normal cdf, etc.]
+Black-Scholes/Implied-Volatility core: $e^\al\Phi[\al/s + s/2] - \Phi[\al/s - s/2]$,
+{\tt erf, erfc, inverse\_erf, inverse\_erfc, erfc\_star, Dawson, Fadeeva},
+
+Iterated error functions $i^n = \int i^{n-1}\erfc$
+
+\[ \erf(z) = \frac{2}{\sqrt\pi}\int_0^z e^{-t^2}\,dt \qquad z\in\CC \]
+\[ \erfc(z) = 1 - \erf(z) \qquad z\in\CC \]
+\[ \erfc^*(z) = e^{z^2} \erfc(z) \]
+\[ \O{erfi}(z) = -\ii\erf(\ii z) \]
+(useful for $z\to\infty$, $z>0$)
+
+\[ \F{erf}(z) = \erf(z) \]
+\[ \F{erfc}(z) = \erfc(z) \]
+
+An approximation from A\&S is 
+\[ \O{inverf}(x) = t + \frac{1}{3}t^3 + \frac{7}{30}t^5 + \frac{127}{630}t^7 + \cdots \]
+where $t=x\sqrt{\pi}/2$.  This can give the first guess to an iterative root-finder (such as Halley's method).
+
+Note that Lebedev defines $\Phi(z)=\text{our $\erf$}$ and $\O{Erf}(z)=\int_0^z e^{-t^2}\,dt$.
+He also defines $F(z) = e^{-z^2}\int_0^z e^{u^2}\,du$.
+
+\[ \erf(\ii x) = \frac{2x\ii}{\sqrt\pi} \sum_{n=0}^\infty (-)^n \left( \O{i}^{(1)}_{2n}(x^2) + \O{i}^{(1)}_{2n+1}(x^2) \right) \qquad x\in\RR \]
+
+\begin{implementation}
+\begin{itemize}
+\item A series that works reasonably well for small $z$ is the following; note that we ensure $z\geq0$ by using
+  the fact that $\erf(-z)=-\erf(z)$ (to avoid cancellation)
+  \[ \erf(z) = \frac{2}{\sqrt\pi}e^{-z^2}\sum_{n=0}^\infty\frac{2^n z^{2n+1}}{1\cdot3\cdot5\cdots(2n+1)} \]
+\item A continued fraction that works well the following (evaluated with, say, the Wallis recurrence)
+  \[ \erfc(z) = \frac{e^{-z^2}}{\sqrt\pi} \frac{2z}{z^2+1-} \frac{1\cdot2}{z^2+5-} \frac{3\cdot4}{z^2+9-} \frac{5\cdot6}{z^2+13-}\cdots \]
+\item An asymptotic expansion that generally underperforms the continued fraction is
+  \[ \erfc(z) \sim \frac{e^{-z^2}}{z\sqrt\pi}\sum_{m=0}^\infty(-)^m\frac{1\cdot3\cdot5\dots(2m-1)}{(2z^2)^m} \]
+\item Marsaglia~\cite{marsaglia} points out (for the normal cdf) that given the value of $\erfc(x_0)$ at a point $x_0$, there is a simple recurrence
+  relation to generate the coefficients of the Taylor series around that point, that is:
+  \[ \erf^{(n+2)}(z) = -2z\erf^{(n+1)}(z) - 2n\erf^{(n)}(z) \qquad n\geq0 \]
+\item A reasonable approach is to use the continued fraction for $|x|>3$, the series for $|x|<1$, and the local Taylor expansions
+  centered at $\pm1\tfrac12, \pm2, \pm2\tfrac12$ for other points.  (Using a table to store the ``seeds'' for those select points.)
+\end{itemize}
+\end{implementation}
+
+Other notes:
+\[ erf(x+\ii y) = \erf(x) + \frac{e^{-x^2}}{2\pi x}\left[(1-\cos(2xy)) + \ii\sin(2xy)\right]
+    +\frac2\pi e^{-x^2}\sum_{n=1}^\infty \frac{e^{-n^2/4}}{n^2+4x^2}\left[ f_n(x,y) + \ii g_n(x,y)\right] + \eps \]
+with $\eps\sim 10^{-16}\cdot|erf(z)|$ where
+$f_n(x,y) = 2x - 2x\cosh(ny)\cos(2xy) + n\sinh(ny)\sin(2xy)$ and
+$g_n(x,y) = 2x\cosh(ny)\sin(2xy) + n\sinh(ny)\cos(2xy)$.
+This seems to work pretty well for small(ish) $z$, but gives NaN for, say, $z=17(1+\ii)$.  (Note that $x=0$ is bad, though
+this case reduces to...)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fadeeva and Dawson integrals}
+Dawson's integral:
+\[ \O{F}(x) = e^{-x^2}\int_0^x e^{t^2}\,dt = -\ii\frac{\sqrt\pi}{2}e^{-z^2}\erf(\ii z) = \ii\frac{\sqrt{\pi}}{2}\left(e^{-z^2} -\O{w}(z)\right)\]
+Generalized Dawson's integral:
+\[ \O{F}_p(x) = e^{-x^p}\int_0^x e^{t^p}\,dt \]
+
+Fadeeva's integral:
+\[ \O{w}(z) = e^{-z^2}\erfc(-\ii z) = e^{-z^2}(1 + \frac{2\ii}{\sqrt\pi}\int_0^z e^{t^2}\,dt \]
+
+Series:
+\begin{eqnarray*}
+\O{F}(x) &=& x\frac{\sqrt{\pi}}{2}\sum_{k=0}^\infty(-)^k\frac{x^{2k}}{\Gam(k+3/2)} \\
+         &=& x\sum_{k=0}^\infty (-)^k \frac{x^{2k}}{(3/2)_k} \\
+         &=& \sum_{n=0}^\infty (-)^n \frac{2^n x^{2n+1}}{(2n+1)!!}
+\end{eqnarray*}
+
+Series of spherical Bessel functions
+\begin{eqnarray*}
+\O{F}(x) &=& e^{-x^2} x \sum_{n=0}^\infty (-)^n \left( \O{i}^{(1)}_{2n}(x^2) + \O{i}^{(1)}_{2n+1}(x^2) \right) \\
+         &=& e^{-x^2} x \left( \O{i}_0 + \O{i}_1 - \O{i}_2 - \O{i}_3 + \O{i}_4 + \O{i}_5 - \cdots \right) \\
+         &=& e^{-x^2} x \left( \frac{3}{z}\O{i}_1 + \frac{5}{z}\O{i}_2 + \frac{11}{z}\O{i}_5 + \frac{13}{z}\O{i}_6 + \frac{19}{z}\O{i}_9 + \frac{21}{z}\O{i}_{10} + \cdots \right)
+\end{eqnarray*}
+where we use the recurrence relation $\O{i}_{n-1} - \O{i}_{n+1} = \tfrac{2n+1}{z}\O{i}_n$ for the last equation.
+Unfortunately, this approach is not numerically stable and we lose much accuracy from bad cancellation.
+
+Continued fractions:
+\[ F(z) = \frac{z}{1+} \frac{2z^2}{3-} \frac{4z^2}{5+} \frac{6z^2}{7-} \frac{8z^2}{9+} \cdots \]
+which is good for $|z|$ smaller.
+\[ F(z) = \frac{z}{1+2z^2-} \frac{4z^2}{3+2z^2-} \frac{8z^2}{5+2z^2-} \frac{12z^2}{7+2z^2-} \cdots \]
+which is good for $|z|$ larger.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Fresnel integrals}
+Need {\em zeros} also
+\[ \O{C}(z) = \int_0^z \cos(t^2 \pi/2)\,dt \]
+\[ \O{S}(z) = \int_0^z \sin(t^2 \pi/2)\,dt \]
+{\tt Fresnel\_C, Fresnel\_S}
+
+We have the series expansions
+\[ \O{C}(z) = \sum_{n=0}^\infty(-)^n\frac{(\pi/2)^{2n}}{(2n)!(4n+1)}z^{4n+1}
+    = \sum_{n=0}^\infty \O{j}_{2n}(z^2\pi/2) \]
+\[ \O{S}(z) = \sum_{n=0}^\infty(-)^n\frac{(\pi/2)^{2n+1}}{(2n+1)!(4n+3)}z^{4n+3}
+    = \sum_{n=0}^\infty \O{j}_{2n+1}(z^2\pi/2) \]
+(for using the spherical bessel expansions, should extract the whole sequence of needed values for efficiency...)
+Note that DLMF and A\&S include a $z$ multiplier on the bessel expansions but numeric tests seem to indicate that that
+is wrong!
+\begin{implementation}
+Use the two series above as well as asymptotic expansion...
+\end{implementation}
+
+``modified Fresnel? (see Z \& J)''
+
+Note: in Lebedev's notation, we have
+$\Phi(\sqrt\ii x)/\sqrt\ii = \frac{2}{\sqrt\pi}\int_0^x\cos u^2\,du -  \ii\frac{2}{\sqrt\pi}\int_0^x\sin u^2\,du$
+
+\[ \O{Ci}(z) = \int_\infty^z\frac{\cos t}{t}\,dt = \gam + \log(z) + \int_0^z \frac{\cos t - 1}{t}\,dt \]
+\[ \O{Si}(z) = \int_0^z \frac{\sin t}{t}\,dt \]
+$\O{Si}(z)$ is an entire function, while $\O{Ci}(z)$ is analytic in the split plane (deleting the negative real axis).
+Note that $\O{Ei}(\ii x) = \O{Ci}(x) - \ii(\frac\pi2 - \O{Si}(x))$ for $x>0$.
+
+When $|\O{ph} z| < \pi/2$, we have
+\[ \O{Ci}(z) = -\frac12\left( \O{E}_1(\ii z) + \O{E}_1(-\ii z) \right) \]
+\[ \O{Si}(z) = \frac\ii2\left( \O{E}_1(-\ii z) - \O{E}_1(\ii z) \right) + \frac\pi2 \]
+Using these with continued-fraction expansion for $\O{E}_1(z) = e^{-z}/(z+1/(1+1/(z+2/(1+2/(z+\cdots)))))$ works well.
+(Note that for real $x$, we have $\O{Ci}(x) = -\Re \O{E}_1(\ii x)$.)
+
+[{\bf Move much of this to Exponential Integrals section}]
+
+\[ \O{Cin}(z) = \int_0^z\frac{1-\cos t}{t}\,dt \]
+thus $\O{Ci}(z) = -\O{Cin}(z) + \ln z + \gam$
+
+Series expansions:
+\[ \O{Ci}(z) = \gamma + \ln(z) + \sum_{n=1}^\infty (-)^n \frac{z^{2n}}{(2n)!(2n)} \]
+\[ \O{Si}(z) = \sum_{n=0}^\infty (-)^n \frac{z^{2n+1}}{(2n+1)!(2n+1)} \]
+
+\[ \O{Si}(z) = z\sum_{n=0}^\infty \O{j}^2_n(z/2) \]
+which works well (and can use recurrence for fast computation...)
+\[ \O{Ci}(z) = \sum_{n=0}^\infty a_n\O{j}^2_n(z/2) \]
+where $a_n = (2n+1)\left(1 - (-)^n + \psi(n+1) - \psi(1)\right)$
+\[ \O{Ei}(x) = \gam + \ln|x| + \sum_{n=0}^\infty (-)^n (x-a_n) \O{i}^{(1)}(x/2)^2 \qquad (x\neq 0) \]
+where $a_n = (2n+1)\left(1 - (-)^n + \psi(n+1) - \psi(1)\right)$
+\[ \O{Ein}(x) = z e^{-z/2}\left( \O{i}^{(1)}_0(z/2) + \sum_{n=1}^\infty \frac{2n+1}{n(n+1)} \O{i}^{(1)}_n(z/2) \right) \]
+Also, $\O{E}_1(z) = \Gam(0,z)$ and $\O{E}_1(z) = e^{-z} U(1,1,z)$
+
+Asymptotic expansions ($|z|=25$ seems to be a reasonable transition point from the series to asymptotic)
+\begin{eqnarray*}
+\O{Si}(z) &=& \frac\pi2 - \cos(z) f(z) - \sin(z) g(z) \\
+\O{Ci}(z) &=& \sin(z) f(z) - \cos(z) g(z) \\
+f(z) &\sim& \frac1z\left(1 - \frac{2!}{z^2} + \frac{4!}{z^4} - \frac{6!}{z^6} + \cdots \right) \\
+g(z) &\sim& \frac1{z^2}\left(1 - \frac{3!}{z^2} + \frac{5!}{z^4} - \frac{7!}{z^6} + \cdots \right)
+\end{eqnarray*}
+
+For $x>0$ we have the following (actually for any $z$ in the slit plane $\CC\setminus(-\infty,0]$):
+\[ \O{Shi}(x) = (\O{Ei}(z) + \O{E}_1(x))/2 \]
+\[ \O{Chi}(x) = (\O{Ei}(z) - \O{E}_1(x))/2 \]
+
+We have
+\[ \O{li}(z) = \O{Ei}(\ln z) \]
+
+Asymptotic expansion for Fresnel integrals
+\begin{eqnarray*}
+\O{C}(x) &=& \O{sgn}(x)\frac12 + \frac{1}{\pi x}\left( f(x)\sin(x^2\pi/2) - g(x)\cos(x^2\pi/2) \right) \\
+\O{S}(x) &=& \O{sgn}(x)\frac12 - \frac{1}{\pi x}\left( f(x)\cos(x^2\pi/2) + g(x)\sin(x^2\pi/2) \right) \\
+\end{eqnarray*}
+where
+\begin{eqnarray*}
+f(x) &\sim& 1 + \sum_{n=1}^\infty (-)^n \frac{1\cdot3\cdot5\cdots(4n-1)}{(\pi x^2)^{2n  }} \\
+g(x) &\sim&     \sum_{n=0}^\infty (-)^n \frac{1\cdot3\cdot5\cdots(4n+1)}{(\pi x^2)^{2n+1}} \\
+\end{eqnarray*}
+[quality of this needs to be validated...]
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Arctangent integral}
+
+\[ \O{atanint}(z) = \int_0^z\frac{\atan(t)}{t}\,dt \]
+then since $\atan(z)=z-z^3/3+z^5/5-\cdots$ (for $|z|\leq1$, $z\neq\pm\ii$), we have
+\[ \O{atanint}(z) = \sum_{n=0}^\infty(-)^n\frac{z^{2n+1}}{(2n+1)^2} \]
+(compare dilogarithm...)
+
+In terms of the Lerch $\Phi$ function we have
+\[ \O{atanint}(z) = \frac{z}{4}\sum_{n=0}^\infty\frac{(-z^2)^n}{(n+1/2)^2} = \frac{z}{4}\Phi[-z^2, 2, 1/2] \]
+
+We have the asymptotic series
+\[ \O{atanint}(z) = \frac\pi2\ln z + \sum_{n=0}^\infty \frac{(-)^n}{z^{2n+1}(2n+1)^2} \qquad|z|\geq1, \Re z\neq0\]
+(from similar series for $\atan$)
+
+We can expand in Taylor series at $1$.  We get
+\begin{eqnarray*}
+  \O{ataint}(1+x) &=& C + \frac\pi4 x + \left(\frac12-\frac\pi4\right) \frac{x^2}{2!} + \left(\frac\pi4-\frac32\right) \frac{x^3}{3!} + \left(5-\frac{3\pi}2\right) \frac{x^4}{4!} \\
+      && {} + \left(6\pi-20\right) \frac{x^5}{5!} + \left(97-30\pi\right) \frac{x^6}{6!} + \left(180\pi-567\right) \frac{x^7}{7!} + \left(3924-1260\pi\right) \frac{x^8}{8!} + \cdots
+\end{eqnarray*}
+where $C=0.9159655942\dots$ is Catalan's constant.
+
+One can attempt Euler-Maclaurin expansion in the series, but you end up with $\Gam(-1,x)$ term for the integral (which can be written in terms of $\O{Ei}(x)$), but the
+computation becomes more expensive... (integral term in EM is $\tfrac{-\ln(z)}{4z}\Gam(-1, (4n+1)\ln z)$
+and we have $\Gam(-1,x) = \O{Ei}(-x) + \frac{e^{-x}}{x} + \frac12(\ln(-1/x) - \ln(-x)) + \ln x$.)
+
+\begin{implementation}
+To implement for real $x$, use series, asymptotic series, reflection, and local series at~$1$.
+\end{implementation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Iterated error functions}
+Define
+\begin{eqnarray*}
+i^{-1}\erfc(z) &=& \frac{2}{\sqrt\pi} e^{-z^2} \\
+i^{0}\erfc(z) &=& \erfc(z) \\
+i^{n}\erfc(z) &=& \int_z^\infty i^{n-1}\erfc(t)\,dt
+\end{eqnarray*}
+We have the recurrence
+\[ i^{n}\erfc(z) = -\frac{z}{n}i^{n-1}\erfc(z) + \frac{1}{2n}i^{n-2}\erfc(z) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Bessel, Hankel, Airy functions}
+
+Need {\em zeros} also
+
+{\tt Jn, Jnu, Yn, Ynu, In, Inu, Kn, Knu, dJn, ..., Integrate\_Jn, ...
+jn, yn, in, kn, ..., (array versions...)
+} --- real / imaginary / complex arguments, integer / real / imaginary / complex parameters
+$\Lambda_\nu(x) = $?, ``Riccati Bessel functions''?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bessel functions}
+Bessel functions are also known as ``cylinder functions''
+
+Bessel's differential equation $z^2 y'' + z y' + (z^2-\nu^2) y = 0$.
+
+Bessel function of the first kind, regular at~$0$; if $\nu\in\ZZ$ then we can have any $z\in\CC$, but
+for arbitrary $\nu\in\CC$ we need $|\arg z|<\pi$.
+\[ \O{J}_\nu(z) = \sum_{k=0}^\infty\frac{(z/2)^{2k+\nu}}{k!(k+\nu)!} \]
+Note that
+\[ \O{J}_\nu(z) = \frac{1}{\pi}\int_0^\pi\cos(z \sin\theta - \nu\theta)\,d\theta
+  - \frac{\sin \nu\pi}{\pi}\int_0^\infty e^{-z \sinh t - \nu t}\,dt \]
+
+Bessel function of the second kind, irregular at~$0$:
+\[ \O{Y}_\nu(z) = \frac{\O{J}_\nu(z)\cos\nu\pi - \O{J}_{-\nu}(z)}{\sin \nu\pi} \]
+Some people use the notation $\O{N}_\nu(z) = \O{Y}_\nu(z)$.
+For $\nu=n\in\ZZ$, define $\O{Y}_n(z) = \lim_{\nu\to n}\O{Y}_\nu(z)$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modified Bessel functions}
+
+Hyperbolic or modified Bessel function (of the first kind), regular at~$0$:
+\[ \O{I}_\nu(z) = e^{-\nu\pi\ii/2} \O{J}_\nu(\ii z) \qquad z\in\CC, \nu\in\CC \]
+Hyperbolic or modified Bessel function (of the third kind), irregular at~$0$, also called Bassett's function or Macdonald's function:
+\[ \O{K}_\nu(z) = xxx \qquad z\in\CC\setminus\RR_{\leq0}, \nu\in\CC \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Incomplete Bessel functions}
+
+\[ \O{I}_\nu(z; \xi) = \dots \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spherical Bessel functions}
+
+\[ \O{j}_n(z) = \sqrt{\frac{\pi}{2z}} \O{J}_{n+1/2}(z) \]
+\[ \O{y}_n(z) = \sqrt{\frac{\pi}{2z}} \O{Y}_{n+1/2}(z) \]
+\[ \O{i}^{(1)}_n(z) = \]
+\[ \O{i}^{(2)}_n(z) = \]
+\[ \O{k}_n(z) = \]
+\[ \O{h}^{(1)}_n(z) = \]
+\[ \O{h}^{(2)}_n(z) = \]
+
+Some explicit formul\ae\ for spherical Bessel functions:
+let $a_k(n+\tfrac12) = \begin{cases}\frac{(n+k)!}{2^k k! (n-k)!} & k=0,1,\dots,n\\0&k>n\end{cases}$
+\[ \O{j}_n(z) = \sin(z - n\frac\pi2)\sum_{k=0}^{\lfloor n/2\rfloor}(-)^k\frac{a_{2k}(n+\tfrac12)}{z^{2k+1}}
+    + \cos(z - n\frac\pi2)\sum_{k=0}^{\lfloor (n-1)/2\rfloor}(-)^k\frac{a_{2k+1}(n+\tfrac12)}{z^{2k+2}} \]
+(The Bessel polynomial of degree $n$ is given by $\sum_{k=0}^n a_k(n+\tfrac12)z^{n-k}$.)
+\begin{eqnarray*}
+\O{j}_0(z) &=& \frac{\sin z}{z} \\
+\O{j}_1(z) &=& \frac{\sin z}{z^2} - \frac{\cos z}{z} = \sum_{n=0}^\infty (-)^{n+1}\frac{z^{2n+1}}{(2n+1)!(2n+3)} \\
+\O{y}_0(z) &=& -\frac{\cos z}{z} \\
+\O{y}_1(z) &=& -\frac{\cos z}{z^2} - \frac{\sin z}{z} \\
+\O{k}_0(z) &=& \frac{\pi}{2} e^{-z} \frac{1}{z} \\
+\O{k}_1(z) &=& \frac{\pi}{2} e^{-z} \left( \frac{1}{z} + \frac{1}{z^2} \right) \\
+\O{i}^{(1)}_0(z) &=& \frac{\sinh z}{z} = \sum_{n=0}^\infty\frac{z^{2n}}{(2n+1)!} \\
+\O{i}^{(1)}_1(z) &=& -\frac{\sinh z}{z^2} + \frac{\cosh z}{z} = \frac{1}{z}\sum_{n=0}^\infty\frac{2n}{(2n+1)!}z^{2n} \\
+\O{i}^{(2)}_0(z) &=& \frac{\cosh z}{z} \\
+\O{i}^{(2)}_1(z) &=& -\frac{\cosh z}{z^2} + \frac{\sinh z}{z}
+\end{eqnarray*}
+
+Reflection relations:
+\[ \O{j}_n(-z) = (-)^n\O{j}_n(z) \]
+\[ \O{y}_n(-z) = (-)^{n+1}\O{y}_n(z) \]
+\[ \O{i}^{(1)}_n(-z) = (-)^n\O{i}^{(1)}_n(z) \]
+\[ \O{i}^{(2)}_n(-z) = (-)^{n+1}\O{i}^{(2)}_n(z) \]
+\[ \O{k}_n(-z) = -\frac{\pi}{2}\left( \O{i}^{(1)}_n(-z) \O{i}^{(2)}_n(-z) \right) \]
+
+Recurrence relations:
+Let $f_n(z)$ denote $\O{j}_n(z)$, $\O{y}_n(z)$, or $\O{h}^{(j)}_n(z)$, then
+\[ f_{n-1}(z) + f_{n+1}(z) = \frac{2n+1}{z} f_n(z) \]
+and
+\[ f'_n(z) = f_{n-1}(z) - \frac{n+1}{z} f_n(z) \]
+For $\O{y}_n$, use forward.  For $\O{j}_n$, use forward when $|z|>n$ and backward when $|z|<n$.
+
+Let $g_n(z)$ denote $(-)^n\O{k}_n(z)$, $\O{i}^{(j)}_n(z)$, then
+\[ g_{n-1}(z) - g_{n+1}(z) = \frac{2n+1}{z} g_n(z) \]
+and
+\[ g'_n(z) = g_{n-1}(z) - \frac{n+1}{z} g_n(z) \]
+For $\O{k}_n$, use forward.  For $\O{i}^{(2)}_n$, use forward.  For $\O{i}^{(1)}$, use forward when $|z|>n$ and backward when $|z|<n$.
+
+For scaling in recurrence, can use:
+\[ \sum_{n=0}^\infty (2n+1)\O{j}_n^2(z) = 1 \]
+(or can use, for example, $\O{j}_0(z)=\sin z / z$.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Integral Bessel functions}
+
+\[ \O{Ji}_\nu(z) = \int_0^z \O{J}_\nu(t)\,dt \]
+\[ \O{Ii}_\nu(z) = \int_0^z \O{I}_\nu(t)\,dt \]
+etc.
+
+Note that Lebedev defines $\O{Ji}_\nu(z) = \int_0^z\frac{\O{J}_\nu(t)}{t}\,dt$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hankel, (Whittaker?)}
+
+Hankel functions are also known as Bessel functions of the third kind:
+\[ \O{H}^{(1)}_\nu(z) = \O{J}_\nu(z) + \ii\O{Y}_\nu(z) \]
+\[ \O{H}^{(2)}_\nu(z) = \O{J}_\nu(z) - \ii\O{Y}_\nu(z) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Airy functions}
+Solutions of Airy DE $y'' - z y = 0$.
+[Need derivatives also]
+
+\[ \O{Ai}(z) = \frac1\pi \int_0^\infty \cos(t^3/3 + xt)\,dt
+  = \frac{\sqrt{z/3}}{\pi}K_{1/3}(\zeta)
+  = \frac{\sqrt{z}}{3}\left( \O{I}_{-1/3}(\zeta) - \O{I}_{1/3}(\zeta) \right)
+  \DEF{$\O{Ai}(z)$} \]
+\[ \O{Bi}(z) = \frac1\pi \int_0^\infty e^{-t^3/3 + xt}\sin(t^3/3 + xt)\,dt
+  = \frac{\sqrt{z}}{3}\left( \O{I}_{-1/3}(\zeta) + \O{I}_{1/3}(\zeta) \right)
+  \DEF{$\O{Bi}(z)$} \]
+where $\zeta = (2/3)z^{3/2}$.
+
+[For positive $z$ use continued fraction from power series??]
+
+We also have
+\[ \O{Ai}(-z) = \frac{\sqrt{z}}{3}\left( \O{J}_{1/3}(\zeta) - \O{J}_{-1/3}(\zeta) \right) \]
+\[ \O{Bi}(-z) = \sqrt{\frac{z}{3}}\left( \O{J}_{-1/3}(\zeta) - \O{J}_{1/3}(\zeta) \right) \]
+
+Plus scaled versions, derivatives, integrals, ...
+(joint versions)
+
+Remark: one could attempt to do "Taylor stepping" (repeated expansion of power-series as analytic continuation...)
+One can derive a recurrence for the derivatives at an arbitrary point from the ordinary differential equation satisfied
+by Airy functions $w'' - zw = 0$ gives $w^{(n+3)} = z\cdot w^{(n+1)} + n\cdot w^{(n)}$.  However, in practice this works
+poorly: backwards is unstable, forwards gives low accuracy, relative error is $O(h^3)$ for step-sizes of $h$, etc.
+
+\begin{implementation}
+Atlas~\cite{atlas:thompson} recommends to compute these as
+$\O{Ai}(z) = c_1 f(x) - c_2 g(x)$, $\O{Bi}(z) = \sqrt3[c_1 f(x) + c_2 g(x)]$,
+where $c_1 = (3^{2/3}\Gam(2/3))^{-1}$, $c_2 = (3^{1/3}\Gam(1/3))^{-1}$, and
+\[ f(x) = \sum_{k=0}^\infty \frac{1\cdot4\cdot7\cdots(3k-2)}{(3k)!}x^{3k} = 1 + \frac{x^3}{3!} + 4\frac{x^6}{6!} + \cdots \]
+\[ g(x) = \sum_{k=0}^\infty \frac{2\cdot5\cdot8\cdots(3k-1)}{(3k+1)!}x^{3k} = x(1 + 2\frac{x^3}{4!} + 2\cdot5\frac{x^6}{7!} + \cdots) \]
+
+For $x>>0$, use the asymptotics
+\[ \O{Ai}(x) \sim \frac{e^{-\zeta}}{2\sqrt{\pi x^{1/2}}}\left(\sum_{k=0}^\infty(-)^k\frac{t_k}{\zeta^k}\right) \]
+\[ \O{Bi}(x) \sim \frac{e^{\zeta}}{2\sqrt{\pi x^{1/2}}}\left(\sum_{k=0}^\infty\frac{t_k}{\zeta^k}\right) \]
+where $t_k = \frac{(2k+1)(2k+3)\cdots(6k-1)}{216^k k!}$ (for $k>0$), $t_0=1$.
+
+For $x<<0$, use the asymptotics
+\[ \O{Ai}(x) \sim \frac{1}{\sqrt{\pi x^{1/2}}}\left[ \sin(\zeta+\pi/4) F(\zeta) - \cos(\zeta+\pi/4) G(\zeta) \right] \]
+\[ \O{Bi}(x) \sim \frac{1}{\sqrt{\pi x^{1/2}}}\left[ \cos(\zeta+\pi/4) F(\zeta) + \sin(\zeta+\pi/4) G(\zeta) \right] \]
+where $F(\zeta) = \sum_{k=0}^\infty (-)^k c_{2k} / \zeta^{2k}$ and $G(\zeta) = \sum_{k=0}^\infty (-)^k c_{2k+1} / \zeta^{2k+1}$.
+(In practice, he solves for $F, G$ in terms of $\O{Ai}, \O{Bi}$ and computes a rational approximation to them.)
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Scorer functions}
+\[ \O{Gi}(z) \text{\ is solution of inhomogeneous Airy DE $y''-z y = -\frac1\pi$ with $\O{Gi}(0)=\O{Bi}(0)/3$, $\O{Gi}'(0)=\O{Bi}'(0)/3$, }
+  \DEF{$\O{Gi}(z)$} \]
+\[ \O{Hi}(z) \text{\ is solution of inhomogeneous Airy DE $y''-z y = +\frac1\pi$ with $\O{Hi}(0)=2\O{Bi}(0)/3$, $\O{Hi}'(0)=2\O{Bi}'(0)/3$, }
+  \DEF{$\O{Hi}(z)$} \]
+
+\[ \O{Gi}(z) = \O{Bi}(z)\int_z^\infty\O{Ai})(t)\,dt + \O{Ai}(z)\int_0^z\O{Bi}(t)\,dt \]
+\[ \O{Hi}(z) = \O{Bi}(z)\int_{-\infty}^z\O{Ai})(t)\,dt - \O{Ai}(z)\int_{-\infty}^z\O{Bi}(t)\,dt \]
+
+For small $|z|$ we can use series
+\[ \O{Gi}(z) = \frac{3^{-2/3}}{\pi}\sum_{k=0}^\infty \cos(\pi\tfrac{2k-1}{3})\Gam(\tfrac{k+1}{3})\frac{(3^{1/3} z)^k}{k!} \]
+\[ \O{Hi}(z) = \frac{3^{-2/3}}{\pi}\sum_{k=0}^\infty                         \Gam(\tfrac{k+1}{3})\frac{(3^{1/3} z)^k}{k!} \]
+Note that from periodicity of $\cos$, we don't need to compute for each term.
+Similarly, $\Gam(n/3)$ can be computed via recurrence from $\Gam(1/3)$ and $\Gam(2/3)$.
+
+For Mathematica use, these integral forms were useful:
+\[ \O{Gi}(z) = \frac{1}{\pi}\int_0^\infty\sin(\tfrac{t^3}{3} + xt)\,dt \qquad x\in\RR \]
+\[ \O{Hi}(z) = \frac{1}{\pi}\int_0^\infty e^{-t^3/3 + zt}\,dt \]
+
+Another integral form (useful for intermediate $|z|$?) is
+\[ \O{Gi}(z) = -\frac{1}{\pi}\int_0^\infty e^{-t^3/3 - zt/2}\cos(\tfrac{\sqrt3}{2}zt + \tfrac23\pi)\,dt \]
+
+For large $|z|\to\infty$ we have asymptotic forms
+\[ \O{Gi}(z) \sim \frac{1}{\pi z}\sum_{k=0}^\infty \frac{(3k)!}{k!(3z^3)^k} \qquad |\O{ph}z|\leq\tfrac\pi3 - \delta \]
+\[ \O{Hi}(z) \sim -\frac{1}{\pi z}\sum_{k=0}^\infty \frac{(3k)!}{k!(3z^3)^k} \qquad |\O{ph} {-z}|\leq\tfrac23\pi - \delta \]
+For other phase ranges, use the connection formulas
+\[ \O{Gi}(z) + \O{Hi}(z) = \O{Bi}(z) \]
+\[ \O{Gi}(z) = \frac12 e^{\pi\ii/3}\O{Hi}(z e^{-2\pi\ii/3}) + \frac12 e^{-\pi\ii/3}\O{Hi}(z e^{2\pi\ii/3}) \]
+\[ \O{Gi}(z) = e^{\mp\pi\ii/3}\O{Hi}(z e^{\pm2\pi\ii/3}) \pm \ii \O{Ai}(z) \]
+\[ \O{Hi}(z) = e^{\pm2\pi\ii/3}\O{Hi}(z e^{\pm2\pi\ii/3}) + 2 e^{\mp\pi\ii/6}\O{Ai}(z e^{\mp2\pi\ii/3}) \]
+
+Finally a few other integral representations:
+\[ \O{Gi}(x) = \frac{4x^2}{3^{3/2}\pi} \dashint_0^\infty\frac{\O{K}_{1/3}(t)}{\zeta^2 - t^2}\,dt \qquad x>0, \text{CHECK!} \]
+\[ \O{Hi}(-z) = \frac{4z^2}{3^{3/2}\pi^2} \int_0^\infty\frac{\O{K}_{1/3}(t)}{\zeta^2 + t^2}\,dt \qquad |\O{ph} z|<\tfrac\pi3 \]
+where $\zeta=\tfrac23z^{3/2}$
+\[ \O{Hi}{z} = \frac{3^{-2/3}}{2\pi^2\ii} \int_{-\ii\infty}^{+\ii\infty} \Gam(\tfrac13+\tfrac13t)\Gam(-t)(3^{1/3}e^{\pi\ii}z)^t\,dt \]
+where the integration contour separates the poles of $\Gam(\tfrac13+\tfrac13t)$ (which are $-1, -4, -7, -10, \dots$)
+from the poles of $\Gam(-t)$ (which are $0, 1, 2, 3, \dots$).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Kelvin functions}
+Regular at 0
+\[ \O{ber}_\nu(z) = \sum_{n=0}^\infty \frac{(z/2)^{2n+\nu}}{n!(n+\nu)!}\cos( (3\nu/4 + n/2) \pi)\]
+\[ \O{bei}_\nu(z) = \sum_{n=0}^\infty \frac{(z/2)^{2n+\nu}}{n!(n+\nu)!}\sin( (3\nu/4 + n/2) \pi)\]
+Note $\O{ber}_\nu(z) - \ii\O{bei}_\nu(z) = \O{J}_\nu(\ii^{-3/2}z)$.
+Irregular at 0
+\[ \O{ker}_\nu(z) = \]
+\[ \O{kei}_\nu(z) = \]
+Note $\O{ker}_\nu(z) \pm \ii\O{kei}_\nu(z) = \ii^{\mp\nu}\O{K}_\nu(\ii^{\pm1/2}z)$.
+{\tt ber, bei, ker, kei, d\_ber, d\_bei, ..., Int\_ber, ...}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Struve functions}
+\[ \Ob{H}_\nu(z) = \sum_{n=0}^\infty (-)^n \frac{(z/2)^{2n+\nu+1}}{(n+1/2)!(n+\nu+1/2)!} \]
+\[ \Ob{L}_\nu(z) = -\ii e^{-\ii\nu\pi/2}\O{\mathbf{H}}_\nu(\ii z) = \sum_{n=0}^\infty \frac{(z/2)^{2n+\nu+1}}{(n+1/2)!(n+\nu+1/2)!} \]
+{\tt Struve\_Hn, d\_Struve\_Hn, ..., Ln, Integrate\_Struve\_Hn, ...}
+
+From A\&S~\cite{a&s}:
+
+The Struve function $\Ob{H}_\nu(z)$ is a particular solution to the non-homogeneous Bessel differential equation
+$z^2w'' + zw' + (z^2-\nu^2)w = \frac{4(z/2)^{\nu+1}}{\sqrt{\pi}\Gam(\nu+1/2)}$
+(which thus has a general solution $w=\al\O{J}_\nu(z) + \beta\O{Y}_\nu(z) + \Ob{H}_\nu(z)$)
+and $z^{-\nu}\Ob{H}_\nu(z)$ is an entire function in $z$.
+\[ \Ob{H}_\nu(z) = \left(\frac{z}{2}\right)^{\nu+1}\sum_{k=0}^\infty(-)^k\frac{(z/2)^{2k}}{\Gam(k+3/2)\Gam(k+\nu+3/2)} \]
+thus
+\[ \Ob{H}_0(z) = \frac2\pi\left(z-\frac{z^3}{1^2\cdot3^2}+\frac{z^5}{1^2\cdot3^2\cdot5^2}-\cdots\right) \]
+and
+\[ \Ob{H}_1(z) = \frac2\pi\left(\frac{z^2}{1^2\cdot3}-\frac{z^4}{1^2\cdot3^2\cdot5}+\frac{z^6}{1^2\cdot3^2\cdot5^2\cdot7}\cdots\right) \]
+We can also write
+\[ \Ob{H}_\nu(z) = \frac{2(z/2)^{\nu+1}}{\sqrt{\pi} \Gam(\nu+3/2)} \Hyper{1}{2}{1}{\tfrac32+\nu, \tfrac32}{-\frac{z^2}{4}} \]
+
+We have the recurrence
+\[ \Ob{H}_{\nu-1} + \Ob{H}_{\nu+1} = \frac{2\nu}{z}\Ob{H}_\nu + \frac{(z/2)^\nu}{\sqrt{\pi} \Gam(\nu+3/2)} \]
+((upward recursion is unstable... power-series seems quite robust enough (for $|x|<20$...)))
+
+And we have the asymptotic expansion for large $z$ with $|\arg z|<\pi$
+\[ \Ob{H}_\nu(z) - \O{Y}_\nu(z) = \frac{1}{\pi}\sum_{k=0}^{m-1}\frac{\Gam(k+1/2)}{\Gam(\nu-k+1/2)(z/2)^{2k-\nu+1}} + R_m \]
+with $R_m=O(|z|^{\nu-2m-1})$; if $\nu$ is real, $z$ positive, and $m-\nu+\tfrac12\geq0$, the remainder after $m$ terms is of the
+same sign and numerically less than the first term neglected.
+
+The modified Struve function is
+\[ \Ob{L}_\nu(z) = -\ii e^{-\ii\nu\pi/2} \Ob{H}_\nu(\ii z)
+    = \left(\frac{z}{2}\right)^{\nu+1}\sum_{k=0}^\infty\frac{(z/2)^{2k}}{\Gam(k+3/2)\Gam(k+\nu+3/2)} \]
+
+Other miscellaneous notes:
+\[ \Ob{H}_\nu' = \frac{\Ob{H}_{\nu-1} - \Ob{H}_{\nu+1}}{2} + \frac{(z/2)^\nu}{2\sqrt{\pi} \Gamma(\nu+3/2)} \]
+\[ \Ob{H}_0' = (2/\pi) - \Ob{H}_1 \]
+\[ \Ob{L}_{\nu-1} - \Ob{L}_{\nu+1} = \frac{2\nu}{z}\Ob{L}_\nu + \frac{(z/2)^\nu}{\sqrt{\pi} \Gam(\nu+3/2)} \]
+\[ \Ob{L}_\nu' = \frac{\Ob{L}_{\nu-1} + \Ob{L}_{\nu+1}}{2} + \frac{(z/2)^\nu}{\sqrt{\pi} \Gamma(\nu+3/2)} \]
+[double check for typos here...]
+\[ \int_0^z \Ob{H}_\nu(t)\,dt = \sum_{k=0}^\infty\frac{(-)^k(z/2)^{2k+2+\nu}}{(2k+2+\nu)\Gamma(k+3/2)\Gamma(\nu+k+3/2)}
+    = \left(\frac{z}{2}\right)^{\nu+2}\sum_{k=0}^\infty\frac{(-)^k(z/2)^{2k}}{(2k+2+\nu)\Gamma(k+3/2)\Gamma(\nu+k+3/2)} \]
+\[ \int_0^z \Ob{H}_0(t)\,dt = \frac{2}{\pi}\left(\frac{z^2}{2} - \frac{z^4}{1^2\cdot3^2\cdot4} + \frac{z^6}{1^2\cdot3^2\cdot5^2\cdot6} - \cdots\right) \]
+(just integrate term-by-term the power-series expansion)
+
+\begin{implementation}
+From~\cite{atlas:thompson}:
+To compute the Struve function $\Ob{H}_n(x)$ for $n=0,\dots,N$ (for real $x$), we:
+\begin{itemize}
+\item if $x=0$, then all values are $0$
+\item if $x<N/2$, use a power-series to compute $\Ob{H}_{N+8}(x)$, $\Ob{H}_{N+7}(x)$ and then use the recursion
+    downward to $n=0$
+\item if $N/2\leq x\leq25$, use power-series to compute $\Ob{H}_0(x)$, $\Ob{H}_1(x)$ and use the recursion upward to $n=N$
+\item else ($N/2,25<x$) use the asymptotic expansion to get $\Ob{H}_0(x)$, $\Ob{H}_1(x)$ and use the recursion upward to $n=N$
+\end{itemize}
+To compute the modified Struve function $\Ob{L}_n(x)$ for $n=0,\dots,N$ (for real $x$), we (for $x>0$) use the power-series or
+asymptotic expansion to compute $\Ob{L}_{N}(x)$, $\Ob{L}_{N-1}(x)$, then use the backwards recursion.
+
+From~\cite{zj}:
+\begin{itemize}
+\item for $\Ob{H}_0(x)$, $\Ob{H}_1(x)$ --- use power-series for $x<20$, asymptotic (with $Y_\nu$) for $x>20$
+\item for $\Ob{H}_\nu(x)$, ($\nu$ arbitrary), use power-series for $x<20$, asymptotic o.w.
+\item *OR* use
+    \[ \Ob{H}_{-n-1/2}(z) = (-)^nJ_{n+1/2}(z) \]
+    \[ \Ob{H}_{\nu}(z) = \frac{1}{\Gam(\nu+1/2)}\sum_{k=0}^\infty \frac{(z/2)^{k+\nu+1/2}}{k!(\nu+k+1/2)}J_{k+1/2}(z) \]
+    and note that the $J_{n+1/2}$ are easy to evaluate
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Spherical harmonics, Legendre functions}
+spherical Legendre, toroidal Legendre, conical Legendre (Atlas~\cite{atlas:thompson} for Computing...)
+{\tt Pn, Pnu, dPn, dPnu, assocPmn, assocPmnu, Qn, ..., Integrate\_Pn, ...} polynomials ...
+``spherical legendre'', ``conical legendre'', ``toroidal legendre'', ...
+
+\[ \O{P}_\nu(z) = \]
+\[ \O{Q}_\nu(z) = \frac{\pi}{2} \frac{\O{P}_\nu(z) \cos\nu z - \O{P}_\nu(-z)}{\sin \nu\pi} \]
+\[ \O{P}^m_\nu(z) = (-)^m(1-z^2)^{m/2} \frac{d^m}{dz^m} \O{P}_\nu(z) \]
+\[ \O{Q}^m_\nu(z) = (-)^m(1-z^2)^{m/2} \frac{d^m}{dz^m} \O{Q}_\nu(z) \]
+
+According to Lebedev, ``spherical harmonics'' are solutions of $(1-z^2)u'' - 2zu' + [\nu(\nu+1)-\mu^2/(1-z^2)]u = 0$
+(typically $z\in(-1,1)$ or sometimes $z\in[-\infty,1]$; $\mu=0,1,2,\dots$; $\nu\in\RR$ or $\nu\in\CC$).
+
+[Lebedev] Legendre functions take $\mu=0$ so we have $(1-z^2)u'' - 2zu' + \nu(\nu+1)u = 0$ and get
+Legendre functions of the first kind:
+\[ \O{P}_\nu(z) = F[-\nu,\nu+1; 1; \frac{1-z}{2}]  \qquad|z-1|<2 \]
+and Legendre functions of the second kind:
+\[ \O{Q}_\nu(z) = \]
+Both of these can be analytically continued to a larger domain.  Note that $P_n(z)$ are the Legendre polynomials for $n\in\NNo$.
+
+[Lebedev] The associated Legendre functions (of the first/second kinds) solve the more general equation with $\mu=m=0,1,2,\dots$
+where
+\[ \O{P}^m_\nu(z) = (z^2-1)^{m/2} \frac{d^m}{dz^m} \O{P}_\nu(z) \]
+\[ \O{Q}^m_\nu(z) = (z^2-1)^{m/2} \frac{d^m}{dz^m} \O{Q}_\nu(z) \]
+and the associated Legendre functions of the first/second kind {\em for the interval $(-1,1)$} are given by:
+\[ \O{P}^m_\nu(x) = (-)^m(1-x^2)^{m/2} \frac{d^m}{dx^m} \O{P}_\nu(x) \]
+\[ \O{Q}^m_\nu(x) = (-)^m(1-x^2)^{m/2} \frac{d^m}{dx^m} \O{Q}_\nu(x) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Exponential integrals}
+
+\[ \O{Ei}(z) = \int_{-\infty}^z \frac{e^t}{t}\,dt  \qquad|\arg {-z}|<\pi  \qquad\text{(correct?) Lebedev agrees}\]
+\[ \O{Ei}_1(x) = \gam + \log z + \sum_{k=1}^\infty \frac{x^k}{k! k} \qquad x>0\]
+\[ \O{E}_n(z) = \int_1^\infty\frac{e^{-zt}}{t^n}\,dt \]
+Generalized exponential-integral for $p\in\CC$:
+\[ \O{E}_p(z) = z^{p-1}\Gam(1-p,z) = z^{p-1}\int_z^\infty\frac{e^{-t}}{t^p}\,dt \]
+
+\[ \O{li}(z) = \int_{0}^z\frac{dt}{\log t} = \O{Ei}(\ln z) \qquad\text{$|\arg z|<\pi$ and $|\arg 1-z|<\pi$} \]
+\[ \O{li}_1(z) = xxx  \qquad\text{modified log-integral (Lebedev)}\]
+
+{\tt Ei, En, Ep, Li, Ci, Chi, Si, Shi, atan\_int} --- real / complex / adjusted real
+
+\begin{implementation}
+Implementation notes for $\O{Ei}(x)$:
+\begin{itemize}
+\item For small $x$, use $\O{Ei}(x) = \gamma + \ln x + \sum_{m=1}^\infty \frac{x^m}{m! m}$
+  (this has some issues near the root at $0.3725074107813666\dots$ with relative precision, dropping to 14 digits
+  using the expression $\O{Ei}(x) = \ln(x\cdot\exp(\gamma + \sum\cdots))$ helps with accuracy in that area)
+\item For large $x$, use asympotics $\O{Ei}(x) \sim \frac{e^x}{x}(1 + \sum_{m=0}^\infty\frac{m!}{x^m})$
+  (this only gives 15 digits accuracy for around $x>38$, so use, say, for $x>=40$)
+\end{itemize}
+\end{implementation}
+
+Continued fraction for $\O{E}_1(z)$ for $|\O{ph} z|<\pi$:
+\[ \O{E}_1(z) = \frac{e^{-z}}{z +} \frac{1}{1 +} \frac{1}{z +} \frac{2}{1 +} \frac{2}{z +} \frac{3}{1 +} \frac{3}{z +} \cdots \]
+and factorial series for $\Re z>0$:
+\[ \O{E}_1(z) = e^{-z}\left( \frac{c_0}{z} + \frac{c_1}{z(z+1)} + 2!\frac{c_2}{z(z+1)(z+2)} + 3!\frac{c_3}{(z)_4} + \cdots \right) \]
+where $c_0=1$, $c_1=-1$, $c_2=1/2$, $c_3=-1/3$, $c_4=1/6$, and $c_k=-\sum_{j=0}^{k-1}\tfrac{c_j}{k-j}$ for $k\geq1$.
+
+\begin{implementation}
+Implementation notes for $\O{E}_n(x)$:
+\begin{itemize}
+\item For $n=0$, use $\O{E}_0(x) = e^{-x}/x$
+\item For $n=1$, use $\O{E}_1(x) = -\gamma - \ln x - \sum_{k=1}^\infty\frac{(-x)^k}{k! k}$
+\item For $x\leq1$, use series $\O{E}_n(x) = \frac{(-x)^{n-1}}{(n-1)!}(-\ln x + \psi(n)) - \sum_{m=0,m\neq n-1}^\infty \frac{(-x)^m}{(m-(n-1))m!}$
+\item for $x>1$, use continued fraction $e^{-x}\left[\frac{1}{x+n-}\ \frac{1\cdot n}{x+n+2-}\ \frac{2\cdot(n+1)}{x+n+4-}\ \cdots\right]$
+  (see~\cite{zj})
+\item the recurrence $\O{E}_{n+1}(x) = \frac{1}{n}(e^{-x} - x \O{E}_n(x))$ $(n>1)$ is forward and backward unstable but works ok for small values
+  (tested for $x<1$ and $n<10$ - should be fine for $x<1$ and any $n$; seems to work decent if $x<<n$)
+\item asymptotic expansion $\O{E}_n(x) \sim \frac{e^{-x}}{x}(1 - \frac{n}{x} + \frac{n(n+1)}{x^2} - \frac{n(n+1)(n+2)}{x^3} + \cdots)$ gives quite
+  disappointing results - works only when $x>>n$
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Wave equation solutions}
+(From Temme ...)
+
+Spheroidal Wave Functions
+- first/second kind, prolate/oblate, characteristic values, expansion coefficients, wave/angular functions,
+radial/angular functions, spheroidal Bessel functions, ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Theta functions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jacobian theta functions}
+
+Notation: $\tau$ is the ``lattice parameter'', $q=e^{\ii\pi\tau}$ is the ``nome'', $z$ is the ``argument''
+Assume that $\Im\tau > 0$ (thus $0<|q|<1$ and $q\notin[-\infty,0]$).
+
+\[ \theta_1(z|\tau) = \theta_1(z,q) = 2\sum_{n=0}^\infty(-)^n q^{(n+1/2)^2}\sin (2n+1)z \]
+\[ \theta_2(z|\tau) = \theta_2(z,q) = 2\sum_{n=0}^\infty q^{(n+1/2)^2}\cos (2n+1)z \]
+\[ \theta_3(z|\tau) = \theta_3(z,q) = 1 + 2\sum_{n=1}^\infty q^{n^2}\cos 2nz \]
+\[ \theta_4(z|\tau) = \theta_4(z,q) = 1 + 2\sum_{n=1}^\infty(-)^n q^{n^2}\cos 2nz \]
+
+{\tt theta\_1, theta\_2, theta\_3, theta\_4, ...}, $\theta'_j/\theta_j$, Neville theta functions: $\theta_s$,n,d,c;
+conversions $k$ to/from $q$, etc.; real/imaginary argument/complex, etc.
+
+\begin{implementation}
+\begin{itemize}
+\item For $q\in\RR$, we can simply use the series definitions and we'll get fast convergence, though it slows down
+  near $1$
+\item Near $q=1$ use the transformations (where $\tau' = -1/\tau$ and square roots assume principal values)
+  \[\sqrt{-\ii\tau} \theta_1(z|\tau) = -\ii e^{\ii\tau' z^2/\pi} \theta_1(z\tau'|\tau') \]
+  \[\sqrt{-\ii\tau} \theta_2(z|\tau) = e^{\ii\tau' z^2/\pi} \theta_4(z\tau'|\tau') \]
+  \[\sqrt{-\ii\tau} \theta_3(z|\tau) = e^{\ii\tau' z^2/\pi} \theta_3(z\tau'|\tau') \]
+  \[\sqrt{-\ii\tau} \theta_4(z|\tau) = e^{\ii\tau' z^2/\pi} \theta_2(z\tau'|\tau') \]
+\item For example, letting $\phi=-\ln q/\pi$ and $q'=e^{-\pi/\phi}$, we end up with the very rapidly converging (near $q=1$):
+  \[ \theta_3(z,q) = \frac{e^{-z^2/\pi\phi}}{\sqrt\phi}\left[ 1 + 2\sum_{n=1}^\infty (q')^{n^2} \cosh 2nz/\phi \right] \]
+  (actually, in practice it seems to work generally better (for $z=0.3$) than the original sum with just a couple more terms needed near $q=0$...
+  oops with $z\sim\pi/2$ we have some issues with the transformed version dying with NaN for $q\sim1$ (though giving much better results until then
+  than the original series --- just need to deal with overflow/underflow issues with exp and cosh...
+  yes, writing $(q')^{n^2}\cosh(2nz/\phi) = e^{-n^2\pi/\phi + 2nz/\phi}(1 + e^{-4nz/\phi})/2$ gives much better results (though seem to lose a
+  bit of precision...))
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Elliptic integrals}
+Weierstrass elliptic function $\mathfrak{p}$, inverse weierstrass, elliptic zeta function, etc.
+Fock functions, etc.
+
+General notation notes: the ``nome'' $q$ and the ``modulus'' $k$ can be related as follows, where $k'=\sqrt{1-k^2}$:
+\begin{eqnarray*}
+q &=& e^{-\pi K'(k)/K(k)} \\
+k &=& \theta_2^2(0,q) / \theta_3^2(0,q) \\
+k' &=& \theta_4^2(0,1) / \theta_3^2(0,q) \\
+K(k) &=& \frac{\pi}{2} \theta_3^2(0,q) 
+\end{eqnarray*}
+(conversions)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Elliptic integrals}
+First kind: ($x=\sin\phi$), $0\leq k\leq 1$
+\[ \O{F}(\phi,k) = \int_0^\phi \frac{d\theta}{\sqrt{1-k^2\sin^2\theta}} = \int_0^x \frac{dt}{\sqrt{(1-t^2)(1-k^2t^2)}} \]
+Second kind: ($x=\sin\phi$), $0\leq k\leq 1$
+\[ \O{E}(\phi,k) = \int_0^\phi \sqrt{1-k^2\sin^2\theta}\,d\theta = \int_0^x\frac{\sqrt{1-k^2t^2}}{\sqrt{1-t^2}}\,dt \]
+Third kind: ($x=\sin\phi$), $0\leq k\leq 1$
+\[ \O{\Pi}(\phi,k,c) = \int_0^\phi\frac{d\theta}{(1-c\sin^2\theta)\sqrt{1-k^2\sin^2\theta}} = \int_0^x\frac{dt}{(1-ct^2)\sqrt{(1-t^2)(1-k^2t^2)}} \]
+
+Special case:
+\[ \O{\Pi}(\phi,0,k) = \int_0^\phi\frac{d\theta}{1 - \xi\sin^2\theta} = \frac{\atan(\sqrt{1-\xi} \tan(\phi))}{\sqrt{1-\xi}} \]
+
+\begin{implementation}
+To implement $\O{F}(\phi,k)$ and $\O{E}(\phi,k)$, use the ascending Landen transforms.
+
+To implement $\O{\Pi}(k,c,\phi)$, the Gauss transform is effective.
+\end{implementation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complete elliptic integrals}
+\[ \O{K}(k) = \O{F}(\pi/2,k) \]
+\[ \O{E}(k) = \O{E}(\pi/2,k) \]
+\[ \O{\Pi}(k,c) = \O{\Pi}(\pi/2,k,c) \]
+
+We use AGM approaches to compute these
+\begin{implementation}
+To implement $\O{\Pi}(k,c)$, we use the AGM approach: for $-\infty<k^2<1$, $-\infty<c<1$, we have
+\[ \O{\Pi}(c,k) = \frac{\pi}{4 M(1,k')}\left(2 + \frac{c}{1-c}\sum_{n=0}^\infty Q_n\right) \]
+where $a_0 = 1$, $b_0 = k'$, $p_0^2 = 1-c$, $Q_0 = 1$,
+and
+\begin{eqnarray*}
+p_{n+1} &=& \frac{p_n^2 + a_n b_n}{2 p_n} \\
+Q_{n+1} &=& \frac12 Q_n \eps_n \\
+\eps_{n} &=& \frac{p_n^2 - a_n b_n}{p_n^2 + a_n b_n}
+\end{eqnarray*}
+\end{implementation}
+
+Also $Z, FK, CE, \Lambda_0, RC, RD, RF, RJ$ ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Complementary complete elliptic integrals}
+Let $k' = \sqrt{1-k^2}$. Then
+\[ \O{K}'(k) = \O{K}(k') \]
+\[ \O{E}'(k) = \O{E}(k') \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Carlson's symmetric elliptic integrals}
+
+\[ \O{R}_C(x,y) = \frac12 \int_0^\infty \frac{dt}{\sqrt{t+x}(t+y)} \qquad x\in\CC\setminus(-\infty,0), y\in\CC\setminus\{0\} \]
+
+\begin{implementation}
+To compute $\O{R}_C(x,y)$ for $x,y\in\RR$, we simply use the closed-form expressions
+\begin{itemize}
+\item $\O{R}_C(x,x) = x^{-1/2}$
+\item For $0\leq x<y$:
+    \[ \O{R}_C(x,y) = \frac{1}{\sqrt{y-x}}\atan\sqrt{\frac{y-x}{x}} = \frac{1}{\sqrt{y-x}}\acos\sqrt{\frac{x}{y}} \]
+\item For $0<y<x$: (note there is a typo in DLMF for this formula)
+    \[ \O{R}_C(x,y) = \frac{1}{\sqrt{x-y}}\atanh\sqrt{\frac{x-y}{x}} = \frac{1}{\sqrt{x-y}}\ln\frac{\sqrt{x} + \sqrt{x-y}}{\sqrt{y}} \]
+\item For $y<0\leq x$:
+    \[ \O{R}_C(x,y) = \sqrt{\frac{x}{x-y}} \O{R}_C(x-y,-y) = \frac{1}{\sqrt{x-y}}\atanh\sqrt\frac{x}{x-y} = \frac{1}{\sqrt{x-y}}\ln\frac{\sqrt{x}+\sqrt{x-y}}{\sqrt{-y}} \]
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jacobian elliptic functions}
+We have implicit parameter $k$ in the following
+\[ \O{sn}(u) = x \text{\quad s.t.\quad} u = F(k,x) = \int_0^x \frac{dt}{\sqrt{(1-t^2)(1-k^2t^2)}} \]
+\[ \O{cn}(u) = \sqrt{1-\O{sn}^2 u} \]
+\[ \O{dn}(u) = \sqrt{1-k^2\O{sn}^2 u} \]
+I.e. $\O{sn}^2 + \O{cn}^2 = 1$ and $\O{dn}^2 + k^2\O{sn}^2 = 1$.
+other inverse?
+
+\begin{implementation}
+From~\cite{DLMF};
+\begin{itemize}
+\item Three basic techniques to compute: use $\theta$ functions, use AGM, use Landen transformations and then series in $k$
+\item Theta functions: let $\zeta=\frac{\pi z}{2 K(k)}$
+  \begin{eqnarray*}
+  \O{sn}(z,k) &=& \frac{\theta_3(0,q)}{\theta_2(0,q)} \frac{\theta_1(\zeta,q)}{\theta_4(\zeta,q)} = \frac{1}{ns} \\
+  \O{cn}(z,k) &=& \frac{\theta_4(0,q)}{\theta_2(0,q)} \frac{\theta_2(\zeta,q)}{\theta_4(\zeta,q)} = \frac{1}{nc} \\
+  \O{dn}(z,k) &=& \frac{\theta_4(0,q)}{\theta_3(0,q)} \frac{\theta_3(\zeta,q)}{\theta_4(\zeta,q)} = \frac{1}{nd} \\
+  \O{sd}(z,k) &=& \frac{\theta_3(0,q)^2}{\theta_2(0,q)\theta_4(0,q)} \frac{\theta_1(\zeta,q)}{\theta_3(\zeta,q)} = \frac{1}{ds} \\
+  \O{cd}(z,k) &=& \frac{\theta_3(0,q)}{\theta_2(0,q)} \frac{\theta_1(\zeta,q)}{\theta_2(\zeta,q)} = \frac{1}{dc} \\
+  \O{sc}(z,k) &=& \frac{\theta_3(0,q)}{\theta_4(0,q)} \frac{\theta_1(\zeta,q)}{\theta_2(\zeta,q)} = \frac{1}{cs} \\
+  \end{eqnarray*}
+\item AGM:
+  \begin{enumerate}
+  \item Let $a_0=1$, $b_0=k'\in(0,1)$
+  \item Compute $a_N, b_N, c_N$ via AGM
+  \item Let $\phi_N = 2^N a_N x$
+  \item and $\phi_{n-1} = \tfrac12(\phi_n + \asin( \frac{c_n}{a_n} \sin \phi_n))$
+  \item Then $\O{sn}(x,k)=\sin\phi_0$, $\O{cn}(x,k)=\cos\phi_0$, and $\O{dn}(x,k) = \cos\phi_0 / \cos(\phi_1-\phi_0)$
+  \end{enumerate}
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Parabolic cylinder functions}
+\[ \O{D}_\nu(z) = \O{U}(a,z) =  \qquad\nu=-a-\tfrac12\]
+\[ \O{V}_\nu(z) = \O{V}(a,z) =  \qquad\nu=-a-\tfrac12\]
+\[ \O{W}(a,\pm z) = \]
+
+{\tt Dnu, Vnu, Wa\_p/m, dDnu, ..., Ua, Va, ...}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lebedev}
+(According to Lebedev~\cite{lebedev}, solutions to $u'' + (2\nu + 1 - z^2)u = 0$ are the {\em parabolic cylinder functions}.)
+
+According to Lebedev: solutions to $v'' - 2zv' + 2\nu v=0$ are {\em Hermite functions}
+\[ \O{H}_\nu(z) = \frac{2^\nu \Gam(1/2)}{\Gam((1-\nu)/2)} \Phi[-\nu/2, 1/2; z^2]
+  + \frac{2^\nu \Gam(-1/2)}{\Gam(-\nu/2)} \Phi[(1-\nu)/2, 3/2; z^2] \]
+And if $\nu=n=0,1,2,\dots$ then we get the Hermite Polynomials
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{NIST handbook}
+According to NIST handbook~\cite{nist}:
+Parabolic cylinder functions are solutions of the differential equation $w'' + (az^2+bz+c)w = 0$
+with three distinct standard forms:
+\begin{enumerate}
+\item $w''-(z^2/4 + a)w=0$ with solutions $U(a,\pm z)$, $V(a,\pm z)$, $\bar{U}(a,\pm x)$ (not complex conjugate), and $U(-a,\pm\ii z)$;
+  for real values of $z(=x)$, numerically satisfactory pairs of solutions are $U(a,x)$ and $V(a,x)$ for $x>0$ and
+  $U(a,-x)$, $V(a,-x)$ for $x<0$.
+\item $w''+(z^2/4-a)w=0$ with solutions $W(a,\pm x)$;
+  for all real $x$, a numerically satisfactory pair is $W(a,x)$, $W(a,-x)$.
+\item and $w''+(\nu+1/2-z^2/4)w=0$ with solutions $D_\nu(\pm z)$ where $D_\nu(z)=U(-1/2-\nu,z)$ (Whittaker function);
+\end{enumerate}
+In $\CC$, for $j=0,1,2,3$, a numerically satisfactory pair of solutions is given by
+$U((-)^{j-1}a,(-\ii)^{j-1}z)$ and $U(-)^ja,(-\ii)^jz)$ in the half-plane $\tfrac14(2j-3)\pi\leq\O{ph}z\leq\tfrac14(2j+1)\pi$.
+
+We can express $U$ and $V$ in terms of $D$ via
+\begin{eqnarray*}
+U(a,x) &=& D_{-a-1/2}(x) \\
+V(a,x) &=& \frac{\Gam(a+\tfrac12)}{\pi}\left(\sin(\pi a) D_{-a-1/2}(x) + D_{-a-1/2}(-x)\right)
+\end{eqnarray*}
+
+All solutions are entire functions of $z$ and $a$ or $\nu$.
+
+Values at $z=0$ are given by
+\begin{eqnarray*}
+U(a,0)  &=& \frac{\sqrt\pi}{2^{a/2+1/4}\Gam(\tfrac34+\tfrac12a)} \\
+U'(a,0) &=& -\frac{\sqrt\pi}{2^{a/2-1/4}\Gam(\tfrac14+\tfrac12a)} \\
+V(a,0)  &=& \frac{\pi 2^{a/2+1/4}}{\Gam^2(\tfrac34-\tfrac12a)\Gam(\tfrac14+\tfrac12a)}
+    = \frac{2^{1/4 + a/2} \sin(\pi(\tfrac34 - \tfrac12a))}{\Gam(\tfrac34 - \tfrac12a)} \\
+V'(a,0) &=& \frac{\pi 2^{a/3+3/4}}{\Gam^2(\tfrac14-\tfrac12a)\Gam(\tfrac34+\tfrac12a)}
+    = \frac{2^{3/4 + a/2} \sin(\pi(\tfrac14 - \tfrac12a))}{\Gam(\tfrac14 - \tfrac12a)} \\
+W(a,0) &=& 2^{-3/4}\left|\frac{\Gamma(\tfrac14+\tfrac12a\ii}{\Gamma(\tfrac34+\tfrac12a\ii}\right|^{1/2} \\
+W'(a,0) &=& -2^{-1/4}\left|\frac{\Gamma(\tfrac34+\tfrac12a\ii}{\Gamma(\tfrac14+\tfrac12a\ii}\right|^{1/2} \qquad\text{?sign?}
+\end{eqnarray*}
+{\tt initial\_value\_U, ...}
+
+Series expansions converging for all $z$ are given by
+\begin{eqnarray*}
+U(a,z) &=& U(a,0)u_1(a,z) + U'(a,0)u_2(a,z) \\
+V(a,z) &=& V(a,0)u_1(a,z) + V'(a,0)u_2(a,z) \\
+W(a,z) &=& W(a,0)w_1(a,z) + W'(a,0)w_2(a,z)
+\end{eqnarray*}
+where
+\begin{eqnarray*}
+u_1(a,z)
+  &=& e^{-z^2/4} \O{M}(\tfrac14 + \tfrac12a, \tfrac12, \frac{z^2}{2}) 
+      = e^{-z^2/4}\left(1+(a+\tfrac12)\frac{z^2}{2!}+(a+\tfrac12)(a+\tfrac52)\frac{z^4}{4!}+\cdots\right) \\
+  &=& e^{z^2/4} \O{M}(\tfrac14 - \tfrac12a, \tfrac12, \frac{-z^2}{2}) 
+      = e^{z^2/4}\left(1+(a-\tfrac12)\frac{z^2}{2!}+(a-\tfrac12)(a-\tfrac52)\frac{z^4}{4!}+\cdots\right) \\
+u_2(a,z)
+  &=& z e^{-z^2/4} \O{M}(\tfrac34 + \tfrac12a, \tfrac32, \frac{z^2}{2}) 
+      = e^{-z^2/4}\left(z+(a+\tfrac32)\frac{z^3}{3!}+(a+\tfrac32)(a+\tfrac72)\frac{z^5}{5!}+\cdots\right) \\
+  &=& z e^{z^2/4} \O{M}(\tfrac34 - \tfrac12a, \tfrac32, \frac{-z^2}{2}) 
+      = e^{z^2/4}\left(z+(a-\tfrac32)\frac{z^3}{3!}+(a-\tfrac32)(a-\tfrac72)\frac{z^5}{5!}+\cdots\right)
+\end{eqnarray*}
+or we have the series
+\begin{eqnarray*}
+u_1(a,z) &=& 1 + a\frac{z^2}{2!} + (a^2 + \tfrac12)\frac{z^4}{4!} + (a^3 + \tfrac72a)\frac{z^6}{6!} + \cdots \\
+u_2(a,z) &=& z + a\frac{z^3}{3!} + (a^2 + \tfrac32)\frac{z^5}{5!} + (a^3 + \tfrac{13}2a)\frac{z^7}{7!} + \cdots \\
+\end{eqnarray*}
+where the coefficients of $x^n/n!$ are given by $a_{n+2} = a a_n + \tfrac14n(n-1)a_{n-2}$.
+
+
+Also,
+\begin{eqnarray*}
+w_1(a,z) &=& \sum_{n=0}^\infty \al_n(a) \frac{x^{2n}}{(2n)!} \\
+w_2(a,z) &=& \sum_{n=0}^\infty \beta_n(a) \frac{x^{2n+1}}{(2n+1)!}
+\end{eqnarray*}
+with $\al_0(a)=\beta_0(a)=1$, $\al_1(a)=\beta_1(a)=a$, and
+\begin{eqnarray*}
+\al_{n+2} = a \al_{n+1} - \frac12(n+1)(2n+1)\al_n \\
+\beta_{n+2} = a \beta_{n+1} - \frac12(n+1)(2n+3)\beta_n
+\end{eqnarray*}
+(Can get recursions for the full series terms directly: $\hat\al_n = \al_n/(2n)!$ then
+$\hat\al_{n+2} = \frac{a \hat\al_{n+1} - \frac14\hat\al_n}{(2n+3)(2n+4)}$, etc.
+
+Recurrence relations are
+\[ z U(a,z) - U(a-1,z) + (a+\tfrac12)U(a+1,z) = 0 \]
+\[ z V(a,z) - V(a+1,z) + (a-\tfrac12)V(a-1,z) = 0 \]
+
+Asymptotic expansions for $z\to\infty$ ($\delta$ is an arbitrarily small positive constant)
+\begin{eqnarray*}
+U(a,z) &\sim& e^{-z^2/4} z^{-a-1/2} \sum_{s=0}^\infty(-)^s\frac{(\tfrac12+a)_{2s}}{s!(2z^2)^s} \qquad |\O{ph}z|\leq\tfrac34\pi-\delta \\
+U(a,z) &\sim& e^{-z^2/4}z^{-a-1/2}\sum_{s=0}^\infty(-)^s\frac{(\tfrac12+a)_{2s}}{s!(2z^2)^s} 
+  \pm\ii\frac{\sqrt{2\pi}}{\Gam(\tfrac12+a)}e^{\mp\ii\pi a}e^{z^2/4}z^{a-1/2}\sum_{s=0}^\infty\frac{(\tfrac12-a)_{2s}}{s!(2z^2)^s} \\
+  &&\qquad \tfrac14\pi+\delta\leq\pm\O{ph}z\leq\tfrac54\pi-\delta \\
+V(a,z) &\sim& \sqrt{\frac2\pi}e^{z^2/4}z^{a-1/2} \sum_{s=0}^\infty\frac{(\tfrac12-a)_{2s}}{s!(2z^2)^s} \qquad |\O{ph}z|\leq\tfrac14\pi-\delta \\
+V(a,z) &\sim& \sqrt{\frac2\pi}e^{z^2/4}z^{a-1/2}\sum_{s=0}^\infty\frac{(\tfrac12-a)_{2s}}{s!(2z^2)^s} 
+  \pm\ii\frac{1}{\Gam(\tfrac12-a)}e^{-z^2/4}z^{-a-1/2}\sum_{s=0}^\infty(-)^s\frac{(\tfrac12+a)_{2s}}{s!(2z^2)^s} \\
+  &&\qquad -\tfrac14\pi+\delta\leq\pm\O{ph}z\leq\tfrac34\pi-\delta \\
+\end{eqnarray*}
+
+\begin{implementation}
+Initial testing seems to indicate that, at least for small $a$, the series expansions can give decent results, though
+not necessarily a full 15 digits (with $a=-20$, looks like only 13 digits, even for small $z$; with $a=-2$, getting around 15 digits).
+\end{implementation}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Lambert functions}
+\[ \O{W}(z) = \rho \text{\quad s.t.\quad} \rho e^\rho = z \]
+\[ \O{W}_{[k]}(z) = \text{$k$'th branch} \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Hypergeometric, Meijer G functions}
+$\mathcal{G}$-function, $\mathcal{H}$-function, Macdonald $E$ function, Carr $\phi[\al,\beta\gam|x,y]$ function,
+
+{\tt 0f0, 1f0, 0f1, 1f1, 1f2, 2f1, 2f2, 3f2, 3f3, 2f3, pfq, ...}
+Confluent $M$ and $U$ (``first'' and ``second'' kinds) [have alternative ode solutions for all hypergeom funcs?]
+
+Utility functions for hypergeometric-type {\em series}(?): odd/even parts of series, alternating odd/even parts, 
+mixed odd/even ($x^n y^{2n}$) etc.?
+
+``Gamma series'' variations (and modifications as above): (?)
+\[ \sum_{n=0}^\infty \frac{\Gam(a_1+n)\cdots\Gam(a_p+n)}{\Gam(b_1+n)\cdots\Gam(b_q+n)} x^n \]
+
+For example,
+\[ \sum_{n=0}^\infty\frac{x^n}{\Gam(\al+n)} = \frac{1}{\Gam(\al)}\sum_{n=0}^\infty\frac{x^n}{(\al)_n}
+    = \frac{1}{\Gam(\al)} \Hyper{1}{1}{1}{\al}{x} \]
+
+Hybrid series, e.g. $\sum_{n=0}^\infty \frac{(a)_n}{\Gam(b+n)}\frac{x^n}{n!}$ etc. (works for $b=0,-1,-2,...$ also!)
+
+Hypergeometric {\em functions} vs. hypergeometric {\em series}
+
+Scaled versions...
+
+Define
+\[ \Hyper{2}{1}{\al, \beta}{\gam}{z} = \sum_{n=0}^\infty \frac{(\al)_n (\beta)_n}{(\gam)_n} \frac{z^n}{n!}
+    = \frac{\Gam(\gam)}{\Gam(\al)\Gam(\beta)}\sum_{n=0}^\infty \frac{\Gam(\al+n)\Gam(\beta+n)}{\Gam(\gam+n)} \frac{x^n}{n!} \]
+This series is defined for $|z|<1$ and $\gam\neq0,-1,-2,\dots$.  It can be extended to an analytic function
+on $\CC\setminus[1,\infty]$ via the integral
+\[ \Hyper{2}{1}{\al, \beta}{\gam}{z} = \frac{\Gam(\gam)}{\Gam(\beta)\Gam(\gam-\beta)}\int_0^1 t^{\beta-1}(1-t)^{\gam-\beta-1}(1-tz)^{\al}\,dt \]
+for $\Re\gam>\Re\beta>0$ and $|\arg 1-z|<\pi$.
+
+The hypergeometric polynomials are given by $F(-n,\beta;\gam;z)$.
+
+Note that Lebedev defines the hypergeometric function of the second kind as $G(\al,\beta;\gam;z) = \dots$ which is the
+other solution of the hypergeometric equation $z(1-z)u'' + [\gam-(\al+\beta+1)z]u' - \al\beta u=0$ (for $|z|<1$.)
+
+The generalized hypergeometric function is:
+\[ \Hyper{p}{q}{\vec{\al}}{\vec{\gam}}{z} = \sum_{n=0}^\infty \frac{(\al_1)_n\cdots(\al_p)_n}{(\gam_1)_n\cdots(\gam_q)_n} \frac{z^n}{n!} \]
+
+\[ \O{M}(\al, \beta; z) = \Hyper{1}{1}{\al}{\beta}{z} = \sum_{n=0}^\infty \frac{(\al)_n}{(\beta)_n} \frac{z^n}{n!} \]
+FOr $\beta\neq0,-1,-2,\dots$, $|Z|<\infty$ (defines an entire function of $z$ on $\CC$).
+(In Lebedev's notation we have $\Phi(\al,\beta;z)$.)
+(Lebedev defines the confluent hypergeometric function of the second kind as $\Psi(\al,\gam;z) = \dots$.)
+
+\[ \O{U}(\al, \beta; z) = \frac{\pi}{\sin \pi\beta}\left( \frac{\O{M}(\al, \beta; z)}{\Gam(\al-\beta+1)\Gam(\beta)}
+  - z^{1-\beta}\frac{\O{M}(\al-\beta+1, 2-\beta; z)}{\Gam(\al) \Gam(2-\beta)} \right) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Whittaker functions}
+\[ \O{M}_{k,\mu}(z) = z^{\mu+1/2}e^{-z/2} \O{M}(\mu+\tfrac12-k, 2\mu+1; z) \]
+\[ \O{W}_{k,\mu}(z) = \frac{\Gam(-2\mu)}{\Gam(1/2 - \mu - k)}\O{M}_{k,\mu}(z) + \frac{\Gam(2\mu)}{\Gam(1/2 + \mu - k)}\O{M}_{k,-\mu}(z) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Zeta functions}
+Need {\em zeros} also
+
+Hurwitz Zeta
+
+Lerch Phi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Riemann zeta function}
+\[ \O{\zeta}(s) = \sum_{n=1}^\infty n^{-s} \qquad \Re s>1 \]
+\[ \O{\eta}(s) =  \sum_{n=1}^\infty (-)^{n-1}n^{-s} = (1-2^{1-s})\zeta(s) \qquad \Re s>1 \]
+\[ \O{\lambda}(s) =  \sum_{n=1}^\infty (2n-1)^{-s} = (1-2^{-s})\zeta(s) \qquad \Re s>1 \]
+\[ \O{\beta}(s) =  \sum_{n=1}^\infty (-)^{n-1}(2n-1)^{-s} \qquad \Re s>1 \]
+We should have implementation of $\zeta(s)-1$ for large $s$, (especially for $s\in\NN$).
+(and for other such funcs) [also $\zeta(s)-2^{-s}$, etc.??]
+Also, a version of just $zeta(\tfrac12 + \ii t)$ for real $t$...
+
+Reflection:
+\[ \zeta(1-s) = \frac{2}{(2\pi)^s}\cos(s\pi/2)\Gam(s)\zeta(s) \]
+\[ \zeta(s) = 2(2\pi)^{s-1}\sin(s\pi/2)\Gam(1-s)\zeta(1-s) \]
+we can write this as $\xi(s) = \xi(1-s)$ where we define
+\[ \xi(s) = \frac{s(s-1)}{2}\Gam(s/2)\pi^{-s/2}\zeta(s) \]
+
+\[ \zeta(-n) = -\frac{B_{n+1}}{n+1} \]
+
+\begin{implementation}
+\begin{itemize}
+\item[\bf(A)] For all $s\in\CC\setminus\{1\}$,
+  \[ \zeta(s) = \frac12 + \frac{1}{s-1} + 2\int_0^\infty\frac{\sin(s \atan t)}{(1+t^2)^{s/2}(e^{2\pi t}-1)}\,dt \]
+\item[\bf(B)] For $s\in\CC$,
+  \[ \pi^{-s/2}\Gam(s/2)\zeta(s) = -\frac{1}{s} - \frac{1}{1-s} + \frac12\int_1^\infty(t^{(1-s)/2}+t^{s/2})(\theta_3(e^{-\pi t})-1)\frac{dt}{t} \]
+\item[\bf(B)] Following from {\bf(B)}, we get
+  \[ \zeta(s)\Gam(s/2) = \frac{\pi^{s/2}}{s(s-1)} + \sum_{n=1}^\infty n^{-s}\Gam(\frac{s}{2}, \pi n^2)
+      + \pi^{s-1/2}\sum_{n=1}^\infty n^{s-1}\Gam(\frac{1-s}{2}, \pi n^2) \]
+\end{itemize}
+
+\cite{DLMF}~claims that a principal approach is using (Euler-Maclaurin)
+\[ \zeta(s) = \sum_{k=1}^N\frac{1}{k^s} + \frac{N^{1-s}}{s-1} - \frac{N^{-s}}{2} + \sum_{k=1}^n\binom{s+2k-2}{2k-1}\frac{B_{2k}}{2k} N^{1-s-2k}
+    - \binom{s+2n}{2n+1}\int_N^\infty\frac{\widetilde{B}_{2n+1}(x)}{x^{s+2n+1}}\,dx \]
+for $\Re s>-2n; n,N=1,2,3,\dots$  (A quick test shows that just the first 2 terms after the initial sum improve the accuracy significantly...)
+[INCLUDE EXPLICIT FIRST FEW TERMS...]
+
+Notes on using the Euler-Maclaurin expansion above:
+\begin{itemize}
+\item stopping criterion is a little bit tricker (but in practice not a bit problem)
+\item improves convergence speed significantly, especially for small $s>1$, chart below gives some sample data
+    (running with long doubles, indicating number of extra E-M terms): gives terms needed to convergence and achieved digits of accuracy
+\end{itemize}
+\end{implementation}
+{\small
+\[\begin{array}{c|ccccccc} 
+s&\text{raw series}&\text{2-terms + n=0}&\text{2-terms + n=1}&\text{2-terms + n=2}&\text{2-terms + n=3}&\text{2-terms + n=4}&\text{2-terms + n=5}\\\hline
+2  & >9999/3.8 & >9999/12.6 & 1089/16.5 & 201/17.6 & 77/18.1 & 40/18.6 & 26/18.3 \\
+5  & >9999/15.2 & 910/16.7 & 204/17.5 & 78/17.7 & 48/18.6 & 33/18.6 & 24/18.7 \\
+10 & 170/18 & 83/19.1 & 40/18.7 & 34/18.5 & 25/19 & 22/18.5 & 23/18.5 \\
+40 & 8/full & 8/full & 8/full & 8/full & 8/full & 9/full & 8/full
+\end{array}\]
+}
+
+\begin{implementation}
+Notes on the Dirichlet Beta function $\beta(\nu)$:
+\begin{itemize}
+\item $\beta(-n) = \tfrac12 E_n$ for $n=0,1,2,\dots$
+\item $\beta(n) = (\tfrac\pi2)^n\frac{|E_{n-1}|}{2(n-1)!}$ for $n=1,3,5,\dots$
+\item $\beta(\nu) = \frac{1}{2\Gam(\nu)}\int_0^\infty t^{\nu-1}\O{sech}(t)\,dt \qquad(\nu>0)$
+\item $\beta(1-\nu) = \frac{\Gam(\nu)\sin(\nu\pi/2)}{(\pi/2)^\nu}\beta(\nu) \qquad \beta\neq0,-1,-2,\dots$
+\item $\beta(\nu) = 4^{-\nu}\left(\zeta(\nu,1/4) - \zeta(\nu,3/4)\right)$ (Hurwitz zeta function)
+\item $\beta(\nu) = 2^{-\nu}\eta(\nu,1/2)$ (bivariate eta function - from~\cite{atlas:oldham})
+\item It is claimed in~\cite{atlas:oldham} that this is the Euler-Maclaurin expansion, but it works very poorly:
+    \[ \beta(\nu) = \lim_{J\to\infty}\left\{  \sum_{j=1}^J \frac{(-)^{j+1}}{(2j-1)^\nu}
+        + \sum_{k=1}^K \frac{2^{k-1}(2^k-1)(\nu)_{k-1} B_k}{k! (2J-1)^{k+\nu-1}} \right\}\]
+\item A much more effective Euler-Maclaurin expansion is given by
+    \begin{eqnarray*}
+    \beta(\nu) &=& \sum_{k=0}^{2N}\frac{(-)^k}{(2k+1)^\nu}
+            + \frac{(4N+1)^{1-\nu} - (4N+3)^{1-\nu}}{4(\nu-1)} - \frac{(4N+1)^{-\nu} - (4N+3)^{-\nu}}{2} \\
+        && {} - \sum_{j=2}^K(-4)^{j-1}(\nu)_{j-1}\frac{B_j}{j!}\left[(4N+1)^{-\nu-j+1} - (4N+3)^{-\nu-j+1}\right]
+    \end{eqnarray*}
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hurwitz' zeta function}
+\[ \zeta(s,a) = \sum_{n=0}^\infty \frac{1}{(n+a)^s} \qquad \Re s>1, a\neq0,-1,-2,\dots \]
+(with continuation in s to $\CC$ with only a simple pole at $s=1$).
+
+We have the following simple identities
+\[ \zeta(s,a) = \zeta(s,a+1) + a^{-s} \]
+\[ \zeta(s,a) = \zeta(s,a+m) + \sum_{n=0}^{m-1} (n+a)^{-s} \]
+\[ \frac{\partial}{\partial a}\zeta(s,a) = -s \zeta(s+1,a) \]
+
+We have a series expansion for $s\neq1$, $|a-1|<1$:
+\[ \zeta(s,a) = \sum_{n=0}^\infty \frac{\Gam(n+s)}{\Gam(s)} \frac{(1-a)^n}{n!}\zeta(n+s) \]
+
+As $a\to0$ with $s\neq1$ fixed
+\[ \zeta(s,a+1) = \zeta(s) - s \zeta(s+1)a + O(a^2) \]
+
+We have the following Euler-Maclaurin-type expansions
+\[ \zeta(s,a) = \sum_{n=0}^N(n+a)^{-s} + \frac{(N+a)^{1-s}}{s-1} - s\int_N^\infty \cdots \]
+\[ \zeta(s,a) = a^{-s}(\frac12 + \frac{a}{s-1}) - s(s+1)\int_0^\infty \cdots \]
+\[ \zeta(s,a) = a^{-s} + (1+a)^{-s}(\frac12 + \frac{1+a}{s-1}) + \sum_{k=1}^\infty\binom{s+2k-2}{2k-1}\frac{B_{2k}}{2k} \frac{1}{(1+a)^{s+2k-1}} - R\cdots \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Lerch's transcendent}
+\[ \O{\Phi}(z,s,a) = \sum_{n=1}^\infty \frac{z^n}{(a+n)^s} \qquad a\neq0,-1,-2,\dots; |z|<1; (|z|=1 \implies \Re(s)>1) \]
+(To implement, try out Euler-Maclaurin...)
+
+We have the following identities
+\[ \Phi(z,s,a) = z^m \Phi(z,s,a+m) + \sum_{n=0}^{m-1}\frac{z^n}{(a+n)^s} \]
+\[ \Phi(z,s,a) = \frac{1}{\Gam(s)}\int_0^\infty \frac{x^{s-1} e^{-ax}}{1-z e^{-x}}\,dx \]
+(for $\Re s>0, \Re a>0, z\in\CC\setminus[1,\infty)$.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dirichlet L-function}
+\[ \O{L}(s,\chi) = \sum_{n=1}^\infty \frac{\chi(n)}{n^s} \qquad \Re(s)>1, \text{$\chi$ a Dirichlet character (mod $k$)} \]
+(express as sum of zeta-functions, allow a general $k$-periodic character~$\chi$.)
+
+The following is valid for all $s$ if $\chi\neq\chi_1$; otherwise valid for all $s\neq1$:
+\[ \O{L}(s,\chi) = k^{-s}\sum_{r=1}^{k-1}\chi(r)\zeta(s,\tfrac{r}{k} \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polylogarithms and related}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Dilogarithm}
+The dilogarithm is defined via
+\[ \O{Li}_2(z) = \sum_{n=1}^\infty \frac{z^n}{n^2} \qquad |z|\leq1 \]
+and can be analytically continued to the complex plane split along the real line from $+1$ to $\infty$ as
+\[ \O{Li}_2(z) = -\int_0^z \ln(1-t) \frac{dt}{t} \qquad z\in\CC\setminus(1,\infty) \]
+(Compare also with Spence integral)
+{\tt Dilog, Li\_2, Polylog, Li\_n, ...} generalized polylog $\O{Li}_s(z)$...
+
+Noodling around:
+\begin{eqnarray*}
+\O{Li}_2(z) &=& \sum_{n=1}^\infty \frac{z^n}{n^2} \\
+\frac{\O{Li}_2(z^2)}{4} &=& \sum_{n=1}^\infty \frac{z^{2n}}{(2n)^2} \\
+\O{Li}_2(z) - \frac{\O{Li}_2(z^2)}{4} &=& \sum_{n=1}^\infty \frac{z^{2n+1}}{(2n+1)^2} \\
+\frac{1}{\ii}\left(\O{Li}_2(\ii z) - \frac{\O{Li}_2(-z^2)}{4}\right) &=& \sum_{n=1}^\infty (-)^n \frac{z^{2n+1}}{(2n+1)^2}
+\end{eqnarray*}
+
+We can derive the following Euler-Maclaurin expansion for the power-series to get
+\[ \O{Li}_2(z) = \sum_{k=1}^N\frac{z^k}{k^2} + \frac{\O{E}_2(-N\ln z)}{N} - \frac{z^N}{2 N^2} - \sum_{j=2}^K \frac{B_j}{j!}f^{(j-1)}(N) + R_k \]
+where $\O{E}_2(z)$ is the exponential integral, and $f(x) = z^x/x^2$.  This improves convergence, but the cost of computing the exponential integral
+outweighs any benefits.
+Note that we have
+\begin{eqnarray*}
+f'(n) &=& \frac{z^n}{n^2}\left( \ln z - \frac{2}{n} \right) \\
+f^{(2)}(n) &=& \frac{z^n}{n^2}\left( (\ln z)^2 - 4\frac{\ln z}{n} + \frac{6}{n^2} \right) \\
+f^{(3)}(n) &=& \frac{z^n}{n^2}\left( (\ln z)^3 - 6\frac{(\ln z)^2}{n} + 18\frac{\ln z}{n^2} - \frac{24}{n^3} \right) \\
+f^{(4)}(n) &=& \frac{z^n}{n^2}\left( (\ln z)^4 - 8\frac{(\ln z)^3}{n} + 36\frac{(\ln z)^2}{n^2}
+    - 96\frac{\ln z}{n^3} + \frac{120}{n^4} \right) \\
+f^{(5)}(n) &=& \frac{z^n}{n^2}\left( (\ln z)^5 - 10\frac{(\ln z)^4}{n} + 60\frac{(\ln z)^3}{n^2}
+    - 240\frac{(\ln z)^2}{n^3} + 600\frac{\ln z}{n^4} - \frac{720}{n^5} \right)
+\end{eqnarray*}
+
+\begin{implementation}
+Many identities are useful:
+\[ \O{Li}_2(z) + \O{Li}_2(\frac{z}{z-1}) = -\frac12(\ln 1-z)^2 \qquad z\in\CC\setminus[1,\infty) \]
+\[ \O{Li}_2(z) + \O{Li}_2(\frac{1}{z}) = -\frac{\pi^2}{6} - \frac12(\ln{-z})^2 \qquad z\in\CC\setminus[0,\infty) \]
+\[ \O{Li}_2(x) + \O{Li}_2(1-x) = \frac{\pi^2}{6} - (\ln x)(\ln 1-x) \qquad 0<x<1 \]
+\[ \O{Li}_2(z^m) = m\sum_{k=0}^{m-1}\O{Li}_2(z e^{2\pi\ii k/m}) \qquad |z|<1, m=1,2,3,\dots \]
+When $z=e^{\ii\theta}$, the original definition becomes
+\[ \O{Li}_2(e^{\ii\theta}) = \sum_{n=1}^\infty\frac{\cos n\theta}{n^2} + \ii\sum_{n=1}^\infty\frac{\sin n\theta}{n^2}
+    = (\frac{\pi^2}{6} - \frac{\pi\theta}{2} + \frac{\theta^2}{4}) - \ii\int_0^\theta \ln(2\sin(x/2))\,dx \]
+(and notice the final integal is Clausen's integral).
+\end{implementation}
+
+\begin{titled-frame}{{\tt dilog(z)}${}=\O{Li}_2(z)$}
+\small%
+\begin{verbatim}
+## -*- texinfo -*-
+## @deftypefn {Function File} {@var{res} =} sf_dilog (@var{z})
+## Compute the dilogarithm $Di_2(z) = \sum_(n=1)^\infty z^n/n^2$
+## @end deftypefn
+function res = sf_dilog(z)
+  if (nargin < 1) print_usage; endif
+  res = zeros(size(z));
+  for n = 1:prod(size(z))
+    res(n) = sf_dilog_1(z(n));
+  endfor
+endfunction
+function res = sf_dilog_1(z)
+  # branch cut on positive real axis [1,+\infty)
+  if (imag(z)==0 && z>=1) res = NaN; return; endif
+
+  if (imag(z)==0 && z>1/2)
+    # for efficiency for real values
+    # L(z) + L(1-z) = pi^2/6 - (ln z)(ln 1-z)
+    res = pi^2/6 - sf_log(z)*sf_log_p1(-z) - power_series(1-z);
+  elseif (abs(z) <= 2/3)
+    # direct series (radius of convergence for |z|<1)
+    res = power_series(z);
+  elseif (abs(z) >= 3/2)
+    # reflect large values to small
+    # L(z) + L(1/z) = -pi^2/6 - ln(-z)^2/2
+    res = -pi^2/6 - sf_log(-z)^2/2 - power_series(1/z);
+  else
+    # clean up the rest
+    # L(z) + L(z/(z-1)) = -ln(1-z)^2/2
+    res = -sf_log(1-z)^2/2 - power_series(z/(z-1));
+  endif
+endfunction
+function res = power_series(z)
+  res = 0.0; n = 1; term = 1.0;
+  do
+    term *= z;
+    old_res = res;
+    res += term / (n^2);
+    ++n; if (n>999) break; endif
+  until (res == old_res)
+endfunction
+\end{verbatim}
+\end{titled-frame}
+
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Polylogarithm}
+For real or complex $s$ and $z$, the polylogarithm is defined by
+\[ \O{Li}_s(z) = \sum_{n=1}^\infty \frac{z^n}{n^s} \]
+For fixed $s\in\CC$, the series defines an analytic function of $z$ for $|z|<1$.  The series also converges
+when $|z|=1$ if $\Re s>1$.  (For other values of $z$, define by analytic continuation).
+
+We have the integral representation for $\Re s>0$ and $|\O{ph} 1-z|<\pi$, or $\Re s>1$ and $z=1$:
+\[ \O{Li}_s(z) = \frac{z}{\Gam(s)} \int_0^\infty \frac{x^{s-1}}{e^x - z}\,dx \]
+
+Finally we have the properties
+\[ \O{Li}_s(z) = \Gam(1-s)(\ln 1/z)^{s-1} + \sum_{n=0}^\infty \zeta(s-n)\frac{(\ln z)^n}{n!}
+    \qquad |\ln z|<2\pi, s\neq1,2,3,\dots \]
+and
+\[ \O{Li}_s(e^{2\pi\ii a}) + e^{\pi\ii s}\O{Li}_s(e^{-2\pi\ii a}) = \frac{(2\pi)^s e^{\pi\ii s/2}}{\Gam(s)}\zeta(1-s, a) \]
+valid when $\Re s>0$, $\Im a>0$; or $\Re s>1$, $\Im a=0$.
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Fermi-Dirac and Bose-Einstein integrals}
+\[ \O{FD}(k,\eta,\theta) = \int_0^\infty \frac{x^k (1+\theta x/2)^{1/2}}{e^{x-\eta} + 1} \,dx \qquad k>-1; \theta\geq0\]
+
+The DLMF~\cite{DLMF} defines the Fermi-Dirac integrals:
+\[ \O{F}_s(x) = \frac{1}{\Gam(s+1)} \int_0^\infty \frac{t^s}{e^{t-x} + 1}\,dt \qquad(s>-1) \]
+and the Bose-Einstein integrals:
+\[ \O{G}_s(x) = \frac{1}{\Gam(s+1)} \int_0^\infty \frac{t^s}{e^{t-x} - 1}\,dt \qquad(s>-1, x<0; \text{\ or\ } s>0,x\leq0) \]
+(``Sometimes the Gamma factor is omitted.'')
+
+In terms of polylogarithms we have: $\O{F}_s(x) = -\O{Li}_{s+1}(-e^{x})$ and $\O{G}_s(x) = \O{Li}_{s+1}(e^{x})$.
+
+\begin{implementation}
+We can integrate the definition directly using numerical quadrature ...
+
+From~\cite{approximation-fermi-dirac} we have:
+\begin{itemize}
+\item Start with an expansion for $\Re(x)<0$:
+    \[ F_q(x) = \sum_{n=1}^\infty(-)^{n-1}\frac{e^{xn}}{n^{q+1}} \]
+\item Consider the representation (with $p=q+1$), where $\mathcal{L}$ is a vertical contour cutting the real
+    $s$-axis between $0$ and $1$:
+    \[ F_{p-1}(x) = \frac{1}{2\ii} \int_{\mathcal{L}} \frac{e^{xs}}{s^p \sin\pi s}\,ds \qquad p>0, x>0 \]
+\item (etc.)
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Coulomb wave functions}
+These are solutions $w(\rho)$ to the Coulomb (wave) equation, for $\ell=0,1,2,\dots$; $\eta\in\RR$; $\rho>0$:
+\[ w'' + \left( 1 - \frac{2\eta}{\rho} - \frac{\ell(\ell+1)}{\rho^2}\right) w = 0 \]
+
+The {\em normalizing constant} is defined
+\[ C_\ell(\eta) = \frac{2^\ell e^{-\pi\eta/2} |\Gam(\ell+1+\eta\ii)|}{(2\ell+1)!}
+    = \frac{2^\ell \left( \frac{2\pi\eta}{e^{2\pi\eta} - 1} \prod_{k=1}^\ell(\eta^2 + k^2)\right)^{1/2}}{(2\ell+1)!} \]
+[use exp(log(...)) in the product form to avoid some blow-up for large $\ell$.]
+The {\em Coulomb phase shift} is defined (where the branch of phase is chosen as zero when $\eta=0$)
+\[ \sig_\ell(\eta) = \O{ph} \Gam(\ell+1+\eta\ii) \]
+and we define
+\[ \theta_\ell(\eta,\rho) = \rho - \eta\ln(2\rho) - \frac\pi2\eta + \sig_\ell(\eta) \]
+
+The solution, recessive at $\rho=0$ is $\O{F}_\ell(\eta,\rho)$ (analytic on $\rho\in(0,\infty)$ and for $\eta\in\RR$)
+defined via (where $\O{M}_{\kap,\mu}(z)$ is the Whittaker function and $\O{M}(a,b,z)$ is the Kummer function)
+\begin{eqnarray*}
+\O{F}_\ell(\eta,\rho)
+    &=& C_\ell(\eta) \left(\frac{\mp\ii}{2}\right)^{\ell+1} \O{M}_{\pm\eta\ii, \ell+1/2}(\pm2\rho\ii) \\
+    &=& C_\ell(\eta) \rho^{\ell+1} e^{\mp\rho\ii} \O{M}(\ell+1\mp\eta\ii, 2\ell+2, \pm2\rho\ii)
+\end{eqnarray*}
+The irregular solutions (both analytic on $\rho\in(0,\infty)$ and with $e^{\mp\sig\ii}H$ analytic on $\eta\in\RR$) are
+\begin{eqnarray*}
+\O{H}_\ell^\pm(\eta,\rho)
+    &=& \O{G}_\ell(\eta,\rho) \pm \ii \O{F}_\ell(\eta,\rho) \\
+    &=& (\mp\ii)^{\ell} e^{(\pi\eta/2)\pm\ii\sig_\ell(\eta)} \O{W}_{\mp\eta\ii, \ell+1/2}(\mp2\rho\ii) \\
+    &=& (\mp2\rho\ii)^{\ell+1\pm\eta\ii} e^{\pm\ii\theta_\ell(\eta,\rho)} U(\ell+1\pm\eta\ii, 2\ell+2, \mp2\rho\ii)
+\end{eqnarray*}
+
+Interrelations:
+$\mathcal{W}\{G_\ell,F_\ell\} = \mathcal{W}\{H^\pm_\ell, F_\ell\} = 1$
+and
+$F_{\ell-1} G_\ell - F_\ell G_{\ell-1} = \frac{\ell}{\sqrt{\ell^2+\eta^2}}$.
+
+We have various recursion formula.  Let $R_\ell = \sqrt{1 + \eta^2/\ell^2}$, $S_\ell = \ell/\rho + \eta/\ell$, and $T_\ell=S_\ell + S_{\ell+1}$,
+then with $X_\ell$ being $\O{F}_\ell(\eta,\rho)$ or $\O{G}_\ell(\eta,\rho)$, or $\O{H}_\ell^\pm(\eta,\rho)$, we have
+\[ R_\ell X_{\ell-1} - T_\ell X_\ell + R_{\ell+1} X_{\ell+1} = 0 \qquad (\ell\geq1) \]
+\[ X_\ell' = R_\ell X_{\ell-1} - S_\ell X_\ell \qquad (\ell\geq1) \]
+\[ X_\ell' = S_{\ell+1} X_\ell - R_{\ell+1} X_{\ell+1} \qquad (\ell\geq0) \]
+[These recursions should be used in decreasing $\ell$ for regular solutions and increasing $\ell$ for irregular solutions.]
+
+We have a series in $\rho$:
+\[ \O{F}_\ell(\eta,\rho) = C_\ell(\eta) \sum_{k=\ell+1}^\infty A^\ell_k(\eta) \rho^k \]
+\[ \O{F}_\ell'(\eta,\rho) = C_\ell(\eta) \sum_{k=\ell+1}^\infty k A^\ell_k(\eta) \rho^{k-1} \]
+where
+$A^\ell_{\ell+1} = 1$, $A^\ell_{\ell+2} = \frac{\eta}{\ell+1}$, and
+$(k+\ell)(k-\ell-1)A^\ell_k = 2\eta A^\ell_{k-1} - A^\ell_{k-2}$ for $k=\ell+3, \ell+4, \dots$.
+(Alternatively, can write this as $A^\ell_k(\eta) = \frac{(-\ii)^{k-\ell-1}}{(k-\ell-1)!} \Hyper{2}{1}{\ell+1-k, \ell+1-\eta\ii}{2\ell+2}{2}$.)
+
+Various limiting forms:
+
+As $\rho\to\infty$ with $\eta$ fixed:
+$\O{F}_\ell(\eta,\rho) = \sin( \theta_\ell(\eta,\rho) ) + o(1)$,
+$\O{G}_\ell(\eta,\rho) = \cos( \theta_\ell(\eta,\rho) ) + o(1)$, and
+$\O{H}^\pm_\ell(\eta,\rho) \sim \exp( \pm\ii\theta_\ell(\eta,\rho) )$.
+
+For $\eta=0$,
+$\O{F}_\ell(0,\rho) = \rho \O{j}_\ell(\rho) = \sqrt{\rho\pi/2} \O{J}_{\ell+\tfrac12}(\rho)$,
+$\O{G}_\ell(0,\rho) = -\rho \O{y}_\ell(\rho) = -\sqrt{\rho\pi/2} \O{Y}_{\ell+\tfrac12}(\rho)$, and
+$C_\ell(0) = \frac{2^\ell \ell!}{(2\ell+1)!} = \frac{1}{(2\ell+1)!!}$.
+(Note thus that $\O{F}_0(0,\rho) = \sin\rho$, $\O{G}_0(0,\rho) = \cos\rho$, and $\O{H}^\pm_0(0,\rho)=e^{\pm\rho\ii}$.)
+
+etc.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Orthogonal polynomials}
+%\[\begin{array}{l|lccc|cc}
+%{}&\multicolumn{4}{c|}{g_2 w'' + g_1 w' + g_0 w = 0} &{}&{}\\
+%\text{Name} & w(x) & g_2(x) & g_1(x) & g_0(x) & \text{weight} & \text{interval} \\\hline
+%\text{Chebyshev, 1st} & T_n(x) & 1-x^2 & -x & n^2 & (1-x^2)^{-1/2} & (-1,1) \\
+%\text{Chebyshev, 2nd} & U_n(x) & 1-x^2 & -3x & n(n+2) & (1-x^2)^{1/2} & (-1,1) \\
+%\text{Gegenbauer} & C^{(\al)}_n(x) & 1-x^2 & -(2\al+1)x & n(n+2\al) & (1-x^2)^{\al-1/2} & (-1,1) \\
+%\text{Hermite} & H_n(x) & 1 & -2x & 2n & e^{-x^2} & (-\infty,\infty) \\
+%\text{Laguerre} & L^{(\al)}_n(x) & x & \al+1-x & n & e^{-x}x^\al & (0,\infty) \\
+%\text{Legendre} & P_n(x) & 1-x^2 & -2x & n(n+1) & 1 & (-1,1) \\
+%\text{Jacobi} & P_n^{(\al,\beta)}(x) & 1-x^2 & \beta-\al-(\al+\beta+2)x & n(n+\al+\beta+1) & (1-x)^\al(1+x)^\beta & (-1,1) \\
+%\end{array}\]
+\begin{itemize}
+\item name, symbol, parameters (and restrictions)
+\item differential equation (and second solution to DE); integral equation(s)
+\item integral representation(s)
+\item recurrence relation(s), ``Rodrigues' formula''
+\item representation(s) as hypergeometric series
+\item weight, interval --- orthogonality relations, orthonormality weightings,
+  ortho functions (basically including sqrt of weight)
+\item alternative tricks: chebyshev in terms of trig functions, etc.
+\item zeros, polynomial coeffs, ... Gauss integration weights, ...
+\item relationships (Jacobi $\to$ Gegenbauer $\to$ Chebyshev1\&2/Legendre
+\end{itemize}
+Computation of {\em general} orthogonal polynomials --- compute coefficients / zeros / evaluate / etc.
+(Give arbitrary weight function or arbitrary zero locations or ...)
+Evaluate functions given as a squence of orthogonal polynomials; compute such series representations.
+
+{\tt function-evaluation, coefficients, zeros, weights, etc.}
+Other orthogonal polynomials (...) generalized ... etc.
+
+Note that {\em orthonormal} $p_n$ satisfy
+\[ p_{n+1} - (a_n x + b_n)p_n + c_n p_{n-1} = 0 \]
+where $c_0=0$, $c_n = a_n / a_{n-1}$; $b_n = -a_n\langle x p_n, p_n \rangle$; $a_n = k_{n+1} / k_n$,
+with $k_n$ being the coefficient of $x^n$ in $p_n$.
+
+Let
+\[ K_n(x,y) = \sum_{k=0}^n p_k(x) p_k(y) = \frac{k_n}{k_{n+1}} \frac{p_n(y)p_{n+1}(x) - p_n(x) p_{n+1}(y)}{x-y} \]
+then we have
+\[ K_n(x,x) = \frac{k_n}{k_{n+1}}\left( p_n(x) p_{n+1}'(x) - p_n'9x) p_{n+1}(x) \right) = \sum_{k=0}^n p_k^2(x) > 0 \]
+
+For Gaussian quadrature we have
+\[ \int w(x) f(x) \,dx \approx \sum_{k=1}^n \lam_{k,n} f(x_k) \]
+where $x_1, \dots, x_n$ being the zeros of $p_n$ and where
+\[ \lam_{k,n} = \left( \sum_{j=0}^{n-1} p_j(x_k)^2 \right)^{-1} \]
+
+To find the zeros of orthogonal polynomials $p_n$ (from SF book):
+suppose that $p_n$ satisfy the recurrence (with $c_0 p_{-1} = 0$):
+\[ x p_k = a_k p_{k+1} + b_k p_k + c_k p_{k01} \]
+then the zeros of $p_n$ are exactly the eigenvalues of the Jacobian matrix
+\[\begin{pmatrix}
+b_0 & a_0 &   0 \\
+c_1 & b_1 & a_1 &  0 \\
+  0 & c_2 & b_2 & a_2 &  0 \\
+    &  0  & \ddots & \ddots & \ddots & 0\\
+    &     &   0 & a_{n-2} & b_{n-2} & a_{n-2} \\
+    &     &     &       0 & c_{n-1} & b_{n-1}
+\end{pmatrix}\]
+For instance, for the generalized Laguerre polynomials we have $a_n = -(n+1)$, $b_n = (2n+\al+1)$, $c_n = -(n+\al)$.
+For Hermite $H_n$ we have $a_n = 1/2$, $b_n = 0$, $c_n = n$.
+Note that due to numerical issues, an eigenvalue solver may find complex eigenvalues for large values of $n$
+(for some cases - Hermite especially, whereas Laguerre works much more effectively).
+Even if all eigenvalues found are real, it is useful to ``polish'' the accuracy by applying root-finders to improve the accuracy
+of the roots found (such as Newton --- Halley's method hasn't been found to be very effective).
+
+Alternative approach might be an iterative method using the roots of $p_{n-1}$ to bracket the roots of $p_n$ for a general root-finder.
+
+An alternative symmetric matrix (whose eigenvalues give roots) is given by
+\[\begin{pmatrix}
+\beta_0 & \al_0 &   0 \\
+\al_1 & \beta_1 & \al_1 &  0 \\
+  0 & \al_2 & \beta_2 & \al_2 &  0 \\
+    &  0  & \ddots & \ddots & \ddots & 0\\
+    &     &   0 & \al_{n-2} & \beta_{n-2} & \al_{n-2} \\
+    &     &     &       0 & \al_{n-1} & \beta_{n-1}
+\end{pmatrix}\]
+(for details see NR4SF book...)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Chebyshev polynomials}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{First kind}
+$\O{T}_n(z)$
+\begin{itemize}
+\item $\O{T}_0 = 1$, $\O{T}_1 = x$
+\item Weight $w(x) = (1-x^2)^{-1/2}$ on interval $(-1,1)$
+\item Differential equation $\left(1-x^2\right) \O{T}_n'' + \left(-x\right) \O{T}_n' + \left(n^2 \right) \O{T}_n = 0$
+\item Normalization $(\pi/2)^{-1/2}$ for $n\neq0$ and $(\pi)^{-1/2}$ for $n=0$
+\item Relation $\O{T}_n(x) = \frac{n!}{(1/2)_n} \O{P}_n^{(-1/2, -1/2)}(x)$
+\item Recurrence $\O{T}_n = 2 x \O{T}_{n-1} - \O{T}_{n-2}$
+\item Derivative $\O{T}_n' = \frac{n}{1-x^2}\left( \O{T}_{n-1} - x \O{T}_{n} \right)$
+\item Zeros
+\item Weights
+\item Rodrigues' formula $\O{T}_n(z) = (-2)^n \frac{n!}{(2n)!} (1-x^2)^{1/2} \frac{d^n}{dx^n}\left[ (1-x^2)^{n-1/2} \right]$
+\item $\O{T}_n(x) = \cos(n \acos x)$.
+\end{itemize}
+Shifted: $\O{T}^*_n(x) = T_n(2x-1)$ on $(0,1)$ with weight $(x(1-x))^{-1/2}$
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Second kind}
+$\O{U}_n(z)$
+\begin{itemize}
+\item $\O{U}_0 = 1$, $\O{U}_1 = 2x$
+\item Weight $w(x) = (1-x^2)^{1/2}$ on interval $(-1,1)$
+\item Differential equation $\left(1-x^2\right) \O{U}_n'' + \left(-3x\right) \O{U}_n' + \left(n(n+2)\right) \O{U}_n = 0$
+\item Normalization $ $
+\item Relation $\O{U}_n(x) = \frac{(n+1)!}{(3/2)_n} \O{P}_n^{(1/2, 1/2)}(x)$
+\item Recurrence $\O{U}_n = 2 x \O{U}_{n-1} - \O{U}_{n-2}$
+\item Derivative $\O{U}_n' = \frac{1}{1-x^2}\left( (n+1)\O{U}_{n-1} - n x \O{U}_{n} \right)$
+\item Zeros
+\item Weights
+\item Rodrigues' formula $\O{U}_n(z) = (-2)^n\frac{n+1}{2n+1}\frac{n!}{(2n)!} (1-x^2)^{-1/2} \frac{d^n}{dx^n}\left[ (1-x^2)^{n+1/2} \right]$
+\item 
+\end{itemize}
+Shifted: $\O{U}^*_n(x) = U_n(2x-1)$ on $(0,1)$ with weight $(x(1-x))^{1/2}$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Legendre polynomials}
+$\O{P}_n(z)$
+\begin{itemize}
+\item $\O{P}_0 = 1$, $\O{P}_1 = x$
+\item Weight $w(x) = 1$ on interval $(-1,1)$
+\item Differential equation $\left(1-x^2\right) \O{P}_n'' + \left(-2x\right) \O{P}_n' + \left(n(n+1)\right) \O{P}_n = 0$
+\item Normalization $\sqrt{\frac{2}{2n+1}}$
+\item Relation $\O{P}_n(x) = \O{P}_n^{(0,0)}(x)$
+\item Recurrence $\O{P}_n = \frac{(2n-1)x}{n}\O{P}_{n-1} - \frac{n-1}{n}\O{P}_{n-2}$
+\item Derivative $\O{P}_n' = $
+\item Zeros
+\item Weights
+\item Rodrigues' formula $\O{P}_n(z) = \frac{1}{2^n n!}\frac{d^n}{dx^n}\left[ (x^2-1)^n \right]$
+\item 
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Laguerre (generalized) polynomials}
+$\O{L}^{(\al)}_n(z)$ with $\al>-1$
+\begin{itemize}
+\item $\O{L}^{(\al)}_0 = 1$, $\O{L}^{(\al)}_1 = 1+\al-x$
+\item Weight $w(x) = e^{-x} x^\al$ on interval $(0,\infty)$
+\item Differential equation $\left(x\right) \O{L}_n'' + \left(\al+1-x\right) \O{L}_n' + \left(n\right) \O{L}_n = 0$
+\item Normalization $\sqrt{\frac{n!}{\Gam(n+\al+1)}}$
+\item Relation
+\item Recurrence $\O{L}^{(\al)}_n(z) = \frac{2n+a-1-z}{n}\O{L}^{(\al)}_{n-1}(z) - \frac{n+\al-1}{n}\O{L}^{(\al)}_{n-2}(z)$
+\item Derivative $\O{L}' = \frac{n}{x}\left(\O{L}_{n} - \O{L}_{n-1}\right)$ [TODO: generalized form]
+\item Zeros
+\item Weights
+\item Rodrigues' formula $\O{L}^{(\al)}_n(z) = e^x \frac{x^{-\al}}{n!} \frac{d^n}{dx^n}\left[ e^{-x} x^{n+\al} \right]$
+\item 
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Gegenbauer (ultraspherical) polynomials}
+$\O{C}^{(\gam)}_n(z)$ with $\gam...$
+\begin{itemize}
+\item Weight $w(x) = (1-x^2)^{\gam-1/2}$ on interval $(-1,1)$
+\item Differential equation $\left(1-x^2\right) \O{C}_n'' + \left(-(2\gam+1)x\right) \O{C}_n' + \left(n(n+2\gam)\right) \O{C}_n = 0$
+\item Normalization $\left(\frac{(2\gam)_n}{(\gam+1/2)_n} \frac{2^\gam \Gam(n+\gam+1/2)}{\sqrt{2(n+\gam)n!\Gam(n+2\gam)}}\right)^{-1}$
+\item Relation $\O{C}^{(\gam)}_n(x) = \frac{(2+\gam)_n}{(\gam+1/2)_n} \O{P}_n^{(\gam-1/2, \gam-1/2)}(x)$
+\item Recurrence
+\item Zeros
+\item Weights
+\item Rodrigues' formula $\O{C}^{(\gam)}_n(z) = \frac{d^n}{dx^n}\left[  \right]$
+\item Eigenvalue matrix terms $\beta_j = 0$,
+    \[ \al_j = \frac{2}{2j+2\gam-1} \sqrt{\frac{j(j+\gam-1/2)^2(j+2\gam-1)}{(2j+2\gam)(2j+2\gam-2)}} \qquad j\geq1 \]
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Jacobi polynomials}
+$\O{P}^{(\al,\beta)}(z)$ with $\al,\beta>-1$
+\begin{itemize}
+\item Weight $w(x) = (1-x)^\al(1+x)^\beta$ on interval $(-1,1)$
+\item Differential equation $\left(1-x^2\right) \O{P}_n'' + \left(\beta-\al-(\al+\beta+2)x\right) \O{P}_n' + \left(n(n+\al+\beta+1)\right) \O{P}_n = 0$
+\item Normalization $\sqrt{\frac{2^{\al+\beta+1}}{2n+\al+\beta+1} \frac{\Gam(n+\al+1)}{\Gam(n+1)} \frac{\Gam(n+\beta+1)}{\Gam(n+\al+\beta+1)}}$
+\item Relation 
+\item Recurrence
+\item Zeros
+\item Weights
+\item Rodrigues' formula $\O{P}^{(\al,\beta)}_n(z) = \frac{(-)^n}{2^n n!}(1-x)^{-\al}(1+x)^{-\beta}\frac{d^n}{dx^n}\left[ (1-x)^{n+\al}(1+x)^{n+\beta} \right]$
+\item Eigenvalue matrix terms $\beta_0 = \frac{\beta-\al}{\al+\beta+2}$,
+    \[ \beta_j = \frac{\beta^2-\al^2}{(2j+\al+\beta)(2j+\al+\beta+2)} \qquad j\geq1 \]
+    \[ \al_j = \frac{2}{2j+\al+\beta}\sqrt{\frac{j(j+\al)(j+\beta)(j+\al+\beta)}{(2j+\al+\beta+1)(2j+\al+\beta-1)}} \qquad j\geq1 \]
+\end{itemize}
+Shifted: $\O{R}^{(\al,\beta)}(x)=\O{P}^{(\al,\beta)}_n(2x-1)$ on $(0,1)$ with weight $(1-x)^\al x^\beta$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hermite polynomials}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Physicists'}
+$\O{H}_n(z)$
+\begin{itemize}
+\item $\O{H}_0 = 1$, $\O{H}_1 = 2x$
+\item Weight $w(x) = e^{-x^2}$ on interval $(-\infty,\infty)$
+\item Differential equation $\left(1\right) \O{H}_n'' + \left(-2x\right) \O{H}_n' + \left(2n\right) \O{H}_n = 0$
+\item Normalization $(\sqrt{pi}2^n n!)^{-1/2}$
+\item Relation 
+\item Recurrence $\O{H}_n = 2x\O{H}_{n-1} - 2(n-1)\O{H}_{n-2}$
+\item Derivative $\O{H}_n' = 2n \O{H}_{n-1}$
+\item Zeros
+\item Weights
+\item Rodrigues' formula $\O{H}_n(z) = (-)^n e^{x^2} \frac{d^n}{dx^n}\left[ e^{-x^2} \right]$
+\item Eigenvalue matrix terms $\beta_j = 0$, $\al_j = \sqrt{j/2}$, $\mu_0 = \sqrt\pi$
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Probabilists'}
+$\O{He}_n(z)$
+\begin{itemize}
+\item Weight $w(x) = e^{-x^2/2}$ on interval $(-\infty,\infty)$
+\item Differential equation $\left(2\right) \O{He}_n'' + \left(-4x\right) \O{He}_n' + \left(2n\right) \O{He}_n = 0$
+  [double-check this]
+\item Normalization $(\sqrt{2pi}n!)^{-1/2}$
+\item Relation $\O{He}_n(z) = 2^{-n/2}\O{H}_n(x/\sqrt2)$
+\item Recurrence
+\item Zeros: zeros of $\O{He}_n(x)$ are $\sqrt{2} \times$ zeros of $\O{H}_n(x)$
+\item Weights
+\item Rodrigues' formula $\O{He}_n(z) = (-)^n e^{x^2/2} \frac{d^n}{dx^n}\left[ e^{-x^2/2} \right]$
+\item 
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Misc functions}
+
+synchrotron, transport, Einstein, Lobachevsky, Erdelyi $\mu$/$\nu$,
+
+Heun
+
+Lam\'e
+
+Painlev\'e
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Anger, Weber functions}
+[Move this section???]
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Lommel functions}
+For $\mu\pm\nu\neq\pm1,\pm3,\pm5,\dots$
+\[ S_{\mu,\nu}(z) = \frac{z^{\mu+1}}{(\mu+1)^2 - \nu^2} \sum_{k=0}^\infty t_k \]
+where $t_0 = 1$ and $t_k = t_{k-1}\frac{-z^2}{(\mu+2k+1)^2 - \nu^2}$.
+
+And the second Lommel function given via asymptotic expansion:
+\[ s_{\mu,\nu}(z) \sim \sum_{k=0}^\infty u_k \]
+where $u_0=1$, $u_k = u_{k-1}\frac{-(\mu-2k+1)^2 - \nu^2}{z^2}$.
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Anger function}
+\[ \Ob{J}_\nu(z) = \int_0^\pi\frac{\cos(\nu\theta - z\sin\theta)}{\pi}\,d\theta \]
+We have
+\[ \Ob{J}_\nu(z) = \frac{\sin\nu\pi}{\pi}S_{0,\nu}(z) - \nu\frac{\sin\nu\pi}{\pi}S_{-1,\nu}(z) \]
+and
+\[ \Ob{J}_\nu(z) = \O{J}_\nu(z) + \frac{\sin\nu\pi}{\pi z}s_{0,\nu}(z) - \nu\frac{\sin\nu\pi}{\pi z^2}s_{-1,\nu}(z) \]
+
+Power-series if $|z|<10$ or $|z/\nu|<q$??
+\begin{implementation}
+From~\cite{atlas:thompson}: to get an array of values for index $\nu, \nu+1, \dots, \nu+m$ with $0<\nu<1$:
+\begin{itemize}
+\item Compute $\Ob{J}_\nu(x)$, $\Ob{J}_{\nu+1}(x)$ by power-series for $x<30$ and by asymptotic expansion for $x\geq30$
+\item Use upwards recurrence in $\nu$ --- for small $x$ this can be bad, so we can use a downwards recurrence
+    (with modifications to the previous step)
+\item For the special case of $x=0$, use the fact that $\Ob{J}_\nu(0) = \sin(\nu\pi)/(\nu\pi)$ exactly
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Weber function}
+\[ \Ob{E}_\nu(z) = \int_0^\pi\frac{\sin(\nu\theta - z\sin\theta)}{\pi}\,d\theta \]
+This is computed the same basic way as $\Ob{J}_\nu(x)$ above...~\cite{atlas:thompson}.
+
+We have
+\[ \Ob{E}_\nu(z) = -\frac{1+\cos\nu\pi}{\pi}S_{0,\nu}(z) - \nu\frac{1-\cos\nu\pi}{\pi}S_{-1,\nu}(z) \]
+and
+\[ \Ob{E}_\nu(z) = -\O{Y}_\nu(z) + \frac{1+\cos\nu\pi}{\pi}s_{0,\nu}(z) - \nu\frac{1-\cos\nu\pi}{\pi z^2}s_{-1,\nu}(z) \]
+[CHECK THE DENOMINATOR ON THE FIRST FRACTION IN THE PREVIOUS EQUATION! (compare with Anger function...)]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Howland integrals}
+\[ I_k = \frac{1}{2(k!)}\int_0^\infty \frac{w^k}{\O{sinh}w + w}\,dw \qquad (k\geq1) \]
+\[ I^*_k = \frac{1}{2(k!)}\int_0^\infty \frac{w^k}{\O{sinh}w - w}\,dw \qquad (k\geq3) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mathieu functions}
+(elliptic cylinder functions)
+[This needs to be cleaned up!!]
+[MOVE TO ITS OWN SECTION!]
+
+{\tt characteristic values, expansion coefficients, sem, cem dsem, dcem, McM, dMcM, MsM, dMsM, etc. ...}
+
+From Zhang-Jin~\cite{zj}
+Mathieu's differential equation is
+\[  y'' + (\lam - 2q\cos 2z)y = 0 \]
+And note that due to periodicity requirements, there are conditions on $\lam=\lam(q)$ as a function of $q$.
+Let $\lam(0) = m^2$, then we get the following Mathieu functions of order~$m$:
+\[ \O{ce}_m(z,q) = \sum_{k=0}^\infty A^m_k(q)\cos kz \]
+\[ \O{se}_m(z,q) = \sum_{k=0}^\infty B^m_k(q)\cos kz \]
+for some coeffs $A$, $B$...
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Modified Mathieu functions}
+
+\[  y'' - (\lam - 2q\cosh 2z)y = 0 \]
+\[ \O{Ce}_m(z,q) = \O{ce}_m(z,q)(\ii z,q) \]
+\[ \O{Se}_m(z,q) = -\ii \O{se}_m(z,q)(\ii z,q) \]
+
+\[ \O{Mc}^{(j)}_m(z,q) = (j=1..4)\]
+\[ \O{Ms}^{(j)}_m(z,q) = (j=1..4)\]
+Matheiu-Hankel for $j=3,4$
+
+? others: ?
+
+\[ \O{Cc}^{(1)}_m(z,q) = \]
+\[ \O{Cs}^{(1)}_m(z,q) = \]
+\[ \O{Cc}^{(2)}_m(z,q) = \]
+\[ \O{Cs}^{(2)}_m(z,q) = \]
+\[ \O{Cc}^{(3)}_m(z,q) = \]
+\[ \O{Cs}^{(3)}_m(z,q) = \]
+\[ \O{Cc}^{(4)}_m(z,q) = \]
+\[ \O{Cs}^{(4)}_m(z,q) = \]
+\[ \lambda(q) = \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Debye functions}
+\[ \O{D}_n(x) = \int_0^x\frac{t^n}{e^t-1}\,dt \]
+\[ \O{\widetilde{D}}_n(x) = \frac{n}{x^n}\O{D}_n(x) \]
+\begin{implementation}
+A series representation (compare with generating function for Bernoulli numbers) (for $|x|<2\pi$ and $n\geq1$):
+\[ \int_0^x\frac{t^n}{e^t-1}\,dt = x^n\left( \frac{1}{n} - \frac{x}{2(n+1)} + \sum_{k=1}^\infty \frac{B_{2k}}{(2k+n)(2k)!}x^{2k}\right) \]
+This series works ok, but requires increasing number of terms as $n$ or $x$ increase (for $n=1$, $x=1$ we already need 13 terms, for $n=6$, $x=3$ we need 31 terms).
+
+Reflection:
+\[ \O{D}_n(-x) = (-)^n \O{D}_n(x) + (-)^n\frac{x^{n+1}}{n+1} \]
+\[ \O{\widetilde{D}}_n(-x) = \O{\widetilde{D}}_n(x) + \frac{n}{n+1}x \]
+
+Also for the complementary integral (for $x>0$ and $n\geq1$):
+\[ \int_x^\infty\frac{t^n}{e^t-1}\,dt = \sum_{k=1}^\infty e^{-kx}\left( \frac{x^n}{k} + \frac{n x^{n-1}}{k^2} + \frac{n(n-1)x^{n-2}}{k^3} + \cdots + \frac{n!}{k^{n+1}} \right) \]
+Note that
+\[ \int_0^\infty\frac{t^n}{e^t-1}\,dt = n!\zeta(n+1) \]
+The complementary integral is useful for $|x|\geq2$ but for large $n$ (say $n>20$) we get bad cancellation.
+
+Note
+\[ \O{D}_n(x) = n!\zeta(n+1) - \int_x^\infty\frac{t^n}{e^t-1}\,dt = n!\left\{\left[\zeta(n+1)-1\right]
+    + e^{-x}\left[\sum_{j=n+1}^\infty\frac{z^j}{j!}\right] - \sum_{k=2}^\infty \frac{e^{-kx}}{k^{n+1}}\left[\sum_{j=0}^n\frac{z^j}{j!}\right] \right\} \]
+which might offer improved numerical stability (with bracketed terms computed individually with high precision)
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sievert integral}
+\[ \O{S}(\theta,x) = \int_0^\theta e^{-x\sec\phi}\,d\phi = \int_0^\theta e^{-x/cos\phi}\,d\phi \]
+\[ \O{\widetilde{S}}(\theta,x) = \frac{\O{S}(\theta,x)}{\theta} \]
+
+From~\cite{a&s}:
+As $x\to\infty$,
+\[ \O{S}(x,\theta) \sim \sqrt{\frac{\pi}{2x}} e^{-x} \erf(\theta\sqrt{x/2}) \]
+
+Also, if $a_0=1$, $a_n=\frac{1\cdot3\cdot5\cdots(2n-1)}{2\cdot4\cdot6\cdots(2n)}$ then
+\[ \O{S}(x,\theta) = \O{S}(x,\pi/2) - \sum_{k=0}^\infty \al_k \cos(\theta)^{2k+1} E_{2k+2}(\frac{x}{\cos\theta}) \]
+for $x\geq0$, $0<\theta<\pi/2$.  ($E_n(z)=\int_1^\infty e^{-zt} t^{-n}\,dt$ are exponential integrals.)
+
+\[ \O{S}(x,\pi/2) = \O{Ki}_1(x) = \int_x^\infty \O{K}_0(t)\,dt \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Abramowitz functions}
+\[ \O{f}_m(x) = \int_0^\infty t^me^{-t^2-x/t}\,dt \]
+for $m=0,1,2,\dots$
+
+\begin{implementation}
+A few potentially useful facts (from~\cite{a&s}):
+\begin{itemize}
+\item A recurrence: $2\O{f}_m = (m-1)\O{f}_{m-2} + x\O{f}_{m-3}$
+\item $f'_m = -f_{m-1}$ ($m=1,2,\dots$)
+\item A series expansion for $\O{f}_1$:
+  \[ \O{f}_1(x) = \frac12\sum_{k=0}^\infty(a_k\ln x + b_k)x^k\]
+  where
+  \begin{itemize}
+  \item $a_0 = a_1 = 0$; $a_2 = -b_0$
+  \item $b_0 = 1$; $b_1 = -\sqrt\pi$; $b_2 = \tfrac32(1-\gamma)$
+  \item $a_k = \frac{-2a_{k-2}}{k(k-1)(k-2)}$
+  \item $b_k = \frac{-2b_{k-2} - (3k^2-6k+2)a_k}{k(k-1)(k-2)}$
+  \end{itemize}
+\item An asymptotic expansion, let $v=3(x/2)^{2/3}$, then
+  \[ \O{f}_{m}(x) \sim \sqrt{\frac\pi3}3^{-m/2}v^{m/2}e^{-v}\left(a_0 + \frac{a_1}{v} + \frac{a_2}{v^2} + \cdots \right) \]
+  where $a_0 = 1$; $a_1 = \tfrac{1}{12}(3m^2+3m-1)$; and
+  $12(k+2)a_{k+2} = -(12k^2+36k-3m^2-3m+25)a_{k+1} + \tfrac12(m-2k)(2k+3-m)(2k+3+2m)a_k$
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Abramowitz 2 functions}
+\[ \O{f}(x) = \int_0^\infty\frac{e^{-t^2}}{t+x}\,dt \]
+Representation in terms of exponential integral and Dawson's integral:
+\[ \O{f}(x) = -\frac12e^{-x^2}\O{Ei}(x^2) + \sqrt{\pi}e^{-x^2}\int_0^x e^{t^2}\,dt \]
+Series expansion:
+\[ \O{f}(x) = -e^{-x^2}\ln x + e^{-x^2}\left[ \sqrt{\pi}\sum_{k=0}^\infty \frac{x^{2k+1}}{k!(2k+1)}
+    - \sum_{k=1}^\infty \frac{x^{2k}}{k!(2k)} - \frac\gamma2 \right] \]
+or a series with the digamma function:
+\[ \O{f}(x) = -e^{-x^2}\ln x + \frac12\sum_{k=0}^\infty\frac{\psi(k+1)x^{2k}}{k!}
+    + \sqrt{\pi}\sum_{k=0}^\infty\frac{(-2)^k x^{2k+1}}{1\cdot3\cdot5\cdots(2k+1)} \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Clausen integral}
+[and generalizations...]
+For $0\leq\theta\leq\pi$:
+\[ \O{C}(\theta) = -\int_0^\theta \ln(2\sin t/2)\,dt = \sum_{n=1}^\infty \frac{\sin n\theta}{n^2} = \Im(\O{Li}_2(e^{\ii\theta}))\]
+
+Another series:
+\[ \O{C}(\theta) = -\theta\ln\theta + \theta + \sum_{k=1}^\infty(-)^{k-1}\frac{B_{2k}}{(2k)!}\frac{\theta^{2k+1}}{2k(2k+1)} \]
+or equivalently:
+\[ \frac{\O{C}(\theta)}{\theta} = 1 - \ln\theta + \sum_{k=1}^\infty\frac{\zeta(2k)}{n(2n+1)}\left(\frac{\theta}{2\pi}\right)^{2k} \]
+
+Another series (from wikipedia)
+\[ \O{C}(\theta) = 3\theta - \theta\ln\left(\theta(1-\frac{\theta^2}{4\pi^2})\right)
+    -2\pi\ln(\frac{2\pi+\theta}{2\pi-\theta}) + \theta\sum_{n=1}^\infty \frac{\zeta(2n)-1}{n(2n+1)}\left(\frac{\theta}{2\pi}\right)^{n} \]
+[check and test this...]
+
+Relation:
+\[ \O{C}(\pi-\theta) = \O{C}(\theta) - \frac12\O{C}(2\theta) \qquad (0\leq\theta\leq\pi/2) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Voigt (plasma dispersion) function}
+\[ \O{V}(u,\al) = \frac1\pi \int_{-\infty}^\infty \frac{e^{-(\al y-u)^2}}{y^2+1}\,dy \]
+\[ \O{V}(u,\al) = \Re(e^{z^2}\erfc(z)) \qquad z=\al+u\ii \]
+
+The versions from DLMF:
+\[ \O{U}(x,t) = \frac{1}{\sqrt{4\pi t}} \int_{-\infty}^\infty \frac{e^{-(x-y)^2/4t}}{1 + y^2}\,dy \]
+\[ \O{V}(x,t) = \frac{1}{\sqrt{4\pi t}} \int_{-\infty}^\infty \frac{y e^{-(x-y)^2/4t}}{1 + y^2}\,dy \]
+then with $z=\frac{1-\ii x}{2\sqrt{t}}$ we have
+\[ \O{U}(x,t) + \ii\O{V}(x,t) = \sqrt{\frac{\pi}{4t}}e^{z^2}\erfc(z) \]
+
+The ``line-broadening function'' (from DLMF) is defined by (and related to Voight functions via):
+\[ \O{H}(a,u) = \frac{a}{\pi}\int_{-\infty}^\infty\frac{e^{-t^2}}{(u-t)^2 + a^2}\,dt
+    = \frac{1}{a\sqrt\pi} \O{U}(\frac{u}{a}, \frac{1}{4a^2}) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Spence integral}
+\[ \O{S}(x) = -\int_1^x\frac{\ln t}{t-1}\,dt = \O{Li}_2(1-x) \qquad \Re{x}\geq0 \vee x\notin\RR\]
+
+\begin{implementation}
+Implementation notes for $\O{S}(z)$, $z\geq0$:
+\begin{itemize}
+\item Recall $\O{Li}_2(z)=\sum_{k=1}^\infty\frac{z^k}{k^2}$ (with $z<1$). Recall the following identities (and their applicability when $z\in\RR$)
+  \begin{itemize}
+  \item [\bf(A)] $\O{Li}_2(z) + \O{Li}_2(\frac{1}{z}) = -\frac{\pi^2}{6} - \frac{\ln(-z)^2}{2}$ for $z<0$
+  \item [\bf(B)] $\O{Li}_2(z) + \O{Li}_2(1-z) = \frac{\pi^2}{6} - \ln(z)\ln(1-z)$ for $0<z<1$
+  \item [\bf(C)] $\O{Li}_2(z) + \O{Li}_2(\frac{z}{z-1}) = -\frac{\ln(1-z)^2}{2}$ for $z<1$
+  \end{itemize}
+\item Using these identities, we have the following computations:
+  \begin{itemize}
+  \item For $x=0$ use $\O{S}(0) = \frac{\pi^2}{6}$
+  \item For $0<x<0.5$, use {\bf(B)} and compute $\O{S}(x) = \frac{\pi^2}{6} - \ln(x)\ln(1-x) - \sum_{k=1}^\infty \frac{x^k}{k^2}$
+  \item For $0.5\leq x<1$, use $\O{S}(x)=\O{Li}_2(1-x)$ and compute $\O{S}(x) = \sum_{k=1}^\infty\frac{(1-x)^k}{k^2}$
+  \item For $1\leq x<2.5$, use {\bf(C)} and compute $\O{S}(x) = -\frac{\ln(x)^2}{2} - \sum_{k=1}^\infty\frac{1}{k^2}\left(\frac{x-1}{x}\right)^k$
+  \item For $2.5\leq x$, use {\bf(A)} and compute $\O{S}(x) = -\frac{\pi^2}{6} - \frac{\ln(x-1)^2}{2} - \sum_{k=1}^\infty \frac{(1-x)^{-k}}{k^2}$
+  \end{itemize}
+\item This gives 15 digits precision everywhere but up to 7 ulps near $1$
+\item Generally have less than 50 terms needed everywhere in the domain, as $x\to\infty$, need fewer terms
+\item Atlas recommends series near $0$ and $1$ and in other cases to integrate $\O{S}(x) = -\int_0^{x-1}\frac{\ln 1+u}{u}\,dt$ using Simpson's rule
+  (140 points for $x\leq2$ and more points for larger $x$)
+\end{itemize}
+\end{implementation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Angular momentum coupling coefficients}
+Define $\Delta(abc) = \sqrt{\frac{(a+b-c)!(a-b+c)!(-a+b+c)!}{(a+b+c+1)!}}$
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{$3-j$ coefficients}
+The sum below is over all nonnegative integers $s$ such that factorial arguments are nonnegative:
+\begin{eqnarray*}
+ \begin{pmatrix}a&b&c\\\al&\beta&\gam\end{pmatrix}
+ &=& (-)^{a-b-\gam} \Delta(abc)\sqrt{(a+\al)!(a-\al)!(b+\beta)!(b-\beta)!(c+\gam)!(c-\gam)!} \\
+ && {}\cdot\sum_s\frac{(-)^s}{s!(a+b-c-s)!(a-\al-s)!(b+\beta-s)!(c-b+\al+s)!(c-a-\beta+s)!}
+\end{eqnarray*}
+
+Alternatively: 
+\begin{eqnarray*}
+ \begin{pmatrix}a&b&c\\\al&\beta&\gam\end{pmatrix}
+  &=& \delta_{\al+\beta+\gam,0}(-)^{a-b-\gam} \\
+  && {}\cdot\sqrt{\frac{(c+a-b)!(c-a+b)!(a+b-c)!(c-\gam)!(c+\gam)!}{(a+b+c+1)!(a-\al)!(a+\al)!(b-\beta)!(b+\beta)!}} \\
+  && {}\cdot{\sum_k}'\frac{(-)^{k+b+\beta}(b+c+\al-k)!(a-\al+k)!}{k!(c-a+b-k)!(c-\gam-k)!(k+a-b+\gam)!}
+\end{eqnarray*}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{$6-j$ coefficients}
+\begin{eqnarray*}
+\left\{\begin{matrix}a&b&c\\d&e&f\end{matrix}\right\}
+  &=& (-)^{a+b+c+d}\Delta(abe)\Delta(acf)\Delta(bdf)\Delta(cde) \\
+  && {}\cdot{\sum_k}'(a+b+c+d+1-k)! \\
+  && {}\qquad \left(k!(e+f-a-d+k)!(e+f-b-c+k)!\right)^{-1} \\
+  && {}\qquad \left((a+b-e-k)!(c+d-e-k)!(a+c-f-k)!(b+d-f-k)!\right)^{-1}
+\end{eqnarray*}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{$9-j$ coefficients}
+\[\left\{\begin{matrix}a&b&c\\d&e&f\\g&h&i\end{matrix}\right\} = \sum_k(-)^{2k}(2k+1)
+ \left\{\begin{matrix}a&i&k\\h&d&g\end{matrix}\right\}
+ \left\{\begin{matrix}b&f&k\\d&h&e\end{matrix}\right\}
+ \left\{\begin{matrix}a&i&k\\f&b&c\end{matrix}\right\}
+\]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Combinatorial functions and numbers}
+Fibonacci numbers/polynomials, Lucas numbers/polynomials,
+Stirling numbers (1/2), factorial, binomial, multinomial,
+Pochhammer symbol, rising/falling factorial, 
+generalized Lucas/Fibonacci numbers,
+((brackets and numbers from ``concrete mathematics''))
+
+integer \& generalized versions
+
+Bell numbers = \# of partitions of set.  Touchard's congruence: $B_{p+k}\cong B_k + B_{k+1}\pmod{p}$
+where $p$ is prime and $B_n$ is a Bell number.  $e^{e^x-1} = \sum_{n=0}^\infty B_n \frac{x^n}{n!}$.
+Bell polynomials --- Dobinski's formula: $B_n(x) = e^{-x}\sum_{k=0}^\infty k^n \frac{x^k}{k!}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bernoulli numbers, polynomials}
+
+\[ \frac{t}{e^t-1} = \sum_{n=0}^\infty \frac{t^n}{n!} B_n \]
+\[ \frac{t e^{xt}}{e^t-1} = \sum_{n=0}^\infty \frac{t^n}{n!} B_n(x) \]
+
+Fact: $\zeta(2n) = \frac{(2\pi)^{2n}}{2} \frac{|B_{2n}|}{(2n)!}$ which implies
+that $|B_{2n}\sim \frac{2(2n)!}{(2\pi)^{2n}}$ for large $n$...
+** Use $\zeta$ to generate $B_n$ for large/scaled $n$ (very easy to compute)...
+
+Compute: $B_n$, $B_n/n!$, $\ln|B_n|$, etc.
+
+\[ B_n(x) = \sum_{k=0}^n\binom{n}{k}B_k x^{n-k} \]
+\[ B_n(1-x) = (-)^n B_n(x) \]
+\[ B_n(x+1) - B_n(x) = n x^{n-1} \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Euler numbers, polynomials}
+
+\[ \frac{1}{\cosh t} = \frac{2 e^{t}}{e^{2t}+1} = \sum_{n=0}^\infty \frac{t^n}{n!} E_n  \qquad|z|<\frac\pi2\]
+\[ \frac{2 e^{xt}}{e^t+1} = \sum_{n=0}^\infty \frac{t^n}{n!} E_n(x) \qquad|z|<\pi\]
+
+\[ E_n = 2^n E_n(\tfrac12)\in\ZZ \]
+\[ E_n(x) = \sum_{k=0}^n\binom{n}{k}\frac{E_k}{2^k} (x-\tfrac12)^{n-k} \]
+\[ E_n(1-x) = (-)^n E_n(x) \]
+\[ E_n(x+1) + E_n(x) = 2 x^n \]
+
+We also have the {\em secant numbers},
+with $\sec x = \sum_{k=0}^\infty S_k \frac{x^{2k}}{(2k)!}$:
+\[ S_n = |E_{2k}| = E^*_k \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tangent numbers, polynomials}
+
+\[ T_{2n-1} = \frac{2^{2n}(2^{2n}-1)|B_{2n}|}{2n} = (-)^{n-1}\frac{2^{2n}(2^{2n}-1)B_{2n}}{2n} \in \ZZ \]
+and $T_{2n} = 0$ with $\tan x = \sum_{k=1}^\infty T_k \frac{x^k}{k!}$
+Note that
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Genocchi numbers, polynomials}
+
+\[ \frac{2t}{e^t+1} = \sum_{n=1}^\infty G_n \frac{t^n}{n!} \]
+whence $G_n = 2(1-2^n) B_n$.  We can define the scaled numbers also $G_n^* = G_n/n!$.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Number theoretic functions}
+
+for unsigned long long (64-bit): isprime, factor (note <=16 distinct factors of $n\leq2^{64}$), nth\_prime, 
+
+Chinese Remainder Theorem, M\"obius function, Jacobi function, $\sig$, $\tau$, etc.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Mathematical finance}
+
+digital, power, log,
+OT, NT, DOT, DNT, KI, KO, DKI, DKO, sequentials, windowed,
+aisan, lookback, ratchet, cliquet,
+forward-start, chooser, compound, reset, extendible,
+fader, accumulator, accrual, digital-accrual, ..., fadelets, ...,
+quanto, basket,
+
+
+implied-volatility function
+
+various associated functionals of Brownian motion: pdf, hitting-time pdfs, BF with drift,
+lognormal, local-times, etc.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.%
+\subsection{Brownian motion}
+pdf/cdf of BM at time $T$ (with starting point); with drift/volatility;
+pdf/cdf of hitting time BH (w/drift) for level $L$, $H$, $L$ and $H$, $L$ before $H$, etc.;
+conditional density of $B_T$ on not hitting barrier(s);
+pdf/cdf of minimum/maximum before $T$;
+joint pdf of $B_T$, $M_T$, $m_T$ (\& combinations);
+occupation times;
+average densities (Asians...);
+joint densities of $B_{T_1}$, $B_{T_2}$, etc.;
+
+Brownian bridge; lognormal;
+
+copulas?
+
+sampling?; generating Weiner paths?; generic SDE simulator? (Euler/Milstein/etc.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.%
+\subsection{Bachelier model}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.%
+\subsection{Black-Scholes-Merton (BS) model}
+
+\[ d_{\pm}(k,t,s,r,g,\sig) = \frac{\ln(s/k) + (r-g\pm\sig^2/2)t}{\sig\sqrt{t}} \]
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Vanilla}
+\[ \O{Prem}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig)
+  = \om e^{-gt}s\O{N}(\om d_+) - \om e^{-rt}k\O{N}(\om d_-) \]
+\[ \O{\Delta}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig) = \frac{\partial\O{P}}{\partial s}
+  = \om e^{-gt}\O{N}(\om d_+) \]
+\[ \O{\Gam}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig) = \frac{\partial^2\O{P}}{\partial s^2}
+  = \O{n}(d_+)\frac{e^{-gt}}{\sig\sqrt{t}} \]
+\[ \O{Ve}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig) = \frac{\partial\O{P}}{\partial \sig}
+  = \O{n}(d_+) s e^{-gt}\sqrt{t} \]
+\[ \O{Va}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig) = \frac{\partial^2\O{P}}{\partial s\partial\sig}
+  = \O{n}(d_+)\frac{-e^{-gt}d_-}{\sig} \]
+\[ \O{Vo}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig) = \frac{\partial^2\O{P}}{\partial \sig^2}
+  = \O{Ve}\frac{d_+ d_-}{\sig} \]
+\[ \O{\rho}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig) = \frac{\partial\O{P}}{\partial r}
+  = \om t k e^{-rt} \O{N}(\om d_-) \]
+\[ \O{\phi}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig) = \frac{\partial\O{P}}{\partial g}
+  = -\om t s e^{-gt} \O{N}(\om d_+) \]
+\[ \O{\theta}^\text{V}_\text{BS}(k, t, \om; s, r, g; \sig) = -\frac{\partial\O{P}}{\partial t}
+  = -\frac{s \sig e^{-gt} \O{n}(d_+)}{2\sqrt{t}} + \om g s e^{-gt}\O{N}(d_+) - \om r k e^{-rt}\O{N}(d_-) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Heston stochastic-volatility model}
+
+\[ \O{Prem}^\text{Van}_\text{H}(k, t; s, r, g; \dots) = \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variance-gamma (VG) model}
+
+\[ \O{\Psi}(a, b, \gam) = \frac{1}{\Gam(\gam)}\int_0^\infty \O{N}[ a u^{-1/2} + b u^{1/2} ] u^{\gam-1} e^{-u} \,du \]
+\[ \O{\Phi}(\al, \beta, \gam; x, y) = \frac{\Gam(\gam)}{\Gam(\al)\Gam(\gam-\al)} \int_0^1 u^{\al-1} (1-u)^{\gam-\al-1} (1-ux)^{-\beta} e^{uy} \,du \]
+
+\[ \O{Prem}^\text{Van}_\text{VG}(k, t; s, r, g; \dots) = \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constant-elasticity-of-variance (CEV) model}
+\[ \O{Prem}^\text{Van}_\text{CEV}(k, t; s, r, g; \dots) = \]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Probability functions}
+pdf, cdf, co-cdf, inverse cdf, inverse co-cdf, shifted/scaled versions (give mean/variance {\em or} location/scale parameters), moments (mean, variance, general),
+
+sampling, generation, integration against density, fitting, etc.
+
+normal, lognormal, t, gamma, exponential, logistic, F, $\chi^2$, beta, cauchy, Weibull, Bessel (I),
+$\al$-stable, Pareto, Laplace, inverse-gamma, inverse-normal, Bernoulli, Cauchy-Lorentz, ``extreme-value distribution'',
+erlang, inverse $\chi^2$, non-centered beta/F/t, Rayleigh, triangular, uniform, ``logarithmic series distribution''
+
+
+bivariate normal, trivariate normal, n-variate normal,
+
+binomial, poisson, hypergeometric, Kolmogorov-Smirnov, negative binomial, geometric
+
+copulas
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Useful techniques}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Misc}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Euler-Maclaurin summation}
+
+A few results for possible use:
+\begin{eqnarray*}
+\int\frac{1}{x^s}\,dx &=& \frac{x^{1-s}}{1-s} \\
+\int\frac{1}{(x+a)^s}\,dx &=& \frac{(x+a)^{1-s}}{1-s} \\
+\int\frac{z^x}{x^s}\,dx &=& -x^{1-s}\Gam(1-s,-x\ln z)(-x\ln z)^{s-1} \\
+\int\frac{z^x}{(x+a)^s}\,dx &=& -(x+a)^{1-s}\Gam(1-s,-(x+a)\ln z)(-(x+a)\ln z)^{s-1}
+\end{eqnarray*}
+
+The Euler-Maclaurin summation formula
+\[ \sum_{n=a}^b f(n) = \int_a^b f(t)\,dt - \frac{f(b)+f(a)}{2}
+    + \sum_{j=2}^k\frac{B_j}{j!}\left( f^{(j-1)}(b) - f^{(j-1)}(a) \right) - \int_a^b \frac{B_k(\{1-t\})}{k!}f^{(k)}(t)\,dt \]
+where $\{x\}\in[0,1)$ is the fractional part of $x$ and $B_j$, $B_j(x)$ are Bernoulli numbers, polynomials (resp.).
+
+If $f$ and its derivatives go to zero as $x\to\infty$ then we have
+\[ \sum_{n=a}^\infty f(n) = \int_a^\infty f(t)\,dt - \frac{f(a)}{2}
+    - \sum_{j=2}^k\frac{B_j}{j!}f^{(j-1)}(a) - \int_a^\infty \frac{B_k(\{1-t\})}{k!}f^{(k)}(t)\,dt \]
+
+This is very useful for getting accurate approximations to the tail of truncated summations...
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Boole summation}
+Let $h\in[0,1]$, $f:[m,\infty)\to\RR$ with $k$ continuous derivatives, $f^{(i)}(x)\to0$ as $x\to\infty$ for $i=0,\dots,k$,
+then
+\[ \sum_{i=m}^\infty (-)^{i-m}f(h+i) = \frac12 \sum_{i=0}^{k-1} \frac{E_i(h)}{i!} f^{(i)}(m) + R_k \]
+(recall that the Euler numbers $E_n$ are related to the Euler polynomials $E_n=E_n(1/2)$ and are
+$E_{2n+1}=0$, $E_0=1$, $E_2=-1$, $E_4=5$, $E_6=-61$, $E_8=1385$, \dots).
+
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Borel summation}
+(From Wikipedia)
+
+Let $y(z)=\sum_{k=0}^\infty y_k z^k$ be a formal power series in $z$.  Define the Borel transform of $y$
+\[ \mathcal{B}_y(t) = \sum_{k=0}^\infty \frac{y_k}{k!} t^k \]
+Suppose that $\mathcal{B}_y$ converges to an analytic function near $0$ that can be analytically continued
+along the positive real axis to a function growing sufficiently slowly that the following integral is
+well-defined (as an improper integral).  Then the {\em Borel sum} of $y$ is given by
+\[ \int_0^\infty e^{-t}\mathcal{B}_y(tz)\,dt \]
+
+A slightly weaker form of Borel's summation method gives the Borel sum of $y$ as
+\[ \lim_{t\to\infty}e^{-t}\sum_{n}\frac{t^n}{n!}\cdot\sum_{k\leq n} y_k z^k \]
+If the sum exists in this sense then it also exists in the previous sense and is the same, but there are some
+series that can be summed with the previous method but not with this method.
+
+Example: $y(z)=\sum_{k=0}^\infty z^k = \frac{1}{1-z}$ for $|z|<1$.  Then $\mathcal{B}_y(t) = \sum_{k=0}^\infty\frac{1}{k!}t^k = e^t$ and
+the Borel sum is $\int_0^\infty e^{-t}e^{tz}\,dt = \frac{1}{1-z}$ for $\Re z<1$, giving analytic continuation of
+the original series to a larger region.
+
+Example: $y(z)=\sum_{k=0}^\infty k!(-z)^k$ diverges for all $z\neq0$.  Then $\mathcal{B}_y(t) = \sum_{k=0}^\infty(-t)^k = \frac{1}{1+t}$ and
+the Borel sum is $\int_0^\infty\frac{e^{-t}}{1+tz}\,dt = \frac1z e^{1/z} \Gam(0,1/z)$.
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Kahan's compensated summation trick}
+Note that optimization will destroy these algorithms!!
+
+To sum up the numbers $x_1, \dots, x_n$:
+\begin{verbatim}
+s = 0; e = 0;
+for i = 1:n
+  temp = s
+  y = x[i] + e
+  s = temp + y
+  e = (temp - s) + y
+end
+s = s + e // optional correction
+\end{verbatim}
+Then $s$ is a more accurate summation.
+%
+%Alternative (equivalent) formulation (from Wikipedia)
+%\begin{verbatim}
+%sum = 0; c = 0;
+%for i = 1 to N
+%  y = x[i] - c
+%  t = sum + y
+%  c = (t - sum) - y
+%  sum = t
+%end for
+%return sum
+%\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Continued fractions}
+
+Add Wallis algorithm also?
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Pincherle's theorem}
+(From Temme: "Numerical Aspects of Special Function")
+Pincherle's theorem: given a three-term recurrence relation
+\[ y_{n+1} + b(n) y_n + a(n) y_{n-1} = 0 \]
+then the continued fraction
+\[ \frac{-a_k}{b_k + } \frac{-a_{k+1}}{b_{k+1} + } \cdots \]
+converges iff the recurrence relation possesses a minimal solution.  Furthermore,
+if $f_n$ is a minimal solution, then the continued fraction converges to $f_k/f_{k-1}$.
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Modified Lentz algorithm}
+(cribbed from Numerical Recipes)
+Suppose $f(x) = b_0 + \frac{a_1}{b_1 +} \frac{a_2}{b_2 +} \frac{a_3}{b_3 +} \cdots$.
+Then compute the following (where $\eps\sim10^{-15}$ and $\zeta\sim10^{-30}$):
+\begin{itemize}
+\item Set $f_0 = b_0$ (if $b_0=0$ then set $f_0=\zeta$)
+\item Set $C_0 = f_0$
+\item Set $D_0 = 0$
+\item For $j=1, 2, \dots$
+  \begin{itemize}
+  \item Set $D_j = b_j + a_j D_{j-1}$ (if $D_j = 0$ then set $D_j = \zeta$)
+  \item Set $C_j = b_j + a_j / C_{j-1}$ (if $C_j = 0$ then set $C_j = \zeta$)
+  \item Set $D_j = 1/D_j$
+  \item Set $\Delta_j = C_j D_j$
+  \item Set $f_j = f_{j-1} \Delta_j$
+  \item if $|\Delta_j -1|<\eps$ then exit.
+  \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Quotient-difference algorithm}
+Given a series $f(z)=c_0 + c_1 + c_2 z^2$, we can find an equivalent continued fraction via the table
+\[\begin{array}{cccccc}
+      & q^0_1 \\
+e^1_0 &       & e^0_1 \\
+      & q^1_1 &       & q^0_2 \\
+e^2_0 &       & e^1_1 &       & e^0_2 \\
+\vdots& \vdots& \vdots& \vdots& &\ddots \\
+\end{array}\]
+where $e^n_0 = 0$, $q^n_1 = \frac{c_{n+1}}{c_n}$ and we continue via the rules
+\begin{eqnarray*}
+e^k_j &=& e^{k+1}_{j-1} + \left(q^{k+1}_j - q^k_j\right) \\
+q^k_{j+1} &=& q^{k+1}_j \frac{e^{k+1}_j}{e^k_j}
+\end{eqnarray*}
+Then we get the continued fraction
+\[ c = \frac{a_0}{1 -} \frac{a_1 z}{1 -} \frac{a_2 z}{1 -} \cdots \]
+where $a_0 = c_0$, $a_1 = q^0_1$, $a_2 = e^0_1$, $a_3 = q^0_2$, $a_4 = e^0_2$, \dots
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequence acceleration}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Aitken acceleration}
+Given $\{x_n\}_n$, produce
+\[ \al_n = \frac{x_{n+2}x_n - x_{n+1}^2}{x_{n+2} - 2x_{n+1} + x_n} = x_n - \frac{(\Delta x_n)^2}{\Delta^2 x_n} \]
+where $\Delta x_n = x_{n+1} - x_n$ and $\Delta^2 x_n = x_{n+2} - 2x_{n+1} + x_n$.
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Cohen-Villegas-Zagier convergence acceleration of alternating series}
+Suppose we have $S=\sum_{k=0}^\infty(-)^k a_k$.  Then fixing $N$, we compute
+\begin{verbatim}
+Let d = (3 + sqrt(8))^N;
+    d = (d + 1/d) / 2;
+    b = -1;  c = -d;  s = 0;
+    for k = 0 : (N-1)
+      c = b - c;
+      s = s + c * a_k;
+      b = b * ((k+N) * (k-N))/((k+1/2) * (k+1));
+output s/d;
+\end{verbatim}
+Note that this uses universal rational coefficients $c^{(N)}_k/d^{(N)}$ independent of
+the particular sequence (so they could be pre-computed...)
+
+This algorithm gives relative accuracy $\sim 5.828^{-N}$, so to get $D$ decimal digits,
+we need $N\sim 1.31 D$ (so for 16 digits, need $N\sim21$).  (Assuming $a_k$ are the moments
+of a positive measure on $[0,1]$, equivalent to ...)
+
+Can also use the partial sums $s_m=\sum_{k=0}^{m-1}(-)^k a_k$ (rather than the individual terms) and compute
+\[ \sum_{k=0}^N c^{(N)}_k a_k = \sum_{m=1}^N \frac{N}{n+m}\binom{N+m}{2m} 2^{2m} s_m \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Root finding}
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Newton's method}
+\[ x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)} \]
+
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Halley's method}
+\[ x_{n+1} = x_n - \frac{2f(x_n)f'(x_n)}{2f'(x_n)^2 - f(x_n)f''(x_n)} \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Notes on implementations}
+tolerance, accuracy, error estimate (max, expected), iterations, time, cost (mul,div,plus,sub,exp,... ops)
+\begin{itemize}
+\item Taylor series
+  \begin{itemize}
+  \item at fixed points
+  \item at arbitrary points
+  \item analytic continuation
+  \item (modified series)
+  \end{itemize}
+\item (For inverse functions)
+  \begin{itemize}
+  \item root-finders
+  \item direct approximation / inverse interpolation
+  \item power series (Lagrange inversion, Dominici techniques)
+  \end{itemize}
+\item quadrature
+  \begin{itemize}
+  \item real
+  \item complex (contour)
+  \item ODE (system)
+  \end{itemize}
+\item local approximation
+  \begin{itemize}
+  \item polynomial (power-series, Chebyshev, other orthogonal polynomial)
+  \item Pad\'e (rational)
+  \item other series
+  \end{itemize}
+\item continued fraction
+  \begin{itemize}
+  \item fixed depth, direct
+  \item iteration (P,Q)
+  \end{itemize}
+\item asymptotic expansion
+\item recurrence (backward, forward, scaling trick)
+\item expansion in other special functions
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Notes on testing}
+\begin{enumerate}
+\item tabulated values (Mathematica, Maple, etc.) [$\erf 0=0$]
+\item comparison for special cases (relations between functions) [$\erf z=\gamma(z^2,1/2)$]
+\item identities [$\cos^2z+\sin^2z=1$]
+\item comparison among alternative implementations [power series vs. Pad\'e approximation vs. continued fraction vs. integration]
+\item properties of function (e.g. check monotonicity --- strictest test is 1ulp bump...; inequalities, etc.)
+\item for functions with many parameters, use a lattice (say Sobol' qrng) to generate points that uniformly sample the
+  space for testing specific values
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{General mathematical library}
+\begin{enumerate}
+\item Data-types
+  \begin{enumerate}
+  \item double
+  \item double-double, quad-double
+  \item arbitrary precision
+  \item complex<>
+  \item vector<>, matrix<>, matrix\_ndim<>
+  \item Common Lisp has: Number=Complex/Real; Real=Float/Rational; Float=Short/Single/Double/Long; Rational=Ratio/Integer;
+    Integer=Fixnum/Bignum
+  \item Scheme (R6RS) has: Complex - Real - Rational - Integer and distinguishes Exact/Inexact and Flonum/Fixnum
+  \end{enumerate}
+\item Monte-carlo methods
+  \begin{enumerate}
+  \item Random-number generation (Mersenne Twister prng, Sobol' qrng)
+  \item Distribution sampling (all major types as well as generic; discrete and continuous)
+  \end{enumerate}
+\item Root-finding
+  \begin{enumerate}
+  \item $1$-dimension: bracketer, bisection, secant, Newton, inverse-quadratic, Halley, Brent-Dekker, (monotonic)
+  \item $2$-,$n$-dimension: conjugate-gradient, homotopy
+  \item polynomial methods --- specialized methods to find {\em all} real/complex roots, etc.
+  \end{enumerate}
+\item Sequence acceleration (Aitken, Wynn, $\Delta$, etc.)
+\item Differentiation (basic, $n$-th order, Savitzy-Golay, adaptive; weight generators)
+\item Optimization
+  \begin{enumerate}
+  \item $1$-dim minimization / maximization
+  \item $n$-dim minimization / maximization
+  \item least-squares optimization (linear / non-linear)
+  \end{enumerate}
+\item Integration
+  \begin{enumerate}
+  \item Quadrature ($1$-dim)
+    \begin{enumerate}
+    \item Open/closed/infinite intervals, singularities
+    \item Trapezoidal, Simpson, Gauss-type rules (\& weight generators)
+    \item Contour integration in $\CC$ (branch tracking?)
+    \end{enumerate}
+  \item Cubature ($2$-dim)
+  \item High-dimensional integration (lattice, MC, quasi-MC; dimension reduction)
+  \item ODE
+    \begin{enumerate}
+    \item $1$-dim second-order equation
+    \item $n$-dim first-order (RK (4 \& others), adaptive, Boer-Stoerlisch, etc.)
+    \end{enumerate}
+  \item PDE (generic IC, BC, coeffs)
+    \begin{enumerate}
+    \item $1$-dim parabolic
+    \item $2$-dim parabolic
+    \item $2$-,$3$-dim elliptic
+    \end{enumerate}
+  \end{enumerate}
+  \item Solving integral equations ...
+\item Interpolation
+  \begin{enumerate}
+  \item $1$-dim (splines (cubic, B-, Akima, general), Chebyshev, RBF, etc.)
+  \item $2$-dim (bicubic, scattered data, etc.)
+  \item $n$-dim (scattered, etc.)
+  \item probability distribution
+  \end{enumerate}
+\item Linear algebra
+  \begin{enumerate}
+  \item ...
+  \end{enumerate}
+\end{enumerate}
+
+\begin{itemize}
+\item function grouping / classification
+\item name, symbol
+\item parameters, arguments: largest domain of definition, branch cuts, etc.
+\item different representations (and domains of validity)
+\item relations
+\item implementation notes
+  --- for different parameter/argument restrictions (e.g. $\NN$ vs $\RR$ vs $\CC$)
+  --- for scaled versions, etc.
+\item NR/ISML/Boost/GSL/C library/NAG/Pari/cephes/\&c. availability
+\end{itemize}
+
+Generic functions templated with input-type, working-type, output-type
+(which can be allowed to be real or complex variants).  Can be useful for balancing
+needed accuracy vs. speed (especially inside other routines...)
+
+Precision: [also 20/25/30 digits for double-double, etc.; arbitrary precision? (template implementation...)]
+\begin{itemize}
+\item Green: $\ge15$ digits
+\item Yellow: $\ge10$ digits
+\item Red: $\geq5$ digits
+\item Grey: $<5$ digits and/or restricted domain
+\item Black: not supported
+\end{itemize}
+Timing: 
+\begin{itemize}
+\item $\leq10$ms
+\item $\leq100$ms
+\item $\leq1$s
+\item $>1$s
+\end{itemize}
+Domain: 
+\begin{itemize}
+\item integer
+\item real interval
+\item reals
+\item complex domain
+\item complex
+\item principal value + branches
+\end{itemize}
+Platform: 
+\begin{itemize}
+\item Octave
+\item C
+\item C++
+\end{itemize}
+Modify with $+/-$ for some discrepancies (lower in extreme ranges, etc.)
+
+Also, intrinsic liminations (over/under-flow) [solve with scaled versions also]
+vs. extrinsic (unstable algorithm, etc.)
+
+Idea: number representation as Integer $\pm$ Fractional-part, where both of the two components
+have an independent exponent/mantissa representation.  (Similar to the quad/double-double representations
+in two parts...)  This allows to represent $1+\eps$ with high precision in $\eps$...
+
+Estimation of cancellation errors in summations --- compare magnitude of result to largest term / partial-sum.
+
+Test data-files: \# comment or nnn|nnn|nnn (to many digits of accuracy, minimum 72 (for quad-double+guards)).
+
+Plot test points --- color-coded for error/etc. (for 2 parameter cases).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\bibliography{special_functions}{}
+%\bibliographystyle{plain}
+
+\begin{thebibliography}{WWWWW}
+\bibitem[A\&S]{a&s}
+  Abramowitz and Stegun,
+  \emph{Handbook of ...}.
+\bibitem[Concrete]{ConcreteMath}
+R.L. Graham, D.E. Knuth, and O. Patashnik, \emph{Concrete
+mathematics}, Addison-Wesley, Reading, MA, 1989.
+\bibitem[Luke1]{luke1}
+  Yudell Luke,
+  \emph{The Special Functions and Their Approximations, Volume 1}.
+\bibitem[Atlas]{atlas:oldham}
+  K. Oldham, J. Myland, and J. Spanier,
+  \emph{An Atlas of Special Functions: With Equator, the Atlas Function Calculator}, second edition
+  Springer, 2009.
+\bibitem[NIST]{nist}
+  eds F.W.J. Olver, D.W. Lozier, R.F. Boisvert, and C.W. Clark,
+  \emph{NIST Handbook of Mathematical Functions},
+  NIST and Cambridge University Press, 2010.
+\bibitem[NR]{nr}
+  W.H. Press, S.A. Teukolsky, W.T. Vetterling, and B.P. Flannery,
+  \emph{Numerical Recipes: The art of scientific computing}, third edition,
+  Cambridge University Press, 2007.
+\bibitem[ACMF]{atlas:thompson}
+  W.J. Thompson,
+  \emph{Atlas for Computing Mathematical Functions: An Illustrated Guide for Practitioners; With Programs in Fortran 90 and Mathematica},
+  John Wiley \& Sons, Inc., 1997.
+\bibitem[ZJ]{zj}
+  S. Zhang and J. Jin,
+  \emph{Computation of Special Functions},
+  John Wiley \& Sons, Inc., 1996.
+\bibitem[DLMF]{DLMF}
+  \emph{DLMF}
+\bibitem[Lebedev]{lebedev}
+  Lebedev
+  \emph{Special Functions...}
+\bibitem[Marsaglia]{marsaglia}
+  G. Marsaglia,
+  ``Evaluating the Normal Distribution''
+  \emph{Journal of Statistical Software},
+  July 2004, Volume 11, Issue 4.
+\bibitem[Precise]{precise-numerical}
+  M. Sofroniou and G. Spaletta,
+  ``Precise Numerical Computation'',
+  in \emph{...}.
+\bibitem[AppFD]{approximation-fermi-dirac}
+  N.M. Temme and A.B. Olde Daalhuis,
+  ``Approximation of Fermi-Dirac integrals''
+  in \emph{Journal of Computational and Applied Mathematics},
+  {\bf 31} (1990) 383--387, North-Holland.
+\bibitem[ZetaE]{edwards-zeta}
+  Edwards ...
+  \emph{Riemann Zeta Function}.
+\end{thebibliography}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
