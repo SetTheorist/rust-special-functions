@@ -1,6 +1,6 @@
 use crate::traits::*;
 
-pub trait Gamma : Value {
+pub trait Gamma {
   fn lngamma(self) -> Self;
   fn gamma(self) -> Self;
 }
@@ -12,22 +12,36 @@ pub fn sf_lngamma<V:Gamma>(x:V) -> V { x.lngamma() }
 
 // TODO: quick and dirty for now
 use crate::real::*;
+use crate::log::{Log};
+use crate::exp::{Exp};
+use crate::traits::{Constants};
+use crate::trig::{sf_sin,sf_cos};
 impl Gamma for r64 {
   fn gamma(self) -> Self {
-    impls::gamma_spouge(11, self)
+    if self < ι(0.5) {
+      // gamma(z) = pi/(sin(pi*z) * gamma(1-z))
+      return r64::PI / (sf_sin(self * r64::PI) * (1-self).gamma());
+    }
+    //impls::gamma_spouge(11, self)
+    impls::lngamma_lanczos_15(self).exp()
   }
   fn lngamma(self) -> Self {
-    unimplemented!()
+    impls::gamma_spouge(11, self).log() // TODO
   }
 }
 // TODO: quick and dirty for now
 use crate::complex::*;
 impl Gamma for c64 {
   fn gamma(self) -> Self {
-    impls::gamma_spouge(11, self)
+    if self.real() < ι(0.5) {
+      // gamma(z) = pi/(sin(pi*z) * gamma(1-z))
+      return c64::PI / (sf_sin(self * c64::PI) * (1-self).gamma());
+    }
+    //impls::gamma_spouge(11, self)
+    impls::lngamma_lanczos_15(self).exp()
   }
   fn lngamma(self) -> Self {
-    unimplemented!()
+    impls::gamma_spouge(11, self).log() // TODO
   }
 }
   

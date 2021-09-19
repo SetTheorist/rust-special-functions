@@ -53,7 +53,7 @@ use std::time::{Instant};
 //use crate::kahan::{*};
 //use crate::num::complex::{Complex};
 use crate::algorithm::{*};
-use crate::bessel::{BesselJ};
+use crate::bessel::{*};
 use crate::complex::{*};
 use crate::dawson::{*};
 use crate::exp::{*};
@@ -404,8 +404,8 @@ fn main() {
     for &(x,j3x) in &j3n {
       let n = 3;
       let x = r64(x);
-      println!("J_{}({}) = {:.16e}  {:.16e}  {}", n, x,
-        x.bessel_j(n).0, j3x, rel(j3x, x.bessel_j(n).0));
+      let myj = sf_bessel_j(n, x);
+      println!("J_{}({}) = {:.16e}  {:.16e}  {}", n, x, myj.0, j3x, rel(j3x, myj.0));
     }
   }
 
@@ -833,5 +833,12 @@ fn main() {
     let q = Poly(vec![1, 1_isize]);
     println!("p={} q={}", p, q);
     println!("p(q)={}", p.substitute(q));
+  }
+  
+  if true {
+    println!("{}", sf_gamma(r64(4.5)));
+    println!("{}", sf_gamma(r64(-4.5)));
+    println!("{}", sf_gamma(c64{re:r64(4.0), im:r64(1.0)}));
+    println!("{}", sf_gamma(c64{re:r64(-4.0), im:r64(1.0)}));
   }
 }

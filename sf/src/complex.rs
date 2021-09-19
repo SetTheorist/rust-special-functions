@@ -137,12 +137,30 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
+    impl Add<c64> for $t {
+      type Output = c64;
+      #[inline]
+      fn add(self, rhs:c64) -> c64 {
+        let re = self + rhs.re;
+        let im = rhs.im;
+        c64 { re, im }
+      }
+    }
     impl Sub<$t> for c64 {
       type Output = c64;
       #[inline]
       fn sub(self, rhs:$t) -> c64 {
         let re = self.re - rhs;
         let im = self.im;
+        c64 { re, im }
+      }
+    }
+    impl Sub<c64> for $t {
+      type Output = c64;
+      #[inline]
+      fn sub(self, rhs:c64) -> c64 {
+        let re = self - rhs.re;
+        let im = -rhs.im;
         c64 { re, im }
       }
     }
@@ -155,6 +173,15 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
+    impl Mul<c64> for $t {
+      type Output = c64;
+      #[inline]
+      fn mul(self, rhs:c64) -> c64 {
+        let re = self * rhs.re;
+        let im = self * rhs.im;
+        c64 { re, im }
+      }
+    }
     impl Div<$t> for c64 {
       type Output = c64;
       #[inline]
@@ -164,6 +191,7 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
+    //impl Div<c64> for $t // TODO
     impl Rem<$t> for c64 {
       type Output = c64;
       #[inline]
@@ -171,6 +199,7 @@ macro_rules! scalar_impls {
         unimplemented!("c64::Rem::<{}>({:?},{:?})", stringify!($t), self, rhs)
       }
     }
+    //impl Rem<c64> for $t // TODO
   }
 }
 
