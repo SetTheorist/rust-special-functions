@@ -1,37 +1,36 @@
 use crate::traits::*;
 
 pub trait Zeta : Value {
-  pub fn zeta(self) -> Self;
-  pub fn zeta_m1(self) -> Self;
+  fn zeta(self) -> Self;
+  fn zeta_m1(self) -> Self;
 }
 
 pub mod impls {
 use crate::traits::*;
 
-/*
-pub fn zeta_series_em9<T:Value>(s:T) -> T {
-  let terms = (1..).map(|n|r64((n as f64).powf(-s.0)));
-  let mut sum = r64(0.0);
+pub fn zeta_series_em9<V:Value+Power>(s:V, μeps:V::NT) -> V {
+  let terms = (1..).map(|n|(ι(n):V).pow(-s));
+  let mut sum = V::zero;
   let mut n = 1;
-  let mut old_res = ι(0);
+  let mut old = V::zero;
   for t in terms {
     sum += t;
+    let vn:V = ι(n);
     let res = sum
-      + (n as f64).powf(1.0 - s.0)/(s.0 - 1.0)
-      - (n as f64).powf(-s.0)/2.0
-      + (n as f64).powf(-s.0-1.0)*(s.0/12.0)
-      - (n as f64).powf(-s.0-3.0)*(s.0*(s.0+1.0)*(s.0+2.0)/720.0)
-      + (n as f64).powf(-s.0-5.0)*(s.0*(s.0+1.0)*(s.0+2.0)*(s.0+3.0)*(s.0+4.0)/30240.0)
-      - (n as f64).powf(-s.0-7.0)*(s.0*(s.0+1.0)*(s.0+2.0)*(s.0+3.0)*(s.0+4.0)*(s.0+5.0)*(s.0+6.0)/1209600.0)
-      + (n as f64).powf(-s.0-9.0)*(s.0*(s.0+1.0)*(s.0+2.0)*(s.0+3.0)*(s.0+4.0)*(s.0+5.0)*(s.0+6.0)*(s.0+7.0)*(s.0+8.0)/239500800.0)
+      + vn.pow(-s+1)/(s-1)
+      - vn.pow(-s)/2
+      + vn.pow(-s-1)*(s/12)
+      - vn.pow(-s-3)*(s*(s+1)*(s+2)/720)
+      + vn.pow(-s-5)*(s*(s+1)*(s+2)*(s+3)*(s+4)/30240)
+      - vn.pow(-s-7)*(s*(s+1)*(s+2)*(s+3)*(s+4)*(s+5)*(s+6)/1209600)
+      + vn.pow(-s-9)*(s*(s+1)*(s+2)*(s+3)*(s+4)*(s+5)*(s+6)*(s+7)*(s+8)/239500800)
       ;
-    if abs(res - old_res) <= abs(res)*1e-16 && n>2 { print!("${}$",n);break; }
-    old_res = res;
+    if μ(res-old) <= μ(res)*μeps && n>2 { print!("${}$",n);break; }
+    old = res;
     n += 1;
   }
-  old_res
+  old
 }
-*/
 
 }
 

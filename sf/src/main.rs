@@ -43,6 +43,7 @@ mod real;
 mod traits;
 mod trig;
 mod util;
+mod zeta;
 
 // idea: auto-differentiation (using "dual" numbers) ?
 
@@ -311,16 +312,18 @@ fn main() {
     println!("-----");
     println!("Debye:");
     println!("{}  {}", debye::impls::debye_series_1(1, r64(0.1)),
-      debye::impls::debye_coint(1, r64(0.1)));
+      debye::impls::debye_scaled_series_1(1, r64(0.1)));
     println!("{}  {}", debye::impls::debye_series_1(1, r64(1.0)),
-      debye::impls::debye_coint(1, r64(1.0)));
+      debye::impls::debye_scaled_series_1(1, r64(1.0)));
     println!("{}  {}", debye::impls::debye_series_1(2, r64(1.0)),
-      debye::impls::debye_coint(2, r64(1.0)));
+      debye::impls::debye_scaled_series_1(2, r64(1.0)));
     println!("{}  {}", debye::impls::debye_series_1(1, r64(10.0)),
-      debye::impls::debye_coint(1, r64(10.0)));
+      debye::impls::debye_scaled_series_1(1, r64(10.0)));
+    println!("{}  {}", debye::impls::debye_series_1(2, r64(2.0)),
+      debye::impls::debye_scaled_series_1(2, r64(2.0)));
   }
 
-  if false {
+  if true {
     println!("-----");
     println!("Dawson:");
     println!("{:.16e}", dawson::impls::dawson_contfrac(r64(1.0)).0);
@@ -689,8 +692,17 @@ fn main() {
       contfrac(r64(1.0), (1..).map(|_|(r64(1.0),r64(1.0))),1e-12).0);
   }
 
-  if (false) {
+  */
+
+  if (true) {
     println!("-----");
+    println!("Zeta:");
+    for ix in 2..=10 {
+      let x = ι(ix):r64/2+1;
+      println!("{} {}", x, zeta::impls::zeta_series_em9(x,r64::epsilon));
+      //println!("{}", zeta::impls::zeta_series_em9(ι(x):c64,c64::epsilon*100));
+    }
+    /*
     for n in 2..=10 {
       println!("{}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}", n,
         zeta_m1_directseries(r64(n as f64)).0,
@@ -713,8 +725,8 @@ fn main() {
       print!("  {:.16e}", zeta_m1_directseries(r64(n as f64)).0);
     }
     println!();
+    */
   }
-  */
 
   if false {
     let p = Poly(vec![1.0, 0.0, 1.0_f64]);
