@@ -1,10 +1,8 @@
-
 //pub fn relerr(exact:f64, approx:f64) -> f64 {
 //  re logBase 10 (abs ((approx-exact)/exact))
 //}
 
 ////////////////////////////////////////////////////////////////////////////////
-
 
 /*
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -12,7 +10,7 @@
 
 Given two sequences $\{a_n\}_{n=1}^\infty$ and $\{b_n\}_{n=0}^\infty$ we have the continued fraction
 \[ b_0 + \frac{a_1}{b_1 + \frac{a_2}{b_2 + \frac{a_3}{b_3 + \frac{a_4}{b_4 + \cdots}}}} \]
-or 
+or
 \[ b_0 + a_1/(b_1 + a_2/(b_2 + a_3/(b_3 + a_4/(b_4 + \cdots)))) \]
 though for typesetting purposes this is often written
 \[ b_0 + \frac{a_1}{b_1 + {}}\ \frac{a_2}{b_2 + {}}\ \frac{a_3}{b_3 + {}}\ \frac{a_4}{b_4 + \cdots} \]
@@ -33,7 +31,7 @@ sf_cf_back !n !as !bs =
   let !an = reverse $ take n as
       !(un:bn) = reverse $ take (n+1) bs
   in go un an bn
-  where 
+  where
     go :: v -> [v] -> [v] -> v
     go !ukp1 ![] ![] = ukp1
     go !ukp1 !(a:an) !(b:bn) =
@@ -58,7 +56,7 @@ sf_cf_steeds (a1:as) (b0:b1:bs) =
     in recur c1 delc1 d1 as bs
     where
       !eps = 5e-16
-      recur !cn' !delcn' !dn' !(an:as) !(bn:bs) = 
+      recur !cn' !delcn' !dn' !(an:as) !(bn:bs) =
         let !dn = 1/(dn'*an+bn)
             !delcn = (bn*dn - 1)*delcn'
             !cn = cn' + delcn
@@ -84,7 +82,7 @@ sf_cf_lentz as (b0:bs) =
     !eps = 5e-16
     !zeta = 1e-100
     nz !x = if x==0 then zeta else x
-    iter cn dn en (an:as) (bn:bs) = 
+    iter cn dn en (an:as) (bn:bs) =
       let !idn = nz $ bn + an*dn
           !en' = nz $ bn + an/en
           !dn' = 1 / idn

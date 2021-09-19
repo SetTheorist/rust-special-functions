@@ -1,7 +1,6 @@
 //#![feature(let_chains)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
-
 #![allow(confusable_idents)]
 #![allow(dead_code)]
 #![allow(mixed_script_confusables)]
@@ -12,7 +11,7 @@
 #![allow(unused_variables)]
 
 /*
-  	    0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+          0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
 U+037x 	Ͱ 	ͱ 	Ͳ 	ͳ 	ʹ 	͵ 	Ͷ 	ͷ 			ͺ 	ͻ 	ͼ 	ͽ 	; 	Ϳ
 U+038x 					΄ 	΅ 	Ά 	· 	Έ 	Ή 	Ί 		Ό 		Ύ 	Ώ
 U+039x 	ΐ 	Α 	Β 	Γ 	Δ 	Ε 	Ζ 	Η 	Θ 	Ι 	Κ 	Λ 	Μ 	Ν 	Ξ 	Ο
@@ -33,6 +32,7 @@ mod erf;
 mod exp;
 mod gamma;
 mod hypergeom;
+mod integration;
 mod kahan;
 mod log;
 mod numbers;
@@ -47,28 +47,32 @@ mod zeta;
 
 // idea: auto-differentiation (using "dual" numbers) ?
 
-use std::time::{Instant};
+use std::str::FromStr;
+use std::time::Instant;
 
 //use crate::erf::{*};
 //use crate::kahan::{*};
 //use crate::num::complex::{Complex};
-use crate::algorithm::{*};
-use crate::bessel::{*};
-use crate::complex::{*};
-use crate::dawson::{*};
-use crate::exp::{*};
-use crate::gamma::{*};
-use crate::log::{*};
-use crate::numbers::{*};
-use crate::orthopoly::{*};
-use crate::orthopoly::chebyshev_t::{*};
-use crate::poly::{*};
-use crate::real::{*};
-use crate::traits::{*};
+use crate::algorithm::*;
+use crate::bessel::*;
+use crate::complex::*;
+use crate::dawson::*;
+use crate::exp::*;
+use crate::gamma::*;
+use crate::integration::Integrator;
+use crate::log::*;
+use crate::numbers::*;
+use crate::orthopoly::chebyshev_t::*;
+use crate::orthopoly::*;
+use crate::poly::*;
+use crate::real::*;
+use crate::traits::*;
 
-fn rel(ex:f64, ap:f64) -> f64 {
-  if ex==ap { return -17.0; }
-  ((ex-ap).abs()/(1e-20+ex.abs())).ln()/10.0_f64.ln()
+fn rel(ex: f64, ap: f64) -> f64 {
+  if ex == ap {
+    return -17.0;
+  }
+  ((ex - ap).abs() / (1e-20 + ex.abs())).ln() / 10.0_f64.ln()
 }
 
 // literate programming?〚 〛
@@ -170,9 +174,9 @@ fn doplots() -> Result<(),Box<dyn std::error::Error>> {
 
 fn main() {
   if false {
-    let ch : ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
+    let ch: ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
     for i in 0..10 {
-      println!("{:?}", ch.coeffs(i).iter().map(|x|x.0).collect::<Vec<_>>());
+      println!("{:?}", ch.coeffs(i).iter().map(|x| x.0).collect::<Vec<_>>());
     }
     for i in 0..10 {
       println!("{}", ch.poly(i));
@@ -180,96 +184,95 @@ fn main() {
     println!("{} {}", ch.poly(3).value(ι(0.3)), ch.value(3, ι(0.3)));
     println!("{} {}", ch.poly(37).value(ι(0.1)), ch.value(37, ι(0.1)));
   }
-/*
-  //if true { doplots(); }
-  let ch : ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
-  if true {
-    let fxrange = (-1.0,1.0);
-    let num_points = 200; // 5000;
-    let dx = (fxrange.1 - fxrange.0) / ((num_points - 1) as f64);
-    let xrange = (-1.01,1.01);
-    let yrange = (-1.05,1.05);
-    make_plot(
-      &(0..11)
-        .map(|n|
-          (BLACK, "T",
-            (0..num_points).map(|ix| (ix as f64)*dx + fxrange.0)
-              .map(|x|(x, ch.value(n,r64(x)).0)).collect::<Vec<_>>()))
-        .collect::<Vec<_>>(),
-      "chebyshev_t.svg", "Chebyshev T", xrange, yrange).unwrap();
-    /*
-    make_plot(&[
-      (GREEN, "T1",
-        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
-          .map(|x|(x, ch.value(1,r64(x)).0)).collect::<Vec<_>>()),
-      (BLUE, "T2",
-        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
-          .map(|x|(x, ch.value(2,r64(x)).0)).collect::<Vec<_>>()),
-      (RED, "T3",
-        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
-          .map(|x|(x, ch.value(3,r64(x)).0)).collect::<Vec<_>>()),
-      (CYAN, "T4",
-        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
-          .map(|x|(x, ch.value(4,r64(x)).0)).collect::<Vec<_>>()),
-      (MAGENTA, "T5",
-        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
-          .map(|x|(x, ch.value(5,r64(x)).0)).collect::<Vec<_>>()),
-      (BLACK, "T11",
-        (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
-          .map(|x|(x, ch.value(11,r64(x)).0)).collect::<Vec<_>>()),
-      ], "chebyshev_t.svg", "Chebyshev T", xrange, yrange).unwrap();
-      */
-  }
-*/
-
+  /*
+    //if true { doplots(); }
+    let ch : ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
+    if true {
+      let fxrange = (-1.0,1.0);
+      let num_points = 200; // 5000;
+      let dx = (fxrange.1 - fxrange.0) / ((num_points - 1) as f64);
+      let xrange = (-1.01,1.01);
+      let yrange = (-1.05,1.05);
+      make_plot(
+        &(0..11)
+          .map(|n|
+            (BLACK, "T",
+              (0..num_points).map(|ix| (ix as f64)*dx + fxrange.0)
+                .map(|x|(x, ch.value(n,r64(x)).0)).collect::<Vec<_>>()))
+          .collect::<Vec<_>>(),
+        "chebyshev_t.svg", "Chebyshev T", xrange, yrange).unwrap();
+      /*
+      make_plot(&[
+        (GREEN, "T1",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(1,r64(x)).0)).collect::<Vec<_>>()),
+        (BLUE, "T2",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(2,r64(x)).0)).collect::<Vec<_>>()),
+        (RED, "T3",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(3,r64(x)).0)).collect::<Vec<_>>()),
+        (CYAN, "T4",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(4,r64(x)).0)).collect::<Vec<_>>()),
+        (MAGENTA, "T5",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(5,r64(x)).0)).collect::<Vec<_>>()),
+        (BLACK, "T11",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(11,r64(x)).0)).collect::<Vec<_>>()),
+        ], "chebyshev_t.svg", "Chebyshev T", xrange, yrange).unwrap();
+        */
+    }
+  */
 
   if false {
-    let cc = c64{re:ι(1), im:ι(1)};
+    let cc = c64 { re: ι(1), im: ι(1) };
     println!("cc={}", cc);
-    println!("cc^2={}", cc*cc);
-    println!("cc/2={}", cc/2);
-    println!("{}", cc/2.0);
-    println!("{}", cc/r64(2.0));
-    println!("{}  {}", cc.arg(), 3.1415926535897932384626/4.0);
-    println!("{}  {}", (cc.sqr()).arg(), 3.1415926535897932384626/2.0);
+    println!("cc^2={}", cc * cc);
+    println!("cc/2={}", cc / 2);
+    println!("{}", cc / 2.0);
+    println!("{}", cc / r64(2.0));
+    println!("{}  {}", cc.arg(), 3.1415926535897932384626 / 4.0);
+    println!("{}  {}", (cc.sqr()).arg(), 3.1415926535897932384626 / 2.0);
     println!("μcc={}", μ(cc));
     println!("{}", μ(cc.sqr()));
     println!("|cc|={}", abs(cc));
     println!("|cc^2|={}", abs(cc.sqr()));
-    println!("(cc*cc).sqrt()={}", (cc*cc).sqrt());
-    println!("{}", (cc*cc*cc).cbrt());
+    println!("(cc*cc).sqrt()={}", (cc * cc).sqrt());
+    println!("{}", (cc * cc * cc).cbrt());
     println!("{}", exp::impls::exp_power_series(cc, 0));
-    println!("{} {}", (1.0_f64.exp()*1.0_f64.cos()), (1.0_f64.exp()*1.0_f64.sin()));
+    println!("{} {}", (1.0_f64.exp() * 1.0_f64.cos()), (1.0_f64.exp() * 1.0_f64.sin()));
     println!("{}", erf::impls::erf_series(cc));
   }
 
   if false {
-    let mut p = Poly(vec![ι(1),ι(0),ι(3),ι(-4),ι(6),ι(0):r64]);
+    let mut p = Poly(vec![ι(1), ι(0), ι(3), ι(-4), ι(6), ι(0): r64]);
     println!("{}", p);
     println!("{:?}", p);
     p.reduce();
     println!("{}", p);
     println!("{:?}", p);
-    let mut p = Poly(vec![ι(0),ι(0):r64]);
+    let mut p = Poly(vec![ι(0), ι(0): r64]);
     println!("{}", p);
     println!("{:?}", p);
     p.reduce();
     println!("{}", p);
     println!("{:?}", p);
-    let p = Poly(vec![ι(1),ι(1):r64]);
+    let p = Poly(vec![ι(1), ι(1): r64]);
     println!("p={}", p);
-    println!("p*p={}", &p*&p);
-    println!("p*p*p={}", &(&p*&p)*&p);
+    println!("p*p={}", &p * &p);
+    println!("p*p*p={}", &(&p * &p) * &p);
 
     println!("-----");
-    let mut p = Poly(vec![ι(1),ι(0),ι(3),ι(-4),ι(6),ι(0):r64]);
+    let mut p = Poly(vec![ι(1), ι(0), ι(3), ι(-4), ι(6), ι(0): r64]);
     println!("{}", p);
     for _ in 0..6 {
       p = p.diff();
       println!("{}", p);
     }
     println!("-----");
-    let p = Poly(vec![ι(1),ι(0),ι(3):r64]);
+    let p = Poly(vec![ι(1), ι(0), ι(3): r64]);
     println!("p={}", p);
     println!("p(0)={}", p.value(ι(0)));
     println!("p(1)={}", p.value(ι(1)));
@@ -283,19 +286,29 @@ fn main() {
     println!("exact: {}", r64(x.0.exp()));
     println!("e:ps:  {}", exp::impls::exp_power_series(x, 0));
     println!("e:cf:  {}", exp::impls::exp_continued_fraction(x));
-    println!("e:RR:  {:?}", exp::impls::range_reduce_ln2(x*2));
+    println!("e:RR:  {:?}", exp::impls::range_reduce_ln2(x * 2));
 
     println!("---");
-    let terms = (1..).scan(ι(1):r64, |s,n|{let o=*s; *s*=x/n; Some(o)});
+    let terms = (1..).scan(ι(1): r64, |s, n| {
+      let o = *s;
+      *s *= x / n;
+      Some(o)
+    });
     let terms = cum_sums(terms);
-    let terms = terms.scan(ι(0):r64, |s,t|{if*s==t{None}else{*s=t;Some(t)}});
+    let terms = terms.scan(ι(0): r64, |s, t| {
+      if *s == t {
+        None
+      } else {
+        *s = t;
+        Some(t)
+      }
+    });
     println!("{:.16e}", terms.last().unwrap().0);
     //for t in terms.take(100) { println!("{:.16e}", t.0); }
 
-
     println!("Log1p:");
     let x = r64(0.10);
-    println!("l1p:na {:.16e}", (x.0+1.0).ln());
+    println!("l1p:na {:.16e}", (x.0 + 1.0).ln());
     println!("l1p:ps {:.16e}", log::impls::ln1p_power_series(x).0);
     println!("l1p:xx {:.16e}", log::sf_ln_1p_real(x.0));
     println!("l1p:cf {:.16e}", log::impls::ln1p_contfrac(x).0);
@@ -303,25 +316,24 @@ fn main() {
     //println!("ksum: {:.16e}", [1.0_f64,1e-12,-1.0,1e-22].iter().ksum():f64);
 
     println!("---");
-    for x in cum_prods((1..).map(|n|r64(n as f64))).take(10) { print!("{:?}", x); }
+    for x in cum_prods((1..).map(|n| r64(n as f64))).take(10) {
+      print!("{:?}", x);
+    }
     println!();
-    for x in cum_sums((0..).map(|n|r64(n as f64))).take(10) { print!("{:?}", x); }
+    for x in cum_sums((0..).map(|n| r64(n as f64))).take(10) {
+      print!("{:?}", x);
+    }
     println!();
   }
-  
+
   if true {
     println!("-----");
     println!("Debye:");
-    println!("{}  {}", debye::impls::debye_series_1(1, r64(0.1)),
-      debye::impls::debye_scaled_series_1(1, r64(0.1)));
-    println!("{}  {}", debye::impls::debye_series_1(1, r64(1.0)),
-      debye::impls::debye_scaled_series_1(1, r64(1.0)));
-    println!("{}  {}", debye::impls::debye_series_1(2, r64(1.0)),
-      debye::impls::debye_scaled_series_1(2, r64(1.0)));
-    println!("{}  {}", debye::impls::debye_series_1(1, r64(10.0)),
-      debye::impls::debye_scaled_series_1(1, r64(10.0)));
-    println!("{}  {}", debye::impls::debye_series_1(2, r64(2.0)),
-      debye::impls::debye_scaled_series_1(2, r64(2.0)));
+    println!("{}  {}", debye::impls::debye_series_1(1, r64(0.1)), debye::impls::debye_scaled_series_1(1, r64(0.1)));
+    println!("{}  {}", debye::impls::debye_series_1(1, r64(1.0)), debye::impls::debye_scaled_series_1(1, r64(1.0)));
+    println!("{}  {}", debye::impls::debye_series_1(2, r64(1.0)), debye::impls::debye_scaled_series_1(2, r64(1.0)));
+    println!("{}  {}", debye::impls::debye_series_1(1, r64(10.0)), debye::impls::debye_scaled_series_1(1, r64(10.0)));
+    println!("{}  {}", debye::impls::debye_series_1(2, r64(2.0)), debye::impls::debye_scaled_series_1(2, r64(2.0)));
   }
 
   if true {
@@ -329,54 +341,73 @@ fn main() {
     println!("Bessel:");
     for n in 0..=5 {
       let x = r64(1.0);
-      println!("J_{}({}) = {:.16e}  {:.16e}  {:.16e}", n, x,
+      println!(
+        "J_{}({}) = {:.16e}  {:.16e}  {:.16e}",
+        n,
+        x,
         bessel::impls::bessel_j_series(ι(n), x).0,
         bessel::impls::bessel_j_asymp_z(ι(n), x).0,
-        bessel::impls::bessel_j_recur_back(31, n as isize, x).0);
+        bessel::impls::bessel_j_recur_back(31, n as isize, x).0
+      );
     }
     for n in 0..=5 {
       let x = r64(10.0);
-      println!("J_{}({}) = {:.16e}  {:.16e}  {:.16e}", n, x,
+      println!(
+        "J_{}({}) = {:.16e}  {:.16e}  {:.16e}",
+        n,
+        x,
         bessel::impls::bessel_j_series(ι(n), x).0,
         bessel::impls::bessel_j_asymp_z(ι(n), x).0,
-        bessel::impls::bessel_j_recur_back(51, n as isize, x).0);
+        bessel::impls::bessel_j_recur_back(51, n as isize, x).0
+      );
     }
     for n in 0..=5 {
       let x = r64(100.0);
-      println!("J_{}({}) = {:.16e}  {:.16e}  {:.16e}", n, x,
+      println!(
+        "J_{}({}) = {:.16e}  {:.16e}  {:.16e}",
+        n,
+        x,
         bessel::impls::bessel_j_series(ι(n), x).0,
         bessel::impls::bessel_j_asymp_z(ι(n), x).0,
-        bessel::impls::bessel_j_recur_back(151, n as isize, x).0);
+        bessel::impls::bessel_j_recur_back(151, n as isize, x).0
+      );
     }
     for n in 0..=5 {
       let x = r64(250.0);
-      println!("J_{}({}) = {:.16e}  {:.16e}  {:.16e}", n, x,
+      println!(
+        "J_{}({}) = {:.16e}  {:.16e}  {:.16e}",
+        n,
+        x,
         bessel::impls::bessel_j_series(ι(n), x).0,
         bessel::impls::bessel_j_asymp_z(ι(n), x).0,
-        bessel::impls::bessel_j_recur_back(301, n as isize, x).0);
+        bessel::impls::bessel_j_recur_back(301, n as isize, x).0
+      );
     }
     for n in 0..=5 {
-      let x = c64{re:ι(2),im:ι(1)};
-      println!("J_{}({}) = {:.16}  {:.16}  {:.16}", n, x,
+      let x = c64 { re: ι(2), im: ι(1) };
+      println!(
+        "J_{}({}) = {:.16}  {:.16}  {:.16}",
+        n,
+        x,
         bessel::impls::bessel_j_series(ι(n), x),
         bessel::impls::bessel_j_asymp_z(ι(n), x),
-        bessel::impls::bessel_j_recur_back(31, n as isize, x));
+        bessel::impls::bessel_j_recur_back(31, n as isize, x)
+      );
     }
 
     {
-      let x = c64{re:ι(13),im:ι(0)};
+      let x = c64 { re: ι(13), im: ι(0) };
       for n in 0..=5 {
         println!("-");
         for m in (3..=25).step_by(3) {
-          println!("J_{}({})[{:2}] = {:.16}", n, x, m+n,
-          bessel::impls::bessel_j_recur_back(m+n, n as isize, x));
+          println!("J_{}({})[{:2}] = {:.16}", n, x, m + n, bessel::impls::bessel_j_recur_back(m + n, n as isize, x));
         }
       }
     }
   }
 
   if true {
-    let j3n : [(f64,f64); 21] = [
+    let j3n: [(f64, f64); 21] = [
       (0.0, 0.0),
       (1.0000000000000000000, 0.019563353982668405919),
       (2.0000000000000000000, 0.12894324947440205110),
@@ -397,11 +428,11 @@ fn main() {
       (17.000000000000000000, 0.13493057304919323175),
       (18.000000000000000000, 0.18632099329078039410),
       (19.000000000000000000, 0.072489661438052575226),
-      (20.000000000000000000, -0.098901394560449675613)
-      ];
+      (20.000000000000000000, -0.098901394560449675613),
+    ];
     println!("-----");
     println!("Bessel:");
-    for &(x,j3x) in &j3n {
+    for &(x, j3x) in &j3n {
       let n = 3;
       let x = r64(x);
       let myj = sf_bessel_j(n, x);
@@ -418,18 +449,12 @@ fn main() {
     println!("{:.16e}", dawson::impls::dawson_rybicki(r64(1.0)).0);
   }
 
-  if false { 
+  if false {
     println!("-----");
     println!("Erf:");
-    println!("{:.16e}  {:.16e}",
-      erf::impls::erf_series(r64(1.0)).0,
-      1.0-erf::impls::erf_series(r64(1.0)).0);
-    println!("{:.16e}  {:.16e}",
-      1.0-erf::impls::erfc_contfrac(r64(1.0)).0,
-      erf::impls::erfc_contfrac(r64(1.0)).0);
-    println!("{:.16e}  {:.16e}",
-      1.0-erf::impls::erfc_contfrac2(r64(1.0)).0,
-      erf::impls::erfc_contfrac2(r64(1.0)).0);
+    println!("{:.16e}  {:.16e}", erf::impls::erf_series(r64(1.0)).0, 1.0 - erf::impls::erf_series(r64(1.0)).0);
+    println!("{:.16e}  {:.16e}", 1.0 - erf::impls::erfc_contfrac(r64(1.0)).0, erf::impls::erfc_contfrac(r64(1.0)).0);
+    println!("{:.16e}  {:.16e}", 1.0 - erf::impls::erfc_contfrac2(r64(1.0)).0, erf::impls::erfc_contfrac2(r64(1.0)).0);
   }
 
   if false {
@@ -439,7 +464,7 @@ fn main() {
       let mut t = (0.0);
       let st = Instant::now();
       for n in 0..1000000 {
-        let x = ((n%1000) as f64/1000.0)*scale;
+        let x = ((n % 1000) as f64 / 1000.0) * scale;
         t += log::impls::sf_ln_1p_macroseries(x);
       }
       let en = Instant::now();
@@ -449,7 +474,7 @@ fn main() {
       let mut t = (0.0);
       let st = Instant::now();
       for n in 0..1000000 {
-        let x = ((n%1000) as f64/1000.0)*scale;
+        let x = ((n % 1000) as f64 / 1000.0) * scale;
         t += log::sf_ln_1p_real(x);
       }
       let en = Instant::now();
@@ -459,7 +484,7 @@ fn main() {
       let mut t = r64(0.0);
       let st = Instant::now();
       for n in 0..1000000 {
-        let x = r64((n%1000) as f64/1000.0)*scale;
+        let x = r64((n % 1000) as f64 / 1000.0) * scale;
         t += log::impls::ln1p_power_series(x);
       }
       let en = Instant::now();
@@ -469,7 +494,7 @@ fn main() {
       let mut t = r64(0.0);
       let st = Instant::now();
       for n in 0..1000000 {
-        let x = r64((n%1000) as f64/1000.0)*scale;
+        let x = r64((n % 1000) as f64 / 1000.0) * scale;
         t += log::impls::ln1p_contfrac(x);
       }
       let en = Instant::now();
@@ -481,7 +506,7 @@ fn main() {
       let mut t = r64(0.0);
       let st = Instant::now();
       for n in 0..1000000 {
-        let x = r64((n%1000) as f64/1000.0);
+        let x = r64((n % 1000) as f64 / 1000.0);
         t += exp::impls::exp_power_series(x, 0);
       }
       let en = Instant::now();
@@ -491,7 +516,7 @@ fn main() {
       let mut t = r64(0.0);
       let st = Instant::now();
       for n in 0..1000000 {
-        let x = r64((n%1000) as f64/1000.0);
+        let x = r64((n % 1000) as f64 / 1000.0);
         t += exp::impls::exp_power_series_(x, 0);
       }
       let en = Instant::now();
@@ -508,23 +533,31 @@ fn main() {
     //println!("{} {:.16e} {}", 21.0, gamma_asympt(21.0), sf_factorial_exact(20));
     //println!("{} {:.16e} {}", 51.0, gamma_asympt(51.0), sf_factorial_exact(50));
     //println!("-----");
-    println!("{} {:.16e} {}", 0.5, gamma::impls::gamma_spouge(11,r64(0.5)).0, 3.1415926535897932384626433_f64.sqrt());
-    println!("{} {:.16e} {}", 3.0, gamma::impls::gamma_spouge(11,r64(3.0)).0, sf_factorial_exact(2));
-    println!("{} {:.16e} {}", 13.0, gamma::impls::gamma_spouge(11,r64(13.0)).0, sf_factorial_exact(12));
-    println!("{} {:.16e} {}", 40.0, gamma::impls::gamma_spouge(11,r64(40.0)).0, sf_factorial_exact(39));
+    println!("{} {:.16e} {}", 0.5, gamma::impls::gamma_spouge(11, r64(0.5)).0, 3.1415926535897932384626433_f64.sqrt());
+    println!("{} {:.16e} {}", 3.0, gamma::impls::gamma_spouge(11, r64(3.0)).0, sf_factorial_exact(2));
+    println!("{} {:.16e} {}", 13.0, gamma::impls::gamma_spouge(11, r64(13.0)).0, sf_factorial_exact(12));
+    println!("{} {:.16e} {}", 40.0, gamma::impls::gamma_spouge(11, r64(40.0)).0, sf_factorial_exact(39));
     //println!("{} {:.16e} {}", 100.0, gamma::impls::gamma_spouge(11,r64(100.0)).0, sf_factorial_exact(99));
     println!("-----");
-    println!("{} {:.16e} {}", 0.5, gamma::impls::lngamma_lanczos_7(r64(0.5)).exp().0, 3.1415926535897932384626433_f64.sqrt());
+    println!(
+      "{} {:.16e} {}",
+      0.5,
+      gamma::impls::lngamma_lanczos_7(r64(0.5)).exp().0,
+      3.1415926535897932384626433_f64.sqrt()
+    );
     println!("{} {:.16e} {}", 3.0, gamma::impls::lngamma_lanczos_7(r64(3.0)).exp().0, sf_factorial_exact(2));
     println!("{} {:.16e} {}", 13.0, gamma::impls::lngamma_lanczos_7(r64(13.0)).exp().0, sf_factorial_exact(12));
     println!("{} {:.16e} {}", 40.0, gamma::impls::lngamma_lanczos_7(r64(40.0)).exp().0, sf_factorial_exact(39));
     //println!("{} {:.16e} {}", 100.0, gamma::impls::lngamma_lanczos_7(r64(100.0)).exp().0, sf_factorial_exact(99));
-    let z = c64::rect(ι(0),ι(1)); println!("z = {}  1/z={}", z, ι(1):c64/z);
-    let z = c64::rect(ι(2),ι(0)); println!("z = {}  1/z={}", z, ι(1):c64/z);
-    let z = c64::rect(ι(1),ι(1)); println!("z = {}  1/z={}", z, ι(1):c64/z);
-    let z = c64::rect(ι(3),ι(1));
+    let z = c64::rect(ι(0), ι(1));
+    println!("z = {}  1/z={}", z, ι(1): c64 / z);
+    let z = c64::rect(ι(2), ι(0));
+    println!("z = {}  1/z={}", z, ι(1): c64 / z);
+    let z = c64::rect(ι(1), ι(1));
+    println!("z = {}  1/z={}", z, ι(1): c64 / z);
+    let z = c64::rect(ι(3), ι(1));
     println!("z = {}", z);
-    println!("1/z = {}", ι(1):c64/z);
+    println!("1/z = {}", ι(1): c64 / z);
     println!("log(z) = {}", sf_log(z));
     println!("exp(z) = {}", sf_exp(z));
     println!("exp(log(z)) = {}", sf_exp(sf_log(z)));
@@ -532,11 +565,16 @@ fn main() {
     println!("lngamma(z) = {}", gamma::impls::lngamma_lanczos_7(z));
     println!("gamma(z) = {}", gamma::impls::lngamma_lanczos_7(z).exp());
     println!("gamma(z) = {}", gamma::impls::lngamma_lanczos_15(z).exp());
-    let z = c64::rect(ι(1),ι(1));
+    let z = c64::rect(ι(1), ι(1));
     println!("z = {}", z);
     println!("gamma(z) = {}", gamma::impls::lngamma_lanczos_15(z).exp());
     println!("-----");
-    println!("{} {:.16e} {}", 0.5, gamma::impls::lngamma_lanczos_15(r64(0.5)).exp().0, 3.1415926535897932384626433_f64.sqrt());
+    println!(
+      "{} {:.16e} {}",
+      0.5,
+      gamma::impls::lngamma_lanczos_15(r64(0.5)).exp().0,
+      3.1415926535897932384626433_f64.sqrt()
+    );
     println!("{} {:.16e} {}", 3.0, gamma::impls::lngamma_lanczos_15(r64(3.0)).exp().0, sf_factorial_exact(2));
     println!("{} {:.16e} {}", 13.0, gamma::impls::lngamma_lanczos_15(r64(13.0)).exp().0, sf_factorial_exact(12));
     println!("{} {:.16e} {}", 40.0, gamma::impls::lngamma_lanczos_15(r64(40.0)).exp().0, sf_factorial_exact(39));
@@ -547,8 +585,8 @@ fn main() {
     let pz = 0.0_f64;
     let mz = -0.0_f64;
     println!("{} {}", pz, mz);
-    println!("{} {}", pz+mz, mz+pz);
-    println!("{} {}", 1.0*0.0, -1.0*0.0);
+    println!("{} {}", pz + mz, mz + pz);
+    println!("{} {}", 1.0 * 0.0, -1.0 * 0.0);
     println!("{} {}", pz.ln(), mz.ln());
     let x = r64(3.15);
     println!("{}", x);
@@ -556,54 +594,54 @@ fn main() {
   }
 
   // quad
-  let qq = quad::Quad::new(11.0,0.0)/10.0;
+  let qq = quad::Quad::new(11.0, 0.0) / 10.0;
   println!("11/10:{}", qq);
-  if false {
-    let q_pi = quad::stoq("3.14159265358979323846264338327950288419716939937510");
+  if true {
+    let q_pi = quad::Quad::from_str("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
-    println!("{}", q_pi);
-    let q_eulergamma = quad::stoq("0.57721566490153286060651209008240243104215933593992");
+    println!("{}", q_pi.unwrap());
+    let q_eulergamma = quad::Quad::from_str("0.57721566490153286060651209008240243104215933593992");
     println!("{:?}", q_eulergamma);
-    let q_ln2 = quad::stoq("0.69314718055994530941723212145817656807");
+    let q_ln2 = quad::Quad::from_str("0.69314718055994530941723212145817656807").unwrap();
     {
-        let mut dsum = 1.0;
-        let mut dt = 1.0;
-        let dln2 = q_ln2.hi();
-        let mut qsum = quad::Quad::new(1.0,0.0);
-        let mut t = quad::Quad::new(1.0,0.0);
-        for i in 1..25 {
-            dt = dt * dln2 / (i as f64);
-            dsum += dt;
-            t = t * q_ln2 / (i as f64);
-            qsum += t;
-            println!("{:4}  {}  {:?}  {}  {:?}", i, qsum, qsum, dsum, (qsum - 2.0)*10.0);
-        }
+      let mut dsum = 1.0;
+      let mut dt = 1.0;
+      let dln2 = q_ln2.hi();
+      let mut qsum = quad::Quad::new(1.0, 0.0);
+      let mut t = quad::Quad::new(1.0, 0.0);
+      for i in 1..25 {
+        dt = dt * dln2 / (i as f64);
+        dsum += dt;
+        t = t * q_ln2 / (i as f64);
+        qsum += t;
+        println!("{:4}  {}  {:?}  {}  {:?}", i, qsum, qsum, dsum, (qsum - 2.0) * 10.0);
+      }
     }
 
     println!("{:?}", q_ln2);
     println!("-----");
-    let x = quad::Quad::new(1.0,0.0); 
-    let y = quad::Quad::new(0.0,0.1); 
+    let x = quad::Quad::new(1.0, 0.0);
+    let y = quad::Quad::new(0.0, 0.1);
     println!("{}", x);
     println!("{}", y);
-    println!("{}", quad::Quad::new(1.0,0.1));
-    println!("{}", x+y);
-    println!("11/10:{}", quad::Quad::new(11.0,0.0)/10.0);
-    println!("{:?}", (x+y)*(x+y));
-    println!("{}", (x+y)*(x+y));
-    println!("{:?}", (x*y)+(x*y));
-    println!("{}", (x*y)+(x*y));
-    println!("{:?}", (x+y)*10.0);
-    println!("{:?}", quad::Quad::new(1.0,0.0)/10.0);
-    println!("{:?}", (quad::Quad::new(1.0,0.0)/10.0)*10.0);
-    println!("{:?}", quad::Quad::new(1.0,0.1).scale2(3));
+    println!("{}", quad::Quad::new(1.0, 0.1));
+    println!("{}", x + y);
+    println!("11/10:{}", quad::Quad::new(11.0, 0.0) / 10.0);
+    println!("{:?}", (x + y) * (x + y));
+    println!("{}", (x + y) * (x + y));
+    println!("{:?}", (x * y) + (x * y));
+    println!("{}", (x * y) + (x * y));
+    println!("{:?}", (x + y) * 10.0);
+    println!("{:?}", quad::Quad::new(1.0, 0.0) / 10.0);
+    println!("{:?}", (quad::Quad::new(1.0, 0.0) / 10.0) * 10.0);
+    println!("{:?}", quad::Quad::new(1.0, 0.1).scale2(3));
     println!("-----");
-    let mut z = quad::Quad::new(1.0,0.0);
+    let mut z = quad::Quad::new(1.0, 0.0);
     z /= 10.0;
     println!("{}  {:?}", z, z);
-    println!("{}", quad::Quad::new(0.1,0.0));
+    println!("{}", quad::Quad::new(0.1, 0.0));
   }
-/*
+  /*
 
   if false {
     println!("-----");
@@ -733,9 +771,9 @@ fn main() {
   if false {
     let terms = (1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)});
     for t in terms { print!("  {}", t); } println!();
-    println!("sum:  {:.16e}", 
+    println!("sum:  {:.16e}",
       ((1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)})).sum():f64);
-    println!("ksum: {:.16e}", 
+    println!("ksum: {:.16e}",
       ((1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)})).ksum():f64);
     println!("sum:  {:.16e}", [1.0_f64,1e-12,-1.0,1e-22].iter().sum():f64);
     //println!("ksum: {:.16e}", [1.0_f64,1e-12,-1.0,1e-22].iter().ksum():f64);
@@ -783,18 +821,22 @@ fn main() {
     println!("-----");
     println!("Zeta:");
     for ix in 2..=20 {
-      let x = ι(ix):r64/2+1;
-      println!("{}  {}  {}", x,
-        zeta::impls::zeta_series_em9(x,r64::epsilon), zeta::impls::zeta_m1_series_em9(x,r64::epsilon));
+      let x = ι(ix): r64 / 2 + 1;
+      println!(
+        "{}  {}  {}",
+        x,
+        zeta::impls::zeta_series_em9(x, r64::epsilon),
+        zeta::impls::zeta_m1_series_em9(x, r64::epsilon)
+      );
     }
 
-    let z : c64 = c64::rect(r64(3.0), r64(4.0));
+    let z: c64 = c64::rect(r64(3.0), r64(4.0));
     println!("{}  {}", z, zeta::impls::zeta_series_em9(z, r64::epsilon.sqr()));
-    let z : c64 = c64::rect(r64(3.0), r64(-4.0));
+    let z: c64 = c64::rect(r64(3.0), r64(-4.0));
     println!("{}  {}", z, zeta::impls::zeta_series_em9(z, r64::epsilon.sqr()));
-    let z : c64 = c64::rect(r64(4.5), r64(0.5));
+    let z: c64 = c64::rect(r64(4.5), r64(0.5));
     println!("{}  {}", z, zeta::impls::zeta_series_em9(z, r64::epsilon.sqr()));
-    let z : c64 = c64::rect(r64(4.5), r64(-0.5));
+    let z: c64 = c64::rect(r64(4.5), r64(-0.5));
     println!("{}  {}", z, zeta::impls::zeta_series_em9(z, r64::epsilon.sqr()));
 
     /*
@@ -807,7 +849,7 @@ fn main() {
         zeta_directseries_em2(r64(n as f64)).0
       );
     }
-    println!("{:.16e} {:.16e}", 
+    println!("{:.16e} {:.16e}",
       zeta_directseries_em1(r64(2.0)).0,
       (zeta_directseries_em1(r64(4.0)).0*2.5).sqrt()
     );
@@ -834,23 +876,32 @@ fn main() {
     println!("p={} q={}", p, q);
     println!("p(q)={}", p.substitute(q));
   }
-  
+
   if true {
     println!("{}", sf_gamma(r64(4.5)));
     println!("{}", sf_gamma(r64(-4.5)));
-    println!("{}", sf_gamma(c64{re:r64(4.0), im:r64(1.0)}));
-    println!("{}", sf_gamma(c64{re:r64(-4.0), im:r64(1.0)}));
-    
+    println!("{}", sf_gamma(c64 { re: r64(4.0), im: r64(1.0) }));
+    println!("{}", sf_gamma(c64 { re: r64(-4.0), im: r64(1.0) }));
+
     for i in (5..=100).step_by(5) {
-      let x : r64 = ι(i);
-      println!("Γ({}) = {:.16e}  {:.16e}", x,
-        gamma::impls::gamma_asympt(x).0, sf_factorial_approx((i-1) as usize));
+      let x: r64 = ι(i);
+      println!("Γ({}) = {:.16e}  {:.16e}", x, gamma::impls::gamma_asympt(x).0, sf_factorial_approx((i - 1) as usize));
     }
   }
 
   if true {
     for i in 0..=20 {
       println!("{:2} {:+.16e}  {:+.16e}", i, sf_bernoulli_number_approx(i), sf_bern2(i));
+    }
+  }
+
+  if true {
+    for i in 1..16 {
+      println!(
+        "{:.16e} {:.16e}",
+        integration::Trapezoidal::new(r64(0.0), r64(1.0), 1 << i).integrate(trig::sf_cos).0,
+        trig::sf_sin(r64(1.0)).0
+      );
     }
   }
 }

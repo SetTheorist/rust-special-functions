@@ -1,157 +1,142 @@
-use core::ops::{Add,Sub,Mul,Div,Rem,Neg};
-use core::ops::{AddAssign,SubAssign,MulAssign,DivAssign,RemAssign};
-use core::ops::{Shl,ShlAssign,Shr,ShrAssign};
+use core::ops::{Add, Div, Mul, Neg, Rem, Sub};
+use core::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
+use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 //use num::complex::{Complex};
 use crate::algorithm::{power_i, power_u};
 
 #[inline]
-pub fn ι<A,B:From<A>>(a:A) -> B { B::from(a) }
+pub fn ι<A, B: From<A>>(a: A) -> B { B::from(a) }
 
 // we assume for convenience that our basic values
 // are all Copy-able.
 // This excludes, for example, arbitrary-precision floats,
 // but we are not targeting such use cases...
-pub trait Base
-  : Copy + Sized
-  + PartialEq
-  + Default + std::fmt::Debug
-  + 'static
-{ }
+pub trait Base: Copy + Sized + PartialEq + Default + std::fmt::Debug + 'static {}
 
-pub trait Power<P=Self>
-  : Base
-{
-  fn pow(self, p:P) -> Self;
+pub trait Power<P = Self>: Base {
+  fn pow(self, p: P) -> Self;
 }
 
-pub trait Zero : Base {
-  const zero : Self;
+pub trait Zero: Base {
+  const zero: Self;
 }
 
-pub trait Addition
-  : Base + Zero
-  + Add<Self,Output=Self> + AddAssign<Self>
-{
-}
+pub trait Addition: Base + Zero + Add<Self, Output = Self> + AddAssign<Self> {}
 
-pub trait Subtraction
-  : Base + Addition
-  + Sub<Self,Output=Self> + SubAssign<Self>
-  + Neg<Output=Self>
-{
-}
+pub trait Subtraction: Base + Addition + Sub<Self, Output = Self> + SubAssign<Self> + Neg<Output = Self> {}
 
-pub trait Additive
-  : Addition + Subtraction
-{
-}
+pub trait Additive: Addition + Subtraction {}
 
-pub trait One : Base {
-  const one : Self;
+pub trait One: Base {
+  const one: Self;
 }
 
 // absorb isize & f64 into operations also...
 
-pub trait Multiplication
-  : Base + One
-  + Mul<Self,Output=Self> + MulAssign<Self>
-{
+pub trait Multiplication: Base + One + Mul<Self, Output = Self> + MulAssign<Self> {
   #[inline]
-  fn sqr(self) -> Self { self*self }
+  fn sqr(self) -> Self { self * self }
 }
 //pub fn sqr<M:Multiplication>(x:M) -> M { x.sqr() }
 //pub fn ldexp<M:Multiplication>(x:M, n:isize) -> M { x.ldexp(n) }
 
-impl<T:Multiplication> Power<usize> for T {
+impl<T: Multiplication> Power<usize> for T {
   #[inline]
-  fn pow(self, u:usize) -> Self {
-    power_u(self, u)
-  }
+  fn pow(self, u: usize) -> Self { power_u(self, u) }
 }
 
-pub trait Division
-  : Base + Multiplication
-  + Div<Self,Output=Self> + DivAssign<Self>
-  + Rem<Self,Output=Self> + RemAssign<Self>
-  + Shl<isize,Output=Self> + ShlAssign<isize>
-  + Shr<isize,Output=Self> + ShrAssign<isize>
+pub trait Division:
+  Base
+  + Multiplication
+  + Div<Self, Output = Self>
+  + DivAssign<Self>
+  + Rem<Self, Output = Self>
+  + RemAssign<Self>
+  + Shl<isize, Output = Self>
+  + ShlAssign<isize>
+  + Shr<isize, Output = Self>
+  + ShrAssign<isize>
 {
   #[inline]
   fn recip(self) -> Self { Self::one / self }
   #[inline]
-  fn ldexp(self, n:isize) -> Self { self << n }
+  fn ldexp(self, n: isize) -> Self { self << n }
 }
 
-impl<T:Division> Power<isize> for T {
+impl<T: Division> Power<isize> for T {
   #[inline]
-  fn pow(self, i:isize) -> Self {
-    power_i(self, i)
-  }
+  fn pow(self, i: isize) -> Self { power_i(self, i) }
 }
 
-pub trait Ring
-  : Base + Additive + Multiplication
-{
-}
+pub trait Ring: Base + Additive + Multiplication {}
 
-impl<T:Base+Additive+Multiplication> Ring for T
-{
-}
+impl<T: Base + Additive + Multiplication> Ring for T {}
 
-pub trait Multiplicative
-  : Multiplication +  Division
-{
-}
+pub trait Multiplicative: Multiplication + Division {}
 
 // left-embedding has issues due to current compiler constraints
 // c.f. https://github.com/rust-lang/rust/issues/86635
-pub trait Embeds<T>
-  : Base
-  + Add<T,Output=Self> + AddAssign<T>
-  + Sub<T,Output=Self> + SubAssign<T>
-  + Mul<T,Output=Self> + MulAssign<T>
-  + Div<T,Output=Self> + DivAssign<T>
-  + Rem<T,Output=Self> + RemAssign<T>
+pub trait Embeds<T>:
+  Base
+  + Add<T, Output = Self>
+  + AddAssign<T>
+  + Sub<T, Output = Self>
+  + SubAssign<T>
+  + Mul<T, Output = Self>
+  + MulAssign<T>
+  + Div<T, Output = Self>
+  + DivAssign<T>
+  + Rem<T, Output = Self>
+  + RemAssign<T>
   + From<T>
   + PartialEq<T>
 {
 }
 
-pub trait Field
-  : Additive + Multiplicative
-  + Embeds<isize> + Embeds<f64>
-{
+pub trait Field: Additive + Multiplicative + Embeds<isize> + Embeds<f64> {
   // self * (-1)^n
   #[inline]
-  fn pari(self, n:isize) -> Self { if n%2==0 {self} else {-self} }
+  fn pari(self, n: isize) -> Self {
+    if n % 2 == 0 {
+      self
+    } else {
+      -self
+    }
+  }
 }
 
-pub trait Roots
-: Field
-{
+pub trait Roots: Field {
   fn sqrt(self) -> Self;
   fn cbrt(self) -> Self;
   #[inline]
   fn sqrt_recip(self) -> Self { self.sqrt().recip() }
   #[inline]
   fn cbrt_recip(self) -> Self { self.cbrt().recip() }
-  fn nth_root(self, n:isize) -> Self;
+  fn nth_root(self, n: isize) -> Self;
 }
 
-
-pub trait Bounded
-{
-  const MIN_VALUE : Self;
-  const MAX_VALUE : Self;
+pub trait Bounded {
+  const MIN_VALUE: Self;
+  const MAX_VALUE: Self;
 }
 
-pub trait Ordered
-  : Base + PartialOrd<Self>
-{
+pub trait Ordered: Base + PartialOrd<Self> {
   #[inline]
-  fn min(self,b:Self) -> Self { if self<b {self} else {b} }
+  fn min(self, b: Self) -> Self {
+    if self < b {
+      self
+    } else {
+      b
+    }
+  }
   #[inline]
-  fn max(self,b:Self) -> Self { if self>b {self} else {b} }
+  fn max(self, b: Self) -> Self {
+    if self > b {
+      self
+    } else {
+      b
+    }
+  }
 
   fn floor(self) -> Self;
   fn ceil(self) -> Self;
@@ -160,116 +145,111 @@ pub trait Ordered
   fn rint(self) -> isize;
 }
 
-pub trait Normed
-  : Base+From<Self::NT>
-{
-  type NT : Field+Ordered;
-  const epsilon : Self::NT;
+pub trait Normed: Base + From<Self::NT> {
+  type NT: Field + Ordered;
+  const epsilon: Self::NT;
   fn abs(self) -> Self::NT;
   fn fabs(self) -> f64;
   // self/|self|
   fn signum(self) -> Self;
 
   fn mu(self) -> Self::NT;
-  const mu_epsilon : Self::NT;
+  const mu_epsilon: Self::NT;
 }
 #[inline]
-pub fn abs<T:Normed>(x:T) -> T::NT { x.abs() }
+pub fn abs<T: Normed>(x: T) -> T::NT { x.abs() }
 #[inline]
-pub fn fabs<T:Normed>(x:T) -> f64 { x.fabs() }
+pub fn fabs<T: Normed>(x: T) -> f64 { x.fabs() }
 #[inline]
-pub fn signum<T:Normed>(x:T) -> T { x.signum() }
+pub fn signum<T: Normed>(x: T) -> T { x.signum() }
 #[inline]
-pub fn mu<T:Normed>(x:T) -> T::NT { x.mu() }
-pub fn μ<T:Normed>(x:T) -> T::NT { x.mu() }
+pub fn mu<T: Normed>(x: T) -> T::NT { x.mu() }
+pub fn μ<T: Normed>(x: T) -> T::NT { x.mu() }
 
-pub trait ComplexType
-  : Base
-  + Normed<NT=Self::RT>
-  + Embeds<Self::RT>
-  //+ Embeds<Complex<f64>>
+pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT> //+ Embeds<Complex<f64>>
 {
-  type RT : Field+Ordered;
+  type RT: Field + Ordered;
   fn real(self) -> Self::RT;
   fn imag(self) -> Self::RT;
   fn arg(self) -> Self::RT;
   fn conj(self) -> Self;
-  fn rect(re:Self::RT,im:Self::RT) -> Self;
-  fn polar(r:Self::RT,arg:Self::RT) -> Self;
-  fn to_rect(self) -> (Self::RT,Self::RT) { (self.real(), self.imag()) }
-  fn to_polar(self) -> (Self::RT,Self::RT) {
+  fn rect(re: Self::RT, im: Self::RT) -> Self;
+  fn polar(r: Self::RT, arg: Self::RT) -> Self;
+  fn to_rect(self) -> (Self::RT, Self::RT) { (self.real(), self.imag()) }
+  fn to_polar(self) -> (Self::RT, Self::RT) {
     let a = self.abs();
-    if a == 0 { (a,a) }
-    else { (a, self.arg()) }
+    if a == 0 {
+      (a, a)
+    } else {
+      (a, self.arg())
+    }
   }
 }
 
-pub trait RealType
-  : Base
-  + Normed<NT=Self>
-  + Ordered
-{
-}
+pub trait RealType: Base + Normed<NT = Self> + Ordered {}
 
-pub trait Constants
-{
+pub trait Constants {
   // $e^1$
-  const E : Self;
+  const E: Self;
   // $\pi$
-  const PI : Self;
+  const PI: Self;
   // $1/\pi$
-  const FRAC_1_PI : Self;
+  const FRAC_1_PI: Self;
   // $\pi/2$
-  const FRAC_PI_2 : Self;
+  const FRAC_PI_2: Self;
   // $\sqrt(2\pi)$
-  const SQRT2PI : Self;
+  const SQRT2PI: Self;
   // $1/\sqrt(2\pi)$
-  const FRAC_1_SQRT2PI : Self;
+  const FRAC_1_SQRT2PI: Self;
   // $1/\sqrt(\pi)$
-  const FRAC_1_SQRTPI : Self;
+  const FRAC_1_SQRTPI: Self;
   // $\log(2)$
-  const LOG2 : Self;
+  const LOG2: Self;
   // $1/\log(2)$
-  const FRAC_1_LOG2 : Self;
+  const FRAC_1_LOG2: Self;
   // $\log(2\pi)/2 = \log(\sqrt{2\pi})$
-  const FRAC_LOG2PI_2 : Self;
+  const FRAC_LOG2PI_2: Self;
 }
 
-pub trait Value
-  : Field + Normed + Roots + Constants
-{
-}
+pub trait Value: Field + Normed + Roots + Constants {}
 
-pub trait RealValue : Value + RealType { }
-impl<T> RealValue for T where T:Value + RealType { }
+pub trait RealValue: Value + RealType {}
+impl<T> RealValue for T where T: Value + RealType {}
 
-pub trait ComplexValue : Value + ComplexType { }
-impl<T> ComplexValue for T where T:Value + ComplexType { }
+pub trait ComplexValue: Value + ComplexType {}
+impl<T> ComplexValue for T where T: Value + ComplexType {}
 
 ////////////////////////////////////////////////////////////////////////////////
 
-impl Base for isize { }
-impl Zero for isize { const zero : isize = 0; }
-impl Addition for isize { }
-impl Subtraction for isize { }
-impl Additive for isize { }
-impl One for isize { const one : isize = 1; }
-impl Multiplication for isize { }
-impl Division for isize { }
-impl Multiplicative for isize { }
-impl Embeds<isize> for isize { }
+impl Base for isize {}
+impl Zero for isize {
+  const zero: isize = 0;
+}
+impl Addition for isize {}
+impl Subtraction for isize {}
+impl Additive for isize {}
+impl One for isize {
+  const one: isize = 1;
+}
+impl Multiplication for isize {}
+impl Division for isize {}
+impl Multiplicative for isize {}
+impl Embeds<isize> for isize {}
 
-impl Base for f64 { }
-impl Zero for f64 { const zero : f64 = 0.0; }
-impl Addition for f64 { }
-impl Subtraction for f64 { }
-impl Additive for f64 { }
-impl One for f64 { const one : f64 = 1.0; }
-impl Multiplication for f64 { }
+impl Base for f64 {}
+impl Zero for f64 {
+  const zero: f64 = 0.0;
+}
+impl Addition for f64 {}
+impl Subtraction for f64 {}
+impl Additive for f64 {}
+impl One for f64 {
+  const one: f64 = 1.0;
+}
+impl Multiplication for f64 {}
 //impl Division for f64 { }
 //impl Multiplicative for f64 { }
-impl Embeds<f64> for f64 { }
-
+impl Embeds<f64> for f64 {}
 
 /*
 pub trait ExpLog : ...
@@ -289,6 +269,3 @@ pub trait Float {
 
 */
 ////////////////////////////////////////////////////////////////////////////////
-
-
-

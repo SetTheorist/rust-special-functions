@@ -1,9 +1,8 @@
-
 pub trait Debye {
   // $D_n(x) = \int_0^x \frac{t^n}{e^t - 1}\,dt$
-  fn debye(self, n:usize) -> Self;
+  fn debye(self, n: usize) -> Self;
   // $\tilde{D}_n(x) = \frac{n}{x^n} D_n(x) = \frac{n}{x^n}\int_0^x \frac{t^n}{e^t - 1}\,dt$
-  fn debye_scaled(self, n:usize) -> Self;
+  fn debye_scaled(self, n: usize) -> Self;
 }
 
 // asymptotics for fixed cases:
@@ -17,18 +16,17 @@ pub trait Debye {
 // conjectured general form:
 // exp(-x)*-n*(x^n*n!/n!+x^(n-1)*n!/(n-1)!+x^(n-2)*n!/(n-2)!+...+x*n+1) + log(1-cosh(x)+sinh(x))*x^n + n!*zeta(n+1)
 
-
 pub mod impls {
+  use crate::exp::{sf_exp, Exp};
+  use crate::numbers::sf_bernoulli_number_scaled_approx;
   use crate::traits::*;
-  use crate::numbers::{sf_bernoulli_number_scaled_approx};
-  use crate::exp::{Exp,sf_exp};
 
-  pub fn debye_real<V:RealValue>(n:isize, z:V) -> V {
+  pub fn debye_real<V: RealValue>(n: isize, z: V) -> V {
     if z < V::zero {
-      (-z).pow(n+1).pari(n)/(n+1) - debye_real(n, -z)
+      (-z).pow(n + 1).pari(n) / (n + 1) - debye_real(n, -z)
     } else {
       //if μ(z) < μ(ι(2):V) {
-        debye_series_1(n, z)
+      debye_series_1(n, z)
       //} else if μ(z) < μ(ι(n):V) {
       //  debye_coterm_2(n, z)
       //} else {
@@ -37,48 +35,54 @@ pub mod impls {
     }
   }
 
-  pub fn debye_series_1<V:Value>(n:isize, z:V) -> V {
-    let mut res = V::one/n - z/(2*(n+1));
+  pub fn debye_series_1<V: Value>(n: isize, z: V) -> V {
+    let mut res = V::one / n - z / (2 * (n + 1));
     let z2 = z * z;
     let mut zpow = V::one;
     for k in 1..300 {
       zpow *= z2;
       let old = res;
-      res += zpow * sf_bernoulli_number_scaled_approx(2*k as usize) / (2*k + n);
-      if res == old { break; }
+      res += zpow * sf_bernoulli_number_scaled_approx(2 * k as usize) / (2 * k + n);
+      if res == old {
+        break;
+      }
     }
     res *= z.pow(n);
     res
   }
 
-  pub fn debye_scaled_series_1<V:Value>(n:isize, z:V) -> V {
-    let mut res = V::one/n - z/(2*(n+1));
+  pub fn debye_scaled_series_1<V: Value>(n: isize, z: V) -> V {
+    let mut res = V::one / n - z / (2 * (n + 1));
     let z2 = z * z;
     let mut zpow = V::one;
     for k in 1..300 {
       zpow *= z2;
       let old = res;
-      res += zpow * sf_bernoulli_number_scaled_approx(2*k as usize) / (2*k + n);
-      if res == old { break; }
+      res += zpow * sf_bernoulli_number_scaled_approx(2 * k as usize) / (2 * k + n);
+      if res == old {
+        break;
+      }
     }
     res *= n;
     res
   }
 
-  pub fn debye_coint<V:Value+Exp>(n:isize, z:V) -> V {
+  pub fn debye_coint<V: Value + Exp>(n: isize, z: V) -> V {
     let mut res = V::zero;
     for k in 1..1000 {
       let old = res;
-      res += sf_exp(-z*k) * coterm(n, k, z);
-      if old == res { break; }
+      res += sf_exp(-z * k) * coterm(n, k, z);
+      if old == res {
+        break;
+      }
     }
     res
   }
-  pub fn coterm<V:Value>(n:isize, k:isize, z:V) -> V {
+  pub fn coterm<V: Value>(n: isize, k: isize, z: V) -> V {
     let mut res = z.pow(n) / k;
     let mut term = res;
     for j in (0..n).rev() {
-      term *= ι(j+1):V / (z*k);
+      term *= ι(j + 1): V / (z * k);
       res += term;
     }
     res
@@ -114,6 +118,3 @@ pub mod impls {
   }
   */
 }
-
-
-

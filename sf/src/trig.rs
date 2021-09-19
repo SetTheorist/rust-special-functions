@@ -1,9 +1,9 @@
-use crate::traits::{Value,ι};
+use crate::traits::{ι, Value};
 
 // TODO: split into Trig and TrigExtra (TrigObscure?)
 
 // NB lots TODO here
-pub trait Trig : Value {
+pub trait Trig: Value {
   // cosine
   fn cos(self) -> Self;
   fn acos(self) -> Self;
@@ -26,13 +26,13 @@ pub trait Trig : Value {
   // sin(pi*x)
   //fn sin_pix(self) -> Self { (self*ι(3.1415926535897932384626433)).sin() }
 
-  fn cos_sin(self) -> (Self,Self) { (self.cos(),self.sin()) }
+  fn cos_sin(self) -> (Self, Self) { (self.cos(), self.sin()) }
 
   // tangent
   fn tan(self) -> Self;
   fn atan(self) -> Self;
 
-/*
+  /*
   // secant
   fn sec(self) -> Self { self.cos().recip() }
   // exsecant
@@ -58,7 +58,7 @@ pub trait Trig : Value {
 
   fn tanh(self) -> Self;
   fn atanh(self) -> Self;
-  
+
   // hyperbolic secant
   fn sech(self) -> Self { self.cosh().recip() }
 
@@ -75,11 +75,11 @@ pub trait Trig : Value {
   */
 }
 
-pub fn sf_cos<V:Trig>(x:V) -> V { x.cos() }
-pub fn sf_sin<V:Trig>(x:V) -> V { x.sin() }
+pub fn sf_cos<V: Trig>(x: V) -> V { x.cos() }
+pub fn sf_sin<V: Trig>(x: V) -> V { x.sin() }
 
 // TODO: quick placeholder impl
-use crate::real::{r64};
+use crate::real::r64;
 impl Trig for r64 {
   fn cos(self) -> Self { r64(self.0.cos()) }
   fn acos(self) -> Self { r64(self.0.acos()) }
@@ -90,18 +90,14 @@ impl Trig for r64 {
 }
 
 // TODO: quick placeholder impl
-use crate::complex::{c64};
+use crate::complex::c64;
 impl Trig for c64 {
-  fn cos(self) -> Self { c64 {
-    re : ι( self.re.0.cos() * self.im.0.cosh()),
-    im : ι(-self.re.0.sin() * self.im.0.sinh()),
-    }
+  fn cos(self) -> Self {
+    c64 { re: ι(self.re.0.cos() * self.im.0.cosh()), im: ι(-self.re.0.sin() * self.im.0.sinh()) }
   }
   fn acos(self) -> Self { unimplemented!("c64::acos()") }
-  fn sin(self) -> Self { c64 {
-    re : ι(self.re.0.sin() * self.im.0.cosh()),
-    im : ι(self.re.0.cos() * self.im.0.sinh()),
-    }
+  fn sin(self) -> Self {
+    c64 { re: ι(self.re.0.sin() * self.im.0.cosh()), im: ι(self.re.0.cos() * self.im.0.sinh()) }
   }
   fn asin(self) -> Self { unimplemented!("c64::asin()") }
 

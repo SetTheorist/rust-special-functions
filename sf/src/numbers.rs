@@ -1,38 +1,43 @@
-use crate::traits::{ι};
+use crate::traits::ι;
 
-pub fn sf_factorial_approx(n:usize) -> f64 {
+pub fn sf_factorial_approx(n: usize) -> f64 {
   //if n==0 { return 1.0; }
-  (1..=n).map(|i|i as f64).product()
+  (1..=n).map(|i| i as f64).product()
 }
 
-use num::bigint::{BigInt};
-pub fn sf_factorial_exact(n:usize) -> BigInt {
-  if n==0 { return ι(1); }
-  (1..=n).map(|i|ι(i):BigInt).product()
+use num::bigint::BigInt;
+pub fn sf_factorial_exact(n: usize) -> BigInt {
+  if n == 0 {
+    return ι(1);
+  }
+  (1..=n).map(|i| ι(i): BigInt).product()
 }
 
-pub fn sf_binomial_approx(n:usize, k:usize) -> f64 {
+pub fn sf_binomial_approx(n: usize, k: usize) -> f64 {
   //sf_factorial_exact(n) / sf_factorial_exact(k) / sf_factorial_exact(n-k)
-  let k = k.min(n-k);
+  let k = k.min(n - k);
   let mut val = 1.0;
   for i in 0..k {
-    val *= (n-i) as f64;
-    val /= (i+1) as f64
+    val *= (n - i) as f64;
+    val /= (i + 1) as f64
   }
   val
 }
 
-use std::collections::HashMap;
 use once_cell::sync::Lazy; // 1.3.1
+use std::collections::HashMap;
 use std::sync::Mutex;
-static BERNOULLI_FLOAT_CACHE: Lazy<Mutex<HashMap<usize,f64>>> = Lazy::new(||Mutex::new(HashMap::new()));
-pub fn sf_bernoulli_number_approx(n:usize) -> f64 {
-  if n == 0 { 1.0 }
-  else if n == 1 { -0.5 }
-  else if n%2 == 1 { 0.0 }
-  else {
+static BERNOULLI_FLOAT_CACHE: Lazy<Mutex<HashMap<usize, f64>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+pub fn sf_bernoulli_number_approx(n: usize) -> f64 {
+  if n == 0 {
+    1.0
+  } else if n == 1 {
+    -0.5
+  } else if n % 2 == 1 {
+    0.0
+  } else {
     if let Ok(c) = BERNOULLI_FLOAT_CACHE.lock() {
-      if let Some(x) = c.get(&(n/2)) {
+      if let Some(x) = c.get(&(n / 2)) {
         return *x;
       }
     }
@@ -40,34 +45,38 @@ pub fn sf_bernoulli_number_approx(n:usize) -> f64 {
     // (or use scaled * n!)
     let mut sum = 0.0;
     for k in 0..n {
-      sum += sf_bernoulli_number_approx(k) * sf_binomial_approx(n+1,k);
+      sum += sf_bernoulli_number_approx(k) * sf_binomial_approx(n + 1, k);
     }
-    let val = -sum / ((n+1) as f64);
-    BERNOULLI_FLOAT_CACHE.lock().unwrap().insert(n/2,val);
+    let val = -sum / ((n + 1) as f64);
+    BERNOULLI_FLOAT_CACHE.lock().unwrap().insert(n / 2, val);
     val
   }
 }
-use crate::real::{r64};
-use crate::traits::{*};
-use crate::zeta::{sf_zeta_approx};
-pub fn sf_bern2(n:usize) -> f64 {
-  if n == 0 { 1.0 }
-  else if n == 1 { -0.5 }
-  else if n%2 == 1 { 0.0 }
-  else {
-    (((r64::PI*2).pow(-(n as isize)) * 2
-      * sf_factorial_approx(n) * sf_zeta_approx(n)).pari((1+n/2) as isize)).0
+use crate::real::r64;
+use crate::traits::*;
+use crate::zeta::sf_zeta_approx;
+pub fn sf_bern2(n: usize) -> f64 {
+  if n == 0 {
+    1.0
+  } else if n == 1 {
+    -0.5
+  } else if n % 2 == 1 {
+    0.0
+  } else {
+    (((r64::PI * 2).pow(-(n as isize)) * 2 * sf_factorial_approx(n) * sf_zeta_approx(n)).pari((1 + n / 2) as isize)).0
   }
 }
 // B_n / n!
-pub fn sf_bernoulli_number_scaled_approx(n:usize) -> f64 {
+pub fn sf_bernoulli_number_scaled_approx(n: usize) -> f64 {
   //sf_bernoulli_number_approx(n) / sf_factorial_approx(n)
-  if n == 0 { 1.0 }
-  else if n == 1 { -0.5 }
-  else if n%2 == 1 { 0.0 }
-  else {
-    (((r64::PI*2).pow(-(n as isize)) * 2
-      * sf_zeta_approx(n)).pari((1+n/2) as isize)).0
+  if n == 0 {
+    1.0
+  } else if n == 1 {
+    -0.5
+  } else if n % 2 == 1 {
+    0.0
+  } else {
+    (((r64::PI * 2).pow(-(n as isize)) * 2 * sf_zeta_approx(n)).pari((1 + n / 2) as isize)).0
   }
 }
 
@@ -114,7 +123,7 @@ impl NumbersRational for BigRational {
   fn harmonic(n:isize) -> Self { sf_harmonic_number_exact(n) }
 }
 impl NumbersRational for f64 {
-  fn bernoulli(n:isize) -> Self { 
+  fn bernoulli(n:isize) -> Self {
   fn harmonic(n:isize) -> Self { unimplemented!() }
 }
 */
@@ -162,7 +171,7 @@ fn powi(mut x:Fib,mut n:isize) -> Fib {
   v
 }
 
-pub fn sf_fibonacci_number_exact(n:isize) -> BigInt { 
+pub fn sf_fibonacci_number_exact(n:isize) -> BigInt {
   let x = powi(Fib(num::One::one(),num::One::one()), n);
   (x.1*2) >> (n as usize)
 }
