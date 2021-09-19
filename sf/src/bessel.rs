@@ -56,6 +56,8 @@ use crate::algorithm::{sum_series};
 use crate::gamma::{Gamma,sf_gamma};
 use crate::trig::{*};
 
+// TODO: separate type for nu and z
+// (sf_gamma may be implemented more efficiently, e.g. for integral types)
 pub fn bessel_j_series<V:Value+Gamma+Power>(nu:V, z:V) -> V {
   let z2 = -(z/2).sqr();
   let terms = (1..).scan(ι(1):V,|s,m|{*s *= z2/m/(nu+m); Some(*s)});
@@ -64,7 +66,8 @@ pub fn bessel_j_series<V:Value+Gamma+Power>(nu:V, z:V) -> V {
 }
 
 // for |z|>>nu, |arg z|<pi
-// z needs to be quite large for this to to be accurate
+// z needs to be fairly large for this to to be accurate
+// TODO: separate type for nu and z
 pub fn bessel_j_asymp_z<V:Value+Trig>(nu:V, z:V) -> V {
   let chi = z - (nu/2 + 0.25)*V::PI;
   let mu = nu.sqr() * 4;
@@ -77,7 +80,7 @@ fn asymp_p<V:Value>(nu:V, z:V) -> V {
   let z8 = -(z*8).sqr();
   for k in 1..1000 {
     let old_term = term;
-    term *= (mu - (2*k-1).sqr()) * (mu - (2*k+1).sqr()) / (z8*(2*k-1)*(2*k));
+    term *= (mu - (4*k-3).sqr()) * (mu - (4*k-1).sqr()) / (z8*(2*k-1)*(2*k));
     let old_res = res;
     res += term;
     if res == old_res || μ(term) > μ(old_term) { res = old_res; break; }
@@ -91,7 +94,7 @@ fn asymp_q<V:Value>(nu:V, z:V) -> V {
   let z8 = -(z*8).sqr();
   for k in 2..1000 {
     let old_term = term;
-    term *= (mu - (2*k-1).sqr()) * (mu - (2*k+1).sqr()) / (z8*(2*k-2)*(2*k-1));
+    term *= (mu - (4*k-5).sqr()) * (mu - (4*k-3).sqr()) / (z8*(2*k-2)*(2*k-1));
     let old_res = res;
     res += term;
     if res == old_res || μ(term) > μ(old_term) { res = old_res; break; }
