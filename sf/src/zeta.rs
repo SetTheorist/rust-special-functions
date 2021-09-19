@@ -5,6 +5,11 @@ pub trait Zeta : Value {
   fn zeta_m1(self) -> Self;
 }
 
+use crate::real::{r64};
+pub fn sf_zeta_approx(n:usize) -> f64 {
+  impls::zeta_series_em9(ι(n as isize):r64, r64::mu_epsilon).0
+}
+
 pub mod impls {
 use crate::traits::*;
 
@@ -49,7 +54,7 @@ pub fn zeta_m1_series_em9<V:Value+Power>(s:V, μeps:V::NT) -> V {
       - vn.pow(-s-7)*(s*(s+1)*(s+2)*(s+3)*(s+4)*(s+5)*(s+6)/1209600)
       + vn.pow(-s-9)*(s*(s+1)*(s+2)*(s+3)*(s+4)*(s+5)*(s+6)*(s+7)*(s+8)/239500800)
       ;
-    if μ(res-old) <= μ(res)*μeps && n>2 { print!("${}$",n);break; }
+    if μ(res-old) <= μ(res)*μeps && n>2 { /*print!("${}$",n);*/break; }
     old = res;
     n += 1;
   }

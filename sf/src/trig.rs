@@ -28,6 +28,10 @@ pub trait Trig : Value {
 
   fn cos_sin(self) -> (Self,Self) { (self.cos(),self.sin()) }
 
+  // tangent
+  fn tan(self) -> Self;
+  fn atan(self) -> Self;
+
 /*
   // secant
   fn sec(self) -> Self { self.cos().recip() }
@@ -36,9 +40,6 @@ pub trait Trig : Value {
   // cosecant
   fn csc(self) -> Self { self.sin().recip() }
 
-  // tangent
-  fn tan(self) -> Self;
-  fn atan(self) -> Self;
   fn atan2(self,x:Self) -> Self;
   // cotangent = 1/tan(x)
   fn cot(self) -> Self { self.cos() / self.sin() }
@@ -84,6 +85,8 @@ impl Trig for r64 {
   fn acos(self) -> Self { r64(self.0.acos()) }
   fn sin(self) -> Self { r64(self.0.sin()) }
   fn asin(self) -> Self { r64(self.0.asin()) }
+  fn tan(self) -> Self { r64(self.0.tan()) }
+  fn atan(self) -> Self { r64(self.0.atan()) }
 }
 
 // TODO: quick placeholder impl
@@ -101,6 +104,9 @@ impl Trig for c64 {
     }
   }
   fn asin(self) -> Self { unimplemented!("c64::asin()") }
+
+  fn tan(self) -> Self { unimplemented!("c64::tan()") }
+  fn atan(self) -> Self { unimplemented!("c64::atan()") }
 }
 
 /*

@@ -1,4 +1,4 @@
-#![feature(let_chains)]
+//#![feature(let_chains)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
 
@@ -840,5 +840,17 @@ fn main() {
     println!("{}", sf_gamma(r64(-4.5)));
     println!("{}", sf_gamma(c64{re:r64(4.0), im:r64(1.0)}));
     println!("{}", sf_gamma(c64{re:r64(-4.0), im:r64(1.0)}));
+    
+    for i in (5..=100).step_by(5) {
+      let x : r64 = ι(i);
+      println!("Γ({}) = {:.16e}  {:.16e}", x,
+        gamma::impls::gamma_asympt(x).0, sf_factorial_approx((i-1) as usize));
+    }
+  }
+
+  if true {
+    for i in 0..=20 {
+      println!("{:2} {:+.16e}  {:+.16e}", i, sf_bernoulli_number_approx(i), sf_bern2(i));
+    }
   }
 }

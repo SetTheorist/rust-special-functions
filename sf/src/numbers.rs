@@ -47,11 +47,28 @@ pub fn sf_bernoulli_number_approx(n:usize) -> f64 {
     val
   }
 }
+use crate::real::{r64};
+use crate::traits::{*};
+use crate::zeta::{sf_zeta_approx};
+pub fn sf_bern2(n:usize) -> f64 {
+  if n == 0 { 1.0 }
+  else if n == 1 { -0.5 }
+  else if n%2 == 1 { 0.0 }
+  else {
+    (((r64::PI*2).pow(-(n as isize)) * 2
+      * sf_factorial_approx(n) * sf_zeta_approx(n)).pari((1+n/2) as isize)).0
+  }
+}
+// B_n / n!
 pub fn sf_bernoulli_number_scaled_approx(n:usize) -> f64 {
-  // TODO: super hacky temporary approach here
-  // (defeats the purpose of have scaled variant...)
-  // Better is: 2 * (2*Pi)^(-n) * zeta(n) * (-1)^(1+n/2)
-  sf_bernoulli_number_approx(n) / sf_factorial_approx(n)
+  //sf_bernoulli_number_approx(n) / sf_factorial_approx(n)
+  if n == 0 { 1.0 }
+  else if n == 1 { -0.5 }
+  else if n%2 == 1 { 0.0 }
+  else {
+    (((r64::PI*2).pow(-(n as isize)) * 2
+      * sf_zeta_approx(n)).pari((1+n/2) as isize)).0
+  }
 }
 
 /*

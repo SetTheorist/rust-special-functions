@@ -1,57 +1,13 @@
-use crate::traits::*;
-
-pub trait Gamma {
-  fn lngamma(self) -> Self;
-  fn gamma(self) -> Self;
-}
-
-#[inline]
-pub fn sf_gamma<V:Gamma>(x:V) -> V { x.gamma() }
-#[inline]
-pub fn sf_lngamma<V:Gamma>(x:V) -> V { x.lngamma() }
-
-// TODO: quick and dirty for now
-use crate::real::*;
-use crate::log::{Log};
-use crate::exp::{Exp};
-use crate::traits::{Constants};
-use crate::trig::{sf_sin,sf_cos};
-impl Gamma for r64 {
-  fn gamma(self) -> Self {
-    if self < ι(0.5) {
-      // gamma(z) = pi/(sin(pi*z) * gamma(1-z))
-      return r64::PI / (sf_sin(self * r64::PI) * (1-self).gamma());
-    }
-    //impls::gamma_spouge(11, self)
-    impls::lngamma_lanczos_15(self).exp()
-  }
-  fn lngamma(self) -> Self {
-    impls::gamma_spouge(11, self).log() // TODO
-  }
-}
-// TODO: quick and dirty for now
-use crate::complex::*;
-impl Gamma for c64 {
-  fn gamma(self) -> Self {
-    if self.real() < ι(0.5) {
-      // gamma(z) = pi/(sin(pi*z) * gamma(1-z))
-      return c64::PI / (sf_sin(self * c64::PI) * (1-self).gamma());
-    }
-    //impls::gamma_spouge(11, self)
-    impls::lngamma_lanczos_15(self).exp()
-  }
-  fn lngamma(self) -> Self {
-    impls::gamma_spouge(11, self).log() // TODO
-  }
-}
-  
-pub mod impls {
 use crate::algorithm::{contfrac_modlentz, sum_series};
 use crate::exp::{Exp,sf_exp};
 use crate::log::{Log,sf_log};
-use crate::numbers::{sf_factorial_approx};
+use crate::numbers::{sf_factorial_approx, sf_bernoulli_number_approx};
 use crate::traits::{*};
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// Spouge approximation
+//
 #[inline]
 fn spouge_c<V:Value+Exp+Power>(k:isize, a:V) -> V {
   (ι(1):V/sf_factorial_approx((k-1) as usize)).pari(k+1)
@@ -68,7 +24,41 @@ pub fn gamma_spouge<V:Value+Exp+Power>(a:isize, z:V) -> V {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//
+// Asymptotic expansion
+//
 
+// assumes re>0
+pub fn gamma_asympt<V:Value+Log+Exp>(x:V) -> V {
+  let mut div = V::one;
+  let mut z = x;
+  // shift z 
+  while z.fabs() < 50.0 {
+    //res += -sf_log(z*(z+1));
+    div *= (z*(z+1));
+    z += 2;
+  }
+  let z = z;
+
+  let mut res = V::zero;
+  let mut term : V = (z - 0.5)*sf_log(z) - z + V::FRAC_LOG2PI_2;
+  res += term;
+  for m in (2..250).step_by(2) {
+    let old_term = term;
+    term = (ι(sf_bernoulli_number_approx(m as usize)):V) / (z.pow(m-1)*(m*(m-1)));
+    if μ(term) > μ(old_term) { break; }
+    let old_res = res;
+    res += term;
+    if res == old_res { break; }
+  }
+  sf_exp(res) / div
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Lanczos approximation(s)
+//
 /*
  g=7, n=9
 0 	0.99999999999980993227684700473478
@@ -146,41 +136,4 @@ pub fn lngamma_lanczos_7<V:Value+Exp+Log>(z:V) -> V {
   sum += LANCZOS_7[0].1;
   ((sf_log(sum) + V::FRAC_LOG2PI_2) - base) + sf_log(base)*(z + 0.5)
 }
-
-}
-
-/*
-use crate::embed::*;
-use crate::exp::{*};
-use crate::kahan::{Kahan};
-use crate::numbers::{sf_bernoulli_number_approx, sf_factorial_approx};
-use crate::value::{*};
-//use num::complex::{Complex};
-
-// for values with real part < 1/2, should use reflection first:
-// gamma(z) = pi/(sin(pi*z) * gamma(1-z))
-pub fn gamma_asympt<V:Value+Ln+Exp>(x:V) -> V {
-  let mut z = x;
-  // shift z 
-  let mut res : Kahan<V> = Kahan::default();
-  while z.dabs() < 50.0 {
-    res += -sf_ln(z*(z+ι(1)));
-    z += ι(2);
-  }
-  let z = z;
-
-  let ln2pi_2 = ι(0.9189385332046727417803297364056176398613974736377834128171515404); // log(2*pi)/2
-  let mut term : V = (z - ι(0.5))*sf_ln(z) - z + ln2pi_2;
-  res += term;
-  for m in (2..250).step_by(2) {
-    let old_term = term;
-    term = (ι(sf_bernoulli_number_approx(m)):V) / ((ι(m*(m-1)):V)*z.powi(m-1));
-    if term.dabs() > old_term.dabs() { break; }
-    let old_res = res;
-    res += term;
-    if res == old_res { break; }
-  }
-  sf_exp(res.0) * sf_exp(res.1)
-}
-*/
 
