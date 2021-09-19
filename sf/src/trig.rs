@@ -77,12 +77,30 @@ pub trait Trig : Value {
 pub fn sf_cos<V:Trig>(x:V) -> V { x.cos() }
 pub fn sf_sin<V:Trig>(x:V) -> V { x.sin() }
 
+// TODO: quick placeholder impl
 use crate::real::{r64};
 impl Trig for r64 {
   fn cos(self) -> Self { r64(self.0.cos()) }
   fn acos(self) -> Self { r64(self.0.acos()) }
   fn sin(self) -> Self { r64(self.0.sin()) }
   fn asin(self) -> Self { r64(self.0.asin()) }
+}
+
+// TODO: quick placeholder impl
+use crate::complex::{c64};
+impl Trig for c64 {
+  fn cos(self) -> Self { c64 {
+    re : ι( self.re.0.cos() * self.im.0.cosh()),
+    im : ι(-self.re.0.sin() * self.im.0.sinh()),
+    }
+  }
+  fn acos(self) -> Self { unimplemented!("c64::acos()") }
+  fn sin(self) -> Self { c64 {
+    re : ι(self.re.0.sin() * self.im.0.cosh()),
+    im : ι(self.re.0.cos() * self.im.0.sinh()),
+    }
+  }
+  fn asin(self) -> Self { unimplemented!("c64::asin()") }
 }
 
 /*

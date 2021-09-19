@@ -71,9 +71,14 @@ pub fn bessel_j_series<V:Value+Gamma+Power>(nu:V, z:V) -> V {
 pub fn bessel_j_asymp_z<V:Value+Trig>(nu:V, z:V) -> V {
   let chi = z - (nu/2 + 0.25)*V::PI;
   let mu = nu.sqr() * 4;
-  (ι(2):V/(V::PI*z)).sqrt() * (asymp_p(nu,z)*sf_cos(chi) - asymp_q(nu,z)*sf_sin(chi))
+  (ι(2):V/(V::PI*z)).sqrt() * (asymp_even(nu,z)*sf_cos(chi) - asymp_odd(nu,z)*sf_sin(chi))
 }
-fn asymp_p<V:Value>(nu:V, z:V) -> V {
+pub fn bessel_y_asymp_z<V:Value+Trig>(nu:V, z:V) -> V {
+  let chi = z - (nu/2 + 0.25)*V::PI;
+  let mu = nu.sqr() * 4;
+  (ι(2):V/(V::PI*z)).sqrt() * (asymp_even(nu,z)*sf_sin(chi) + asymp_odd(nu,z)*sf_cos(chi))
+}
+fn asymp_even<V:Value>(nu:V, z:V) -> V {
   let mu = nu.sqr()*4;
   let mut res : V = ι(1);
   let mut term : V = ι(1);
@@ -87,7 +92,7 @@ fn asymp_p<V:Value>(nu:V, z:V) -> V {
   }
   res
 }
-fn asymp_q<V:Value>(nu:V, z:V) -> V {
+fn asymp_odd<V:Value>(nu:V, z:V) -> V {
   let mu = nu.sqr()*4;
   let mut res = (mu - 1) / (z*8);
   let mut term = res;
@@ -102,6 +107,39 @@ fn asymp_q<V:Value>(nu:V, z:V) -> V {
   res
 }
 
+/*
+pub fn bessel_j_recur_back_in_order<V:Value>(nu:V, z:V) -> V [
+  let n = nu.floor();
+  let nuf = nu - n;
+  let nx = n + 10;
+  unimplemented!()
+}
+*/
+
+// for integral order (assumed non-negative)
+pub fn bessel_j_recur_back<V:Value>(maxm:isize, n:isize, z:V) -> V {
+  let mut jjp2 = V::zero;
+  let mut jjp1 = V::one;
+  let mut scale : V = ι(2);
+  let mut res = V::zero;
+  for m in (1..=(maxm-2)).rev() {
+    let jjm = -jjp2 + (ι(2):V * m/z)*jjp1;
+    jjp2 = jjp1;
+    jjp1 = jjm;
+    if m == n+1 {
+      // desired value, but keep going to get scale-factor
+      res = jjm;
+    }
+    scale += if m != 1 {jjm.sqr() * 2} else {jjm.sqr() * 1};
+    if abs(scale) > ι(1e20) {
+      jjp2 /= 1024;
+      jjp1 /= 1024;
+      res /= 1024;
+      scale /= 1024*1024;
+    }
+  }
+  res / scale.sqrt()
+}
 
 }
 

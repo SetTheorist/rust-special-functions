@@ -4,6 +4,7 @@ use core::ops::{Shl,ShlAssign,Shr,ShrAssign};
 
 use crate::real::{r64};
 use crate::traits::{*};
+use crate::trig::Trig;
 
 
 // TODO: Make generic on any RealValue type?
@@ -318,9 +319,8 @@ impl ComplexType for c64 {
   }
   #[inline]
   fn polar(r:Self::RT,arg:Self::RT) -> Self {
-    // TODO: use crate cos/sin ...
-    let re = r * arg.0.cos();
-    let im = r * arg.0.sin();
+    let re = r * arg.cos();
+    let im = r * arg.sin();
     c64 { re, im }
   }
 }

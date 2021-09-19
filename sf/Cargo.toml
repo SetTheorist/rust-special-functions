@@ -14,12 +14,22 @@ num-traits = "*"
 num-rational = "*"
 once_cell = "*"
 
+# approximate equality asserts
+#approx = "*"
+
+#microbenchmarking crate:
+#criterion = "*"
+
+#for eigenvalue calcs:
 #nalgebra = "*"
 
+#heavy overhead, but interesting:
 #plotlib = "*"
 #plotters = "*"
 
+#maybe:
 #num-bigint = "*"
 #num-iter = "*"
 
+#not on cargo.rs:
 #qd = "*"

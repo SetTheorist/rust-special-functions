@@ -16,7 +16,7 @@ pub fn power_i<T:Multiplication+Division>(x:T, n:isize) -> T {
   if n<0 {
     power_u(x,-n as usize).recip()
   } else {
-    power_u(x,n as usize).recip()
+    power_u(x,n as usize)
   }
 }
 

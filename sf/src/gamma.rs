@@ -20,6 +20,16 @@ impl Gamma for r64 {
     unimplemented!()
   }
 }
+// TODO: quick and dirty for now
+use crate::complex::*;
+impl Gamma for c64 {
+  fn gamma(self) -> Self {
+    impls::gamma_spouge(11, self)
+  }
+  fn lngamma(self) -> Self {
+    unimplemented!()
+  }
+}
   
 pub mod impls {
 use crate::algorithm::{contfrac_modlentz, sum_series};

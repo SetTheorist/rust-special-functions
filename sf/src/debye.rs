@@ -15,8 +15,7 @@ pub trait Debye {
 // n=6: exp(-x)*-6*(x^5+5x^4+20x^3+60x^2+120x+120) + log(1-cosh(x)+sinh(x))*x^6 + 720*zeta(7)
 //
 // conjectured general form:
-// Let {n,k} = n(n-1)(...)(n-(k-1))
-// exp(-x)*-n*(x^n+{n,1}x^(n-1)+{n,2}x^(n-2)+...+{n,n-1}x+{n,n}1) + log(1-cosh(x)+sinh(x))*x^n + n!*zeta(n+1)
+// exp(-x)*-n*(x^n*n!/n!+x^(n-1)*n!/(n-1)!+x^(n-2)*n!/(n-2)!+...+x*n+1) + log(1-cosh(x)+sinh(x))*x^n + n!*zeta(n+1)
 
 
 pub mod impls {

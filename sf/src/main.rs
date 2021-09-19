@@ -328,21 +328,38 @@ fn main() {
     println!("Bessel:");
     for n in 0..=5 {
       let x = r64(1.0);
-      println!("J_{}({}) = {:.16e}  {:.16e}", n, x,
-        bessel::impls::bessel_j_series(r64(ι(n)), x).0,
-        bessel::impls::bessel_j_asymp_z(r64(ι(n)), x).0);
+      println!("J_{}({}) = {:.16e}  {:.16e}  {:.16e}", n, x,
+        bessel::impls::bessel_j_series(ι(n), x).0,
+        bessel::impls::bessel_j_asymp_z(ι(n), x).0,
+        bessel::impls::bessel_j_recur_back(31, n as isize, x).0);
     }
     for n in 0..=5 {
       let x = r64(10.0);
-      println!("J_{}({}) = {:.16e}  {:.16e}", n, x,
-        bessel::impls::bessel_j_series(r64(ι(n)), x).0,
-        bessel::impls::bessel_j_asymp_z(r64(ι(n)), x).0);
+      println!("J_{}({}) = {:.16e}  {:.16e}  {:.16e}", n, x,
+        bessel::impls::bessel_j_series(ι(n), x).0,
+        bessel::impls::bessel_j_asymp_z(ι(n), x).0,
+        bessel::impls::bessel_j_recur_back(51, n as isize, x).0);
     }
     for n in 0..=5 {
       let x = r64(100.0);
-      println!("J_{}({}) = {:.16e}  {:.16e}", n, x,
-        bessel::impls::bessel_j_series(r64(ι(n)), x).0,
-        bessel::impls::bessel_j_asymp_z(r64(ι(n)), x).0);
+      println!("J_{}({}) = {:.16e}  {:.16e}  {:.16e}", n, x,
+        bessel::impls::bessel_j_series(ι(n), x).0,
+        bessel::impls::bessel_j_asymp_z(ι(n), x).0,
+        bessel::impls::bessel_j_recur_back(151, n as isize, x).0);
+    }
+    for n in 0..=5 {
+      let x = r64(250.0);
+      println!("J_{}({}) = {:.16e}  {:.16e}  {:.16e}", n, x,
+        bessel::impls::bessel_j_series(ι(n), x).0,
+        bessel::impls::bessel_j_asymp_z(ι(n), x).0,
+        bessel::impls::bessel_j_recur_back(301, n as isize, x).0);
+    }
+    for n in 0..=5 {
+      let x = c64{re:ι(2),im:ι(1)};
+      println!("J_{}({}) = {:.16}  {:.16}  {:.16}", n, x,
+        bessel::impls::bessel_j_series(ι(n), x),
+        bessel::impls::bessel_j_asymp_z(ι(n), x),
+        bessel::impls::bessel_j_recur_back(31, n as isize, x));
     }
   }
 
