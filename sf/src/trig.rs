@@ -1,6 +1,4 @@
-/*
-use crate::traits::{Value};
-use crate::embed::{ι};
+use crate::traits::{Value,ι};
 
 // TODO: split into Trig and TrigExtra (TrigObscure?)
 
@@ -10,26 +8,27 @@ pub trait Trig : Value {
   fn cos(self) -> Self;
   fn acos(self) -> Self;
   // vercosine
-  fn vcos(self) -> Self { (self/ι(2)).cos().sqr()*ι(2) }
+  //fn vcos(self) -> Self { (self/ι(2)).cos().sqr()*ι(2) }
   // havercosine
-  fn hvcos(self) -> Self{ (self/ι(2)).cos().sqr() }
+  //fn hvcos(self) -> Self{ (self/ι(2)).cos().sqr() }
   // cos(pi*x)
-  fn cos_pix(self) -> Self { (self*ι(3.1415926535897932384626433)).cos() }
+  //fn cos_pix(self) -> Self { (self*ι(3.1415926535897932384626433)).cos() }
   // cos(x) - 1
-  fn cos_m1(self) -> Self { self.cos() - ι(1) }
+  //fn cos_m1(self) -> Self { self.cos() - ι(1) }
 
   // sine
   fn sin(self) -> Self;
   fn asin(self) -> Self;
   // versine
-  fn vsin(self) -> Self { (self/ι(2)).sin().sqr()*ι(2) }
+  //fn vsin(self) -> Self { (self/ι(2)).sin().sqr()*ι(2) }
   // haversine
-  fn hvsin(self) -> Self { (self/ι(2)).sin().sqr() }
+  //fn hvsin(self) -> Self { (self/ι(2)).sin().sqr() }
   // sin(pi*x)
-  fn sin_pix(self) -> Self { (self*ι(3.1415926535897932384626433)).sin() }
+  //fn sin_pix(self) -> Self { (self*ι(3.1415926535897932384626433)).sin() }
 
   fn cos_sin(self) -> (Self,Self) { (self.cos(),self.sin()) }
 
+/*
   // secant
   fn sec(self) -> Self { self.cos().recip() }
   // exsecant
@@ -72,18 +71,27 @@ pub trait Trig : Value {
   // = log(abs(tan(z) + sec(z)) = log(abs(tan(pi/4 + z/2)))
   // = atanh(sin(z)) = sinh(tan(x))
   fn agud(self) -> Self { self.tan().asinh() }
+  */
 }
-*/
+
+pub fn sf_cos<V:Trig>(x:V) -> V { x.cos() }
+pub fn sf_sin<V:Trig>(x:V) -> V { x.sin() }
+
+use crate::real::{r64};
+impl Trig for r64 {
+  fn cos(self) -> Self { r64(self.0.cos()) }
+  fn acos(self) -> Self { r64(self.0.acos()) }
+  fn sin(self) -> Self { r64(self.0.sin()) }
+  fn asin(self) -> Self { r64(self.0.asin()) }
+}
 
 /*
 
-pub fn sf_cos<V:Trig>(x:V) -> V { x.cos() }
 pub fn sf_acos<V:Trig>(x:V) -> V { x.acos() }
 pub fn sf_vcos<V:Trig>(x:V) -> V { x.vcos() }
 pub fn sf_hvcos<V:Trig>(x:V) -> V { x.hvcos() }
 pub fn sf_cos_pix<V:Trig>(x:V) -> V { x.cos_pix() }
 pub fn sf_cos_m1<V:Trig>(x:V) -> V { x.cos_m1() }
-pub fn sf_sin<V:Trig>(x:V) -> V { x.sin() }
 pub fn sf_asin<V:Trig>(x:V) -> V { x.asin() }
 pub fn sf_vsin<V:Trig>(x:V) -> V { x.vsin() }
 pub fn sf_hvsin<V:Trig>(x:V) -> V { x.hvsin() }

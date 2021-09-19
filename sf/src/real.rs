@@ -115,6 +115,19 @@ macro_rules! lift1 {
   }
 }
 
+impl Constants for r64 {
+  const E : r64 = r64(2.7182818284590452354);
+  const PI : r64 = r64(3.1415926535897932385);
+  const FRAC_1_PI : r64 = r64(0.31830988618379067154);
+  const FRAC_PI_2 : r64 = r64(1.5707963267948966192);
+  const SQRT2PI : r64 = r64(2.5066282746310005024);
+  const FRAC_1_SQRT2PI : r64 = r64(0.39894228040143267794);
+  const FRAC_1_SQRTPI : r64 = r64(0.56418958354775628695);
+  const LOG2 : r64 = r64(0.69314718055994530942);
+  const FRAC_1_LOG2 : r64 = r64(1.4426950408889634074);
+  const FRAC_LOG2PI_2 : r64 = r64(0.91893853320467274178);
+}
+
 impl Base for r64 { }
 impl Zero for r64 { const zero : r64 = r64(0.0); }
 impl Addition for r64 { }

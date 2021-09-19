@@ -325,6 +325,29 @@ fn main() {
 
   if true {
     println!("-----");
+    println!("Bessel:");
+    for n in 0..=5 {
+      let x = r64(1.0);
+      println!("J_{}({}) = {:.16e}  {:.16e}", n, x,
+        bessel::impls::bessel_j_series(r64(ι(n)), x).0,
+        bessel::impls::bessel_j_asymp_z(r64(ι(n)), x).0);
+    }
+    for n in 0..=5 {
+      let x = r64(10.0);
+      println!("J_{}({}) = {:.16e}  {:.16e}", n, x,
+        bessel::impls::bessel_j_series(r64(ι(n)), x).0,
+        bessel::impls::bessel_j_asymp_z(r64(ι(n)), x).0);
+    }
+    for n in 0..=5 {
+      let x = r64(100.0);
+      println!("J_{}({}) = {:.16e}  {:.16e}", n, x,
+        bessel::impls::bessel_j_series(r64(ι(n)), x).0,
+        bessel::impls::bessel_j_asymp_z(r64(ι(n)), x).0);
+    }
+  }
+
+  if true {
+    println!("-----");
     println!("Dawson:");
     println!("{:.16e}", dawson::impls::dawson_contfrac(r64(1.0)).0);
     println!("{:.16e}", dawson::impls::dawson_contfrac2(r64(1.0)).0);
@@ -644,7 +667,6 @@ fn main() {
     }
   }
 
-
   if false {
     let terms = (1..10).scan(1.0_f64,|s,n|{*s*=2.0/(ι(n):f64);Some(*s)});
     for t in terms { print!("  {}", t); } println!();
@@ -697,11 +719,21 @@ fn main() {
   if (true) {
     println!("-----");
     println!("Zeta:");
-    for ix in 2..=10 {
+    for ix in 2..=20 {
       let x = ι(ix):r64/2+1;
-      println!("{} {}", x, zeta::impls::zeta_series_em9(x,r64::epsilon));
-      //println!("{}", zeta::impls::zeta_series_em9(ι(x):c64,c64::epsilon*100));
+      println!("{}  {}  {}", x,
+        zeta::impls::zeta_series_em9(x,r64::epsilon), zeta::impls::zeta_m1_series_em9(x,r64::epsilon));
     }
+
+    let z : c64 = c64::rect(r64(3.0), r64(4.0));
+    println!("{}  {}", z, zeta::impls::zeta_series_em9(z, r64::epsilon.sqr()));
+    let z : c64 = c64::rect(r64(3.0), r64(-4.0));
+    println!("{}  {}", z, zeta::impls::zeta_series_em9(z, r64::epsilon.sqr()));
+    let z : c64 = c64::rect(r64(4.5), r64(0.5));
+    println!("{}  {}", z, zeta::impls::zeta_series_em9(z, r64::epsilon.sqr()));
+    let z : c64 = c64::rect(r64(4.5), r64(-0.5));
+    println!("{}  {}", z, zeta::impls::zeta_series_em9(z, r64::epsilon.sqr()));
+
     /*
     for n in 2..=10 {
       println!("{}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}\n\t{:.16e}", n,

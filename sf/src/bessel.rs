@@ -52,40 +52,54 @@ pub trait BesselSpherY<N:Additive+Embeds<isize>> : Value+Embeds<N> {
 
 pub mod impls {
 use crate::traits::{*};
+use crate::algorithm::{sum_series};
+use crate::gamma::{Gamma,sf_gamma};
+use crate::trig::{*};
 
-pub fn bessel_j_series<V:Value>(z:V, nu:V) -> V {
+pub fn bessel_j_series<V:Value+Gamma+Power>(nu:V, z:V) -> V {
   let z2 = -(z/2).sqr();
   let terms = (1..).scan(ι(1):V,|s,m|{*s *= z2/m/(nu+m); Some(*s)});
-  let mut terms = std::iter::once(ι(1)).chain(terms);
-  //sumit(terms, 1e-16) * (z/2)^nu / gamma(nu+1)
-  while true && let Some(x) = terms.next() {
-  }
-  unimplemented!()
+  let terms = std::iter::once(ι(1)).chain(terms);
+  sum_series(terms, V::mu_epsilon) * (z/2).pow(nu) / sf_gamma(nu+1)
 }
 
 // for |z|>>nu, |arg z|<pi
-pub fn bessel_j_asymp_z<V:Value>(z:V, nu:V) -> V {
-  //let chi = z - (nu/2 + 0.25)*PI;
-  //let mu = 4 * (nu^2);
-  // sqrt(2/(pi*z)) * (asymp_p(z,nu)*sf_cos(chi) - asymp_q(z,nu)*sin(chi))
-  unimplemented!()
+// z needs to be quite large for this to to be accurate
+pub fn bessel_j_asymp_z<V:Value+Trig>(nu:V, z:V) -> V {
+  let chi = z - (nu/2 + 0.25)*V::PI;
+  let mu = nu.sqr() * 4;
+  (ι(2):V/(V::PI*z)).sqrt() * (asymp_p(nu,z)*sf_cos(chi) - asymp_q(nu,z)*sf_sin(chi))
 }
-
-}
-/*
-fn asymp_p(z:r64, nu:r64) -> r64 {
-  let mu = 4*(nu^2);
-  let mut res = ι(1);
-  let mut term = ι(1);
-  let z8 = -(8*z)^2;
+fn asymp_p<V:Value>(nu:V, z:V) -> V {
+  let mu = nu.sqr()*4;
+  let mut res : V = ι(1);
+  let mut term : V = ι(1);
+  let z8 = -(z*8).sqr();
   for k in 1..1000 {
     let old_term = term;
-    term *= (mu - (2*k-1).sqr()) * (mu - (2*k+1).sqr()^2) / ((2*k-1)*(2*k)*z8);
+    term *= (mu - (2*k-1).sqr()) * (mu - (2*k+1).sqr()) / (z8*(2*k-1)*(2*k));
     let old_res = res;
     res += term;
-    if res == old_res || term.abs() > old_term.abs() { break; }
+    if res == old_res || μ(term) > μ(old_term) { res = old_res; break; }
   }
+  res
 }
-*/
+fn asymp_q<V:Value>(nu:V, z:V) -> V {
+  let mu = nu.sqr()*4;
+  let mut res = (mu - 1) / (z*8);
+  let mut term = res;
+  let z8 = -(z*8).sqr();
+  for k in 2..1000 {
+    let old_term = term;
+    term *= (mu - (2*k-1).sqr()) * (mu - (2*k+1).sqr()) / (z8*(2*k-2)*(2*k-1));
+    let old_res = res;
+    res += term;
+    if res == old_res || μ(term) > μ(old_term) { res = old_res; break; }
+  }
+  res
+}
+
+
+}
 
 

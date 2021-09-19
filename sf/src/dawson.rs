@@ -33,9 +33,7 @@ pub fn dawson_rybicki<V:Value+Exp>(x:V) -> V {
   let h : V = ι(0.1);
   let terms = (1..).step_by(2)
     .map(|n|(sf_exp(-(x-h*n).sqr()) - sf_exp(-(x+h*n).sqr()))/n);
-  // sqrt(pi) - TODO: use Constants
-  let sqpi : V = ι(1.7724538509055160272981674833411451827975494561223871282138077898);
-  sum_series(terms, V::mu_epsilon) / sqpi
+  sum_series(terms, V::mu_epsilon) * V::FRAC_1_SQRTPI
 }
 
 // bessel series (in terms of spherical bessel i1() functions

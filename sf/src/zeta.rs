@@ -32,6 +32,30 @@ pub fn zeta_series_em9<V:Value+Power>(s:V, μeps:V::NT) -> V {
   old
 }
 
+pub fn zeta_m1_series_em9<V:Value+Power>(s:V, μeps:V::NT) -> V {
+  let terms = (2..).map(|n|(ι(n):V).pow(-s));
+  let mut sum = V::zero;
+  let mut n = 2;
+  let mut old = V::zero;
+  for t in terms {
+    sum += t;
+    let vn:V = ι(n);
+    let res = sum
+      + vn.pow(-s+1)/(s-1)
+      - vn.pow(-s)/2
+      + vn.pow(-s-1)*(s/12)
+      - vn.pow(-s-3)*(s*(s+1)*(s+2)/720)
+      + vn.pow(-s-5)*(s*(s+1)*(s+2)*(s+3)*(s+4)/30240)
+      - vn.pow(-s-7)*(s*(s+1)*(s+2)*(s+3)*(s+4)*(s+5)*(s+6)/1209600)
+      + vn.pow(-s-9)*(s*(s+1)*(s+2)*(s+3)*(s+4)*(s+5)*(s+6)*(s+7)*(s+8)/239500800)
+      ;
+    if μ(res-old) <= μ(res)*μeps && n>2 { print!("${}$",n);break; }
+    old = res;
+    n += 1;
+  }
+  old
+}
+
 }
 
 

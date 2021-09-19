@@ -5,7 +5,22 @@ pub trait Gamma : Value {
   fn gamma(self) -> Self;
 }
 
+#[inline]
+pub fn sf_gamma<V:Gamma>(x:V) -> V { x.gamma() }
+#[inline]
+pub fn sf_lngamma<V:Gamma>(x:V) -> V { x.lngamma() }
 
+// TODO: quick and dirty for now
+use crate::real::*;
+impl Gamma for r64 {
+  fn gamma(self) -> Self {
+    impls::gamma_spouge(11, self)
+  }
+  fn lngamma(self) -> Self {
+    unimplemented!()
+  }
+}
+  
 pub mod impls {
 use crate::algorithm::{contfrac_modlentz, sum_series};
 use crate::exp::{Exp,sf_exp};
@@ -21,8 +36,7 @@ fn spouge_c<V:Value+Exp+Power>(k:isize, a:V) -> V {
 pub fn gamma_spouge<V:Value+Exp+Power>(a:isize, z:V) -> V {
   let z = z - 1;
   let res : V = (z+a).pow(z+0.5)*sf_exp(-(z+a));
-  let mut sm : V = 
-    ι(2.5066282746310005024157652848110452530069867406099383166299235763); // sqrt(2*\pi)
+  let mut sm : V = V::SQRT2PI;
   for k in 1..=(a-1) {
     sm += spouge_c(k,ι(a)):V/(z+k);
   }
@@ -78,9 +92,6 @@ const LANCZOS_15 : [(isize,f64); 15] = [
 const LANCZOS_G_15 : f64 = 4.7421875;
 // use for z>1/2 (otherwise use standard reflection)
 pub fn lngamma_lanczos_15<V:Value+Exp+Log>(z:V) -> V {
-  // log(sqrt(2*Pi))
-  const LQ2P : f64 = 0.9189385332046727417803297364056176398613974736377834128171515404;
-  const PI : f64 = 3.1415926535897932384626433832795028841971693993751058209749445923;
   let z = z - 1;
   let base = z + LANCZOS_G_15 + 0.5;
   let mut sum : V = ι(0);
@@ -88,7 +99,7 @@ pub fn lngamma_lanczos_15<V:Value+Exp+Log>(z:V) -> V {
     sum += ι(c):V / (z + i);
   }
   sum += LANCZOS_15[0].1;
-  ((sf_log(sum) + LQ2P) - base) + sf_log(base)*(z + 0.5)
+  ((sf_log(sum) + V::FRAC_LOG2PI_2) - base) + sf_log(base)*(z + 0.5)
 }
 
 const LANCZOS_7 : [(isize,f64); 7] = [
@@ -102,9 +113,6 @@ const LANCZOS_7 : [(isize,f64); 7] = [
 const LANCZOS_G_7 : f64 = 5.0;
 // use for z>1/2 (otherwise use standard reflection)
 pub fn lngamma_lanczos_7<V:Value+Exp+Log>(z:V) -> V {
-  // log(sqrt(2*Pi))
-  const LQ2P : f64 = 0.9189385332046727417803297364056176398613974736377834128171515404;
-  const PI : f64 = 3.1415926535897932384626433832795028841971693993751058209749445923;
   let z = z - 1;
   let base = z + LANCZOS_G_7 + 0.5;
   let mut sum : V = ι(0);
@@ -112,7 +120,7 @@ pub fn lngamma_lanczos_7<V:Value+Exp+Log>(z:V) -> V {
     sum += ι(c):V / (z + i);
   }
   sum += LANCZOS_7[0].1;
-  ((sf_log(sum) + LQ2P) - base) + sf_log(base)*(z + 0.5)
+  ((sf_log(sum) + V::FRAC_LOG2PI_2) - base) + sf_log(base)*(z + 0.5)
 }
 
 }

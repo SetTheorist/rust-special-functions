@@ -211,8 +211,32 @@ pub trait RealType
 {
 }
 
+pub trait Constants
+{
+  // $e^1$
+  const E : Self;
+  // $\pi$
+  const PI : Self;
+  // $1/\pi$
+  const FRAC_1_PI : Self;
+  // $\pi/2$
+  const FRAC_PI_2 : Self;
+  // $\sqrt(2\pi)$
+  const SQRT2PI : Self;
+  // $1/\sqrt(2\pi)$
+  const FRAC_1_SQRT2PI : Self;
+  // $1/\sqrt(\pi)$
+  const FRAC_1_SQRTPI : Self;
+  // $\log(2)$
+  const LOG2 : Self;
+  // $1/\log(2)$
+  const FRAC_1_LOG2 : Self;
+  // $\log(2\pi)/2 = \log(\sqrt{2\pi})$
+  const FRAC_LOG2PI_2 : Self;
+}
+
 pub trait Value
-  : Field + Normed + Roots
+  : Field + Normed + Roots + Constants
 {
 }
 
@@ -254,35 +278,6 @@ pub trait ExpLog : ...
   fn log(self) -> Self; // etc.
 }
 
-pub trait Constants
-{
-  const EPSILON : Self;
-  const TINY : Self; // ~ O(sqrt(min-positive normal)) for example
-
-  // $e^1$
-  const E : Self;
-
-  // $\pi$
-  const PI : Self;
-  // $1/\pi$
-  const FRAC_1_PI : Self;
-  // $\pi/2$
-  const FRAC_PI_2 : Self;
-  // $\sqrt(2\pi)$
-  const SQRT2PI : Self;
-  // $1/\sqrt(2\pi)$
-  const FRAC_1_SQRT2PI : Self;
-  // $1/\sqrt(\pi)$
-  const FRAC_1_SQRTPI : Self;
-
-  // $\log(2)$
-  const LOG2 : Self;
-  // $1/\log(2)$
-  const FRAC_1_LOG2 : Self;
-
-  // $log(2\pi)/2$
-  const FRAC_LOG2PI_2 : Self;
-}
 pub trait Float {
   const EPSILON : Self;
   const NAN : Self;
