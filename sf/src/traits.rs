@@ -189,6 +189,33 @@ pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT> //+ Embed
 
 pub trait RealType: Base + Normed<NT = Self> + Ordered {}
 
+pub trait Classify {
+  fn is_nan(self) -> bool;
+  fn is_infinite(self) -> bool;
+  fn is_finite(self) -> bool;
+
+  fn is_zero(self) -> bool;
+  fn is_negzero(self) -> bool;
+  fn is_real(self) -> bool;
+  fn is_imag(self) -> bool;
+
+  fn is_negreal(self) -> bool;
+  fn is_posreal(self) -> bool;
+  fn is_nonnegreal(self) -> bool;
+  fn is_nonposreal(self) -> bool;
+
+  fn is_int(self) -> bool;
+  fn is_posint(self) -> bool;
+  fn is_negint(self) -> bool;
+  fn is_nonposint(self) -> bool;
+  fn is_nonnegint(self) -> bool;
+  fn is_evenint(self) -> bool;
+  fn is_oddint(self) -> bool;
+
+  // upper-half complex plane (positive imag part)?
+  // positive real part?
+}
+
 pub trait Constants {
   // $e^1$
   const E: Self;
@@ -223,50 +250,79 @@ impl<T> ComplexValue for T where T: Value + ComplexType {}
 ////////////////////////////////////////////////////////////////////////////////
 
 impl Base for isize {}
-impl Zero for isize {
-  const zero: isize = 0;
-}
+impl Zero for isize { const zero: isize = 0; }
 impl Addition for isize {}
 impl Subtraction for isize {}
 impl Additive for isize {}
-impl One for isize {
-  const one: isize = 1;
-}
+impl One for isize { const one: isize = 1; }
 impl Multiplication for isize {}
 impl Division for isize {}
 impl Multiplicative for isize {}
 impl Embeds<isize> for isize {}
 
-impl Base for f64 {}
-impl Zero for f64 {
-  const zero: f64 = 0.0;
+impl Classify for isize {
+  #[inline] fn is_nan(self) -> bool { false }
+  #[inline] fn is_infinite(self) -> bool { false }
+  #[inline] fn is_finite(self) -> bool { true }
+  #[inline] fn is_zero(self) -> bool { self == 0 }
+  #[inline] fn is_negzero(self) -> bool { false }
+  #[inline] fn is_real(self) -> bool { true }
+  #[inline] fn is_imag(self) -> bool { false }
+  #[inline] fn is_negreal(self) -> bool { self < 0 }
+  #[inline] fn is_posreal(self) -> bool { self > 0 }
+  #[inline] fn is_nonnegreal(self) -> bool { self >= 0 }
+  #[inline] fn is_nonposreal(self) -> bool { self <= 0 }
+  #[inline] fn is_int(self) -> bool { true }
+  #[inline] fn is_posint(self) -> bool { self > 0 }
+  #[inline] fn is_negint(self) -> bool { self < 0 }
+  #[inline] fn is_nonposint(self) -> bool { self <= 0 }
+  #[inline] fn is_nonnegint(self) -> bool { self >= 0 }
+  #[inline] fn is_evenint(self) -> bool { self%2 == 0 }
+  #[inline] fn is_oddint(self) -> bool { self%2 == 1 }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+impl Base for f64 {}
+impl Zero for f64 { const zero: f64 = 0.0; }
 impl Addition for f64 {}
 impl Subtraction for f64 {}
 impl Additive for f64 {}
-impl One for f64 {
-  const one: f64 = 1.0;
-}
+impl One for f64 { const one: f64 = 1.0; }
 impl Multiplication for f64 {}
 //impl Division for f64 { }
 //impl Multiplicative for f64 { }
 impl Embeds<f64> for f64 {}
 
-/*
-pub trait ExpLog : ...
-{
-  fn exp(self) -> Self; // etc.
-  fn log(self) -> Self; // etc.
+impl Classify for f64 {
+  #[inline] fn is_nan(self) -> bool { self.is_nan() }
+  #[inline] fn is_infinite(self) -> bool { self.is_infinite() }
+  #[inline] fn is_finite(self) -> bool { self.is_finite() }
+  #[inline] fn is_zero(self) -> bool { self == 0.0 }
+  #[inline] fn is_negzero(self) -> bool { self == 0.0 && 1.0_f64.copysign(self) < 0.0}
+  #[inline] fn is_real(self) -> bool { true }
+  #[inline] fn is_imag(self) -> bool { false }
+  #[inline] fn is_negreal(self) -> bool { self < 0.0 }
+  #[inline] fn is_posreal(self) -> bool { self > 0.0 }
+  #[inline] fn is_nonnegreal(self) -> bool { self >= 0.0 }
+  #[inline] fn is_nonposreal(self) -> bool { self <= 0.0 }
+  #[inline] fn is_int(self) -> bool { self == self.trunc() }
+  #[inline] fn is_posint(self) -> bool { self.is_int() && self.is_posreal() }
+  #[inline] fn is_negint(self) -> bool { self.is_int() && self.is_negreal() }
+  #[inline] fn is_nonposint(self) -> bool { self.is_int() && self.is_nonposreal() }
+  #[inline] fn is_nonnegint(self) -> bool { self.is_int() && self.is_nonnegreal() }
+  #[inline] fn is_evenint(self) -> bool {
+    const last_odd : f64 = 9007199254740991_f64; // 2^53-1
+    self.is_int()
+    && (self.abs() > last_odd
+        || (self.abs().trunc() as i64)%2 == 0)
+  }
+  #[inline] fn is_oddint(self) -> bool {
+    const last_odd : f64 = 9007199254740991_f64; // 2^53-1
+    self.is_int()
+    && self.abs() <= last_odd
+    && (self.abs().trunc() as i64)%2 == 1
+  }
 }
 
-pub trait Float {
-  const EPSILON : Self;
-  const NAN : Self;
-  const INFINITY : Self;
-  fn is_nan(self) -> bool;
-  fn is_infinite(self) -> bool;
-  fn is_finite(self) -> bool;
-}
-
-*/
 ////////////////////////////////////////////////////////////////////////////////

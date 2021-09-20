@@ -50,3 +50,4 @@ impl Gamma for c64 {
     //impls::gamma_spouge(11, self).log() // TODO
   }
 }
+

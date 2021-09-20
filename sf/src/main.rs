@@ -919,4 +919,51 @@ fn main() {
       sievert::impls::sievert_integrate(th, r64(25.0)).0,
       sievert::impls::sievert_asympt(th, r64(25.0)).0);
   }
+
+  if false {
+    println!("----------");
+    for n in [0, 57, -10] {
+      dbg!(n);
+      dbg!(n.is_nan());
+      dbg!(n.is_infinite());
+      dbg!(n.is_finite());
+      dbg!(n.is_zero());
+      dbg!(n.is_negzero());
+      dbg!(n.is_real());
+      dbg!(n.is_imag());
+      dbg!(n.is_negreal());
+      dbg!(n.is_posreal());
+      dbg!(n.is_nonnegreal());
+      dbg!(n.is_nonposreal());
+      dbg!(n.is_int());
+      dbg!(n.is_posint());
+      dbg!(n.is_negint());
+      dbg!(n.is_nonposint());
+      dbg!(n.is_nonnegint());
+      dbg!(n.is_evenint());
+      dbg!(n.is_oddint());
+    }
+    println!("----------");
+    for n in [0.0, 57.0, -10.0, -0.0, 0.5, 1e20-1.0] {
+      dbg!(n);
+      dbg!(n.is_nan());
+      dbg!(n.is_infinite());
+      dbg!(n.is_finite());
+      dbg!(n.is_zero());
+      dbg!(n.is_negzero());
+      dbg!(n.is_real());
+      dbg!(n.is_imag());
+      dbg!(n.is_negreal());
+      dbg!(n.is_posreal());
+      dbg!(n.is_nonnegreal());
+      dbg!(n.is_nonposreal());
+      dbg!(n.is_int());
+      dbg!(n.is_posint());
+      dbg!(n.is_negint());
+      dbg!(n.is_nonposint());
+      dbg!(n.is_nonnegint());
+      dbg!(n.is_evenint());
+      dbg!(n.is_oddint());
+    }
+  }
 }

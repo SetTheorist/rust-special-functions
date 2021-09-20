@@ -37,6 +37,7 @@ pub mod impls {
 }
 
 use crate::real::{*};
+// TODO: quick-crude for now; replace with better approach
 impl Erf for r64 {
   fn erf(self) -> r64 {
     if self.abs() < r64::one {
@@ -48,6 +49,25 @@ impl Erf for r64 {
   fn erfc(self) -> r64 {
     if self.abs() < r64::one {
       r64::one - impls::erf_series(self)
+    } else {
+      impls::erfc_contfrac2(self)
+    }
+  }
+}
+
+use crate::complex::{*};
+// TODO: quick-crude for now; replace with better approach
+impl Erf for c64 {
+  fn erf(self) -> c64 {
+    if μ(self) < r64::one {
+      impls::erf_series(self)
+    } else {
+      c64::one - impls::erfc_contfrac2(self)
+    }
+  }
+  fn erfc(self) -> c64 {
+    if μ(self) < r64::one {
+      c64::one - impls::erf_series(self)
     } else {
       impls::erfc_contfrac2(self)
     }
