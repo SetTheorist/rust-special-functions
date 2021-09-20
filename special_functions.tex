@@ -2271,12 +2271,19 @@ Asymptotic expansion:
 From~\cite{a&s}:
 As $x\to\infty$,
 \[ \O{S}(x,\theta) \sim \sqrt{\frac{\pi}{2x}} e^{-x} \erf(\theta\sqrt{x/2}) \]
+This can be derived by expanding $\sec\phi$ as a power-series at zero, taking the first 2 terms:
+$\sec\phi = 1+\frac{\phi^2}{2} + O(\phi^4)$ and integrating the resulting integral:
+$\int_0^\theta e^{-z(1+t^2/2)}\,dt$.
 
 Also, if $a_0=1$, $a_n=\frac{1\cdot3\cdot5\cdots(2n-1)}{2\cdot4\cdot6\cdots(2n)}$ then
 \[ \O{S}(x,\theta) = \O{S}(x,\pi/2) - \sum_{k=0}^\infty \al_k \cos(\theta)^{2k+1} E_{2k+2}(\frac{x}{\cos\theta}) \]
 for $x\geq0$, $0<\theta<\pi/2$.  ($E_n(z)=\int_1^\infty e^{-zt} t^{-n}\,dt$ are exponential integrals.)
 
 \[ \O{S}(x,\pi/2) = \O{Ki}_1(x) = \int_x^\infty \O{K}_0(t)\,dt \]
+
+We can derive the following expansion by expanding the exponential and integrating,
+but it doesn't seem particularly helpful for calculations:
+\[ \O{S}(x,\theta) = \sum_{n=0}^\infty(-x)^n \Hyper{2}{1}{1/2, (n+1)/2}{3/2}{\sin^2 \theta} \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Abramowitz functions}

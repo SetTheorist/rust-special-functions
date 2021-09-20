@@ -114,6 +114,7 @@ pub trait Roots: Field {
   fn cbrt_recip(self) -> Self { self.cbrt().recip() }
   fn nth_root(self, n: isize) -> Self;
 }
+pub fn sf_sqrt<V:Roots>(x:V) -> V { x.sqrt() }
 
 pub trait Bounded {
   const MIN_VALUE: Self;

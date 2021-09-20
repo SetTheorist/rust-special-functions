@@ -4,6 +4,8 @@ pub trait Erf {
   fn erf(self) -> Self;
   fn erfc(self) -> Self;
 }
+pub fn sf_erf<V:Erf>(z:V) -> V { z.erf() }
+pub fn sf_erfc<V:Erf>(z:V) -> V { z.erfc() }
 
 pub mod impls {
   use crate::algorithm::{contfrac_modlentz, sum_series};
@@ -31,14 +33,26 @@ pub mod impls {
     let terms = (1..).map(|n| (ι(-(2 * n - 1) * (2 * n)): V, x2 + (4 * n + 1)));
     sf_exp(-x.sqr()) * V::FRAC_1_SQRTPI * (x * 2) / contfrac_modlentz(x2 + 1, terms, V::mu_epsilon)
   }
+
 }
 
-/*
-pub fn erf<V:Value>(x:V) -> V {
-  if x.dabs() < 1.0 {
-    erf_series(x)
-  } else {
-    ι(1) - erfc(x)
+use crate::real::{*};
+impl Erf for r64 {
+  fn erf(self) -> r64 {
+    if self.abs() < r64::one {
+      impls::erf_series(self)
+    } else {
+      r64::one - impls::erfc_contfrac2(self)
+    }
+  }
+  fn erfc(self) -> r64 {
+    if self.abs() < r64::one {
+      r64::one - impls::erf_series(self)
+    } else {
+      impls::erfc_contfrac2(self)
+    }
   }
 }
-*/
+
+
+

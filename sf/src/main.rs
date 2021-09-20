@@ -40,6 +40,7 @@ mod orthopoly;
 mod poly;
 mod quad;
 mod real;
+mod sievert;
 mod traits;
 mod trig;
 mod util;
@@ -903,5 +904,19 @@ fn main() {
         trig::sf_sin(r64(1.0)).0
       );
     }
+  }
+
+  if true {
+    println!("-----\nSievert:");
+    let th = r64::PI/4;
+    println!("{:.16e}  {:.16e}",
+      sievert::impls::sievert_integrate(th, r64(1.0)).0,
+      sievert::impls::sievert_asympt(th, r64(1.0)).0);
+    println!("{:.16e}  {:.16e}",
+      sievert::impls::sievert_integrate(th, r64(5.0)).0,
+      sievert::impls::sievert_asympt(th, r64(5.0)).0);
+    println!("{:.16e}  {:.16e}",
+      sievert::impls::sievert_integrate(th, r64(25.0)).0,
+      sievert::impls::sievert_asympt(th, r64(25.0)).0);
   }
 }
