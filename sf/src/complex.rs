@@ -24,16 +24,12 @@ impl c64 {
 
 impl std::fmt::Display for c64 {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    if self.im < ι(0) {
-      self.re.fmt(f)?;
-      self.im.fmt(f)?;
-      write!(f, "ι")
-    } else {
-      self.re.fmt(f)?;
+    self.re.fmt(f)?;
+    if self.im >= ι(0) {
       write!(f, "+")?;
-      self.im.fmt(f)?;
-      write!(f, "ι")
     }
+    self.im.fmt(f)?;
+    write!(f, "ι")
   }
 }
 
@@ -357,17 +353,13 @@ impl Power<r64> for c64 {
 impl Power for c64 {
   fn pow(self, p: c64) -> c64 {
     // TODO: temporary quick implementation
+    let r = self.abs();
+    let th = self.arg();
     if p.im == 0 {
-      let r = self.abs();
-      let th = self.arg();
       c64::polar(r.pow(p.im), th * p.im)
     } else if p.re == 0 {
-      let r = self.abs();
-      let th = self.arg();
       c64::polar((-th * p.im).exp(), r.log() * p.im)
     } else {
-      let r = self.abs();
-      let th = self.arg();
       c64::polar(r.pow(p.re - th * p.im), r.log() * p.im + th * p.re)
     }
   }

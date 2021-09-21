@@ -141,20 +141,18 @@ impl Quad {
   }
 
   #[inline]
-  pub fn scale2(self, i: isize) -> Quad { Quad(libm::ldexp(self.0, i as i32), libm::ldexp(self.1, i as i32)) }
+  pub fn scale2(self, i: isize) -> Quad {
+    Quad(libm::ldexp(self.0, i as i32), libm::ldexp(self.1, i as i32))
+  }
 
   pub fn scale10(self, i: isize) -> Quad {
     if i < 0 {
       let mut q = self;
-      for _ in 0..(-i) {
-        q = q / 10.0;
-      }
+      for _ in 0..(-i) { q /= 10.0; }
       q
     } else if i > 0 {
       let mut q = self;
-      for _ in 0..i {
-        q = q * 10.0;
-      }
+      for _ in 0..i { q *= 10.0; }
       q
     } else {
       self
@@ -337,7 +335,7 @@ impl PartialEq<isize> for Quad {
 impl std::str::FromStr for Quad {
   type Err = ();
   fn from_str(s: &str) -> Result<Self, ()> {
-    if s.len() == 0 {
+    if s.is_empty() {
       return Err(());
     }
     let mut neg = false;
@@ -346,23 +344,17 @@ impl std::str::FromStr for Quad {
     let mut q = Quad(0.0, 0.0);
     for c in s.chars() {
       match c {
-        '-' => {
-          neg = true;
-        }
+        '-' => { neg = true; }
         '+' => {}
-        '.' => {
-          dec = true;
-        }
+        '.' => { dec = true; }
         //'e' => { }
         d => {
-          let v = ((d as u8) - ('0' as u8)) as f64;
-          if v > 9.0 || v < 0.0 {
+          let v = ((d as u8) - b'0') as f64;
+          if !(0.0<=v && v<=9.0) {
             return Err(());
           }
           q = q * 10.0 + v;
-          if dec {
-            e -= 1;
-          }
+          if dec { e -= 1; }
         }
       }
     }
@@ -409,7 +401,7 @@ impl std::fmt::Display for Quad {
         write!(f, ".")?;
       }
       let d = floor0(&q);
-      let dd = ((d as u8) + ('0' as u8)) as char;
+      let dd = ((d as u8) + b'0') as char;
       write!(f, "{}", dd)?;
       q = (q - d) * 10.0;
     }

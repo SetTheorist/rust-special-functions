@@ -89,7 +89,7 @@ where
     *s += a;
     Some(*s)
   })
-  .scan(ι(0.0 / 0.0): T, |s, t| {
+  .scan(ι(f64::NAN): T, |s, t| {
     if μ(*s - t) <= μ(*s) * meps {
       None
     } else {

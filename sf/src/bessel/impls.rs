@@ -87,7 +87,7 @@ pub fn bessel_j_recur_back<V: Value>(maxm: isize, n: isize, z: V) -> V {
       // desired value, but keep going to get scale-factor
       res = jjm;
     }
-    scale += if m != 1 { jjm.sqr() * 2 } else { jjm.sqr() * 1 };
+    scale += jjm.sqr() * (if m==1 {1} else {2});
     if abs(scale) > ι(1e20) {
       jjp2 /= 1024;
       jjp1 /= 1024;

@@ -8,11 +8,10 @@ impl<V: Value> OrthogonalPolynomial<V> for ChebyshevT<V> {
   fn domain(&self) -> (V, V) { (ι(-1), ι(1)) }
   fn coeff(&self, n: usize, k: usize) -> V { unimplemented!() }
   fn scale(&self, n: usize) -> V {
-    let PI: V = ι(3.14159265358979); // TODO: use Constants
     if n == 0 {
-      PI.sqrt()
+      V::PI.sqrt()
     } else {
-      (PI / 2).sqrt()
+      (V::PI/2).sqrt()
     }
   }
   fn value(&self, n: usize, x: V) -> V {

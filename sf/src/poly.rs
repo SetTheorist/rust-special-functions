@@ -66,18 +66,14 @@ impl<T> std::fmt::Display for Poly<T>
 where T: std::fmt::Display + Zero + PartialEq
 {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    let mut i = 0;
-    for c in &self.0 {
+    for (i,c) in self.0.iter().enumerate() {
       if i == 0 {
         std::fmt::Display::fmt(&c, f)?;
-      } else {
-        if c != &T::zero {
-          write!(f, "+")?;
-          std::fmt::Display::fmt(&c, f)?;
-          write!(f, "*x^{}", i)?;
-        }
+      } else if c != &T::zero {
+        write!(f, "+")?;
+        std::fmt::Display::fmt(&c, f)?;
+        write!(f, "*x^{}", i)?;
       }
-      i += 1;
     }
     write!(f, "")
   }

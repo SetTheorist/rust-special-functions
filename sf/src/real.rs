@@ -11,7 +11,60 @@ pub struct r64(pub f64);
 impl std::fmt::Display for r64 {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
     write!(f, "ρ")?;
-    self.0.fmt(f)
+    std::fmt::Display::fmt(&self.0, f)
+  }
+}
+
+impl std::fmt::LowerExp for r64 {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "ρ")?;
+    std::fmt::LowerExp::fmt(&self.0, f)
+  }
+}
+
+impl std::fmt::UpperExp for r64 {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "ρ")?;
+    std::fmt::UpperExp::fmt(&self.0, f)
+  }
+}
+
+// TODO: ignores formatting specifiers
+impl std::fmt::LowerHex for r64 {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    let b : u64 = unsafe{std::mem::transmute(self.0)};
+    write!(f, "ρ")?;
+    write!(f, "{:01x}", b>>63)?;
+    write!(f, ":")?;
+    write!(f, "{:03x}", (b>>52)&0x7FF)?;
+    write!(f, ":")?;
+    write!(f, "{:013x}", b&0x000F_FFFF_FFFF_FFFF)
+  }
+}
+
+// TODO: ignores formatting specifiers
+impl std::fmt::UpperHex for r64 {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    let b : u64 = unsafe{std::mem::transmute(self.0)};
+    write!(f, "ρ")?;
+    write!(f, "{:01X}", b>>63)?;
+    write!(f, ":")?;
+    write!(f, "{:03X}", (b>>52)&0x7FF)?;
+    write!(f, ":")?;
+    write!(f, "{:013X}", b&0x000F_FFFF_FFFF_FFFF)
+  }
+}
+
+// TODO: ignores formatting specifiers
+impl std::fmt::Binary for r64 {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    let b : u64 = unsafe{std::mem::transmute(self.0)};
+    write!(f, "ρ")?;
+    write!(f, "{:01b}", b>>63);
+    write!(f, ":")?;
+    write!(f, "{:011b}", (b>>52)&0x7FF)?;
+    write!(f, ":")?;
+    write!(f, "{:52b}", b&0x000F_FFFF_FFFF_FFFF)
   }
 }
 

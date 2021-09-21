@@ -212,6 +212,8 @@ pub trait Classify {
   fn is_evenint(self) -> bool;
   fn is_oddint(self) -> bool;
 
+  fn is_halfint(self) -> bool;
+
   // upper-half complex plane (positive imag part)?
   // positive real part?
 }
@@ -279,6 +281,7 @@ impl Classify for isize {
   #[inline] fn is_nonnegint(self) -> bool { self >= 0 }
   #[inline] fn is_evenint(self) -> bool { self%2 == 0 }
   #[inline] fn is_oddint(self) -> bool { self%2 == 1 }
+  #[inline] fn is_halfint(self) -> bool { true }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -323,6 +326,7 @@ impl Classify for f64 {
     && self.abs() <= last_odd
     && (self.abs().trunc() as i64)%2 == 1
   }
+  #[inline] fn is_halfint(self) -> bool { (self*2.0).is_int() }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -9,6 +9,15 @@
 #![allow(unused_imports)]
 #![allow(unused_parens)]
 #![allow(unused_variables)]
+#![allow(clippy::comparison_chain)]
+#![allow(clippy::eq_op)]
+#![allow(clippy::excessive_precision)]
+#![allow(clippy::float_cmp)]
+#![allow(clippy::manual_range_contains)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::suspicious_arithmetic_impl)]
+#![allow(clippy::suspicious_op_assign_impl)]
+#![allow(clippy::wrong_self_convention)]
 
 /*
           0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
@@ -602,7 +611,7 @@ fn main() {
     println!("{:?}", q_pi);
     println!("{}", q_pi.unwrap());
     let q_eulergamma = quad::Quad::from_str("0.57721566490153286060651209008240243104215933593992");
-    println!("{} {:?}", q_eulergamma, q_eulergamma);
+    println!("{} {:?}", q_eulergamma.unwrap(), q_eulergamma);
     let q_ln2 = quad::Quad::from_str("0.69314718055994530941723212145817656807").unwrap();
     {
       let mut dsum = 1.0;
@@ -610,7 +619,7 @@ fn main() {
       let dln2 = q_ln2.hi();
       let mut qsum = quad::Quad::new(1.0, 0.0);
       let mut t = quad::Quad::new(1.0, 0.0);
-      for i in 1..25 {
+      for i in 1..28 {
         dt = dt * dln2 / (i as f64);
         dsum += dt;
         t = t * q_ln2 / (i as f64);
@@ -966,4 +975,6 @@ fn main() {
       dbg!(n.is_oddint());
     }
   }
+  println!("{:.4e}  {:.4E}  {:.4}", r64::PI, r64::PI, r64::PI);
+  println!("{:b}  {:x}  {:X}", r64::PI, r64::PI, r64::PI);
 }
