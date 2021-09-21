@@ -373,6 +373,17 @@ impl std::str::FromStr for Quad {
 
 impl std::fmt::Display for Quad {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    // local simple flooring function
+    // assumes q >= 0.0
+    fn floor0(q:&Quad) -> f64 {
+      let q0f = q.0.floor();
+      if -q.1 > (q.0 - q0f) {
+        q0f - 1.0
+      } else {
+        q0f
+      }
+    }
+
     write!(f, "ξ")?;
     if self.0 == 0.0 {
       return write!(f, "0.0");
@@ -393,18 +404,11 @@ impl std::fmt::Display for Quad {
       q *= 10.0;
     }
 
-    // TODO: there seems to be a bug here, but it may be a symptom
-    // of a bug above (perhaps in qdmul()?)
-    // with floor() instead of trunc() this displays invalid characters
-    // and with trunc() it is not displaying all significant digits
-    // HMMM: probably an issue with negative LO part moving to significance!?
     for n in 0..33 {
-      //dbg!(q);
       if n == 1 {
         write!(f, ".")?;
       }
-      //let d = q.0.trunc();
-      let d = q.0.floor();
+      let d = floor0(&q);
       let dd = ((d as u8) + ('0' as u8)) as char;
       write!(f, "{}", dd)?;
       q = (q - d) * 10.0;

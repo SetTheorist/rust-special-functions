@@ -602,7 +602,7 @@ fn main() {
     println!("{:?}", q_pi);
     println!("{}", q_pi.unwrap());
     let q_eulergamma = quad::Quad::from_str("0.57721566490153286060651209008240243104215933593992");
-    println!("{:?}", q_eulergamma);
+    println!("{} {:?}", q_eulergamma, q_eulergamma);
     let q_ln2 = quad::Quad::from_str("0.69314718055994530941723212145817656807").unwrap();
     {
       let mut dsum = 1.0;
@@ -615,7 +615,7 @@ fn main() {
         dsum += dt;
         t = t * q_ln2 / (i as f64);
         qsum += t;
-        println!("{:4}  {}  {:?}  {}  {:?}", i, qsum, qsum, dsum, (qsum - 2.0) * 10.0);
+        println!("{:4}  {}  {}", i, qsum, dsum);
       }
     }
 
