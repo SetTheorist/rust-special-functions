@@ -1,5 +1,11 @@
 use crate::traits::*;
 
+// Trapezoidal
+// Erf / Tanh/Sinh ("stretched trapezoidal")
+// Simpson's
+// Gaussian &c.
+// adaptive? (may not need for purposes of spec.fun. implementations)
+
 // TODO: lots of other possibilities,
 // including returning a lot more information...
 pub trait Integrator<V> {

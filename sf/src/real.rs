@@ -4,6 +4,8 @@ use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 use crate::traits::*;
 
+// TODO: make r32 & c32 also?
+
 #[derive(Debug, Default, Clone, Copy, PartialOrd, PartialEq)]
 #[allow(non_camel_case_types)]
 pub struct r64(pub f64);
@@ -60,7 +62,7 @@ impl std::fmt::Binary for r64 {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
     let b : u64 = unsafe{std::mem::transmute(self.0)};
     write!(f, "ρ")?;
-    write!(f, "{:01b}", b>>63);
+    write!(f, "{:01b}", b>>63)?;
     write!(f, ":")?;
     write!(f, "{:011b}", (b>>52)&0x7FF)?;
     write!(f, ":")?;

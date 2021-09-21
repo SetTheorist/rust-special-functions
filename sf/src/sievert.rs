@@ -48,6 +48,8 @@ use crate::integration::{*};
 // just integrate the defining integral directly
 pub fn sievert_integrate<V:Value+Exp+Trig>(theta:V, z:V) -> V {
   // TODO: use a more sensible integration method!
+  // Gaussian integration should be better
+  // maybe integrate difference from asymptotic estimate?
   Trapezoidal::new(ι(0),theta,100).integrate(|t:V|sf_exp(-z/sf_cos(t)))
 }
 

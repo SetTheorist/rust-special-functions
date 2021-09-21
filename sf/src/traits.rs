@@ -5,15 +5,15 @@ use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 use crate::algorithm::{power_i, power_u};
 
 #[inline]
-pub fn ι<A, B: From<A>>(a: A) -> B { B::from(a) }
+pub fn ι<A, B:From<A>>(a: A) -> B { B::from(a) }
 
 // we assume for convenience that our basic values
 // are all Copy-able.
 // This excludes, for example, arbitrary-precision floats,
 // but we are not targeting such use cases...
-pub trait Base: Copy + Sized + PartialEq + Default + std::fmt::Debug + 'static {}
+pub trait Base: Copy+Sized+PartialEq+Default+std::fmt::Debug+'static {}
 
-pub trait Power<P = Self>: Base {
+pub trait Power<P=Self>: Base {
   fn pow(self, p: P) -> Self;
 }
 
@@ -21,11 +21,11 @@ pub trait Zero: Base {
   const zero: Self;
 }
 
-pub trait Addition: Base + Zero + Add<Self, Output = Self> + AddAssign<Self> {}
+pub trait Addition: Base+Zero+Add<Self,Output=Self>+AddAssign<Self> {}
 
-pub trait Subtraction: Base + Addition + Sub<Self, Output = Self> + SubAssign<Self> + Neg<Output = Self> {}
+pub trait Subtraction: Base+Addition+Sub<Self,Output=Self>+SubAssign<Self>+Neg<Output=Self> {}
 
-pub trait Additive: Addition + Subtraction {}
+pub trait Additive: Addition+Subtraction {}
 
 pub trait One: Base {
   const one: Self;
@@ -76,6 +76,7 @@ pub trait Multiplicative: Multiplication + Division {}
 
 // left-embedding has issues due to current compiler constraints
 // c.f. https://github.com/rust-lang/rust/issues/86635
+// can we get trait alias to work?
 pub trait Embeds<T>:
   Base
   + Add<T, Output = Self>
@@ -241,13 +242,19 @@ pub trait Constants {
   const FRAC_LOG2PI_2: Self;
 }
 
-pub trait Value: Field + Normed + Roots + Constants {}
 
-pub trait RealValue: Value + RealType {}
-impl<T> RealValue for T where T: Value + RealType {}
+pub trait Value: Base+Field+Normed+Roots+Constants {}
 
-pub trait ComplexValue: Value + ComplexType {}
-impl<T> ComplexValue for T where T: Value + ComplexType {}
+pub trait RealValue: Value+RealType {}
+impl<T> RealValue for T where T:Value+RealType {}
+
+pub trait ComplexValue: Value+ComplexType {}
+impl<T> ComplexValue for T where T:Value+ComplexType {}
+
+// TODO: maybe?
+pub trait RealComplexPair<R:RealValue,C:ComplexValue<RT=R>> {}
+// TODO: maybe?
+pub trait NarrowWidePair<N:Value,W:Value> {}
 
 ////////////////////////////////////////////////////////////////////////////////
 

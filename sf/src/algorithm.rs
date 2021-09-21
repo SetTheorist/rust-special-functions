@@ -61,10 +61,7 @@ where
   T: Additive,
   I: Iterator<Item = T>,
 {
-  it.scan(T::zero, |s, a| {
-    *s += a;
-    Some(*s)
-  })
+  it.scan(T::zero, |s, a| { *s += a; Some(*s) })
 }
 
 #[inline]
@@ -79,32 +76,23 @@ where
 ////////////////////////////////////////////////////////////////////////////////
 
 #[inline]
-pub fn sum_series_<T, I>(it: I, meps: T::NT) -> T
+pub fn sum_series_<T, I>(it: I, με: T::NT) -> T
 where
   T: Field + Normed,
   I: Iterator<Item = T>,
 {
   //cum_sums(it)
-  it.scan(T::zero, |s, a| {
-    *s += a;
-    Some(*s)
-  })
-  .scan(ι(f64::NAN): T, |s, t| {
-    if μ(*s - t) <= μ(*s) * meps {
-      None
-    } else {
-      *s = t;
-      Some(t)
-    }
-  })
-  .take(1000)
-  .last()
-  .unwrap()
+  it.scan(T::zero, |s, a| { *s += a; Some(*s) })
+    .scan(ι(f64::NAN): T,
+      |s, t| { if μ(*s - t) <= μ(*s) * με { None } else { *s = t; Some(t) } })
+    .take(1000)
+    .last()
+    .unwrap()
 }
 
 // TODO: "wrapped" version (generic over Kahan, e.g.)
 #[inline]
-pub fn sum_series<T, I>(it: I, meps: T::NT) -> T
+pub fn sum_series<T, I>(it: I, με: T::NT) -> T
 where
   T: Field + Normed,
   I: Iterator<Item = T>,
@@ -114,13 +102,8 @@ where
   for t in it {
     let old = sum;
     sum += t;
-    if μ(sum - old) <= μ(sum) * meps {
-      /*eprint!("^{}^",n);*/
-      break;
-    }
-    if n > 999 {
-      break;
-    }
+    if μ(sum - old) <= μ(sum) * με { break; }
+    if n > 999 { break; }
     n += 1;
   }
   sum
@@ -130,35 +113,24 @@ where
 // b0 + a1/(b1 + a2/(b2 + a3/(b3 + ...)))
 // (based on modified Lentz)
 #[inline]
-pub fn contfrac_modlentz<T, I>(b0: T, it: I, meps: T::NT) -> T
+pub fn contfrac_modlentz<T,I>(b0: T, it: I, με: T::NT) -> T
 where
   T: Field + Normed,
-  I: IntoIterator<Item = (T, T)>,
+  I: IntoIterator<Item=(T,T)>,
 {
-  let zeta = ι(T::epsilon.sqr());
-  let mut fj = b0;
-  if b0 == 0 {
-    fj = zeta;
-  }
+  let ζ = ι(T::epsilon.sqr());
+  let fix = |x:T| if x==0 {ζ} else {x};
+  let mut fj = fix(b0);
   let mut cj = fj;
-  let mut dj: T = ι(0);
+  let mut dj = T::zero;
   let mut n = 1;
   for (aj, bj) in it {
-    dj = bj + aj * dj;
-    if dj == 0 {
-      dj = zeta;
-    }
-    cj = bj + aj / cj;
-    if cj == 0 {
-      cj = zeta;
-    }
+    dj = fix(bj + aj * dj);
+    cj = fix(bj + aj / cj);
     dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
-    if μ(deltaj - 1) < meps || n > 1000 {
-      /*print!("~{}~",n);*/
-      break;
-    }
+    if μ(deltaj - 1) < με || n > 1000 { break; }
     n += 1;
   }
   fj

@@ -1,14 +1,3 @@
-//#![feature(let_chains)]
-#![feature(trait_alias)]
-#![feature(type_ascription)]
-#![allow(confusable_idents)]
-#![allow(dead_code)]
-#![allow(mixed_script_confusables)]
-#![allow(non_snake_case)]
-#![allow(non_upper_case_globals)]
-#![allow(unused_imports)]
-#![allow(unused_parens)]
-#![allow(unused_variables)]
 #![allow(clippy::comparison_chain)]
 #![allow(clippy::eq_op)]
 #![allow(clippy::excessive_precision)]
@@ -18,6 +7,16 @@
 #![allow(clippy::suspicious_arithmetic_impl)]
 #![allow(clippy::suspicious_op_assign_impl)]
 #![allow(clippy::wrong_self_convention)]
+#![allow(confusable_idents)]
+#![allow(dead_code)]
+#![allow(mixed_script_confusables)]
+#![allow(non_snake_case)]
+#![allow(non_upper_case_globals)]
+#![allow(unused_imports)]
+#![allow(unused_parens)]
+#![allow(unused_variables)]
+#![feature(trait_alias)]
+#![feature(type_ascription)]
 
 /*
           0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
@@ -32,6 +31,7 @@ U+03Ex 	Ϡ 	ϡ 	Ϣ 	ϣ 	Ϥ 	ϥ 	Ϧ 	ϧ 	Ϩ 	ϩ 	Ϫ 	ϫ 	Ϭ 	ϭ 	Ϯ 	ϯ
 U+03Fx 	ϰ 	ϱ 	ϲ 	ϳ 	ϴ 	ϵ 	϶ 	Ϸ 	ϸ 	Ϲ 	Ϻ 	ϻ 	ϼ 	Ͻ 	Ͼ 	Ͽ
 */
 
+mod airy;
 mod algorithm;
 mod bessel;
 mod complex;
@@ -977,4 +977,14 @@ fn main() {
   }
   println!("{:.4e}  {:.4E}  {:.4}", r64::PI, r64::PI, r64::PI);
   println!("{:b}  {:x}  {:X}", r64::PI, r64::PI, r64::PI);
+
+  if true {
+    println!("-----");
+    println!("Airy:");
+    println!("{:?}", airy::impls::airy_series(r64(0.5)));
+    println!("{:?}", airy::impls::airy_series(r64(1.0)));
+    println!("{} {}",
+      airy::impls::airy_series(c64{re:r64(1.0),im:r64(1.0)}).0,
+      airy::impls::airy_series(c64{re:r64(1.0),im:r64(1.0)}).1);
+  }
 }
