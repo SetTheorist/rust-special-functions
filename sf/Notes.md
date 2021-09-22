@@ -7,7 +7,7 @@ Random jottings:
 
 ## Implementation levels
 
-** Precision: **
+**Precision:**
 - unimplemented ~0 digits
 - low ~3 digits
 - single rough ~6 digits
@@ -20,9 +20,9 @@ Random jottings:
 - perfect ~full double-double or quadruple-precision with correct rounding
 - arbitrary ~arbitrary precision (requires high-precision floats)
 
-** Coverage: **
+**Coverage:**
 
-** Performance: **
+**Performance:**
 (use, say built-in exp() as unit of performance, or maybe fp +/*?)
 - ultra ~ 1
 - fast ~ <10
