@@ -544,9 +544,9 @@ fn main() {
     //println!("{} {:.16e} {}", 51.0, gamma_asympt(51.0), sf_factorial_exact(50));
     //println!("-----");
     println!("{} {:.16e} {}", 0.5, gamma::impls::gamma_spouge(11, r64(0.5)).0, 3.1415926535897932384626433_f64.sqrt());
-    println!("{} {:.16e} {}", 3.0, gamma::impls::gamma_spouge(11, r64(3.0)).0, sf_factorial_exact(2));
-    println!("{} {:.16e} {}", 13.0, gamma::impls::gamma_spouge(11, r64(13.0)).0, sf_factorial_exact(12));
-    println!("{} {:.16e} {}", 40.0, gamma::impls::gamma_spouge(11, r64(40.0)).0, sf_factorial_exact(39));
+    println!("{} {:.16e} {}", 3.0, gamma::impls::gamma_spouge(11, r64(3.0)).0, sf_factorial_approx(2));
+    println!("{} {:.16e} {}", 13.0, gamma::impls::gamma_spouge(11, r64(13.0)).0, sf_factorial_approx(12));
+    println!("{} {:.16e} {}", 40.0, gamma::impls::gamma_spouge(11, r64(40.0)).0, sf_factorial_approx(39));
     //println!("{} {:.16e} {}", 100.0, gamma::impls::gamma_spouge(11,r64(100.0)).0, sf_factorial_exact(99));
     println!("-----");
     println!(
@@ -555,9 +555,9 @@ fn main() {
       gamma::impls::lngamma_lanczos_7(r64(0.5)).exp().0,
       3.1415926535897932384626433_f64.sqrt()
     );
-    println!("{} {:.16e} {}", 3.0, gamma::impls::lngamma_lanczos_7(r64(3.0)).exp().0, sf_factorial_exact(2));
-    println!("{} {:.16e} {}", 13.0, gamma::impls::lngamma_lanczos_7(r64(13.0)).exp().0, sf_factorial_exact(12));
-    println!("{} {:.16e} {}", 40.0, gamma::impls::lngamma_lanczos_7(r64(40.0)).exp().0, sf_factorial_exact(39));
+    println!("{} {:.16e} {}", 3.0, gamma::impls::lngamma_lanczos_7(r64(3.0)).exp().0, sf_factorial_approx(2));
+    println!("{} {:.16e} {}", 13.0, gamma::impls::lngamma_lanczos_7(r64(13.0)).exp().0, sf_factorial_approx(12));
+    println!("{} {:.16e} {}", 40.0, gamma::impls::lngamma_lanczos_7(r64(40.0)).exp().0, sf_factorial_approx(39));
     //println!("{} {:.16e} {}", 100.0, gamma::impls::lngamma_lanczos_7(r64(100.0)).exp().0, sf_factorial_exact(99));
     let z = c64::rect(ι(0), ι(1));
     println!("z = {}  1/z={}", z, ι(1): c64 / z);
@@ -585,9 +585,9 @@ fn main() {
       gamma::impls::lngamma_lanczos_15(r64(0.5)).exp().0,
       3.1415926535897932384626433_f64.sqrt()
     );
-    println!("{} {:.16e} {}", 3.0, gamma::impls::lngamma_lanczos_15(r64(3.0)).exp().0, sf_factorial_exact(2));
-    println!("{} {:.16e} {}", 13.0, gamma::impls::lngamma_lanczos_15(r64(13.0)).exp().0, sf_factorial_exact(12));
-    println!("{} {:.16e} {}", 40.0, gamma::impls::lngamma_lanczos_15(r64(40.0)).exp().0, sf_factorial_exact(39));
+    println!("{} {:.16e} {}", 3.0, gamma::impls::lngamma_lanczos_15(r64(3.0)).exp().0, sf_factorial_approx(2));
+    println!("{} {:.16e} {}", 13.0, gamma::impls::lngamma_lanczos_15(r64(13.0)).exp().0, sf_factorial_approx(12));
+    println!("{} {:.16e} {}", 40.0, gamma::impls::lngamma_lanczos_15(r64(40.0)).exp().0, sf_factorial_approx(39));
     //println!("{} {:.16e} {}", 100.0, gamma::impls::lngamma_lanczos_15(r64(100.0)).exp().0, sf_factorial_exact(99));
   }
 

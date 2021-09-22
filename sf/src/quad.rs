@@ -142,7 +142,8 @@ impl Quad {
 
   #[inline]
   pub fn scale2(self, i: isize) -> Quad {
-    Quad(libm::ldexp(self.0, i as i32), libm::ldexp(self.1, i as i32))
+    // TODO: replace with ldexp() functionality
+    Quad(self.0 * 2.0_f64.powi(i as i32), self.1 * 2.0_f64.powi(i as i32))
   }
 
   pub fn scale10(self, i: isize) -> Quad {

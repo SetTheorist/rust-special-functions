@@ -135,3 +135,23 @@ where
   }
   fj
 }
+
+/*
+// TODO: Steeds (forward) cont.frac. algorithm
+sf_cf_steeds :: (Value v) => [v] -> [v] -> v
+sf_cf_steeds (a1:as) (b0:b1:bs) =
+    let !c0 = b0
+        !d1 = 1/b1
+        !delc1 = a1*d1
+        !c1 = c0 + delc1
+    in recur c1 delc1 d1 as bs
+    where
+      !eps = 5e-16
+      recur !cn' !delcn' !dn' !(an:as) !(bn:bs) = 
+        let !dn = 1/(dn'*an+bn)
+            !delcn = (bn*dn - 1)*delcn'
+            !cn = cn' + delcn
+        in if cn == cn' || (rabs delcn)<eps || is_nan cn
+           then cn
+           else (recur cn delcn dn as bs)
+*/

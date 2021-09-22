@@ -5,7 +5,6 @@ pub trait Airy : Sized {
   fn airy_aibi(self) -> (Self,Self);
 }
 
-
 pub mod impls {
 use crate::traits::*;
 use crate::exp::*;

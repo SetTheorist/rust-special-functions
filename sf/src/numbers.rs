@@ -5,6 +5,7 @@ pub fn sf_factorial_approx(n: usize) -> f64 {
   (1..=n).map(|i| i as f64).product()
 }
 
+/*
 use num::bigint::BigInt;
 pub fn sf_factorial_exact(n: usize) -> BigInt {
   if n == 0 {
@@ -12,6 +13,7 @@ pub fn sf_factorial_exact(n: usize) -> BigInt {
   }
   (1..=n).map(|i| ι(i): BigInt).product()
 }
+*/
 
 pub fn sf_binomial_approx(n: usize, k: usize) -> f64 {
   //sf_factorial_exact(n) / sf_factorial_exact(k) / sf_factorial_exact(n-k)

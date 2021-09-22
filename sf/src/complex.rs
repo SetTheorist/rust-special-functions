@@ -94,7 +94,7 @@ impl Div<c64> for c64 {
     }
   }
 }
-// TODO: complex remainder
+// TODO: complex remainder (think of as (2d) vector ...)
 impl Rem<c64> for c64 {
   type Output = c64;
   #[inline]
