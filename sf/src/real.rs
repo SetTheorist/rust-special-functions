@@ -70,11 +70,11 @@ impl std::fmt::Binary for r64 {
   }
 }
 
-impl From<f64> for r64 {
+impl const From<f64> for r64 {
   #[inline]
   fn from(x: f64) -> r64 { r64(x) }
 }
-impl From<isize> for r64 {
+impl const From<isize> for r64 {
   #[inline]
   fn from(x: isize) -> r64 { r64(x as f64) }
 }
@@ -82,31 +82,31 @@ impl From<isize> for r64 {
 ////////////////////////////////////////////////////////////////////////////////
 
 macro_rules! add_ops {
-  ($opt:ident, $op:ident; $opassignt:ident, $opassign:ident) => {
-    impl $opt<r64> for r64 {
+  ($x:tt, $opt:ident, $op:ident; $opassignt:ident, $opassign:ident) => {
+    impl const $opt<r64> for r64 {
       type Output = r64;
       #[inline]
-      fn $op(self, b: r64) -> r64 { r64(self.0.$op(b.0)) }
+      fn $op(self, b: r64) -> r64 { r64(self.0 $x b.0) }
     }
-    impl $opt<f64> for r64 {
+    impl const $opt<f64> for r64 {
       type Output = r64;
       #[inline]
-      fn $op(self, b: f64) -> r64 { r64(self.0.$op(b)) }
+      fn $op(self, b: f64) -> r64 { r64(self.0 $x b) }
     }
-    impl $opt<r64> for f64 {
+    impl const $opt<r64> for f64 {
       type Output = r64;
       #[inline]
-      fn $op(self, b: r64) -> r64 { r64(self.$op(b.0)) }
+      fn $op(self, b: r64) -> r64 { r64(self $x b.0) }
     }
-    impl $opt<isize> for r64 {
+    impl const $opt<isize> for r64 {
       type Output = r64;
       #[inline]
-      fn $op(self, b: isize) -> r64 { r64(self.0.$op(b as f64)) }
+      fn $op(self, b: isize) -> r64 { r64(self.0 $x (b as f64)) }
     }
-    impl $opt<r64> for isize {
+    impl const $opt<r64> for isize {
       type Output = r64;
       #[inline]
-      fn $op(self, b: r64) -> r64 { r64((self as f64).$op(b.0)) }
+      fn $op(self, b: r64) -> r64 { r64((self as f64) $x b.0) }
     }
 
     impl $opassignt<r64> for r64 {
@@ -124,11 +124,11 @@ macro_rules! add_ops {
   };
 }
 
-add_ops!(Add, add; AddAssign, add_assign);
-add_ops!(Sub, sub; SubAssign, sub_assign);
-add_ops!(Mul, mul; MulAssign, mul_assign);
-add_ops!(Div, div; DivAssign, div_assign);
-add_ops!(Rem, rem; RemAssign, rem_assign);
+add_ops!(+, Add, add; AddAssign, add_assign);
+add_ops!(-, Sub, sub; SubAssign, sub_assign);
+add_ops!(*, Mul, mul; MulAssign, mul_assign);
+add_ops!(/, Div, div; DivAssign, div_assign);
+add_ops!(%, Rem, rem; RemAssign, rem_assign);
 
 impl PartialEq<isize> for r64 {
   fn eq(&self, rhs: &isize) -> bool { self.eq(&(ι(*rhs): r64)) }
@@ -137,7 +137,7 @@ impl PartialEq<f64> for r64 {
   fn eq(&self, rhs: &f64) -> bool { self.eq(&(ι(*rhs): r64)) }
 }
 
-impl Neg for r64 {
+impl const Neg for r64 {
   type Output = r64;
   #[inline]
   fn neg(self) -> r64 { r64(-self.0) }
@@ -189,15 +189,11 @@ impl Constants for r64 {
 }
 
 impl Base for r64 {}
-impl Zero for r64 {
-  const zero: r64 = r64(0.0);
-}
+impl Zero for r64 { const zero: r64 = r64(0.0); }
 impl Addition for r64 {}
 impl Subtraction for r64 {}
 impl Additive for r64 {}
-impl One for r64 {
-  const one: r64 = r64(1.0);
-}
+impl One for r64 { const one: r64 = r64(1.0); }
 impl Multiplication for r64 {}
 impl Division for r64 {}
 impl Multiplicative for r64 {}
@@ -216,6 +212,7 @@ impl Normed for r64 {
   type NT = Self;
   const epsilon: Self = r64(f64::EPSILON);
   lift1!(abs, abs);
+  lift1!(vabs, abs);
   lift1!(signum, signum);
   #[inline]
   fn fabs(self) -> f64 { self.abs().0 }

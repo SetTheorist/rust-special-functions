@@ -24,22 +24,38 @@ impl c64 {
 
 impl std::fmt::Display for c64 {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    self.re.fmt(f)?;
-    if self.im >= ι(0) {
-      write!(f, "+")?;
-    }
-    self.im.fmt(f)?;
+    std::fmt::Display::fmt(&self.re, f)?;
+    if self.im >= ι(0) { write!(f, "+")?; }
+    std::fmt::Display::fmt(&self.im, f)?;
     write!(f, "ι")
   }
 }
 
-impl From<r64> for c64 {
-  #[inline]
-  fn from(x: r64) -> c64 { c64 { re: x, im: ι(0) } }
+impl std::fmt::LowerExp for c64 {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    std::fmt::LowerExp::fmt(&self.re, f)?;
+    if self.im >= ι(0) { write!(f, "+")?; }
+    std::fmt::LowerExp::fmt(&self.im, f)?;
+    write!(f, "ι")
+  }
 }
-impl From<f64> for c64 {
+
+impl std::fmt::UpperExp for c64 {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    std::fmt::UpperExp::fmt(&self.re, f)?;
+    if self.im >= ι(0) { write!(f, "+")?; }
+    std::fmt::UpperExp::fmt(&self.im, f)?;
+    write!(f, "ι")
+  }
+}
+
+impl const From<r64> for c64 {
   #[inline]
-  fn from(x: f64) -> c64 { c64 { re: ι(x), im: ι(0) } }
+  fn from(x: r64) -> c64 { c64 { re:x, im:r64::zero } }
+}
+impl const From<f64> for c64 {
+  #[inline]
+  fn from(x: f64) -> c64 { c64 { re:r64::from(x), im:r64::zero } }
 }
 impl From<isize> for c64 {
   #[inline]
@@ -310,6 +326,8 @@ impl Normed for c64 {
     // TODO: robustify
     (self.re * self.re + self.im * self.im).sqrt()
   }
+  #[inline]
+  fn vabs(self) -> Self { c64{re:self.abs(),im:r64(0.0)} }
   #[inline]
   fn fabs(self) -> f64 { self.abs().0 }
   #[inline]

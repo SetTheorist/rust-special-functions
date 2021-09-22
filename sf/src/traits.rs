@@ -151,6 +151,7 @@ pub trait Normed: Base + From<Self::NT> {
   type NT: Field + Ordered;
   const epsilon: Self::NT;
   fn abs(self) -> Self::NT;
+  fn vabs(self) -> Self;
   fn fabs(self) -> f64;
   // self/|self|
   fn signum(self) -> Self;
@@ -160,6 +161,8 @@ pub trait Normed: Base + From<Self::NT> {
 }
 #[inline]
 pub fn abs<T: Normed>(x: T) -> T::NT { x.abs() }
+#[inline]
+pub fn vabs<T: Normed>(x: T) -> T { x.vabs() }
 #[inline]
 pub fn fabs<T: Normed>(x: T) -> f64 { x.fabs() }
 #[inline]

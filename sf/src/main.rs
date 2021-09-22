@@ -15,6 +15,8 @@
 #![allow(unused_imports)]
 #![allow(unused_parens)]
 #![allow(unused_variables)]
+#![feature(const_fn_floating_point_arithmetic)]
+#![feature(const_trait_impl)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
 
@@ -33,6 +35,7 @@ U+03Fx 	ϰ 	ϱ 	ϲ 	ϳ 	ϴ 	ϵ 	϶ 	Ϸ 	ϸ 	Ϲ 	Ϻ 	ϻ 	ϼ 	Ͻ 	Ͼ 	Ͽ
 
 mod airy;
 mod algorithm;
+mod basic;
 mod bessel;
 mod complex;
 mod dawson;
@@ -446,7 +449,7 @@ fn main() {
       let n = 3;
       let x = r64(x);
       let myj = sf_bessel_j(n, x);
-      println!("J_{}({}) = {:.16e}  {:.16e}  {}", n, x, myj.0, j3x, rel(j3x, myj.0));
+      println!("J_{}({}) = {:.16e}  {:.16e}  err={}", n, x, myj.0, j3x, util::relerr(ι(j3x), myj));
     }
   }
 
@@ -568,8 +571,8 @@ fn main() {
     let z = c64::rect(ι(3), ι(1));
     println!("z = {}", z);
     println!("1/z = {}", ι(1): c64 / z);
-    println!("log(z) = {}", sf_log(z));
-    println!("exp(z) = {}", sf_exp(z));
+    println!("log(z) = {:.16e}", sf_log(z));
+    println!("exp(z) = {:e}", sf_exp(z));
     println!("exp(log(z)) = {}", sf_exp(sf_log(z)));
     println!("log(exp(z)) = {}", sf_log(sf_exp(z)));
     println!("lngamma(z) = {}", gamma::impls::lngamma_lanczos_7(z));
@@ -983,8 +986,44 @@ fn main() {
     println!("Airy:");
     println!("{:?}", airy::impls::airy_series(r64(0.5)));
     println!("{:?}", airy::impls::airy_series(r64(1.0)));
-    println!("{} {}",
+    println!("{:e} {:e}",
       airy::impls::airy_series(c64{re:r64(1.0),im:r64(1.0)}).0,
       airy::impls::airy_series(c64{re:r64(1.0),im:r64(1.0)}).1);
   }
+
+  if true {
+    println!("-----");
+    let x = r64(1.0e-300);
+    println!("{:.16e}  {:.16e}  {:.16e}", x.sqrt(), basic::sqrt_newton(x), basic::sqrt_halley(x));
+    let x = r64(2.0);
+    println!("{:.16e}  {:.16e}  {:.16e}", x.sqrt(), basic::sqrt_newton(x), basic::sqrt_halley(x));
+    let x = r64(65.0);
+    println!("{:.16e}  {:.16e}  {:.16e}", x.sqrt(), basic::sqrt_newton(x), basic::sqrt_halley(x));
+    let x = r64(1.23451e20);
+    println!("{:.16e}  {:.16e}  {:.16e}", x.sqrt(), basic::sqrt_newton(x), basic::sqrt_halley(x));
+    let x = r64(1.2e300);
+    println!("{:.16e}  {:.16e}  {:.16e}", x.sqrt(), basic::sqrt_newton(x), basic::sqrt_halley(x));
+    let x = c64{re:r64(2.0),im:r64(2.0)};
+    println!("{:.16e}  {:.16e}  {:.16e}", x.sqrt(), basic::sqrt_newton(x), basic::sqrt_halley(x));
+    println!("-");
+    let x = r64(2.0);
+    println!("{:.16e}  {:.16e}", x.cbrt(), basic::cbrt_newton(x));
+    let x = r64(64.0);
+    println!("{:.16e}  {:.16e}", x.cbrt(), basic::cbrt_newton(x));
+    let x = r64(1e20);
+    println!("{:.16e}  {:.16e}", x.cbrt(), basic::cbrt_newton(x));
+    let x = c64{re:r64(2.0),im:r64(2.0)};
+    println!("{:.16e}  {:.16e}", x.cbrt(), basic::cbrt_newton(x));
+    println!("-");
+    let x = r64(2.0);
+    println!("{:.16e}  {:.16e}", x.pow(r64(1.0/7.0)), basic::nthrt_newton(x, 7));
+    let x = r64(64.0);
+    println!("{:.16e}  {:.16e}", x.pow(r64(1.0/7.0)), basic::nthrt_newton(x, 7));
+    let x = r64(1e20);
+    println!("{:.16e}  {:.16e}", x.pow(r64(1.0/7.0)), basic::nthrt_newton(x, 7));
+    let x = c64{re:r64(2.0),im:r64(2.0)};
+    println!("{:.16e}  {:.16e}", x.pow(r64(1.0/7.0)), basic::nthrt_newton(x, 7));
+
+  }
 }
+
