@@ -11,8 +11,19 @@ paste = "*"
 #for eigenvalue calcs:
 #nalgebra = "*"
 
-#approx = "*"
+#fast, pure rust bigints:
+#ibig = "*"
+
+#microbenchmarking:
 #criterion = "*"
+
+#for compile-time configuration:
+#cfg_it = "*"
+
+#static assertions
+#static_assertions = "*"
+
+#approx = "*"
 #num-bigint = "*"
 #num-complex = "*"
 #num-integer = "*"

@@ -21,11 +21,25 @@ pub trait Zero: Base {
   const zero: Self;
 }
 
-pub trait Addition: Base+Zero+Add<Self,Output=Self>+AddAssign<Self> {}
+pub trait Addition:
+  Base
+  + Zero
+  + Add<Self, Output=Self>
+  + AddAssign<Self>
+{}
 
-pub trait Subtraction: Base+Addition+Sub<Self,Output=Self>+SubAssign<Self>+Neg<Output=Self> {}
+pub trait Subtraction:
+  Base
+  + Addition
+  + Sub<Self, Output=Self>
+  + SubAssign<Self>
+  + Neg<Output=Self>
+{}
 
-pub trait Additive: Addition+Subtraction {}
+pub trait Additive:
+  Addition
+  + Subtraction
+{}
 
 pub trait One: Base {
   const one: Self;

@@ -19,6 +19,14 @@
 #![feature(const_trait_impl)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
+//#![features(optimize_attribute)] // [#optimize(speed)]
+//#![features(never_type)]
+//#![features(marker_trait_attr)] // #[marker]
+// no_std??
+
+//
+// loop { break returnValue; }  
+//
 
 /*
           0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
@@ -1025,5 +1033,31 @@ fn main() {
     println!("{:.16e}  {:.16e}", x.pow(r64(1.0/7.0)), basic::nthrt_newton(x, 7));
 
   }
+
+  if false {
+    println!("{} {} {}",
+      basic::lerp(r64(1.0), r64(3.0), r64(0.00)),
+      basic::lerp(r64(1.0), r64(3.0), r64(0.25)),
+      basic::lerp(r64(1.0), r64(3.0), r64(1.00)));
+    println!("{} {} {}",
+      basic::lerp(r64(1.0), r64(1.0+1e-12), r64(0.00)),
+      basic::lerp(r64(1.0), r64(1.0+1e-12), r64(0.25)),
+      basic::lerp(r64(1.0), r64(1.0+1e-12), r64(1.00)));
+  }
+
+  if true {
+    let x = c64::rect(r64::PI, ι(2.5));
+    let a = c64::rect(ι(1.0), ι(1.0));
+    let b = c64::rect(ι(1.0), ι(-1.0));
+    println!("x={}  a={}  b={}", x, a, b);
+    println!("x%a={}", x % a);
+    println!("x%b={}", x % b);
+    println!("x%(1,i)={}", x % (c64{re:ι(1),im:ι(0)},c64{re:ι(0),im:ι(1)}));
+    println!("x%(a,b)={}", x % (a,b));
+    println!("x%(b,a)={}", x % (b,a));
+    println!("x%(-a,-b)={}", x % (-a,-b));
+    println!("x%(-b,-a)={}", x % (-b,-a));
+  }
+
 }
 

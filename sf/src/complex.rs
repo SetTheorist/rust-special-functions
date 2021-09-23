@@ -110,11 +110,24 @@ impl Div<c64> for c64 {
     }
   }
 }
-// TODO: complex remainder (think of as (2d) vector ...)
+
 impl Rem<c64> for c64 {
   type Output = c64;
   #[inline]
-  fn rem(self, rhs: c64) -> c64 { unimplemented!("c64::rem::<c64>({:?},{:?})", self, rhs) }
+  fn rem(self, rhs: c64) -> c64 {
+    let n = (self.re*rhs.re + self.im*rhs.im) / (rhs.re.sqr() + rhs.im.sqr());
+    self - rhs*n.floor()
+  }
+}
+
+impl Rem<(c64,c64)> for c64 {
+  type Output = c64;
+  #[inline]
+  fn rem(self, (a,b):(c64,c64)) -> c64 {
+    let a = a%b;
+    let b = b%a;
+    (self%a)%b
+  }
 }
 
 impl Neg for c64 {
@@ -299,6 +312,7 @@ impl Multiplicative for c64 {}
 impl Embeds<isize> for c64 {}
 impl Embeds<f64> for c64 {}
 impl Embeds<r64> for c64 {}
+impl Embeds<c64> for c64 {}
 impl Field for c64 {}
 
 impl Roots for c64 {

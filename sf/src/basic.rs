@@ -1,5 +1,21 @@
 use crate::traits::*;
 
+////////////////////////////////////////////////////////////////////////////////
+
+#[inline]
+pub fn lerp<V:Value,T:Value+Ordered>(a:V, b:V, t:T) -> V
+  where V:Embeds<T>
+{
+  if t<ι(0.5) {a+(b-a)*t} else {b-(b-a)*(-t+1.0)}
+}
+
+// TODO:
+// splines: cubic, B-splines, general
+// multi-point linear interpolation
+// n-dim. interpolation
+
+////////////////////////////////////////////////////////////////////////////////
+
 // Newton's method:
 // x' = x - f(x)/f'(x)
 //
