@@ -369,6 +369,7 @@ impl Normed for c64 {
 
 impl ComplexType for c64 {
   type RT = r64;
+  const I : c64 = c64{re:r64(0.0), im:r64(1.0)};
   #[inline]
   fn real(self) -> Self::RT { self.re }
   #[inline]

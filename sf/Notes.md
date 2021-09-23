@@ -36,20 +36,19 @@ ldexp: ...  Guard/Round/Sticky ...
 ## Outline
 - Basic, Exp, Log, Numbers, Classify, Constants
 - Trig
-- Gamma, digamma, polygamma
+- Gamma, digamma, polygamma, Beta
 - Dilog, Polylog
-- Erf
+- Erf, Fresnel (C,S), Faddeeva, Dawson
 - Zeta, Hurwitz, Lerch Phi
 - Incomplete Gamma
-- Bessel, Airy
+- Bessel, Airy, Kelvin, Struve, Anger, Weber
 - OrthoPoly
 - ExpInt, LogInt, CosInt, SinInt
 - Probability distributions (etc.)
-- Theta
-- Elliptic, beta, eta, lambda
+- Theta; Elliptic, beta, eta, lambda; Jacobian elliptic
 - PCF
 - Spheroidal wafe
-- Hypergeometrics, G
+- Hypergeometrics, confluent, G
 - Lambert
 - Misc.
   - Debye
@@ -59,9 +58,7 @@ ldexp: ...  Guard/Round/Sticky ...
   - Abramowitz 1 & 2
   - Bose-Einstein
   - Coulomb Wafe
-  - Fresnel C,S
   - Legendre P,Q
-  - Struve
   - Scorer gi, hi
   - Voight u,v
   -
@@ -70,6 +67,7 @@ ldexp: ...  Guard/Round/Sticky ...
   - Heun
   - Painleve'
   - Coulomb
+- Math finance: option pricing, etc.
 
 **Integration**
 - trapezoidal

@@ -183,6 +183,7 @@ pub fn μ<T: Normed>(x: T) -> T::NT { x.mu() }
 pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT> //+ Embeds<Complex<f64>>
 {
   type RT: Field + Ordered;
+  const I: Self;
   fn real(self) -> Self::RT;
   fn imag(self) -> Self::RT;
   fn arg(self) -> Self::RT;
