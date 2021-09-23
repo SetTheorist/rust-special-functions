@@ -22,11 +22,12 @@
 //#![features(optimize_attribute)] // [#optimize(speed)]
 //#![features(never_type)]
 //#![features(marker_trait_attr)] // #[marker]
-// no_std??
 
+// ** IDEAS, REMINDERS:
 //
 // loop { break returnValue; }  
-//
+// no_std??
+// c.f. Haskell Numeric.Compensated (E.Kmett) vs. qd/Quad
 
 /*
           0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F

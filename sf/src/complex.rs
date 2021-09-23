@@ -162,7 +162,7 @@ impl ShrAssign<isize> for c64 {
 
 macro_rules! scalar_impls {
   ($t:ty) => {
-    impl Add<$t> for c64 {
+    impl const Add<$t> for c64 {
       type Output = c64;
       #[inline]
       fn add(self, rhs: $t) -> c64 {
@@ -171,7 +171,7 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
-    impl Add<c64> for $t {
+    impl const Add<c64> for $t {
       type Output = c64;
       #[inline]
       fn add(self, rhs: c64) -> c64 {
@@ -180,7 +180,7 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
-    impl Sub<$t> for c64 {
+    impl const Sub<$t> for c64 {
       type Output = c64;
       #[inline]
       fn sub(self, rhs: $t) -> c64 {
@@ -189,7 +189,7 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
-    impl Sub<c64> for $t {
+    impl const Sub<c64> for $t {
       type Output = c64;
       #[inline]
       fn sub(self, rhs: c64) -> c64 {
@@ -198,7 +198,7 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
-    impl Mul<$t> for c64 {
+    impl const Mul<$t> for c64 {
       type Output = c64;
       #[inline]
       fn mul(self, rhs: $t) -> c64 {
@@ -207,7 +207,7 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
-    impl Mul<c64> for $t {
+    impl const Mul<c64> for $t {
       type Output = c64;
       #[inline]
       fn mul(self, rhs: c64) -> c64 {
@@ -216,7 +216,7 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
-    impl Div<$t> for c64 {
+    impl const Div<$t> for c64 {
       type Output = c64;
       #[inline]
       fn div(self, rhs: $t) -> c64 {
@@ -225,13 +225,29 @@ macro_rules! scalar_impls {
         c64 { re, im }
       }
     }
-    //impl Div<c64> for $t // TODO
-    impl Rem<$t> for c64 {
+    impl Div<c64> for $t {
       type Output = c64;
       #[inline]
-      fn rem(self, rhs: $t) -> c64 { unimplemented!("c64::Rem::<{}>({:?},{:?})", stringify!($t), self, rhs) }
+      fn div(self, rhs: c64) -> c64 {
+        c64{re:ι(self), im:ι(0)} / rhs
+      }
     }
-    //impl Rem<c64> for $t // TODO
+    impl const Rem<$t> for c64 {
+      type Output = c64;
+      #[inline]
+      fn rem(self, rhs: $t) -> c64 {
+        let re = self.re % rhs;
+        let im = self.im;
+        c64 { re, im }
+      }
+    }
+    impl Rem<c64> for $t {
+      type Output = c64;
+      #[inline]
+      fn rem(self, rhs: c64) -> c64 {
+        c64{re:ι(self), im:ι(0)} % rhs
+      }
+    }
   };
 }
 
@@ -255,7 +271,7 @@ macro_rules! assign_impls {
     }
     impl RemAssign<$t> for c64 {
       #[inline]
-      fn rem_assign(&mut self, rhs: $t) { unimplemented!("c64::RemAssign::<{}>({:?},{:?})", stringify!($t), self, rhs) }
+      fn rem_assign(&mut self, rhs: $t) { *self = *self % rhs; }
     }
   };
 }

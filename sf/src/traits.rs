@@ -112,11 +112,7 @@ pub trait Field: Additive + Multiplicative + Embeds<isize> + Embeds<f64> {
   // self * (-1)^n
   #[inline]
   fn pari(self, n: isize) -> Self {
-    if n % 2 == 0 {
-      self
-    } else {
-      -self
-    }
+    if n % 2 == 0 { self } else { -self }
   }
 }
 
@@ -139,19 +135,11 @@ pub trait Bounded {
 pub trait Ordered: Base + PartialOrd<Self> {
   #[inline]
   fn min(self, b: Self) -> Self {
-    if self < b {
-      self
-    } else {
-      b
-    }
+    if self < b { self } else { b }
   }
   #[inline]
   fn max(self, b: Self) -> Self {
-    if self > b {
-      self
-    } else {
-      b
-    }
+    if self > b { self } else { b }
   }
 
   fn floor(self) -> Self;
@@ -160,6 +148,13 @@ pub trait Ordered: Base + PartialOrd<Self> {
   fn trunc(self) -> Self;
   fn rint(self) -> isize;
 }
+pub fn sf_min<V:Ordered>(a:V, b:V) -> V { a.min(b) }
+pub fn sf_max<V:Ordered>(a:V, b:V) -> V { a.max(b) }
+pub fn sf_floor<V:Ordered>(a:V) -> V { a.floor() }
+pub fn sf_ceil<V:Ordered>(a:V) -> V { a.ceil() }
+pub fn sf_round<V:Ordered>(a:V) -> V { a.round() }
+pub fn sf_trunc<V:Ordered>(a:V) -> V { a.trunc() }
+pub fn sf_rint<V:Ordered>(a:V) -> isize { a.rint() }
 
 pub trait Normed: Base + From<Self::NT> {
   type NT: Field + Ordered;

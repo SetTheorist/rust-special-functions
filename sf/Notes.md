@@ -31,3 +31,52 @@ Random jottings:
 - bad ~ 10000 or more
 
 ldexp: ...  Guard/Round/Sticky ...
+
+
+## Outline
+- Basic, Exp, Log, Numbers, Classify, Constants
+- Trig
+- Gamma, digamma, polygamma
+- Dilog, Polylog
+- Erf
+- Zeta, Hurwitz, Lerch Phi
+- Incomplete Gamma
+- Bessel, Airy
+- OrthoPoly
+- ExpInt, LogInt, CosInt, SinInt
+- Probability distributions (etc.)
+- Theta
+- Elliptic, beta, eta, lambda
+- PCF
+- Spheroidal wafe
+- Hypergeometrics, G
+- Lambert
+- Misc.
+  - Debye
+  - Sievert
+  - Spence
+  - Lommel
+  - Abramowitz 1 & 2
+  - Bose-Einstein
+  - Coulomb Wafe
+  - Fresnel C,S
+  - Legendre P,Q
+  - Struve
+  - Scorer gi, hi
+  - Voight u,v
+  -
+  - Mathieu
+  - Lame
+  - Heun
+  - Painleve'
+  - Coulomb
+
+**Integration**
+- trapezoidal
+- Erf, tanh/sinh, etc.
+- Simpson's &c.
+- Gaussian &c.
+- ?Adaptive? - probably unnecessary for spec.func. impls?
+
+
+

@@ -6,21 +6,19 @@ mod tests;
 //
 //
 //
-pub trait BesselJ<N: Additive + Embeds<isize>>: Value + Embeds<N> {
+pub trait BesselJ<N: Additive+Embeds<isize>>: Value + Embeds<N> {
   fn bessel_j(self, nu: N) -> Self;
-  fn bessel_j_ddz(self, nu: N) -> Self { (self.bessel_j(nu - 1) - self.bessel_j(nu + 1)) / 2 }
+  fn bessel_j_ddz(self, nu: N) -> Self {
+    (self.bessel_j(nu - 1) - self.bessel_j(nu + 1)) / 2
+  }
 }
 pub fn sf_bessel_j<N, V>(nu: N, z: V) -> V
-where
-  V: BesselJ<N>,
-  N: Additive + Embeds<isize>,
+where V:BesselJ<N>, N:Additive+Embeds<isize>,
 {
   z.bessel_j(nu)
 }
 pub fn sf_bessel_j_ddz<N, V>(nu: N, z: V) -> V
-where
-  V: BesselJ<N>,
-  N: Additive + Embeds<isize>,
+where V:BesselJ<N>, N:Additive+Embeds<isize>,
 {
   z.bessel_j_ddz(nu)
 }
@@ -32,7 +30,9 @@ where
 //
 pub trait BesselI<N: Additive + Embeds<isize>>: Value + Embeds<N> {
   fn bessel_i(self, nu: N) -> Self;
-  fn bessel_i_ddz(self, nu: N) -> Self { (self.bessel_i(nu - 1) + self.bessel_i(nu + 1)) / 2 }
+  fn bessel_i_ddz(self, nu: N) -> Self {
+    (self.bessel_i(nu - 1) + self.bessel_i(nu + 1)) / 2
+  }
 }
 
 //
@@ -40,7 +40,9 @@ pub trait BesselI<N: Additive + Embeds<isize>>: Value + Embeds<N> {
 //
 pub trait BesselK<N: Additive + Embeds<isize>>: Value + Embeds<N> {
   fn bessel_k(self, nu: N) -> Self;
-  fn bessel_k_ddz(self, nu: N) -> Self { (self.bessel_k(nu - 1) + self.bessel_k(nu + 1)) / 2 }
+  fn bessel_k_ddz(self, nu: N) -> Self {
+    (self.bessel_k(nu - 1) + self.bessel_k(nu + 1)) / 2
+  }
 }
 
 //
@@ -48,7 +50,9 @@ pub trait BesselK<N: Additive + Embeds<isize>>: Value + Embeds<N> {
 //
 pub trait BesselY<N: Additive + Embeds<isize>>: Value + Embeds<N> {
   fn bessel_y(self, nu: N) -> Self;
-  fn bessel_y_ddz(self, nu: N) -> Self { (self.bessel_y(nu - 1) - self.bessel_y(nu + 1)) / 2 }
+  fn bessel_y_ddz(self, nu: N) -> Self {
+    (self.bessel_y(nu - 1) - self.bessel_y(nu + 1)) / 2
+  }
 }
 
 //
