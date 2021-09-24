@@ -10,6 +10,39 @@ pub fn relerr<V:Value+Log>(exact:V, approx:V) -> V {
   }
 }
 
+pub struct Grid<V> {
+  a: V,
+  b: V,
+  h: V,
+  n: isize,
+  i: isize,
+}
+
+impl<V:Value> Grid<V> {
+  pub fn new(a:V, b:V, n:isize) -> Self {
+    let h = (b - a) / (n-1);
+    let i = 0;
+    Grid { a, b, h, n, i }
+  }
+}
+
+impl<V:Value> Iterator for Grid<V> {
+  type Item = V;
+  fn next(&mut self) -> Option<V> {
+    if self.i == self.n {
+      None
+    } else {
+      let i = self.i;
+      self.i += 1;
+      if i <= self.n/2 {
+        Some(self.a + self.h*i)
+      } else {
+        Some(self.b - self.h*(self.n-i-1))
+      }
+    }
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 /*

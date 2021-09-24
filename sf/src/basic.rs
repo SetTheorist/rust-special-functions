@@ -35,6 +35,12 @@ impl InitialGuess for r64 {
     r64(f64::from_bits(b))
   }
 }
+// NB: for mantissa part
+// 0.45 + 0.62*x*(1.0 - 0.11x)
+// reduces to 4 newton steps on [1,2)
+// (from 6-7 from n/2 guess)
+// simple: 0.5+x/2*(1.0-x/8)  gives 5 Newton steps on [1,2)
+
 use crate::complex::{c64};
 impl InitialGuess for c64 {
   #[inline]

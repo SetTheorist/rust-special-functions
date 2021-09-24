@@ -33,6 +33,32 @@ pub mod impls {
   use crate::algorithm::{contfrac_modlentz, sum_series, sum_series_};
   use crate::traits::*;
 
+  // TODO: for the moment, only works for postive x ...
+  pub fn fastexp<V:Value+Constants+Float+Ordered>(x:V) -> V {
+    let n = (x / V::LOG2).floor().rint();
+    let f = x - V::LOG2*n;
+    exp_minimax(f).ldexp(n)
+  }
+
+  // Mathematica:
+  // Needs["FunctionApproximations`"]
+  // MiniMaxApproximation[Exp[x], {x, {0, 1}, 4, 6}, WorkingPrecision -> 30][[2, 1]] // Simplify
+  // very fast and double-precision accurate on [0,1]
+  pub fn exp_minimax<V:Value>(x:V) -> V {
+    (ι(1.00000000000000005687377219213):V + 
+      x*0.413481415157924211549876381032 + 
+      x*x*0.0718433332574389662744224350086 + 
+      x*x*x*0.00631921755128576588753585103588 + 
+      x*x*x*x*0.000242852176821162105291512049531)
+    / (ι(1):V - 
+      x*0.586518584842062262747164677147 + 
+      x*x*0.158361918098973478534603103305 - 
+      x*x*x*0.0254500747853637106682783503859 + 
+      x*x*x*x*0.00259839865885544085883496403080 - 
+      x*x*x*x*x*0.000162072980546095283677686506322 + 
+      x*x*x*x*x*x*4.90479980418143115258929318335e-6)
+  }
+
   #[inline]
   pub fn exp_power_series_terms<V: Value>(x: V) -> impl Iterator<Item = V> {
     (1..).scan(ι(1): V, move |s, n| {
@@ -63,9 +89,9 @@ pub mod impls {
   #[inline]
   pub fn range_reduce_ln2<V: RealValue + Ordered>(x: V) -> (V, isize) {
     // range-reduce
-    let ln2: V = ι(0.69314718055994530941723212145817656807_f64); // TODO: use constants
-    let n: isize = (x.abs() / ln2).floor().rint();
-    let r: V = x - ln2 * n;
+    let n: isize = (x.abs() / V::LOG2).floor().rint();
+    // TODO: use Kahan/compensated idea to return 2 floats to get exact diff
+    let r: V = x - V::LOG2 * n;
     (r, n)
   }
 }

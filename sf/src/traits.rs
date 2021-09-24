@@ -16,6 +16,8 @@ pub trait Base: Copy+Sized+PartialEq+Default+std::fmt::Debug+'static {}
 pub trait Power<P=Self>: Base {
   fn pow(self, p: P) -> Self;
 }
+#[inline]
+pub fn sf_pow<P,V:Power<P>>(x:V, p:P) -> V { x.pow(p) }
 
 pub trait Zero: Base {
   const zero: Self;
@@ -51,8 +53,7 @@ pub trait Multiplication: Base + One + Mul<Self, Output = Self> + MulAssign<Self
   #[inline]
   fn sqr(self) -> Self { self * self }
 }
-//pub fn sqr<M:Multiplication>(x:M) -> M { x.sqr() }
-//pub fn ldexp<M:Multiplication>(x:M, n:isize) -> M { x.ldexp(n) }
+pub fn sf_sqr<M:Multiplication>(x:M) -> M { x.sqr() }
 
 impl<T: Multiplication> Power<usize> for T {
   #[inline]
@@ -73,8 +74,6 @@ pub trait Division:
 {
   #[inline]
   fn recip(self) -> Self { Self::one / self }
-  #[inline]
-  fn ldexp(self, n: isize) -> Self { self << n }
 }
 
 impl<T: Division> Power<isize> for T {
@@ -232,6 +231,33 @@ pub trait Classify {
   // positive real part?
 }
 
+// for "floating-point" type (real) values
+pub trait Float : Base {
+  // Split into normalized mantissa and exponent
+  fn frexp(self) -> (Self, isize);
+  // extract only the exponent
+  fn ilogb(self) -> isize;
+
+  // self * 2^n
+  fn ldexp(self, n:isize) -> Self;
+
+  // magnitude of self, but with sign-bit from x
+  fn copysign(self, x:Self) -> Self;
+
+  // next representable number larger
+  fn next_up(self) -> Self;
+  // prev representable number smaller
+  fn next_dn(self) -> Self;
+
+  // checks for bitwise identity
+  fn identical(self, rhs:Self) -> bool;
+
+  const nan: Self;
+  const infinity: Self;
+  const neg_infinity: Self;
+  const neg_zero: Self;
+}
+
 pub trait Constants {
   // $e^1$
   const E: Self;
@@ -347,6 +373,57 @@ impl Classify for f64 {
     && (self.abs().trunc() as i64)%2 == 1
   }
   #[inline] fn is_halfint(self) -> bool { (self*2.0).is_int() }
+}
+
+impl Float for f64 {
+  // Split into normalized mantissa and exponent
+  #[inline]
+  fn frexp(self) -> (Self, isize) {
+    let b = self.to_bits();
+    let e = (((b >> 52) & 0x7FFF) as isize) - 1023;
+    let n = (b & !(0x7FFF<<52)) | (1023<<52);
+    let f = f64::from_bits(n);
+    (f, e)
+  }
+  // extract only the exponent
+  #[inline]
+  fn ilogb(self) -> isize {
+    (((self.to_bits() >> 52) & 0x7FFF) as isize) - 1023
+  }
+  // self * 2^n
+  #[inline]
+  fn ldexp(self, n:isize) -> Self {
+    // TODO: better implementation!
+    self * 2.0_f64.powi(n as i32)
+  }
+
+  // magnitude of self, but with sign-bit from x
+  #[inline]
+  fn copysign(self, x:Self) -> Self {
+    self.copysign(x)
+  }
+
+  // next representable number larger
+  #[inline]
+  fn next_up(self) -> Self {
+    f64::from_bits(f64::to_bits(self)+1)
+  }
+  // prev representable number smaller
+  #[inline]
+  fn next_dn(self) -> Self {
+    f64::from_bits(f64::to_bits(self)-1)
+  }
+
+  // checks for bitwise identity
+  #[inline]
+  fn identical(self, rhs:Self) -> bool {
+    self.to_bits() == rhs.to_bits()
+  }
+
+  const nan: Self = f64::NAN;
+  const infinity: Self = f64::INFINITY;
+  const neg_infinity: Self = f64::NEG_INFINITY;
+  const neg_zero: Self = unsafe{std::mem::transmute(0x8000_0000_0000_0000_u64)};
 }
 
 ////////////////////////////////////////////////////////////////////////////////

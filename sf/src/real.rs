@@ -238,6 +238,36 @@ impl Power for r64 {
   fn pow(self, p: r64) -> r64 { r64(self.0.powf(p.0)) }
 }
 
+impl Float for r64 {
+  #[inline]
+  fn frexp(self) -> (Self, isize) {
+    let (a,b) = self.0.frexp();
+    (r64(a),b)
+  }
+  #[inline]
+  fn ilogb(self) -> isize {
+    self.0.ilogb()
+  }
+  #[inline]
+  fn ldexp(self, n:isize) -> Self {
+    r64(self.0.ldexp(n))
+  }
+  #[inline]
+  fn copysign(self, x:Self) -> Self {
+    r64(self.0.copysign(x.0))
+  }
+  lift1!(next_up, next_up);
+  lift1!(next_dn, next_dn);
+  #[inline]
+  fn identical(self, rhs:Self) -> bool {
+    self.0.identical(rhs.0)
+  }
+  const nan: Self = r64(f64::NAN);
+  const infinity: Self = r64(f64::INFINITY);
+  const neg_infinity: Self = r64(f64::NEG_INFINITY);
+  const neg_zero: Self = r64(unsafe{std::mem::transmute(0x8000_0000_0000_0000_u64)});
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 mod tests {

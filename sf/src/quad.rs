@@ -128,6 +128,9 @@ impl Quad {
   pub fn hi(self) -> f64 { self.0 }
   #[inline]
   pub fn lo(self) -> f64 { self.1 }
+  
+  // apply "correct" rounding to high part...
+  // TODO: pub fn to_f64(self) -> f64 {}
 
   // misc
 

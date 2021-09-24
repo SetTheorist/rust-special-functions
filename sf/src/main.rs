@@ -25,9 +25,21 @@
 
 // ** IDEAS, REMINDERS:
 //
+// cf. "Inverse Symbolic Calculator"
+//
 // loop { break returnValue; }  
 // no_std??
 // c.f. Haskell Numeric.Compensated (E.Kmett) vs. qd/Quad
+//
+// use proc.macro. for high-precision constants:
+//   parse into 1,2,4,8 correctly rounded double sequences (& float?)
+//   (or precision on parameter)
+//   (or pass in constructor even?)
+//   e.g. const Quad::pi = float!(2;Quad(#0,#1);3.1415926535897932384626...)
+// note mathematica can generate binary or hexadecimal floating-point:
+//   NumberForm[...] and BaseForm[...]
+//   e.g. const Quad::pi = float!(2;Quad(#0,#1);3.d4a349a4342...)
+
 
 /*
           0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
@@ -1060,5 +1072,74 @@ fn main() {
     println!("x%(-b,-a)={}", x % (-b,-a));
   }
 
+  if true {
+    println!("-----");
+    println!("Exp:");
+    let x = r64(0.5);
+    println!("{}", sf_exp(x));
+    println!("{}", exp::impls::exp_power_series(x, 0));
+    println!("{}", exp::impls::exp_minimax(x));
+    println!("{}", exp::impls::fastexp(x));
+
+    let scale = 0.5;
+    let base = 0.5;
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = base + ((n % 1000) as f64 / 1000.0) * scale;
+        t += sf_exp(r64(x));
+      }
+      let en = Instant::now();
+      println!("sf_exp(x): {:6}\t{}", en.duration_since(st).as_micros(), t);
+    }
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = base + ((n % 1000) as f64 / 1000.0) * scale;
+        t += exp::impls::exp_minimax(r64(x));
+      }
+      let en = Instant::now();
+      println!("minmax(x): {:6}\t{}", en.duration_since(st).as_micros(), t);
+    }
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = base + ((n % 1000) as f64 / 1000.0) * scale;
+        t += exp::impls::fastexp(r64(x));
+      }
+      let en = Instant::now();
+      println!("fastex(x): {:6}\t{}", en.duration_since(st).as_micros(), t);
+    }
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = base + ((n % 1000) as f64 / 1000.0) * scale;
+        t += exp::impls::exp_power_series(r64(x), 0);
+      }
+      let en = Instant::now();
+      println!("powser(x): {:6}\t{}", en.duration_since(st).as_micros(), t);
+    }
+  }
+
+  if true {
+    for n in 1..7 {
+      for x in util::Grid::new(r64(1.0), r64(2.0), n) { print!("({})", x); }
+      println!();
+    }
+  }
+
+  if true {
+    println!("{:?}", 7.5_f64.frexp());
+    println!("{}", 7.5_f64.ilogb());
+    println!("{}", 7.5_f64.next_up());
+    println!("{}", 7.5_f64.next_dn());
+    println!("{}", 7.5_f64.copysign(f64::neg_zero));
+    println!("{}", f64::neg_zero);
+    println!("{}", -0.0);
+  }
 }
 
