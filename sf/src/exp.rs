@@ -34,16 +34,24 @@ pub mod impls {
   use crate::traits::*;
 
   // TODO: for the moment, only works for postive x ...
+  #[inline]
   pub fn fastexp<V:Value+Constants+Float+Ordered>(x:V) -> V {
     let n = (x / V::LOG2).floor().rint();
     let f = x - V::LOG2*n;
     exp_minimax(f).ldexp(n)
+  }
+  #[inline]
+  pub fn fastexp2<V:Value+Constants+Float+Ordered>(x:V) -> V {
+    let n = (x / V::LOG2).floor().rint();
+    let f = x - V::LOG2*n;
+    exp_minimax2(f).ldexp(n)
   }
 
   // Mathematica:
   // Needs["FunctionApproximations`"]
   // MiniMaxApproximation[Exp[x], {x, {0, 1}, 4, 6}, WorkingPrecision -> 30][[2, 1]] // Simplify
   // very fast and double-precision accurate on [0,1]
+  #[inline]
   pub fn exp_minimax<V:Value>(x:V) -> V {
     (ι(1.00000000000000005687377219213):V + 
       x*0.413481415157924211549876381032 + 
@@ -57,6 +65,21 @@ pub mod impls {
       x*x*x*x*0.00259839865885544085883496403080 - 
       x*x*x*x*x*0.000162072980546095283677686506322 + 
       x*x*x*x*x*x*4.90479980418143115258929318335e-6)
+  }
+  #[inline]
+  pub fn exp_minimax2<V:Value>(x:V) -> V {
+    (ι(1.00000000000000005687377219213):V + 
+      x*(ι(0.413481415157924211549876381032):V + 
+      x*(ι(0.0718433332574389662744224350086):V + 
+      x*(ι(0.00631921755128576588753585103588):V + 
+      x*(ι(0.000242852176821162105291512049531):V)))))
+    / (ι(1):V + 
+      x*(ι(-0.586518584842062262747164677147):V + 
+      x*(ι(0.158361918098973478534603103305):V + 
+      x*(ι(-0.0254500747853637106682783503859):V + 
+      x*(ι(0.00259839865885544085883496403080):V + 
+      x*(ι(-0.000162072980546095283677686506322):V + 
+      x*(ι(4.90479980418143115258929318335e-6):V)))))))
   }
 
   #[inline]

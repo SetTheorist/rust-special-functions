@@ -394,7 +394,10 @@ impl Float for f64 {
   #[inline]
   fn ldexp(self, n:isize) -> Self {
     // TODO: better implementation!
-    self * 2.0_f64.powi(n as i32)
+    //let p2 = f64::from_bits((((n+1023)&0x7FFF) as u64)<<52);
+    //self * p2
+    // TODO: this will fail on any non-normal double (and edge cases!)
+    f64::from_bits(self.to_bits() + ((n as u64)<<52))
   }
 
   // magnitude of self, but with sign-bit from x

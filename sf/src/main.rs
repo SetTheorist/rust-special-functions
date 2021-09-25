@@ -10,6 +10,7 @@
 #![allow(confusable_idents)]
 #![allow(dead_code)]
 #![allow(mixed_script_confusables)]
+#![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
@@ -63,6 +64,7 @@ mod dawson;
 mod debye;
 mod erf;
 mod exp;
+mod f16;
 mod gamma;
 mod hypergeom;
 mod integration;
@@ -1080,6 +1082,8 @@ fn main() {
     println!("{}", exp::impls::exp_power_series(x, 0));
     println!("{}", exp::impls::exp_minimax(x));
     println!("{}", exp::impls::fastexp(x));
+    println!("{}", exp::impls::exp_minimax2(x));
+    println!("{}", exp::impls::fastexp2(x));
 
     let scale = 0.5;
     let base = 0.5;
@@ -1123,23 +1127,63 @@ fn main() {
       let en = Instant::now();
       println!("powser(x): {:6}\t{}", en.duration_since(st).as_micros(), t);
     }
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = base + ((n % 1000) as f64 / 1000.0) * scale;
+        t += exp::impls::fastexp2(r64(x));
+      }
+      let en = Instant::now();
+      println!("faste2(x): {:6}\t{}", en.duration_since(st).as_micros(), t);
+    }
+    {
+      let mut t = r64(0.0);
+      let st = Instant::now();
+      for n in 0..1000000 {
+        let x = base + ((n % 1000) as f64 / 1000.0) * scale;
+        t += exp::impls::exp_minimax2(r64(x));
+      }
+      let en = Instant::now();
+      println!("minma2(x): {:6}\t{}", en.duration_since(st).as_micros(), t);
+    }
   }
 
-  if true {
+  if false {
     for n in 1..7 {
       for x in util::Grid::new(r64(1.0), r64(2.0), n) { print!("({})", x); }
       println!();
     }
   }
 
-  if true {
+  if false {
     println!("{:?}", 7.5_f64.frexp());
     println!("{}", 7.5_f64.ilogb());
     println!("{}", 7.5_f64.next_up());
     println!("{}", 7.5_f64.next_dn());
     println!("{}", 7.5_f64.copysign(f64::neg_zero));
     println!("{}", f64::neg_zero);
+    println!("{}", 7.5_f64.ldexp(1));
+    println!("{}", 7.5_f64.ldexp(-1));
     println!("{}", -0.0);
+  }
+
+  if true {
+    let a = f16::f16(16_u16<<10);
+    println!("{:016b}  {} {}", a.0, a.to_f32(), a.to_f64());
+    println!("{:016b}  {} {}", (-a).0, (-a).to_f32(), (-a).to_f64());
+    println!("{:016b}", f16::f16::from_f32(a.to_f32()).0);
+    let b = a*a;
+    println!("{:016b}  {} {}", b.0, b.to_f32(), b.to_f64());
+    let c = b*b;
+    println!("{:016b}  {} {}", c.0, c.to_f32(), c.to_f64());
+    let a = f16::f16(0x3333);
+    println!("{:016b}  {} {}", a.0, a.to_f32(), a.to_f64());
+    let b = a*a;
+    println!("{:016b}  {} {} {}", b.0, b.to_f32(), b.to_f64(), a.to_f32()*a.to_f32());
+    let c = b*b;
+    println!("{:016b}  {} {} {}={:016b}", c.0, c.to_f32(), c.to_f64(),
+      b.to_f32()*b.to_f32(), f16::f16::from_f32(b.to_f32()*b.to_f32()).0);
   }
 }
 
