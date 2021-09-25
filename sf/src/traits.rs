@@ -395,11 +395,11 @@ impl Float for f64 {
   // self * 2^n
   #[inline]
   fn ldexp(self, n:isize) -> Self {
-    // TODO: better implementation!
-    //let p2 = f64::from_bits((((n+1023)&0x7FFF) as u64)<<52);
-    //self * p2
-    // TODO: this will fail on any non-normal double (and edge cases!)
-    f64::from_bits(self.to_bits() + ((n as u64)<<52))
+    if self == 0.0 || !self.is_finite() {return self;}
+    // TODO: this will fail on edge cases
+    let b = self.to_bits();
+    let e = ((((b >> 52) & 0x7FF) as i64) + (n as i64)) as u64;
+    f64::from_bits( (b & !(0x7FF<<52))|(e<<52) )
   }
 
   // magnitude of self, but with sign-bit from x

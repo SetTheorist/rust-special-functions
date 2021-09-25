@@ -1225,12 +1225,12 @@ fn main() {
   if true {
     println!("-----");
     println!("Lambert");
-    println!("W0 = {:.16e}", lambert::impls::pos_real_0(r64(1.0)));
-    println!("W0 = {:.16e}", lambert::impls::pos_real_0(r64(3.0)));
-    println!("W0 = {:.16e}", lambert::impls::pos_real_0(r64(99.0)));
-    println!("W1 = {:.16e}", lambert::impls::pos_real_1(r64(-0.3)));
-    println!("W1 = {:.16e}", lambert::impls::pos_real_1(r64(-0.2)));
-    println!("W1 = {:.16e}", lambert::impls::pos_real_1(r64(-0.1)));
+    println!("W0 = {:.16e}", lambert::impls::real_branch_pos(r64(1.0)));
+    println!("W0 = {:.16e}", lambert::impls::real_branch_pos(r64(3.0)));
+    println!("W0 = {:.16e}", lambert::impls::real_branch_pos(r64(99.0)));
+    println!("W1 = {:.16e}", lambert::impls::real_branch_neg(r64(-0.3)));
+    println!("W1 = {:.16e}", lambert::impls::real_branch_neg(r64(-0.2)));
+    println!("W1 = {:.16e}", lambert::impls::real_branch_neg(r64(-0.1)));
   }
 }
 

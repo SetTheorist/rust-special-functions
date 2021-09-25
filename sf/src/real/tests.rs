@@ -31,7 +31,7 @@ impl UlpsEq for r64 {
 */
 
 #[test]
-fn basic_ops() {
+fn basic_ops_0() {
   for ia in -100..=100 {
     for ib in -100..=100 {
       let a: f64 = (ia as f64) / 10.0;
@@ -56,6 +56,18 @@ fn basic_ops() {
 
       assert_eq!(ra.recip(), 1 / ra);
       assert_eq!(rb.recip(), 1 / rb);
+    }
+  }
+}
+
+#[test]
+fn basic_ops_1() {
+  for ia in -100..=100 {
+    for ib in -100..=100 {
+      let a: f64 = (ia as f64) / 10.0;
+      let b: f64 = (ib as f64) / 10.0;
+      let ra: r64 = r64(a);
+      let rb: r64 = r64(b);
 
       assert_eq!(-r64(a), r64(-a));
       assert_eq!(ra.sqr(), ra * ra);
@@ -72,6 +84,18 @@ fn basic_ops() {
 
       assert_eq!(ra, ra);
       assert_ne!(ra, ra + 1);
+    }
+  }
+}
+
+#[test]
+fn basic_ops_2() {
+  for ia in -100..=100 {
+    for ib in -100..=100 {
+      let a: f64 = (ia as f64) / 10.0;
+      let b: f64 = (ib as f64) / 10.0;
+      let ra: r64 = r64(a);
+      let rb: r64 = r64(b);
 
       assert!(ra <= ra);
       assert!(ra <= ra + 1);

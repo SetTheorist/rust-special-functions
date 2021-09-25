@@ -4,6 +4,8 @@ use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 use crate::traits::*;
 
+mod tests;
+
 // TODO: make r32 & c32 also?
 
 #[derive(Debug, Default, Clone, Copy, PartialOrd, PartialEq)]

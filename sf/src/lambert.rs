@@ -10,16 +10,16 @@ use crate::exp::*;
 use crate::log::*;
 
 // positive real branch
-pub fn pos_real_0<V:RealValue+Exp+Float+Log>(x:V) -> V {
-  if x < V::FRAC_1_E {return V::nan;}
+pub fn real_branch_pos<V:RealValue+Exp+Float+Log>(x:V) -> V {
+  if x < -V::FRAC_1_E {return V::nan;}
   if x == 0 {return V::zero;}
-  let w = if x.is_negreal() {-V::one/10}
+  let w = if x < ι(0) {-V::one/10}
           else {sf_log(x / sf_log_1p(x))};
   halley_iter(x, w)
 }
 
 // negative real branch
-pub fn pos_real_1<V:RealValue+Exp+Float+Log>(x:V) -> V {
+pub fn real_branch_neg<V:RealValue+Exp+Float+Log>(x:V) -> V {
   if x < -V::FRAC_1_E || x.is_posreal() {return V::nan;}
   if x == 0 {return V::zero;}
   if x == -V::FRAC_1_E {return ι(-1);}
@@ -55,3 +55,45 @@ pub fn halley_iter<V:RealValue+Exp>(x:V, w0:V) -> V {
 }
 
 }
+
+mod tests {
+use super::*;
+use crate::traits::*;
+use crate::exp::{sf_exp};
+use crate::real::*;
+use crate::util::{Grid,relerr};
+
+#[test]
+fn pos_real_branch() {
+  // in domain
+  assert!(!impls::real_branch_pos(r64::FRAC_1_E.next_dn()).is_nan());
+  // not in domain
+  assert!(impls::real_branch_pos(-r64::FRAC_1_E.next_up()).is_nan());
+  assert!(impls::real_branch_pos(r64(-1.0)).is_nan());
+  // defining relation
+  for x in Grid::new(-r64::FRAC_1_E,r64(10.0),1000) {
+    let wx = impls::real_branch_pos(x);
+    let x0 = wx * sf_exp(wx);
+    assert!(relerr(x, x0) < r64(-15.0));
+  }
+}
+
+#[test]
+fn neg_real_branch() {
+  // in domain
+  assert!(!impls::real_branch_pos(r64(0.0)).is_nan());
+  assert!(!impls::real_branch_pos(r64::FRAC_1_E.next_dn()).is_nan());
+  // not in domain
+  assert!(impls::real_branch_neg(-r64::FRAC_1_E.next_up()).is_nan());
+  assert!(impls::real_branch_neg(r64(-1.0)).is_nan());
+  assert!(impls::real_branch_neg(r64(1.0)).is_nan());
+  // defining relation
+  for x in Grid::new(-r64::FRAC_1_E,r64(0.0),1000) {
+    let wx = impls::real_branch_neg(x);
+    let x0 = wx * sf_exp(wx);
+    assert!(relerr(x, x0) < r64(-15.0));
+  }
+}
+
+}
+
