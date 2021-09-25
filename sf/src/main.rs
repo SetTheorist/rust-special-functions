@@ -889,7 +889,7 @@ fn main() {
 
   */
 
-  if (true) {
+  if (false) {
     println!("-----");
     println!("Zeta:");
     for ix in 2..=20 {
@@ -970,8 +970,9 @@ fn main() {
   if false {
     for i in 1..16 {
       println!(
-        "{:.16e} {:.16e}",
+        "{:.16e}  {:.16e}  | {:.16e}",
         integration::Trapezoidal::new(r64(0.0), r64(1.0), 1 << i).integrate(trig::sf_cos).0,
+        integration::TanhRule::new(r64(0.0), r64(1.0), 1 << i).integrate(trig::sf_cos).0,
         trig::sf_sin(r64(1.0)).0
       );
     }
@@ -1256,6 +1257,13 @@ fn main() {
     let x = r64(-0.01);
     println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg(x));
     println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg_2(x));
+  }
+  if true {
+    for i in 1..10 {
+      println!("{:5}  {:.16e}  | {:.16e}", (1<<i)+1,
+        integration::TanhRule::new(r64(0.0), r64(1.0), (1<<i)+1).integrate(trig::sf_cos).0,
+        trig::sf_sin(r64(1.0)).0);
+    }
   }
 }
 

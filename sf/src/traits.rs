@@ -104,8 +104,17 @@ pub trait Embeds<T>:
   + RemAssign<T>
   + From<T>
   + PartialEq<T>
-{
-}
+{ }
+
+impl<T> Embeds<T> for T
+  where T:Base
+  + Add<T,Output=T> + AddAssign<T>
+  + Sub<T,Output=T> + SubAssign<T>
+  + Mul<T,Output=T> + MulAssign<T>
+  + Div<T,Output=T> + DivAssign<T>
+  + Rem<T, Output=T> + RemAssign<T>
+  + From<T> + PartialEq<T>
+{ }
 
 pub trait Field: Additive + Multiplicative + Embeds<isize> + Embeds<f64> {
   // self * (-1)^n
@@ -308,7 +317,6 @@ impl One for isize { const one: isize = 1; }
 impl Multiplication for isize {}
 impl Division for isize {}
 impl Multiplicative for isize {}
-impl Embeds<isize> for isize {}
 
 impl Classify for isize {
   #[inline] fn is_nan(self) -> bool { false }
@@ -343,7 +351,6 @@ impl One for f64 { const one: f64 = 1.0; }
 impl Multiplication for f64 {}
 //impl Division for f64 { }
 //impl Multiplicative for f64 { }
-impl Embeds<f64> for f64 {}
 
 impl Classify for f64 {
   #[inline] fn is_nan(self) -> bool { self.is_nan() }

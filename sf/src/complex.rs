@@ -351,7 +351,6 @@ impl Multiplicative for c64 {}
 impl Embeds<isize> for c64 {}
 impl Embeds<f64> for c64 {}
 impl Embeds<r64> for c64 {}
-impl Embeds<c64> for c64 {}
 impl Field for c64 {}
 
 impl Roots for c64 {

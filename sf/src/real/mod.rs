@@ -197,7 +197,6 @@ impl Division for r64 {}
 impl Multiplicative for r64 {}
 impl Embeds<isize> for r64 {}
 impl Embeds<f64> for r64 {}
-impl Embeds<r64> for r64 {}
 impl Field for r64 {}
 impl Ordered for r64 {
   lift1!(floor, floor);
