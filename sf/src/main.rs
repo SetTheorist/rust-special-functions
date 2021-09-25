@@ -1225,12 +1225,37 @@ fn main() {
   if true {
     println!("-----");
     println!("Lambert");
-    println!("W0 = {:.16e}", lambert::impls::real_branch_pos(r64(1.0)));
-    println!("W0 = {:.16e}", lambert::impls::real_branch_pos(r64(3.0)));
-    println!("W0 = {:.16e}", lambert::impls::real_branch_pos(r64(99.0)));
-    println!("W1 = {:.16e}", lambert::impls::real_branch_neg(r64(-0.3)));
-    println!("W1 = {:.16e}", lambert::impls::real_branch_neg(r64(-0.2)));
-    println!("W1 = {:.16e}", lambert::impls::real_branch_neg(r64(-0.1)));
+    let x = r64(-0.1);
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos(x));
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos_2(x));
+    let x = r64(-0.2);
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos(x));
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos_2(x));
+    let x = r64(-0.3);
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos(x));
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos_2(x));
+    let x = r64(1.0);
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos(x));
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos_2(x));
+    let x = r64(3.0);
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos(x));
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos_2(x));
+    let x = r64(99.0);
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos(x));
+    println!("W0({}) = {:.16e}", x, lambert::impls::real_branch_pos_2(x));
+    println!("-");
+    let x = r64(-0.3);
+    println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg(x));
+    println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg_2(x));
+    let x = r64(-0.2);
+    println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg(x));
+    println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg_2(x));
+    let x = r64(-0.1);
+    println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg(x));
+    println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg_2(x));
+    let x = r64(-0.01);
+    println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg(x));
+    println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg_2(x));
   }
 }
 
