@@ -53,6 +53,41 @@ U+03Cx 	π 	ρ 	ς 	σ 	τ 	υ 	φ 	χ 	ψ 	ω 	ϊ 	ϋ 	ό 	ύ 	ώ 	Ϗ
 U+03Dx 	ϐ 	ϑ 	ϒ 	ϓ 	ϔ 	ϕ 	ϖ 	ϗ 	Ϙ 	ϙ 	Ϛ 	ϛ 	Ϝ 	ϝ 	Ϟ 	ϟ
 U+03Ex 	Ϡ 	ϡ 	Ϣ 	ϣ 	Ϥ 	ϥ 	Ϧ 	ϧ 	Ϩ 	ϩ 	Ϫ 	ϫ 	Ϭ 	ϭ 	Ϯ 	ϯ
 U+03Fx 	ϰ 	ϱ 	ϲ 	ϳ 	ϴ 	ϵ 	϶ 	Ϸ 	ϸ 	Ϲ 	Ϻ 	ϻ 	ϼ 	Ͻ 	Ͼ 	Ͽ
+
+
+  	    0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+U+040x 	Ѐ 	Ё 	Ђ 	Ѓ 	Є 	Ѕ 	І 	Ї 	Ј 	Љ 	Њ 	Ћ 	Ќ 	Ѝ 	Ў 	Џ
+U+041x 	А 	Б 	В 	Г 	Д 	Е 	Ж 	З 	И 	Й 	К 	Л 	М 	Н 	О 	П
+U+042x 	Р 	С 	Т 	У 	Ф 	Х 	Ц 	Ч 	Ш 	Щ 	Ъ 	Ы 	Ь 	Э 	Ю 	Я
+U+043x 	а 	б 	в 	г 	д 	е 	ж 	з 	и 	й 	к 	л 	м 	н 	о 	п
+U+044x 	р 	с 	т 	у 	ф 	х 	ц 	ч 	ш 	щ 	ъ 	ы 	ь 	э 	ю 	я
+U+045x 	ѐ 	ё 	ђ 	ѓ 	є 	ѕ 	і 	ї 	ј 	љ 	њ 	ћ 	ќ 	ѝ 	ў 	џ
+U+046x 	Ѡ 	ѡ 	Ѣ 	ѣ 	Ѥ 	ѥ 	Ѧ 	ѧ 	Ѩ 	ѩ 	Ѫ 	ѫ 	Ѭ 	ѭ 	Ѯ 	ѯ
+U+047x 	Ѱ 	ѱ 	Ѳ 	ѳ 	Ѵ 	ѵ 	Ѷ 	ѷ 	Ѹ 	ѹ 	Ѻ 	ѻ 	Ѽ 	ѽ 	Ѿ 	ѿ
+U+048x 	Ҁ 	ҁ 	҂ 	◌҃ 	◌҄ 	◌҅ 	◌҆ 	◌҇ 	◌҈ 	◌҉ 	Ҋ 	ҋ 	Ҍ 	ҍ 	Ҏ 	ҏ
+U+049x 	Ґ 	ґ 	Ғ 	ғ 	Ҕ 	ҕ 	Җ 	җ 	Ҙ 	ҙ 	Қ 	қ 	Ҝ 	ҝ 	Ҟ 	ҟ
+U+04Ax 	Ҡ 	ҡ 	Ң 	ң 	Ҥ 	ҥ 	Ҧ 	ҧ 	Ҩ 	ҩ 	Ҫ 	ҫ 	Ҭ 	ҭ 	Ү 	ү
+U+04Bx 	Ұ 	ұ 	Ҳ 	ҳ 	Ҵ 	ҵ 	Ҷ 	ҷ 	Ҹ 	ҹ 	Һ 	һ 	Ҽ 	ҽ 	Ҿ 	ҿ
+U+04Cx 	Ӏ 	Ӂ 	ӂ 	Ӄ 	ӄ 	Ӆ 	ӆ 	Ӈ 	ӈ 	Ӊ 	ӊ 	Ӌ 	ӌ 	Ӎ 	ӎ 	ӏ
+U+04Dx 	Ӑ 	ӑ 	Ӓ 	ӓ 	Ӕ 	ӕ 	Ӗ 	ӗ 	Ә 	ә 	Ӛ 	ӛ 	Ӝ 	ӝ 	Ӟ 	ӟ
+U+04Ex 	Ӡ 	ӡ 	Ӣ 	ӣ 	Ӥ 	ӥ 	Ӧ 	ӧ 	Ө 	ө 	Ӫ 	ӫ 	Ӭ 	ӭ 	Ӯ 	ӯ
+U+04Fx 	Ӱ 	ӱ 	Ӳ 	ӳ 	Ӵ 	ӵ 	Ӷ 	ӷ 	Ӹ 	ӹ 	Ӻ 	ӻ 	Ӽ 	ӽ 	Ӿ 	ӿ
+
+  	    0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+U+10Ax 	Ⴀ 	Ⴁ 	Ⴂ 	Ⴃ 	Ⴄ 	Ⴅ 	Ⴆ 	Ⴇ 	Ⴈ 	Ⴉ 	Ⴊ 	Ⴋ 	Ⴌ 	Ⴍ 	Ⴎ 	Ⴏ
+U+10Bx 	Ⴐ 	Ⴑ 	Ⴒ 	Ⴓ 	Ⴔ 	Ⴕ 	Ⴖ 	Ⴗ 	Ⴘ 	Ⴙ 	Ⴚ 	Ⴛ 	Ⴜ 	Ⴝ 	Ⴞ 	Ⴟ
+U+10Cx 	Ⴠ 	Ⴡ 	Ⴢ 	Ⴣ 	Ⴤ 	Ⴥ 		Ⴧ 						Ⴭ 		
+U+10Dx 	ა 	ბ 	გ 	დ 	ე 	ვ 	ზ 	თ 	ი 	კ 	ლ 	მ 	ნ 	ო 	პ 	ჟ
+U+10Ex 	რ 	ს 	ტ 	უ 	ფ 	ქ 	ღ 	ყ 	შ 	ჩ 	ც 	ძ 	წ 	ჭ 	ხ 	ჯ
+U+10Fx 	ჰ 	ჱ 	ჲ 	ჳ 	ჴ 	ჵ 	ჶ 	ჷ 	ჸ 	ჹ 	ჺ 	჻ 	ჼ 	ჽ 	ჾ 	ჿ
+
+  	    0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+U+16Ax 	ᚠ 	ᚡ 	ᚢ 	ᚣ 	ᚤ 	ᚥ 	ᚦ 	ᚧ 	ᚨ 	ᚩ 	ᚪ 	ᚫ 	ᚬ 	ᚭ 	ᚮ 	ᚯ
+U+16Bx 	ᚰ 	ᚱ 	ᚲ 	ᚳ 	ᚴ 	ᚵ 	ᚶ 	ᚷ 	ᚸ 	ᚹ 	ᚺ 	ᚻ 	ᚼ 	ᚽ 	ᚾ 	ᚿ
+U+16Cx 	ᛀ 	ᛁ 	ᛂ 	ᛃ 	ᛄ 	ᛅ 	ᛆ 	ᛇ 	ᛈ 	ᛉ 	ᛊ 	ᛋ 	ᛌ 	ᛍ 	ᛎ 	ᛏ
+U+16Dx 	ᛐ 	ᛑ 	ᛒ 	ᛓ 	ᛔ 	ᛕ 	ᛖ 	ᛗ 	ᛘ 	ᛙ 	ᛚ 	ᛛ 	ᛜ 	ᛝ 	ᛞ 	ᛟ
+U+16Ex 	ᛠ 	ᛡ 	ᛢ 	ᛣ 	ᛤ 	ᛥ 	ᛦ 	ᛧ 	ᛨ 	ᛩ 	ᛪ 	᛫ 	᛬ 	᛭ 	ᛮ 	ᛯ
+U+16Fx 	ᛰ 	ᛱ 	ᛲ 	ᛳ 	ᛴ 	ᛵ 	ᛶ 	ᛷ 	ᛸ
 */
 
 mod airy;
@@ -69,6 +104,7 @@ mod gamma;
 mod hypergeom;
 mod integration;
 mod kahan;
+mod lambert;
 mod log;
 mod numbers;
 mod orthopoly;
@@ -362,7 +398,7 @@ fn main() {
     println!();
   }
 
-  if true {
+  if false {
     println!("-----");
     println!("Debye:");
     println!("{}  {}", debye::impls::debye_series_1(1, r64(0.1)), debye::impls::debye_scaled_series_1(1, r64(0.1)));
@@ -372,7 +408,7 @@ fn main() {
     println!("{}  {}", debye::impls::debye_series_1(2, r64(2.0)), debye::impls::debye_scaled_series_1(2, r64(2.0)));
   }
 
-  if true {
+  if false {
     println!("-----");
     println!("Bessel:");
     for n in 0..=5 {
@@ -442,7 +478,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     let j3n: [(f64, f64); 21] = [
       (0.0, 0.0),
       (1.0000000000000000000, 0.019563353982668405919),
@@ -476,7 +512,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("-----");
     println!("Dawson:");
     println!("{:.16e}", dawson::impls::dawson_contfrac(r64(1.0)).0);
@@ -632,7 +668,7 @@ fn main() {
   // quad
   let qq = quad::Quad::new(11.0, 0.0) / 10.0;
   println!("11/10:{}", qq);
-  if true {
+  if false {
     let q_pi = quad::Quad::from_str("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
     println!("{}", q_pi.unwrap());
@@ -913,7 +949,7 @@ fn main() {
     println!("p(q)={}", p.substitute(q));
   }
 
-  if true {
+  if false {
     println!("{}", sf_gamma(r64(4.5)));
     println!("{}", sf_gamma(r64(-4.5)));
     println!("{}", sf_gamma(c64 { re: r64(4.0), im: r64(1.0) }));
@@ -925,13 +961,13 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     for i in 0..=20 {
       println!("{:2} {:+.16e}  {:+.16e}", i, sf_bernoulli_number_approx(i), sf_bern2(i));
     }
   }
 
-  if true {
+  if false {
     for i in 1..16 {
       println!(
         "{:.16e} {:.16e}",
@@ -941,7 +977,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("-----\nSievert:");
     let th = r64::PI/4;
     println!("{:.16e}  {:.16e}",
@@ -1004,7 +1040,7 @@ fn main() {
   println!("{:.4e}  {:.4E}  {:.4}", r64::PI, r64::PI, r64::PI);
   println!("{:b}  {:x}  {:X}", r64::PI, r64::PI, r64::PI);
 
-  if true {
+  if false {
     println!("-----");
     println!("Airy:");
     println!("{:?}", airy::impls::airy_series(r64(0.5)));
@@ -1014,7 +1050,7 @@ fn main() {
       airy::impls::airy_series(c64{re:r64(1.0),im:r64(1.0)}).1);
   }
 
-  if true {
+  if false {
     println!("-----");
     let x = r64(1.0e-300);
     println!("{:.16e}  {:.16e}  {:.16e}", x.sqrt(), basic::sqrt_newton(x), basic::sqrt_halley(x));
@@ -1060,7 +1096,7 @@ fn main() {
       basic::lerp(r64(1.0), r64(1.0+1e-12), r64(1.00)));
   }
 
-  if true {
+  if false {
     let x = c64::rect(r64::PI, ι(2.5));
     let a = c64::rect(ι(1.0), ι(1.0));
     let b = c64::rect(ι(1.0), ι(-1.0));
@@ -1074,7 +1110,7 @@ fn main() {
     println!("x%(-b,-a)={}", x % (-b,-a));
   }
 
-  if true {
+  if false {
     println!("-----");
     println!("Exp:");
     let x = r64(0.5);
@@ -1168,7 +1204,7 @@ fn main() {
     println!("{}", -0.0);
   }
 
-  if true {
+  if false {
     let a = f16::f16(16_u16<<10);
     println!("{:016b}  {} {}", a.0, a.to_f32(), a.to_f64());
     println!("{:016b}  {} {}", (-a).0, (-a).to_f32(), (-a).to_f64());
@@ -1184,6 +1220,17 @@ fn main() {
     let c = b*b;
     println!("{:016b}  {} {} {}={:016b}", c.0, c.to_f32(), c.to_f64(),
       b.to_f32()*b.to_f32(), f16::f16::from_f32(b.to_f32()*b.to_f32()).0);
+  }
+
+  if true {
+    println!("-----");
+    println!("Lambert");
+    println!("W0 = {:.16e}", lambert::impls::pos_real_0(r64(1.0)));
+    println!("W0 = {:.16e}", lambert::impls::pos_real_0(r64(3.0)));
+    println!("W0 = {:.16e}", lambert::impls::pos_real_0(r64(99.0)));
+    println!("W1 = {:.16e}", lambert::impls::pos_real_1(r64(-0.3)));
+    println!("W1 = {:.16e}", lambert::impls::pos_real_1(r64(-0.2)));
+    println!("W1 = {:.16e}", lambert::impls::pos_real_1(r64(-0.1)));
   }
 }
 

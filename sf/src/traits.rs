@@ -261,6 +261,8 @@ pub trait Float : Base {
 pub trait Constants {
   // $e^1$
   const E: Self;
+  // $e^{-1}$
+  const FRAC_1_E: Self;
   // $\pi$
   const PI: Self;
   // $1/\pi$
@@ -282,7 +284,7 @@ pub trait Constants {
 }
 
 
-pub trait Value: Base+Field+Normed+Roots+Constants {}
+pub trait Value: Base+Field+Normed+Roots+Constants+Classify+Power<isize> {}
 
 pub trait RealValue: Value+RealType {}
 impl<T> RealValue for T where T:Value+RealType {}

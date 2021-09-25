@@ -301,6 +301,7 @@ impl PartialEq<r64> for c64 {
 
 impl Constants for c64 {
   const E: c64 = c64 { re: r64(2.7182818284590452354), im: r64::zero };
+  const FRAC_1_E: c64 = c64 { re: r64(0.3678794411714423215), im: r64::zero };
   const PI: c64 = c64 { re: r64(3.1415926535897932385), im: r64::zero };
   const FRAC_1_PI: c64 = c64 { re: r64(0.31830988618379067154), im: r64::zero };
   const FRAC_PI_2: c64 = c64 { re: r64(1.5707963267948966192), im: r64::zero };
@@ -310,6 +311,28 @@ impl Constants for c64 {
   const LOG2: c64 = c64 { re: r64(0.69314718055994530942), im: r64::zero };
   const FRAC_1_LOG2: c64 = c64 { re: r64(1.4426950408889634074), im: r64::zero };
   const FRAC_LOG2PI_2: c64 = c64 { re: r64(0.91893853320467274178), im: r64::zero };
+}
+
+impl Classify for c64 {
+  #[inline] fn is_nan(self) -> bool { self.re.is_nan() || self.im.is_nan() }
+  #[inline] fn is_infinite(self) -> bool { self.re.is_infinite() || self.im.is_infinite()}
+  #[inline] fn is_finite(self) -> bool { self.re.is_finite() && self.im.is_finite() }
+  #[inline] fn is_zero(self) -> bool { self.re.is_zero() && self.im.is_zero() }
+  #[inline] fn is_negzero(self) -> bool { self.im.is_zero() && self.re.is_negzero() }
+  #[inline] fn is_real(self) -> bool { self.im.is_zero() }
+  #[inline] fn is_imag(self) -> bool { self.re.is_zero() }
+  #[inline] fn is_negreal(self) -> bool { self.is_real() && self.re.is_negreal() }
+  #[inline] fn is_posreal(self) -> bool { self.is_real() && self.re.is_posreal() }
+  #[inline] fn is_nonnegreal(self) -> bool { self.is_real() && self.re.is_nonnegreal() }
+  #[inline] fn is_nonposreal(self) -> bool { self.is_real() && self.re.is_nonposreal() }
+  #[inline] fn is_int(self) -> bool { self.re.is_int() && self.is_real() }
+  #[inline] fn is_posint(self) -> bool { self.is_int() && self.is_posreal() }
+  #[inline] fn is_negint(self) -> bool { self.is_int() && self.is_negreal() }
+  #[inline] fn is_nonposint(self) -> bool { self.is_int() && self.is_nonposreal() }
+  #[inline] fn is_nonnegint(self) -> bool { self.is_int() && self.is_nonnegreal() }
+  #[inline] fn is_evenint(self) -> bool { self.is_real() && self.re.is_evenint() }
+  #[inline] fn is_oddint(self) -> bool { self.is_real() && self.re.is_oddint() }
+  #[inline] fn is_halfint(self) -> bool { self.is_real() && self.re.is_halfint() }
 }
 
 impl Base for c64 {}

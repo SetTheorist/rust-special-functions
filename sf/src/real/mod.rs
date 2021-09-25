@@ -171,11 +171,12 @@ macro_rules! lift1 {
 }
 
 impl Constants for r64 {
-  const E: r64 = r64(2.7182818284590452354);
-  const PI: r64 = r64(3.1415926535897932385);
+  const E: r64         = r64(2.7182818284590452354);
+  const FRAC_1_E: r64  = r64(0.3678794411714423215);
+  const PI: r64        = r64(3.1415926535897932385);
   const FRAC_1_PI: r64 = r64(0.31830988618379067154);
   const FRAC_PI_2: r64 = r64(1.5707963267948966192);
-  const SQRT2PI: r64 = r64(2.5066282746310005024);
+  const SQRT2PI: r64   = r64(2.5066282746310005024);
   const FRAC_1_SQRT2PI: r64 = r64(0.39894228040143267794);
   const FRAC_1_SQRTPI: r64 = r64(0.56418958354775628695);
   const LOG2: r64 = r64(0.69314718055994530942);
@@ -231,6 +232,38 @@ impl Value for r64 {}
 
 impl Power for r64 {
   fn pow(self, p: r64) -> r64 { r64(self.0.powf(p.0)) }
+}
+
+impl Classify for r64 {
+  #[inline] fn is_nan(self) -> bool { self.0.is_nan() }
+  #[inline] fn is_infinite(self) -> bool { self.0.is_infinite() }
+  #[inline] fn is_finite(self) -> bool { self.0.is_finite() }
+  #[inline] fn is_zero(self) -> bool { self.0 == 0.0 }
+  #[inline] fn is_negzero(self) -> bool { self.0 == 0.0 && 1.0_f64.copysign(self.0) < 0.0}
+  #[inline] fn is_real(self) -> bool { true }
+  #[inline] fn is_imag(self) -> bool { false }
+  #[inline] fn is_negreal(self) -> bool { self.0 < 0.0 }
+  #[inline] fn is_posreal(self) -> bool { self.0 > 0.0 }
+  #[inline] fn is_nonnegreal(self) -> bool { self.0 >= 0.0 }
+  #[inline] fn is_nonposreal(self) -> bool { self.0 <= 0.0 }
+  #[inline] fn is_int(self) -> bool { self == self.trunc() }
+  #[inline] fn is_posint(self) -> bool { self.is_int() && self.is_posreal() }
+  #[inline] fn is_negint(self) -> bool { self.is_int() && self.is_negreal() }
+  #[inline] fn is_nonposint(self) -> bool { self.is_int() && self.is_nonposreal() }
+  #[inline] fn is_nonnegint(self) -> bool { self.is_int() && self.is_nonnegreal() }
+  #[inline] fn is_evenint(self) -> bool {
+    const last_odd : f64 = 9007199254740991_f64; // 2^53-1
+    self.is_int()
+    && (self.0.abs() > last_odd
+        || (self.0.abs().trunc() as i64)%2 == 0)
+  }
+  #[inline] fn is_oddint(self) -> bool {
+    const last_odd : f64 = 9007199254740991_f64; // 2^53-1
+    self.is_int()
+    && self.0.abs() <= last_odd
+    && (self.0.abs().trunc() as i64)%2 == 1
+  }
+  #[inline] fn is_halfint(self) -> bool { (self.0*2.0).is_int() }
 }
 
 impl Float for r64 {
