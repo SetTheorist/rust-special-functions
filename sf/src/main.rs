@@ -90,6 +90,7 @@ U+16Ex 	ᛠ 	ᛡ 	ᛢ 	ᛣ 	ᛤ 	ᛥ 	ᛦ 	ᛧ 	ᛨ 	ᛩ 	ᛪ 	᛫ 	᛬ 	᛭ 	�
 U+16Fx 	ᛰ 	ᛱ 	ᛲ 	ᛳ 	ᛴ 	ᛵ 	ᛶ 	ᛷ 	ᛸ
 */
 
+mod agm;
 mod airy;
 mod algorithm;
 mod basic;
@@ -1223,7 +1224,7 @@ fn main() {
       b.to_f32()*b.to_f32(), f16::f16::from_f32(b.to_f32()*b.to_f32()).0);
   }
 
-  if true {
+  if false {
     println!("-----");
     println!("Lambert");
     let x = r64(-0.1);
@@ -1258,12 +1259,21 @@ fn main() {
     println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg(x));
     println!("W-1({}) = {:.16e}", x, lambert::impls::real_branch_neg_2(x));
   }
-  if true {
+  if false {
     for i in 1..10 {
       println!("{:5}  {:.16e}  | {:.16e}", (1<<i)+1,
         integration::TanhRule::new(r64(0.0), r64(1.0), (1<<i)+1).integrate(trig::sf_cos).0,
         trig::sf_sin(r64(1.0)).0);
     }
+  }
+  if true {
+    println!("-----");
+    println!("AGM:");
+    println!("{:e}", agm::impls::impl_scalar(r64(24.0), r64(6.0)));
+    println!("{:e}", agm::impls::impl_scalar(r64(1.0), sf_sqrt(ι(2))).recip());
+    println!("{:e}", agm::impls::impl_scalar(ι(1), ι(2):r64).recip());
+    println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), None));
+    println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), Some(r64(1.0))));
   }
 }
 
