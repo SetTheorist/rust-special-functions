@@ -1,11 +1,13 @@
 
-pub trait EllipticIntegral {
+pub trait EllipticIntegral : Value {
   // complete elliptic integral of the first kind
   fn ellint_k(self) -> Self;
+  fn ellint_kc(self) -> Self { impls::kc(self).ellint_k() }
 
   // incomplete elliptic integral of the first kind
   fn ellint_f(self, phi:Self) -> Self;
 }
+
 pub fn sf_ellint_k<V:EllipticIntegral>(k:V) -> V { k.ellint_k() }
 pub fn sf_ellint_f<V:EllipticIntegral>(phi:V, k:V) -> V { k.ellint_f(phi) }
 

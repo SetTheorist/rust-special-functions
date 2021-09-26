@@ -20,9 +20,10 @@
 #![feature(const_trait_impl)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
-//#![features(optimize_attribute)] // [#optimize(speed)]
-//#![features(never_type)]
-//#![features(marker_trait_attr)] // #[marker]
+//#![feature(marker_trait_attr)] // #[marker]
+//#![feature(never_type)]
+//#![feature(optimize_attribute)] // [#optimize(speed)]
+//#![feature(specialization)]
 
 // ** IDEAS, REMINDERS:
 //
@@ -114,6 +115,7 @@ mod poly;
 mod quad;
 mod real;
 mod sievert;
+mod theta;
 mod traits;
 mod trig;
 mod util;
@@ -141,6 +143,7 @@ use crate::orthopoly::chebyshev_t::*;
 use crate::orthopoly::*;
 use crate::poly::*;
 use crate::real::*;
+use crate::theta::*;
 use crate::traits::*;
 
 fn rel(ex: f64, ap: f64) -> f64 {
@@ -1290,6 +1293,22 @@ fn main() {
     println!("f = {:e}", ellint::impls::ell_f(r64::PI/2, r64(0.5)));
     println!("f = {:e}", ellint::impls::ell_f(r64::PI/4, r64(0.5)));
     //println!("k = {:e}", sf_ellint_k(c64{re:r64(0.5),im:r64(0.1)}));
+  }
+  if true {
+    println!("-----");
+    println!("Theta:");
+    println!("th_1 = {:e}", sf_theta_1(r64(2.0), r64(1.0)/3));
+    println!("th_2 = {:e}", sf_theta_2(r64(2.0), r64(1.0)/3));
+    println!("th_3 = {:e}", sf_theta_3(r64(2.0), r64(1.0)/3));
+    println!("th_3 = {:e}", theta::impls::theta_3_series_xform(r64(2.0), r64(1.0)/3));
+    println!("th_4 = {:e}", sf_theta_4(r64(2.0), r64(1.0)/3));
+    println!("th_1 = {:e}", sf_theta_1(r64(9.0), r64(1.0)/3));
+    println!("th_2 = {:e}", sf_theta_2(r64(9.0), r64(1.0)/3));
+    println!("th_3 = {:e}", sf_theta_3(r64(9.0), r64(1.0)/3));
+    println!("th_3 = {:e}", theta::impls::theta_3_series_xform(r64(9.0), r64(1.0)/3));
+    println!("th_4 = {:e}", sf_theta_4(r64(9.0), r64(1.0)/3));
+    println!("th_1 = {:e}", sf_theta_1(r64(2.0), r64(1.0)/3));
+    println!("th_1 = {:e}", sf_theta_1(r64(2.0)+r64::PI*2, r64(1.0)/3));
   }
 }
 
