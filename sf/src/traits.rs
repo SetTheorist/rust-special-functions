@@ -277,13 +277,14 @@ pub trait Float : Base {
   // checks for bitwise identity
   fn identical(self, rhs:Self) -> bool;
 
-  const nan: Self;
   const infinity: Self;
   const neg_infinity: Self;
   const neg_zero: Self;
 }
 
 pub trait Constants {
+  const nan: Self;
+
   // $e^1$
   const E: Self;
   // $e^{-1}$
@@ -448,7 +449,6 @@ impl Float for f64 {
     self.to_bits() == rhs.to_bits()
   }
 
-  const nan: Self = f64::NAN;
   const infinity: Self = f64::INFINITY;
   const neg_infinity: Self = f64::NEG_INFINITY;
   const neg_zero: Self = unsafe{std::mem::transmute(0x8000_0000_0000_0000_u64)};

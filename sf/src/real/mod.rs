@@ -173,6 +173,8 @@ macro_rules! lift1 {
 }
 
 impl Constants for r64 {
+  const nan: Self = r64(f64::NAN);
+
   const E: r64         = r64(2.7182818284590452354);
   const FRAC_1_E: r64  = r64(0.3678794411714423215);
   const PI: r64        = r64(3.1415926535897932385);
@@ -291,7 +293,6 @@ impl Float for r64 {
   fn identical(self, rhs:Self) -> bool {
     self.0.identical(rhs.0)
   }
-  const nan: Self = r64(f64::NAN);
   const infinity: Self = r64(f64::INFINITY);
   const neg_infinity: Self = r64(f64::NEG_INFINITY);
   const neg_zero: Self = r64(unsafe{std::mem::transmute(0x8000_0000_0000_0000_u64)});

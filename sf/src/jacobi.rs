@@ -17,7 +17,7 @@ use crate::trig::*;
 macro_rules! agm {
   ($fn:ident; $cn:tt,$dn:tt,$sn:tt; $val:expr; $cnf:expr,$dnf:expr,$snf:expr) => {
     #[inline]
-    pub fn $fn<V:Value+AGM+Trig+Float>(x:V, k:V) -> V {
+    pub fn $fn<V:Value+AGM+Trig>(x:V, k:V) -> V {
       let ($cn,$dn,$sn) = jacobi_agm_general::<V,$cnf,$dnf,$snf>(x,k);
       $val
     }
@@ -44,7 +44,7 @@ agm!{jacobi_agm_sd; _, dn, sn; sn/dn; false, true ,true}
 // TODO: Appears to give the incorrect values at k==1 (e.g. z=2)
 // (though nearby values of k (0.999) are still correct)
 pub fn jacobi_agm_general
-  <V:Value+AGM+Trig+Float, const CN:bool, const DN:bool, const SN:bool>
+  <V:Value+AGM+Trig, const CN:bool, const DN:bool, const SN:bool>
   (x:V, k:V) -> (V,V,V)
 {
   if k.is_zero() {

@@ -300,6 +300,8 @@ impl PartialEq<r64> for c64 {
 ////////////////////////////////////////////////////////////////////////////////
 
 impl Constants for c64 {
+  const nan: c64 = c64 { re: r64::nan, im: r64::nan };
+
   const E: c64 = c64 { re: r64(2.7182818284590452354), im: r64::zero };
   const FRAC_1_E: c64 = c64 { re: r64(0.3678794411714423215), im: r64::zero };
   const PI: c64 = c64 { re: r64(3.1415926535897932385), im: r64::zero };

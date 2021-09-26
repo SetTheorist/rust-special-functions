@@ -1361,6 +1361,9 @@ fn main() {
     println!("dn(1) {:e} {:e}", jacobi::impls::jacobi_agm_dn(z, r64(1.0)), sf_sech(z));
     println!("sn(0) {:e} {:e}", jacobi::impls::jacobi_agm_sn(z, r64(0.0)), sf_sin(z));
     println!("sn(1) {:e} {:e}", jacobi::impls::jacobi_agm_sn(z, r64(1.0)), sf_tanh(z));
+
+    println!("cn {:e}", jacobi::impls::jacobi_agm_cn(c64::I, ι(0.5)));
+    println!("cn {:e}", jacobi::impls::jacobi_agm_cn(c64::I+1, ι(0.5)));
     /*
     let z = r64(2.0);
     for i in 0..=64 {
