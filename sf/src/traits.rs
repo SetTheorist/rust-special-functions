@@ -87,6 +87,11 @@ impl<T: Base + Additive + Multiplication> Ring for T {}
 
 pub trait Multiplicative: Multiplication + Division {}
 
+pub trait DivisionRing: Ring + Division {}
+
+impl<T: Ring + Division> DivisionRing for T {}
+
+
 // left-embedding has issues due to current compiler constraints
 // c.f. https://github.com/rust-lang/rust/issues/86635
 // can we get trait alias to work?

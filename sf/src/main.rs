@@ -99,6 +99,7 @@ mod bessel;
 mod complex;
 mod dawson;
 mod debye;
+mod dual;
 mod ellint;
 mod erf;
 mod exp;
@@ -133,6 +134,7 @@ use crate::algorithm::*;
 use crate::bessel::*;
 use crate::complex::*;
 use crate::dawson::*;
+use crate::dual::*;
 use crate::ellint::*;
 use crate::exp::*;
 use crate::gamma::*;
@@ -1309,6 +1311,24 @@ fn main() {
     println!("th_4 = {:e}", sf_theta_4(r64(9.0), r64(1.0)/3));
     println!("th_1 = {:e}", sf_theta_1(r64(2.0), r64(1.0)/3));
     println!("th_1 = {:e}", sf_theta_1(r64(2.0)+r64::PI*2, r64(1.0)/3));
+  }
+  if true {
+    println!("-----");
+    println!("Dual:");
+    let a = Dual::from(r64(3.0));
+    let b = Dual{x:r64(1.0),dx:r64(1.0)};
+    println!("{}", a);
+    println!("{}", b);
+    println!("{}", a*b);
+    println!("{}", a*a);
+    println!("{}", b*b);
+    println!("{}", b*b*b);
+    println!("{}", b*b*b*b);
+    println!("{}", b/b);
+    let bb = Dual{x:b,dx:b};
+    println!("{}", bb);
+    println!("{}", bb*bb);
+    println!("{}", bb*bb*bb*bb);
   }
 }
 
