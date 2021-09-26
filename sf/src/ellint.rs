@@ -2,14 +2,22 @@
 pub trait EllipticIntegral : Value {
   // complete elliptic integral of the first kind
   fn ellint_k(self) -> Self;
-  fn ellint_kc(self) -> Self { impls::kc(self).ellint_k() }
+  fn ellint_kc(self) -> Self { sf_kc(self).ellint_k() }
 
   // incomplete elliptic integral of the first kind
   fn ellint_f(self, phi:Self) -> Self;
 }
 
+#[inline]
 pub fn sf_ellint_k<V:EllipticIntegral>(k:V) -> V { k.ellint_k() }
+pub fn sf_ellint_kc<V:EllipticIntegral>(k:V) -> V { k.ellint_kc() }
+#[inline]
 pub fn sf_ellint_f<V:EllipticIntegral>(phi:V, k:V) -> V { k.ellint_f(phi) }
+
+#[inline]
+pub fn sf_kc<V:Value>(k:V) -> V {
+  sf_sqrt(V::one - k.sqr())
+}
 
 use crate::traits::*;
 use crate::agm::*;
@@ -35,18 +43,15 @@ impl EllipticIntegral for r64 {
 }
 
 pub mod impls {
+use super::*;
 use crate::agm::*;
 use crate::log::*;
 use crate::trig::*;
 use crate::traits::*;
 
-#[inline]
-pub fn kc<V:Value>(k:V) -> V {
-  sf_sqrt(V::one - k.sqr())
-}
 
 pub fn ell_k<V:Value+AGM>(k:V) -> V {
-  let a = sf_agm(ι(1), kc(k));
+  let a = sf_agm(ι(1), sf_kc(k));
   V::PI / (a*2)
 }
 
@@ -63,7 +68,7 @@ pub fn ell_f<V:Value+Log+Trig>(phi:V, k:V) -> V {
 }
 
 pub fn f_agm_method<V:Value+AGM>(phi:V, k:V) -> V {
-  let (an,bn,cn,phin) = sf_agm_vec_extra(V::one, kc(k), phi, k);
+  let (an,bn,cn,phin) = sf_agm_vec_extra(V::one, sf_kc(k), phi, k);
   let n = phin.len();
   phin[n-1] / (an[n-1]<<((n-1) as isize))
 }

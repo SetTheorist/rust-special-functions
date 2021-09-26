@@ -107,6 +107,7 @@ mod f16;
 mod gamma;
 mod hypergeom;
 mod integration;
+mod jacobi;
 mod kahan;
 mod lambert;
 mod log;
@@ -147,6 +148,7 @@ use crate::poly::*;
 use crate::real::*;
 use crate::theta::*;
 use crate::traits::*;
+use crate::trig::*;
 
 fn rel(ex: f64, ap: f64) -> f64 {
   if ex == ap {
@@ -1281,8 +1283,9 @@ fn main() {
     println!("{:e}", agm::impls::impl_scalar(r64(1.0), sf_sqrt(ι(2))).recip());
     println!("{:e}", agm::impls::impl_scalar(ι(1), ι(2):r64).recip());
     println!("{:e}", agm::impls::impl_scalar(ι(1), c64::I));
-    println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), r64(1.0), None));
-    println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), r64(1.0), Some(r64(1.0))));
+    println!("{:e}", agm::sf_agm(r64(1.0), sf_sqrt(ι(2))));
+    //println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), r64(1.0), None));
+    //println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), r64(1.0), Some(r64(1.0))));
   }
   if true {
     println!("-----");
@@ -1312,7 +1315,7 @@ fn main() {
     println!("th_1 = {:e}", sf_theta_1(r64(2.0), r64(1.0)/3));
     println!("th_1 = {:e}", sf_theta_1(r64(2.0)+r64::PI*2, r64(1.0)/3));
   }
-  if true {
+  if false {
     println!("-----");
     println!("Dual:");
     let a = Dual::from(r64(3.0));
@@ -1330,5 +1333,50 @@ fn main() {
     println!("{}", bb*bb);
     println!("{}", bb*bb*bb*bb);
   }
+  if true {
+    println!("-----");
+    println!("Jacobi:");
+    let z = r64(2.0);
+    let k = r64(1.0)/3;
+    println!(" = {:?}", jacobi::impls::jacobi_agm_general::<_,true,true,true>(z, k));
+    let zeta = r64::PI*z/sf_ellint_k(k)/2;
+    let q = sf_exp(-r64::PI*sf_ellint_kc(k)/sf_ellint_k(k));
+    let t10 = sf_theta_1(ι(0),q);
+    let t1z = sf_theta_1(zeta,q);
+    let t20 = sf_theta_2(ι(0),q);
+    let t2z = sf_theta_2(zeta,q);
+    let t30 = sf_theta_3(ι(0),q);
+    let t3z = sf_theta_3(zeta,q);
+    let t40 = sf_theta_4(ι(0),q);
+    let t4z = sf_theta_4(zeta,q);
+    let cn = (t40*t2z)/(t20*t4z);
+    let dn = (t40*t3z)/(t30*t4z);
+    let sn = (t30*t1z)/(t20*t4z);
+    println!("cn = {:e}", cn);
+    println!("dn = {:e}", dn);
+    println!("sn = {:e}", sn);
+    println!("cn(0) {:e} {:e}", jacobi::impls::jacobi_agm_cn(z, r64(0.0)), sf_cos(z));
+    println!("cn(1) {:e} {:e}", jacobi::impls::jacobi_agm_cn(z, r64(1.0)), sf_sech(z));
+    println!("dn(0) {:e} {:e}", jacobi::impls::jacobi_agm_dn(z, r64(0.0)), r64(1.0));
+    println!("dn(1) {:e} {:e}", jacobi::impls::jacobi_agm_dn(z, r64(1.0)), sf_sech(z));
+    println!("sn(0) {:e} {:e}", jacobi::impls::jacobi_agm_sn(z, r64(0.0)), sf_sin(z));
+    println!("sn(1) {:e} {:e}", jacobi::impls::jacobi_agm_sn(z, r64(1.0)), sf_tanh(z));
+    /*
+    let z = r64(2.0);
+    for i in 0..=64 {
+      let k = i/r64(64.0);
+      println!("cn({:.5})={:.5}", k, jacobi::impls::jacobi_agm_cn(z, k));
+    }
+    for i in 0..=64 {
+      let k = i/r64(64.0);
+      println!("dn({:.5})={:.5}", k, jacobi::impls::jacobi_agm_dn(z, k));
+    }
+    for i in 0..=64 {
+      let k = i/r64(64.0);
+      println!("sn({:.5})={:.5}", k, jacobi::impls::jacobi_agm_sn(z, k));
+    }
+    */
+  }
+  //println!("{:e} {:e}", sf_tan(r64(1.0)), trig::impls::tan_contfrac(r64(1.0)));
 }
 

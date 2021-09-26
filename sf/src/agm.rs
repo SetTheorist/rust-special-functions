@@ -50,6 +50,7 @@ impl AGM for c64 {
 }
 
 pub fn impl_scalar<V:Value>(a:V, b:V) -> V {
+  if a.is_zero() || b.is_zero() {return V::zero;}
   let mut a = a;
   let mut b = b;
   for n in 1..100 {
@@ -64,6 +65,7 @@ pub fn impl_scalar<V:Value>(a:V, b:V) -> V {
 
 use crate::trig::*;
 pub fn impl_vec<V:Value+Trig>(a:V, b:V, c0:V, extra:Option<V>) -> (Vec<V>,Vec<V>,Vec<V>,Option<Vec<V>>) {
+  if a.is_zero() || b.is_zero() { todo!(); }
   // TODO: be smarter with vectors...
   // maybe cleaner return value
   let mut va = Vec::new();
@@ -85,7 +87,7 @@ pub fn impl_vec<V:Value+Trig>(a:V, b:V, c0:V, extra:Option<V>) -> (Vec<V>,Vec<V>
   let mut vc = Vec::with_capacity(n);
   vc.push(c0);
   for i in 1..n {
-    vc.push((va[i] - vb[i]) / 2);
+    vc.push((va[i-1] - vb[i-1]) / 2);
   }
   let vd =
     match extra {
