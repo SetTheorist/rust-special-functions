@@ -12,16 +12,13 @@ pub trait BesselJ<N: Additive+Embeds<isize>>: Value + Embeds<N> {
     (self.bessel_j(nu - 1) - self.bessel_j(nu + 1)) / 2
   }
 }
-pub fn sf_bessel_j<N, V>(nu: N, z: V) -> V
-where V:BesselJ<N>, N:Additive+Embeds<isize>,
-{
-  z.bessel_j(nu)
-}
-pub fn sf_bessel_j_ddz<N, V>(nu: N, z: V) -> V
-where V:BesselJ<N>, N:Additive+Embeds<isize>,
-{
-  z.bessel_j_ddz(nu)
-}
+
+#[inline]
+pub fn sf_bessel_j<N, V:BesselJ<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+{ z.bessel_j(nu) }
+#[inline]
+pub fn sf_bessel_j_ddz<N, V:BesselJ<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+{ z.bessel_j_ddz(nu) }
 
 // TODO: Hankel^1, Hankel^2 also
 

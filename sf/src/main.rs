@@ -123,8 +123,6 @@ mod trig;
 mod util;
 mod zeta;
 
-// idea: auto-differentiation (using "dual" numbers) ?
-
 use std::str::FromStr;
 use std::time::Instant;
 
@@ -1381,5 +1379,13 @@ fn main() {
     */
   }
   //println!("{:e} {:e}", sf_tan(r64(1.0)), trig::impls::tan_contfrac(r64(1.0)));
+  if true {
+    println!("-----");
+    println!("Hurwitz Zeta:");
+    println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(r64(4.5),r64(0.25)));
+    println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(ι(4.5),c64::I+r64(0.25)));
+    println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(c64::I+r64(4.5),c64::I+r64(0.25)));
+    println!("{:e}  {:e}", zeta::impls_hurwitz::hurwitz_series_em(r64(4.5),r64(1.00)), zeta::impls::zeta_series_em9(r64(4.5),r64::epsilon));
+  }
 }
 

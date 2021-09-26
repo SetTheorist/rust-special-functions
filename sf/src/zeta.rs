@@ -5,6 +5,12 @@ pub trait Zeta: Value {
   fn zeta_m1(self) -> Self;
 }
 
+pub trait HurwitzZeta: Value {
+  fn hurwitz_zeta(self, a:Self) -> Self;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 use crate::real::r64;
 pub fn sf_zeta_approx(n: usize) -> f64 { impls::zeta_series_em9(ι(n as isize): r64, r64::mu_epsilon).0 }
 
@@ -89,3 +95,43 @@ pub fn zeta_m1_directseries(s:r64) -> r64 {
   sumit(terms, 1e-16)
 }
 */
+
+////////////////////////////////////////////////////////////////////////////////
+
+pub mod impls_hurwitz {
+use super::*;
+use crate::traits::*;
+
+// TODO: generally looks incorrect for complex values
+pub fn hurwitz_series_em<V:Value+Power>(z:V, a:V) -> V {
+  if z == 1 { return ι(f64::INFINITY); } // TODO
+  // TODO: validate reflection
+  /*
+  if z.re() < 1 {
+    return 2 * (2*pi).pow(z-1)*sf_sin(V::PI*z/2)*sf_gamma(1-z)*sf_hurwitz_zeta(1-z);
+  }
+  */
+  let mut oores;
+  let mut ores = V::zero;
+  let mut res = V::zero;
+  let mut sum = a.pow(-z) + (a+1).pow(-z);
+  let em1 = z/12;
+  let em2 = z*(z+1)*(z+2)/720;
+  let em3 = z*(z+1)*(z+2)*(z+3)*(z+4)/30240;
+  let em4 = z*(z+1)*(z+2)*(z+3)*(z+4)*(z+5)*(z+6)/1209600;
+  let em5 = z*(z+1)*(z+2)*(z+3)*(z+4)*(z+5)*(z+6)*(z+7)*(z+8)/239500800;
+  for n in 2..1000 {
+    sum += (a+n).pow(-z);
+    oores = ores;
+    ores = res;
+    res = sum + (a+n).pow(-z+1)/(z-1) - (a+n).pow(-z)/2
+      + (a+n).pow(-z-1)*em1 - (a+n).pow(-z-3)*em2
+      + (a+n).pow(-z-5)*em3 - (a+n).pow(-z-7)*em4
+      + (a+n).pow(-z-9)*em5;
+    if res==ores && res==oores {print!("*{}*",n);break;}
+  }
+  res
+}
+
+}
+
