@@ -98,6 +98,7 @@ mod bessel;
 mod complex;
 mod dawson;
 mod debye;
+mod ellint;
 mod erf;
 mod exp;
 mod f16;
@@ -130,6 +131,7 @@ use crate::algorithm::*;
 use crate::bessel::*;
 use crate::complex::*;
 use crate::dawson::*;
+use crate::ellint::*;
 use crate::exp::*;
 use crate::gamma::*;
 use crate::integration::Integrator;
@@ -1267,13 +1269,27 @@ fn main() {
     }
   }
   if true {
+    use crate::agm::*;
     println!("-----");
     println!("AGM:");
-    println!("{:e}", agm::impls::impl_scalar(r64(24.0), r64(6.0)));
+    println!("{:e}", agm::sf_agm(r64(24.0), r64(6.0)));
     println!("{:e}", agm::impls::impl_scalar(r64(1.0), sf_sqrt(ι(2))).recip());
     println!("{:e}", agm::impls::impl_scalar(ι(1), ι(2):r64).recip());
-    println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), None));
-    println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), Some(r64(1.0))));
+    println!("{:e}", agm::impls::impl_scalar(ι(1), c64::I));
+    println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), r64(1.0), None));
+    println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), r64(1.0), Some(r64(1.0))));
+  }
+  if true {
+    println!("-----");
+    println!("Elliptic:");
+    println!("k(1.5) = {:e}", sf_ellint_k(r64(1.5)));
+    println!("k(0.5) = {:e}", sf_ellint_k(r64(0.5)));
+    println!("k(0.0) = {:e}", sf_ellint_k(r64(0.0)));
+    println!("f = {:e}", ellint::impls::f_agm_method(r64::PI/2, r64(0.5)));
+    println!("f = {:e}", ellint::impls::f_ascending_landen(r64::PI/2, r64(0.5)));
+    println!("f = {:e}", ellint::impls::ell_f(r64::PI/2, r64(0.5)));
+    println!("f = {:e}", ellint::impls::ell_f(r64::PI/4, r64(0.5)));
+    //println!("k = {:e}", sf_ellint_k(c64{re:r64(0.5),im:r64(0.1)}));
   }
 }
 

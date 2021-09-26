@@ -48,7 +48,7 @@ pub fn real_branch_pos_2<V:RealValue+Exp+Float+Log>(x:V) -> V {
 
 // negative real branch
 pub fn real_branch_neg<V:RealValue+Exp+Float+Log>(x:V) -> V {
-  if x < -V::FRAC_1_E || x.is_posreal() {return V::nan;}
+  if !x.є(-V::FRAC_1_E, ι(0)) {return V::nan;}
   if x == 0 {return V::zero;}
   if x == -V::FRAC_1_E {return ι(-1);}
   let w;
@@ -67,7 +67,7 @@ pub fn real_branch_neg<V:RealValue+Exp+Float+Log>(x:V) -> V {
   halley_iter(x, w)
 }
 pub fn real_branch_neg_2<V:RealValue+Exp+Float+Log>(x:V) -> V {
-  if x < -V::FRAC_1_E || x.is_posreal() {return V::nan;}
+  if !x.є(-V::FRAC_1_E, ι(0)) {return V::nan;}
   if x == 0 {return V::zero;}
   if x == -V::FRAC_1_E {return ι(-1);}
   let w;

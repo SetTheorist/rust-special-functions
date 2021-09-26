@@ -1,57 +1,98 @@
 
 
 pub trait AGM : Sized {
-  fn agm(self,b:Self) -> Self;
-  fn agm_vec(self,b:Self,extra:bool) -> (Self,Vec<Self>,Vec<Self>,Vec<Self>,Option<Vec<Self>>);
+  fn agm(self, b:Self) -> Self;
+  fn agm_vec(self, b:Self, c0:Self) -> (Vec<Self>,Vec<Self>,Vec<Self>);
+  fn agm_vec_extra(self, b:Self, c0:Self, extra:Self) -> (Vec<Self>,Vec<Self>,Vec<Self>,Vec<Self>);
+}
+
+pub fn sf_agm<V:AGM>(a:V, b:V) -> V {
+  a.agm(b)
+}
+pub fn sf_agm_vec<V:AGM>(a:V, b:V, c0:V) -> (Vec<V>,Vec<V>,Vec<V>) {
+  a.agm_vec(b, c0)
+}
+pub fn sf_agm_vec_extra<V:AGM>(a:V, b:V, c0:V, extra:V) -> (Vec<V>,Vec<V>,Vec<V>,Vec<V>) {
+  a.agm_vec_extra(b, c0, extra)
 }
 
 pub mod impls {
+use crate::agm::*;
+use crate::complex::*;
+use crate::real::*;
 use crate::traits::*;
+
+impl AGM for r64 {
+  fn agm(self,b:Self) -> Self {
+    impl_scalar(self, b)
+  }
+  fn agm_vec(self, b:Self, c0:Self) -> (Vec<Self>,Vec<Self>,Vec<Self>) {
+    let (va,vb,vc,vd) = impl_vec(self, b, c0, None);
+    (va,vb,vc)
+  }
+  fn agm_vec_extra(self, b:Self, c0:Self, extra:Self) -> (Vec<Self>,Vec<Self>,Vec<Self>,Vec<Self>) {
+    let (va,vb,vc,vd) = impl_vec(self, b, c0, Some(extra));
+    (va,vb,vc,vd.unwrap())
+  }
+}
+impl AGM for c64 {
+  fn agm(self, b:Self) -> Self {
+    impl_scalar(self, b)
+  }
+  fn agm_vec(self, b:Self, c0:Self) -> (Vec<Self>,Vec<Self>,Vec<Self>) {
+    let (va,vb,vc,vd) = impl_vec(self, b, c0, None);
+    (va,vb,vc)
+  }
+  fn agm_vec_extra(self, b:Self, c0:Self, extra:Self) -> (Vec<Self>,Vec<Self>,Vec<Self>,Vec<Self>) {
+    let (va,vb,vc,vd) = impl_vec(self, b, c0, Some(extra));
+    (va,vb,vc,vd.unwrap())
+  }
+}
 
 pub fn impl_scalar<V:Value>(a:V, b:V) -> V {
   let mut a = a;
   let mut b = b;
-  for n in 1.. {
+  for n in 1..100 {
     let a0 = a;
     let b0 = b;
     a = (a0 + b0) / 2;
     b = sf_sqrt(a0 * b0);
-    if a==b {print!("({})",n);break;}
+    if a==b || (a==a0 && b==b0) {print!("({})",n);break;}
   }
   a
 }
 
 use crate::trig::*;
-pub fn impl_vec<V:Value+Trig>(a:V, b:V, extra:Option<V>) -> (V,Vec<V>,Vec<V>,Vec<V>,Option<Vec<V>>) {
+pub fn impl_vec<V:Value+Trig>(a:V, b:V, c0:V, extra:Option<V>) -> (Vec<V>,Vec<V>,Vec<V>,Option<Vec<V>>) {
   // TODO: be smarter with vectors...
   // maybe cleaner return value
   let mut va = Vec::new();
   let mut vb = Vec::new();
   let mut a = a;
   let mut b = b;
-  for i in 1.. {
+  for i in 1..1000 {
     va.push(a);
     vb.push(b);
     let a0 = a;
     let b0 = b;
     a = (a0 + b0) / 2;
     b = sf_sqrt(a0 * b0);
-    if a==b {print!("<{}>",i);break;}
+    if a==b || (a==a0 && b==b0) {print!("<{}>",i);break;}
   }
   va.push(a);
   vb.push(b);
   let n = va.len();
   let mut vc = Vec::with_capacity(n);
-  for i in 0..n {
+  vc.push(c0);
+  for i in 1..n {
     vc.push((va[i] - vb[i]) / 2);
   }
   let vd =
     match extra {
       Some(phi0) => {
         let mut vd = Vec::with_capacity(n);
-        vd.push(V::zero);
         vd.push(phi0);
-        for i in 2..n {
+        for i in 1..n {
           let x = vd[i-1] + sf_atan(sf_tan(vd[i-1])*vb[i-1]/va[i-1]);
           vd.push(x);
         }
@@ -59,7 +100,7 @@ pub fn impl_vec<V:Value+Trig>(a:V, b:V, extra:Option<V>) -> (V,Vec<V>,Vec<V>,Vec
       }
       None => { None }
     };
-  (a,va,vb,vc,vd)
+  (va,vb,vc,vd)
 }
 
 }

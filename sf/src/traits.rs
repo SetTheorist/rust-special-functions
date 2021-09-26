@@ -155,6 +155,17 @@ pub trait Ordered: Base + PartialOrd<Self> {
   fn round(self) -> Self;
   fn trunc(self) -> Self;
   fn rint(self) -> isize;
+
+  #[inline]
+  fn є(self, a:Self, b:Self) -> bool { a<=self && self<=b }
+  #[inline]
+  fn є_cc(self, a:Self, b:Self) -> bool { a.є(a,b) }
+  #[inline]
+  fn є_oc(self, a:Self, b:Self) -> bool { a<self && self<=b }
+  #[inline]
+  fn є_co(self, a:Self, b:Self) -> bool { a<=self && self<b }
+  #[inline]
+  fn є_oo(self, a:Self, b:Self) -> bool { a<self && self<b }
 }
 pub fn sf_min<V:Ordered>(a:V, b:V) -> V { a.min(b) }
 pub fn sf_max<V:Ordered>(a:V, b:V) -> V { a.max(b) }

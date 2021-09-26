@@ -23,6 +23,9 @@ paste = "*"
 #static assertions
 #static_assertions = "*"
 
+#accurate sum algorithms
+#accurate = "*"
+
 #approx = "*"
 #num-bigint = "*"
 #num-complex = "*"
