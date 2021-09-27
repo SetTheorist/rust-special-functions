@@ -410,6 +410,9 @@ impl ComplexType for c64 {
     let im = r * arg.sin();
     c64 { re, im }
   }
+  fn root_of_unity(n:isize) -> Self {
+    c64::polar(r64(1.0), r64::PI*2/n)
+  }
 }
 
 impl Value for c64 {}

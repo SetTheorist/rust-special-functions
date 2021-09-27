@@ -1382,10 +1382,24 @@ fn main() {
   if true {
     println!("-----");
     println!("Hurwitz Zeta:");
+    println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(r64(11.0),r64(2.25)));
     println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(r64(4.5),r64(0.25)));
     println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(ι(4.5),c64::I+r64(0.25)));
     println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(c64::I+r64(4.5),c64::I+r64(0.25)));
+    println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(c64::I+r64(4.5),c64::I*0+r64(0.25)));
+    println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(c64::I*3+r64(4.5),c64::I*3+r64(0.25)));
     println!("{:e}  {:e}", zeta::impls_hurwitz::hurwitz_series_em(r64(4.5),r64(1.00)), zeta::impls::zeta_series_em9(r64(4.5),r64::epsilon));
+  }
+  if true {
+    println!("-----");
+    println!("Elliptic:");
+    println!("k(1.5) = {:e}", sf_ellint_e(r64(1.5)));
+    println!("k(0.5) = {:e}", sf_ellint_e(r64(0.5)));
+    println!("k(0.0) = {:e}", sf_ellint_e(r64(0.0)));
+    println!("k(0.5) = {:e}", ellint::impls::e_agm(r64::PI/2, r64(0.5)));
+    println!("k(0.5) = {:e}", sf_ellint_e_inc(r64::PI/2, r64(0.5)));
+    println!("k(0.0) = {:e}", sf_ellint_e_inc(r64::PI/4, r64(0.5)));
+    //println!("f = {:e}", ellint::impls::f_agm_method(r64::PI/2, r64(0.5)));
   }
 }
 
