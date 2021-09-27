@@ -139,6 +139,7 @@ pub trait Roots: Field {
   fn nth_root(self, n: isize) -> Self;
 }
 pub fn sf_sqrt<V:Roots>(x:V) -> V { x.sqrt() }
+pub fn sf_sqrt_recip<V:Roots>(x:V) -> V { x.sqrt_recip() }
 
 pub trait Bounded {
   const MIN_VALUE: Self;

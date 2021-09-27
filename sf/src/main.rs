@@ -1400,6 +1400,10 @@ fn main() {
     println!("k(0.5) = {:e}", sf_ellint_e_inc(r64::PI/2, r64(0.5)));
     println!("k(0.0) = {:e}", sf_ellint_e_inc(r64::PI/4, r64(0.5)));
     //println!("f = {:e}", ellint::impls::f_agm_method(r64::PI/2, r64(0.5)));
+    println!("rc(0.5,0.1) = {:e}", sf_ellint_rc(r64(0.5), r64(0.1)));
+    println!("rc(0.1,0.5) = {:e}", sf_ellint_rc(r64(0.1), r64(0.5)));
+    println!("rf(0.1,0.5,0.9) = {:e}", sf_ellint_rf(r64(0.1), r64(0.5), r64(0.9)));
+    println!("rf(0.9,0.5,0.1) = {:e}", sf_ellint_rf(r64(0.9), r64(0.5), r64(0.1)));
   }
 }
 

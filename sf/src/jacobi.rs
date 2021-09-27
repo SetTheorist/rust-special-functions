@@ -5,10 +5,13 @@ pub trait JacobiElliptic : Sized {
   fn sn(self, k:Self) -> Self;
   // returns (cn,dn,sn)
   fn jacobi(self, k:Self) -> (Self,Self,Self);
+
+  fn am(self, k:Self) -> Self;
 }
 
 
 pub mod impls {
+use super::*;
 use crate::traits::*;
 use crate::agm::*;
 use crate::ellint::{sf_kc};
@@ -38,6 +41,11 @@ agm!{jacobi_agm_cs; cn, _, sn; cn/sn; true, false ,true}
 agm!{jacobi_agm_sc; cn, _, sn; sn/cn; true, false ,true}
 agm!{jacobi_agm_ds; _, dn, sn; dn/sn; false, true ,true}
 agm!{jacobi_agm_sd; _, dn, sn; sn/dn; false, true ,true}
+
+// TODO: more efficient implementations
+pub fn jacobi_am<V:Value+JacobiElliptic+Trig>(x:V, k:V) -> V {
+  sf_asin(x.sn(k))
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

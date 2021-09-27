@@ -1,12 +1,14 @@
 
-pub trait EllipticIntegral : Value {
+pub trait EllipticIntegralFirst : Value {
   // complete elliptic integral of the first kind
   fn ellint_k(self) -> Self;
   // complete complementary elliptic integral of the first kind
   fn ellint_kc(self) -> Self { sf_kc(self).ellint_k() }
   // incomplete elliptic integral of the first kind
   fn ellint_f(self, phi:Self) -> Self;
+}
 
+pub trait EllipticIntegralSecond : Value {
   // complete elliptic integral of the second kind
   fn ellint_e(self) -> Self;
   // complete complementary elliptic integral of the second kind
@@ -15,18 +17,38 @@ pub trait EllipticIntegral : Value {
   fn ellint_e_inc(self, phi:Self) -> Self;
 }
 
+pub trait EllipticIntegralThird : Value {
+  // complete elliptic integral of the third kind
+  fn ellint_pi(self, c:Self) -> Self;
+  // incomplete elliptic integral of the third kind
+  fn ellint_pi_inc(self, c:Self, phi:Self) -> Self;
+}
+
+pub trait EllipticIntegralSymmetric : Value {
+  fn ellint_rc(self, y:Self) -> Self;
+  fn ellint_rf(self, y:Self, z:Self) -> Self;
+}
+
 #[inline]
-pub fn sf_ellint_k<V:EllipticIntegral>(k:V) -> V { k.ellint_k() }
+pub fn sf_ellint_k<V:EllipticIntegralFirst>(k:V) -> V { k.ellint_k() }
 #[inline]
-pub fn sf_ellint_kc<V:EllipticIntegral>(k:V) -> V { k.ellint_kc() }
+pub fn sf_ellint_kc<V:EllipticIntegralFirst>(k:V) -> V { k.ellint_kc() }
 #[inline]
-pub fn sf_ellint_f<V:EllipticIntegral>(phi:V, k:V) -> V { k.ellint_f(phi) }
+pub fn sf_ellint_f<V:EllipticIntegralFirst>(phi:V, k:V) -> V { k.ellint_f(phi) }
 #[inline]
-pub fn sf_ellint_e<V:EllipticIntegral>(k:V) -> V { k.ellint_e() }
+pub fn sf_ellint_e<V:EllipticIntegralSecond>(k:V) -> V { k.ellint_e() }
 #[inline]
-pub fn sf_ellint_ec<V:EllipticIntegral>(k:V) -> V { k.ellint_ec() }
+pub fn sf_ellint_ec<V:EllipticIntegralSecond>(k:V) -> V { k.ellint_ec() }
 #[inline]
-pub fn sf_ellint_e_inc<V:EllipticIntegral>(phi:V, k:V) -> V { k.ellint_e_inc(phi) }
+pub fn sf_ellint_e_inc<V:EllipticIntegralSecond>(phi:V, k:V) -> V { k.ellint_e_inc(phi) }
+#[inline]
+pub fn sf_ellint_pi<V:EllipticIntegralThird>(c:V, k:V) -> V { k.ellint_pi(c) }
+#[inline]
+pub fn sf_ellint_pi_inc<V:EllipticIntegralThird>(phi:V, c:V, k:V) -> V { k.ellint_pi_inc(c, phi) }
+
+#[inline]
+pub fn sf_ellint_rc<V:EllipticIntegralSymmetric>(x:V, y:V) -> V { x.ellint_rc(y) }
+pub fn sf_ellint_rf<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_rf(y, z) }
 
 #[inline]
 pub fn sf_kc<V:Value>(k:V) -> V {
@@ -37,7 +59,8 @@ use crate::traits::*;
 use crate::agm::*;
 use crate::real::*;
 use crate::trig::*;
-impl EllipticIntegral for r64 {
+
+impl EllipticIntegralFirst for r64 {
   fn ellint_k(self) -> Self {
     if (ι(1):r64 - self*self).is_negreal()  {
       r64::nan
@@ -54,12 +77,24 @@ impl EllipticIntegral for r64 {
       impls::ell_f(phi,self)
     }
   }
+}
+
+impl EllipticIntegralSecond for r64 {
   fn ellint_e(self) -> Self {
     impls::ell_e(self)
   }
   fn ellint_e_inc(self, phi:Self) -> Self {
     // TODO: domain checking
     impls::ell_e_incomplete(phi, self)
+  }
+}
+
+impl EllipticIntegralSymmetric for r64 {
+  fn ellint_rc(self, y:Self) -> Self {
+    impls::sym_rc_real(self, y)
+  }
+  fn ellint_rf(self, y:Self, z:Self) -> Self {
+    impls::sym_rf_real(self, y, z)
   }
 }
 
@@ -161,5 +196,80 @@ pub fn e_agm<V:Value+AGM+Trig>(phi:V, k:V) -> V {
 }
 
 ////////////////////////////////////////
+
+// TODO: transform recursion to iteration
+pub fn gauss_transform<V>(phi:V, c:V, k:V) -> V
+  where V:Value+Log+Trig
+    +EllipticIntegralFirst+EllipticIntegralSecond+EllipticIntegralSymmetric
+{
+  let kp = sf_kc(k);
+
+  if kp == 1 {
+    let cp = sf_sqrt(ι(1):V - c);
+    return sf_atan(cp * sf_tan(phi)) / cp;
+  } else if V::one - (k.sqr()/c) == 0 {
+    // special case else rho below is zero
+    return (sf_ellint_e_inc(phi, k)
+      - c*sf_cos(phi)*sf_sin(phi)/sf_sqrt(ι(1):V-c*sf_sin(phi).sqr()))/(-c+1);
+  }
+
+  let k1 = (-kp+1)/(kp+1);
+  let delta = sf_sqrt(ι(1):V - k.sqr()*sf_sin(phi).sqr());
+  let psi1 = sf_asin((kp+1)*sf_sin(phi)/(delta+1));
+  let rho = sf_sqrt(V::one - (k.sqr()/c));
+  let c1 = c*((rho+1)/(kp+1)).sqr();
+  let xi = sf_csc(phi).sqr();
+  let newgt = gauss_transform(psi1, c1, k1);
+  (newgt*4/(kp+1) + (rho-1)*sf_ellint_f(phi,k) - sf_ellint_rc(xi-1, xi-c))/rho
+}
+
+////////////////////////////////////////
+
+// for real parameters, x>=0, y!=0
+pub fn sym_rc_real<V:Value+Log+Ordered+Trig>(x:V, y:V) -> V {
+  if y == 0 || x.is_negreal() {return V::nan;}
+
+  if x == y {
+    sf_sqrt_recip(x)
+  } else if x.є(ι(0), y) {
+    if x == 0 {
+      sf_sqrt_recip(y-x) * sf_acos(sf_sqrt(x/y))
+    } else {
+      sf_sqrt_recip(y-x) * sf_atan(sf_sqrt((y-x)/x))
+    }
+  } else if y.є(ι(0),x) {
+    sf_sqrt_recip(x-y) * sf_atanh(sf_sqrt((x-y)/x))
+    //sf_sqrt(x-y))*sf_log((sf_sqrt(x)+sf_sqrt(x-y))/sf_sqrt(y))
+  } else /*if y<ι(0):V && ι(0):V<=x*/ {
+    sf_sqrt_recip(x-y) * sf_log((sf_sqrt(x)+sf_sqrt(x-y))/sf_sqrt(-y))
+    //sf_sqrt_recip(x-y) * sf_atanh(sf_sqrt(x/(x-y)))
+    //sf_sqrt(x/(x-y))*sym_rc_real(x-y, -y)
+  }
+}
+
+// for real x,y,z>0
+pub fn sym_rf_real<V:Value+Normed>(x:V, y:V, z:V) -> V {
+  // TODO: domain check
+  // sort x<y<z ?
+  let (mut x,mut y,mut z) = (x,y,z);
+  for n in 0..1000 {
+    let lam = sf_sqrt(x*y) + sf_sqrt(y*z) + sf_sqrt(z*x);
+    let mu = (x + y + z) / 3;
+    let xyz_old = (x,y,z);
+    let qx = x/mu-1;
+    let qy = y/mu-1;
+    let qz = z/mu-1;
+    x = (x+lam)/4;
+    y = (y+lam)/4;
+    z = (z+lam)/4;
+    let eps = qx.abs().max(qy.abs()).max(qz.abs());
+    if eps<V::epsilon || xyz_old==(x,y,z) {break;}
+  }
+  sf_sqrt_recip(x)
+  // s2 = qqq.pow(2).sum()/4
+  // s3 = (-qqq).pow(3).sum()/6
+  // return sf_sqrt_recip(mu)*(1+s2/5+s3/7+s2*s2/6+s2*s3*3/11);
+}
+
 
 }
