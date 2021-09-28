@@ -7,6 +7,11 @@ edition = "2018"
 [dependencies]
 once_cell = "*"
 paste = "*"
+log = "*"
+#for applications:
+simple_logger = "*"
+
+#plotters = "*"
 
 #for eigenvalue calcs:
 #nalgebra = "*"
@@ -35,5 +40,4 @@ paste = "*"
 #num-traits = "*"
 #num = "*"
 #plotlib = "*"
-#plotters = "*"
 #qd = "*"

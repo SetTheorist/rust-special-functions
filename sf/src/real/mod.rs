@@ -85,39 +85,47 @@ impl const From<isize> for r64 {
 
 macro_rules! add_ops {
   ($x:tt, $opt:ident, $op:ident; $opassignt:ident, $opassign:ident) => {
+    #[automatically_derived]
     impl const $opt<r64> for r64 {
       type Output = r64;
       #[inline]
       fn $op(self, b: r64) -> r64 { r64(self.0 $x b.0) }
     }
+    #[automatically_derived]
     impl const $opt<f64> for r64 {
       type Output = r64;
       #[inline]
       fn $op(self, b: f64) -> r64 { r64(self.0 $x b) }
     }
+    #[automatically_derived]
     impl const $opt<r64> for f64 {
       type Output = r64;
       #[inline]
       fn $op(self, b: r64) -> r64 { r64(self $x b.0) }
     }
+    #[automatically_derived]
     impl const $opt<isize> for r64 {
       type Output = r64;
       #[inline]
       fn $op(self, b: isize) -> r64 { r64(self.0 $x (b as f64)) }
     }
+    #[automatically_derived]
     impl const $opt<r64> for isize {
       type Output = r64;
       #[inline]
       fn $op(self, b: r64) -> r64 { r64((self as f64) $x b.0) }
     }
+    #[automatically_derived]
     impl $opassignt<r64> for r64 {
       #[inline]
       fn $opassign(&mut self, b: r64) { *self = self.$op(b); }
     }
+    #[automatically_derived]
     impl $opassignt<f64> for r64 {
       #[inline]
       fn $opassign(&mut self, b: f64) { *self = self.$op(b); }
     }
+    #[automatically_derived]
     impl $opassignt<isize> for r64 {
       #[inline]
       fn $opassign(&mut self, b: isize) { *self = self.$op(b); }
@@ -216,9 +224,7 @@ impl Normed for r64 {
   lift1!(signum, signum);
   #[inline]
   fn fabs(self) -> f64 { self.abs().0 }
-
   fn mu(self) -> Self { self.abs() }
-  const mu_epsilon: Self = Self::epsilon;
 }
 impl RealType for r64 {}
 impl Bounded for r64 {

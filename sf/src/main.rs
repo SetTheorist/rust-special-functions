@@ -253,6 +253,8 @@ fn doplots() -> Result<(),Box<dyn std::error::Error>> {
 */
 
 fn main() {
+  ::simple_logger::SimpleLogger::new().init().unwrap();
+
   if false {
     let ch: ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
     for i in 0..10 {
@@ -1393,12 +1395,12 @@ fn main() {
   if true {
     println!("-----");
     println!("Elliptic:");
-    println!("k(1.5) = {:e}", sf_ellint_e(r64(1.5)));
-    println!("k(0.5) = {:e}", sf_ellint_e(r64(0.5)));
-    println!("k(0.0) = {:e}", sf_ellint_e(r64(0.0)));
-    println!("k(0.5) = {:e}", ellint::impls::e_agm(r64::PI/2, r64(0.5)));
-    println!("k(0.5) = {:e}", sf_ellint_e_inc(r64::PI/2, r64(0.5)));
-    println!("k(0.0) = {:e}", sf_ellint_e_inc(r64::PI/4, r64(0.5)));
+    println!("e(..) = {:e}", sf_ellint_e(r64(1.5)));
+    println!("e(..) = {:e}", sf_ellint_e(r64(0.5)));
+    println!("e(..) = {:e}", sf_ellint_e(r64(0.0)));
+    println!("e(..) = {:e}", ellint::impls::e_agm(r64::PI/2, r64(0.5)));
+    println!("e'(..) = {:e}", sf_ellint_e_inc(r64::PI/2, r64(0.5)));
+    println!("e'(..) = {:e}", sf_ellint_e_inc(r64::PI/4, r64(0.5)));
     //println!("f = {:e}", ellint::impls::f_agm_method(r64::PI/2, r64(0.5)));
     println!("rc(0.5,0.1) = {:e}", sf_ellint_rc(r64(0.5), r64(0.1)));
     println!("rc(0.1,0.5) = {:e}", sf_ellint_rc(r64(0.1), r64(0.5)));

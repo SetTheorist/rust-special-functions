@@ -76,7 +76,7 @@ where
 ////////////////////////////////////////////////////////////////////////////////
 
 #[inline]
-pub fn sum_series_<T, I>(it: I, με: T::NT) -> T
+pub fn sum_series_<T, I>(it: I, ε: T::NT) -> T
 where
   T: Field + Normed,
   I: Iterator<Item = T>,
@@ -84,7 +84,7 @@ where
   //cum_sums(it)
   it.scan(T::zero, |s, a| { *s += a; Some(*s) })
     .scan(ι(f64::NAN): T,
-      |s, t| { if μ(*s - t) <= μ(*s) * με { None } else { *s = t; Some(t) } })
+      |s, t| { if μ(*s - t) <= μ(*s) * ε { None } else { *s = t; Some(t) } })
     .take(1000)
     .last()
     .unwrap()
@@ -92,7 +92,7 @@ where
 
 // TODO: "wrapped" version (generic over Kahan, e.g.)
 #[inline]
-pub fn sum_series<T, I>(it: I, με: T::NT) -> T
+pub fn sum_series<T, I>(it: I, ε: T::NT) -> T
 where
   T: Field + Normed,
   I: Iterator<Item = T>,
@@ -102,7 +102,7 @@ where
   for t in it {
     let old = sum;
     sum += t;
-    if μ(sum - old) <= μ(sum) * με { break; }
+    if μ(sum - old) <= μ(sum) * ε { break; }
     if n > 999 { break; }
     n += 1;
   }
@@ -113,7 +113,7 @@ where
 // b0 + a1/(b1 + a2/(b2 + a3/(b3 + ...)))
 // (based on modified Lentz)
 #[inline]
-pub fn contfrac_modlentz<T,I>(b0: T, it: I, με: T::NT) -> T
+pub fn contfrac_modlentz<T,I>(b0: T, it: I, ε: T::NT) -> T
 where
   T: Field + Normed,
   I: IntoIterator<Item=(T,T)>,
@@ -130,7 +130,7 @@ where
     dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
-    if μ(deltaj - 1) < με || n > 1000 { break; }
+    if μ(deltaj - 1) < ε || n > 1000 { break; }
     n += 1;
   }
   fj

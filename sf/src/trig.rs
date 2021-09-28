@@ -112,7 +112,7 @@ use crate::traits::*;
 pub fn tan_contfrac<V:Value>(z:V) -> V {
   let z2 = -z.sqr();
   let terms = (1..1000).map(|j|(z2,ι(2*j+1):V));
-  z / contfrac_modlentz(V::one, terms, V::mu_epsilon)
+  z / contfrac_modlentz(V::one, terms, V::epsilon)
 }
 }
 

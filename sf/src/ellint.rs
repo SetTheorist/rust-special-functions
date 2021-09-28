@@ -63,6 +63,7 @@ use crate::trig::*;
 impl EllipticIntegralFirst for r64 {
   fn ellint_k(self) -> Self {
     if (ι(1):r64 - self*self).is_negreal()  {
+      ::log::warn!("Domain error EllipticIntegralFirst::<{}>::ellint_k({:e})", std::any::type_name::<Self>(), self);
       r64::nan
     } else {
       impls::ell_k(self)
@@ -70,8 +71,10 @@ impl EllipticIntegralFirst for r64 {
   }
   fn ellint_f(self, phi:Self) -> Self {
     if !phi.є(-r64::FRAC_PI_2, r64::FRAC_PI_2) {
+      ::log::warn!("Domain error EllipticIntegralFirst::<{}>::ellint_f({:e})", std::any::type_name::<Self>(), self);
       r64::nan
     } else if (ι(1):r64 - (self*sf_sin(phi)).sqr()).is_negreal()  {
+      ::log::warn!("Domain error EllipticIntegralFirst::<{}>::ellint_f({:e})", std::any::type_name::<Self>(), self);
       r64::nan
     } else {
       impls::ell_f(phi,self)
@@ -227,7 +230,10 @@ pub fn gauss_transform<V>(phi:V, c:V, k:V) -> V
 
 // for real parameters, x>=0, y!=0
 pub fn sym_rc_real<V:Value+Log+Ordered+Trig>(x:V, y:V) -> V {
-  if y == 0 || x.is_negreal() {return V::nan;}
+  if y == 0 || x.is_negreal() {
+    ::log::warn!("Domain error impls::sym_rc_real::<{}>({},{})", std::any::type_name::<V>(), x, y);
+    return V::nan;
+  }
 
   if x == y {
     sf_sqrt_recip(x)

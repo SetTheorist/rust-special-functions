@@ -11,7 +11,7 @@ pub fn ι<A, B:From<A>>(a: A) -> B { B::from(a) }
 // are all Copy-able.
 // This excludes, for example, arbitrary-precision floats,
 // but we are not targeting such use cases...
-pub trait Base: Copy+Sized+PartialEq+Default+std::fmt::Debug+'static {}
+pub trait Base: Copy+Sized+PartialEq+Default+std::fmt::Debug+std::fmt::Display+'static {}
 
 pub trait Power<P=Self>: Base {
   fn pow(self, p: P) -> Self;
@@ -189,9 +189,7 @@ pub trait Normed: Base + From<Self::NT> {
   fn fabs(self) -> f64;
   // self/|self|
   fn signum(self) -> Self;
-
   fn mu(self) -> Self::NT;
-  const mu_epsilon: Self::NT;
 }
 #[inline]
 pub fn abs<T: Normed>(x: T) -> T::NT { x.abs() }

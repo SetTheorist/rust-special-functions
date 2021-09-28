@@ -13,7 +13,7 @@ pub fn bessel_j_series<V: Value + Gamma + Power>(nu: V, z: V) -> V {
     Some(*s)
   });
   let terms = std::iter::once(ι(1)).chain(terms);
-  sum_series(terms, V::mu_epsilon) * (z / 2).pow(nu) / sf_gamma(nu + 1)
+  sum_series(terms, V::epsilon) * (z / 2).pow(nu) / sf_gamma(nu + 1)
 }
 
 // for |z|>>nu, |arg z|<pi

@@ -14,12 +14,12 @@ pub mod impls {
 
   pub fn dawson_contfrac<V: Value + Normed>(x: V) -> V {
     let terms = (1..).map(|j| (-(x * x * (2 * j)).pari(j), ι(2 * j + 1)));
-    x / contfrac_modlentz(ι(1), terms, V::mu_epsilon)
+    x / contfrac_modlentz(ι(1), terms, V::epsilon)
   }
 
   pub fn dawson_contfrac2<V: Value + Normed>(x: V) -> V {
     let terms = (1..).map(|j| (x * x * (-4 * j), x * x * 2 + (2 * j + 1)));
-    x / contfrac_modlentz(x * x * 2 + 1, terms, V::mu_epsilon)
+    x / contfrac_modlentz(x * x * 2 + 1, terms, V::epsilon)
   }
 
   pub fn dawson_series<V: Value + Exp>(x: V) -> V {
@@ -29,14 +29,14 @@ pub mod impls {
       *s *= x2 / n;
       Some(o / (2 * n - 1))
     });
-    sf_exp(-x * x) * sum_series(terms, V::mu_epsilon)
+    sf_exp(-x * x) * sum_series(terms, V::epsilon)
   }
 
   // doesn't include suggested optimizations
   pub fn dawson_rybicki<V: Value + Exp>(x: V) -> V {
     let h: V = ι(0.1);
     let terms = (1..).step_by(2).map(|n| (sf_exp(-(x - h * n).sqr()) - sf_exp(-(x + h * n).sqr())) / n);
-    sum_series(terms, V::mu_epsilon) * V::FRAC_1_SQRTPI
+    sum_series(terms, V::epsilon) * V::FRAC_1_SQRTPI
   }
 
   // bessel series (in terms of spherical bessel i1() functions

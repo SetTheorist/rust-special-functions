@@ -51,14 +51,17 @@ impl AGM for c64 {
 
 pub fn impl_scalar<V:Value>(a:V, b:V) -> V {
   if a.is_zero() || b.is_zero() {return V::zero;}
-  let mut a = a;
-  let mut b = b;
+  let (a_, b_) = (a, b);
+  let (mut a, mut b) = (a, b);
   for n in 1..100 {
     let a0 = a;
     let b0 = b;
     a = (a0 + b0) / 2;
     b = sf_sqrt(a0 * b0);
-    if a==b || (a==a0 && b==b0) {print!("({})",n);break;}
+    if a==b || (a==a0 && b==b0) {
+      ::log::debug!("impl_scalar::<{}>({},{}) converged in {} iterations", std::any::type_name::<V>(), a_, b_, n);
+      break;
+    }
   }
   a
 }
@@ -66,12 +69,12 @@ pub fn impl_scalar<V:Value>(a:V, b:V) -> V {
 use crate::trig::*;
 pub fn impl_vec<V:Value+Trig>(a:V, b:V, c0:V, extra:Option<V>) -> (Vec<V>,Vec<V>,Vec<V>,Option<Vec<V>>) {
   if a.is_zero() || b.is_zero() { todo!(); }
+  let (a_,b_) = (a,b);
   // TODO: be smarter with vectors...
   // maybe cleaner return value
   let mut va = Vec::new();
   let mut vb = Vec::new();
-  let mut a = a;
-  let mut b = b;
+  let (mut a, mut b) = (a, b);
   for i in 1..1000 {
     va.push(a);
     vb.push(b);
@@ -79,7 +82,10 @@ pub fn impl_vec<V:Value+Trig>(a:V, b:V, c0:V, extra:Option<V>) -> (Vec<V>,Vec<V>
     let b0 = b;
     a = (a0 + b0) / 2;
     b = sf_sqrt(a0 * b0);
-    if a==b || (a==a0 && b==b0) {print!("<{}>",i);break;}
+    if a==b || (a==a0 && b==b0) {
+      ::log::debug!("impl_vec::<{}>({},{},..) converged in {} iterations", std::any::type_name::<V>(), a_, b_, i);
+      break;
+    }
   }
   va.push(a);
   vb.push(b);

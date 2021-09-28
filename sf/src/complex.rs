@@ -387,8 +387,7 @@ impl Normed for c64 {
   #[inline]
   fn signum(self) -> Self { self / self.abs() }
   #[inline]
-  fn mu(self) -> Self::NT { self.re * self.re + self.im * self.im }
-  const mu_epsilon: Self::NT = r64(f64::EPSILON * f64::EPSILON);
+  fn mu(self) -> Self::NT { sf_max(self.re.mu(), self.im.mu()) }
 }
 
 impl ComplexType for c64 {

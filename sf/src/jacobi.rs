@@ -9,6 +9,11 @@ pub trait JacobiElliptic : Sized {
   fn am(self, k:Self) -> Self;
 }
 
+#[inline] pub fn sf_jacobi_ell_cn<V:JacobiElliptic>(x:V, k:V) -> V { x.cn(k) }
+#[inline] pub fn sf_jacobi_ell_dn<V:JacobiElliptic>(x:V, k:V) -> V { x.dn(k) }
+#[inline] pub fn sf_jacobi_ell_sn<V:JacobiElliptic>(x:V, k:V) -> V { x.sn(k) }
+#[inline] pub fn sf_jacobi_ell_am<V:JacobiElliptic>(x:V, k:V) -> V { x.am(k) }
+
 
 pub mod impls {
 use super::*;
