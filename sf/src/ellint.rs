@@ -234,6 +234,7 @@ pub fn gauss_transform<V>(phi:V, c:V, k:V) -> V
 ////////////////////////////////////////
 
 // for real parameters, x>=0, y!=0
+//TODO:RealValue
 pub fn sym_rc_real<V:Value+Log+Ordered+Trig>(x:V, y:V) -> V {
   if y == 0 || x.is_negreal() {
     ::log::warn!("Domain error impls::sym_rc_real::<{}>({},{})", std::any::type_name::<V>(), x, y);
@@ -259,6 +260,7 @@ pub fn sym_rc_real<V:Value+Log+Ordered+Trig>(x:V, y:V) -> V {
 }
 
 // for real x,y,z>0
+//TODO:RealValue
 pub fn sym_rf_real<V:Value+Normed>(x:V, y:V, z:V) -> V {
   //let (x_, y_, z_) = (x, y, z);
   // TODO: domain check
@@ -285,6 +287,7 @@ pub fn sym_rf_real<V:Value+Normed>(x:V, y:V, z:V) -> V {
 }
 
 // for real x,y,z>0
+//TODO:RealValue
 pub fn sym_rd_real<V:Value+Power>(x:V, y:V, z:V) -> V {
   // TODO: domain check
   let half23 : V = (ι(0.5):V).pow(ι(2):V/3); // 2^(-2/3) TODO: move to constants?  or trait constant?
@@ -309,5 +312,36 @@ pub fn sym_rd_real<V:Value+Power>(x:V, y:V, z:V) -> V {
   sum + x.pow(ι(-1.5):V)
 }
 
+// for real x,y,z>0
+pub fn sym_rg_real<V:RealValue+Log+Trig>(x:V, y:V, z:V) -> V {
+  // TODO: domain check
+  //let (x_,y_,z_) = (x,y,z)
+  let (mut x, mut y, mut z) = (x, y, z);
+  // sort x<=y<=z  (xy,xz,yz)
+  if x>y {std::mem::swap(&mut x, &mut y);}
+  if x>z {std::mem::swap(&mut x, &mut z);}
+  if y>z {std::mem::swap(&mut y, &mut z);}
+  let t0 = sf_sqrt(x);
+  let mut tn = t0;
+  let mut cn = sf_sqrt(y - x);
+  let mut an = sf_sqrt(z - x);
+  let h0 = sf_sqrt(z);
+  let mut hn = h0;
+  let theta = ι(1):V; //?
+  let mut cn_sum = cn.sqr()/2;
+  let mut hn_sum = V::zero;
+  for n in 1..1000 {
+    an = (an + sf_sqrt(an.sqr() - cn.sqr()))/2;
+    tn = (tn + sf_sqrt(tn.sqr() + theta*cn.sqr()))/2;
+    cn = cn.sqr()/(an*2)/2;
+    cn_sum += cn.sqr()<<((n-1) as isize);
+    let hnm1 = hn;
+    hn = hn*tn/sf_sqrt(tn.sqr() + theta*cn.sqr());
+    hn_sum += (hn - hnm1)<<(n as isize);
+    if cn.sqr() == 0 {print!("<{}>",n);break;}
+  }
+  // TODO: warn if failure to converge
+  ((t0.sqr()+theta*cn_sum)*sym_rc_real(tn.sqr()+theta*an.sqr(),tn.sqr()) + h0 + hn_sum)/2
+}
 
 }
