@@ -1404,6 +1404,12 @@ fn main() {
     //println!("f = {:e}", ellint::impls::f_agm_method(r64::PI/2, r64(0.5)));
     println!("rc(0.5,0.1) = {:e}", sf_ellint_rc(r64(0.5), r64(0.1)));
     println!("rc(0.1,0.5) = {:e}", sf_ellint_rc(r64(0.1), r64(0.5)));
+    println!("rd(0.1,0.5,0.9) = {:e}", sf_ellint_rd(r64(0.1), r64(0.5), r64(0.9)));
+    println!("rd(0.9,0.5,0.1) = {:e}", sf_ellint_rd(r64(0.9), r64(0.5), r64(0.1)));
+    println!("rd(3,4,5) = {:e}", sf_ellint_rd(r64(3.0), r64(4.0), r64(5.0)));
+    println!("rd(5,4,3) = {:e}", sf_ellint_rd(r64(5.0), r64(4.0), r64(3.0)));
+    println!("rd(5,3,4) = {:e}", sf_ellint_rd(r64(5.0), r64(3.0), r64(4.0)));
+    println!("rd(4,5,3) = {:e}", sf_ellint_rd(r64(4.0), r64(5.0), r64(3.0)));
     println!("rf(0.1,0.5,0.9) = {:e}", sf_ellint_rf(r64(0.1), r64(0.5), r64(0.9)));
     println!("rf(0.9,0.5,0.1) = {:e}", sf_ellint_rf(r64(0.9), r64(0.5), r64(0.1)));
   }

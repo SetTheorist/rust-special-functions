@@ -26,6 +26,7 @@ pub trait EllipticIntegralThird : Value {
 
 pub trait EllipticIntegralSymmetric : Value {
   fn ellint_rc(self, y:Self) -> Self;
+  fn ellint_rd(self, y:Self, z:Self) -> Self;
   fn ellint_rf(self, y:Self, z:Self) -> Self;
 }
 
@@ -48,6 +49,7 @@ pub fn sf_ellint_pi_inc<V:EllipticIntegralThird>(phi:V, c:V, k:V) -> V { k.ellin
 
 #[inline]
 pub fn sf_ellint_rc<V:EllipticIntegralSymmetric>(x:V, y:V) -> V { x.ellint_rc(y) }
+pub fn sf_ellint_rd<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_rd(y, z) }
 pub fn sf_ellint_rf<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_rf(y, z) }
 
 #[inline]
@@ -95,6 +97,9 @@ impl EllipticIntegralSecond for r64 {
 impl EllipticIntegralSymmetric for r64 {
   fn ellint_rc(self, y:Self) -> Self {
     impls::sym_rc_real(self, y)
+  }
+  fn ellint_rd(self, y:Self, z:Self) -> Self {
+    impls::sym_rd_real(self, y, z)
   }
   fn ellint_rf(self, y:Self, z:Self) -> Self {
     impls::sym_rf_real(self, y, z)
@@ -255,26 +260,53 @@ pub fn sym_rc_real<V:Value+Log+Ordered+Trig>(x:V, y:V) -> V {
 
 // for real x,y,z>0
 pub fn sym_rf_real<V:Value+Normed>(x:V, y:V, z:V) -> V {
+  //let (x_, y_, z_) = (x, y, z);
   // TODO: domain check
   // sort x<y<z ?
   let (mut x,mut y,mut z) = (x,y,z);
   for n in 0..1000 {
-    let lam = sf_sqrt(x*y) + sf_sqrt(y*z) + sf_sqrt(z*x);
+    let λ = sf_sqrt(x*y) + sf_sqrt(y*z) + sf_sqrt(z*x);
     let mu = (x + y + z) / 3;
     let xyz_old = (x,y,z);
     let qx = x/mu-1;
     let qy = y/mu-1;
     let qz = z/mu-1;
-    x = (x+lam)/4;
-    y = (y+lam)/4;
-    z = (z+lam)/4;
+    x = (x + λ)/4;
+    y = (y + λ)/4;
+    z = (z + λ)/4;
     let eps = qx.abs().max(qy.abs()).max(qz.abs());
     if eps<V::epsilon || xyz_old==(x,y,z) {break;}
   }
+  // TODO: warn if failure to converge
   sf_sqrt_recip(x)
   // s2 = qqq.pow(2).sum()/4
   // s3 = (-qqq).pow(3).sum()/6
   // return sf_sqrt_recip(mu)*(1+s2/5+s3/7+s2*s2/6+s2*s3*3/11);
+}
+
+// for real x,y,z>0
+pub fn sym_rd_real<V:Value+Power>(x:V, y:V, z:V) -> V {
+  // TODO: domain check
+  let half23 : V = (ι(0.5):V).pow(ι(2):V/3); // 2^(-2/3) TODO: move to constants?  or trait constant?
+  //let half23 : V = ι(0.62996052494743658238);
+  let mut sum : V = ι(0);
+  //let (x_,y_,z_) = (x,y,z);
+  let (mut x, mut y, mut z) = (x, y, z);
+  for n in 0..1000 {
+    let λ = sf_sqrt(x*y) + sf_sqrt(y*z) + sf_sqrt(z*x);
+    sum += z.sqrt_recip()*3/(z+λ);
+    let mu = (x + y + z)/3;
+    let eps = μ(x/mu-1).max(μ(y/mu-1)).max(μ(z/mu-1));
+    let xyz_old = (x,y,z);
+    x = (x + λ) * half23;
+    y = (y + λ) * half23;
+    z = (z + λ) * half23;
+    if eps < V::epsilon || xyz_old == (x, y, z) {
+      break;
+    }
+  }
+  // TODO: warn if failure to converge
+  sum + x.pow(ι(-1.5):V)
 }
 
 
