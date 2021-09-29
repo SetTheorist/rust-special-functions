@@ -32,6 +32,13 @@ pub trait EllipticIntegralSymmetric : Value {
   fn ellint_rj(self, y:Self, z:Self, p:Self) -> Self;
 }
 
+pub trait EllipticIntegralBurlisch : Value {
+  fn ellint_cel(self, p:Self, a:Self, b:Self) -> Self;
+  fn ellint_el1(self, x:Self) -> Self;
+  fn ellint_el2(self, x:Self, a:Self, b:Self) -> Self;
+  fn ellint_el3(self, x:Self, p:Self) -> Self;
+}
+
 #[inline]
 pub fn sf_ellint_k<V:EllipticIntegralFirst>(k:V) -> V { k.ellint_k() }
 #[inline]
@@ -59,6 +66,15 @@ pub fn sf_ellint_rf<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_
 pub fn sf_ellint_rg<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_rg(y, z) }
 #[inline]
 pub fn sf_ellint_rj<V:EllipticIntegralSymmetric>(x:V, y:V, z:V, p:V) -> V { x.ellint_rj(y, z, p) }
+
+#[inline]
+pub fn ellint_cel<V:EllipticIntegralBurlisch>(kc:V, p:V, a:V, b:V) -> V { kc.ellint_cel(p, a, b) }
+#[inline]
+pub fn ellint_el1<V:EllipticIntegralBurlisch>(kc:V, x:V) -> V { kc.ellint_el1(x) }
+#[inline]
+pub fn ellint_el2<V:EllipticIntegralBurlisch>(kc:V, x:V, a:V, b:V) -> V { kc.ellint_el2(x, a, b) }
+#[inline]
+pub fn ellint_el3<V:EllipticIntegralBurlisch>(kc:V, x:V, p:V) -> V { kc.ellint_el3(x, p) }
 
 #[inline]
 pub fn sf_kc<V:Value>(k:V) -> V {
@@ -127,6 +143,21 @@ impl EllipticIntegralSymmetric for r64 {
   }
   fn ellint_rj(self, y:Self, z:Self, p:Self) -> Self {
     impls::sym_rj_real(self, y, z, p)
+  }
+}
+
+impl EllipticIntegralBurlisch for r64 {
+  fn ellint_cel(self, p:Self, a:Self, b:Self) -> Self {
+    impls::burl_cel(self, p, a, b)
+  }
+  fn ellint_el1(self, x:Self) -> Self {
+    impls::burl_el1(self, x)
+  }
+  fn ellint_el2(self, x:Self, a:Self, b:Self) -> Self {
+    impls::burl_el2(self, x, a, b)
+  }
+  fn ellint_el3(self, x:Self, p:Self) -> Self {
+    impls::burl_el3(self, x, p)
   }
 }
 
@@ -288,6 +319,39 @@ pub fn pi_gauss_transform<V>(phi:V, c:V, k:V) -> V
   let xi = sf_csc(phi).sqr();
   let newgt = pi_gauss_transform(psi1, c1, k1);
   (newgt*4/(kp+1) + (rho-1)*sf_ellint_f(phi,k) - sf_ellint_rc(xi-1, xi-c))/rho
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+pub fn burl_cel<V:Value+EllipticIntegralSymmetric>(kc:V, p:V, a:V, b:V) -> V {
+  a * sf_ellint_rf(ι(0), kc.sqr(), ι(1)) + (b-p*a)/3 * sf_ellint_rj(ι(0), kc.sqr(), ι(1), p)
+}
+
+pub fn burl_el1<V:Value+EllipticIntegralSymmetric>(kc:V, x:V) -> V {
+  let r = x.sqr().recip();
+  sf_ellint_rf(r, r+kc.sqr(), r+1)
+}
+pub fn burl_el1_<V:Value+EllipticIntegralFirst+Trig>(kc:V, x:V) -> V {
+   sf_ellint_f(sf_atan(x), sf_kc(kc))
+}
+
+pub fn burl_el2<V>(kc:V, x:V, a:V, b:V) -> V
+  where V:Value+EllipticIntegralSymmetric
+{
+  let r = x.sqr().recip();
+  a * burl_el1(kc, x) + (b-a)/3 * sf_ellint_rd(r, r+kc.sqr(), r+1)
+}
+
+pub fn burl_el3<V>(kc:V, x:V, p:V) -> V
+  where V:Value+EllipticIntegralSymmetric+Trig
+{
+  let r = x.sqr().recip();
+  burl_el1(kc, x) - (p-1)/3 * sf_ellint_rj(r, r+kc.sqr(), r+1, r+p)
+}
+pub fn burl_el3_<V>(kc:V, x:V, p:V) -> V
+  where V:Value+EllipticIntegralThird+Trig
+{
+  sf_ellint_pi_inc(sf_atan(x), -p+1, sf_kc(kc))
 }
 
 ////////////////////////////////////////////////////////////////////////////////
