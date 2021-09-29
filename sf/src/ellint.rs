@@ -102,6 +102,16 @@ impl EllipticIntegralSecond for r64 {
   }
 }
 
+impl EllipticIntegralThird for r64 {
+  fn ellint_pi(self, c:Self) -> Self {
+    impls::ell_pi(c, self)
+  }
+  fn ellint_pi_inc(self, c:Self, phi:Self) -> Self {
+    // TODO: domain checking
+    impls::ell_pi_incomplete(phi, c, self)
+  }
+}
+
 impl EllipticIntegralSymmetric for r64 {
   fn ellint_rc(self, y:Self) -> Self {
     impls::sym_rc_real(self, y)
@@ -219,12 +229,47 @@ pub fn e_agm<V:Value+AGM+Trig>(phi:V, k:V) -> V {
 
 ////////////////////////////////////////
 
+pub fn ell_pi<V:Value+AGM>(c:V, k:V) -> V {
+  pi_complete_agm(c, k)
+}
+
+pub fn ell_pi_incomplete<V>(phi:V, c:V, k:V) -> V
+  where V:Value+Log+Trig
+    +EllipticIntegralFirst+EllipticIntegralSecond+EllipticIntegralSymmetric
+{
+  if phi == 0 {
+    V::zero
+  } else {
+    pi_gauss_transform(phi, c, k)
+  }
+}
+
+pub fn pi_complete_agm<V:Value+AGM>(c:V, k:V) -> V {
+  let (an, gn, _) = sf_agm_vec(V::one, sf_kc(k), V::zero);
+  let n = an.len();
+  let mut pn = Vec::with_capacity(n);
+  pn.push(sf_sqrt(ι(1):V - c));
+  let mut qn = Vec::with_capacity(n);
+  qn.push(ι(1):V);
+  let mut en = Vec::with_capacity(n);
+  en.push((pn[0].sqr() - an[0]*gn[0]) / (pn[0].sqr() + an[0]*gn[0]));
+  for i in 1..n {
+    pn.push((pn[i-1].sqr() + an[i-1]*gn[i-1]) / (pn[i-1]*2));
+    en.push((pn[i].sqr() - an[i]*gn[i]) / (pn[i].sqr() + an[i]*gn[i]));
+    qn.push(qn[i-1] * en[i-1]/2);
+  }
+  let mut qsum = V::zero;
+  for &q in &qn { qsum += q; }
+  V::PI/(an[n-1]*4) * (-c/(c-1)*qsum + 2)
+}
+
 // TODO: transform recursion to iteration
-pub fn gauss_transform<V>(phi:V, c:V, k:V) -> V
+pub fn pi_gauss_transform<V>(phi:V, c:V, k:V) -> V
   where V:Value+Log+Trig
     +EllipticIntegralFirst+EllipticIntegralSecond+EllipticIntegralSymmetric
 {
   let kp = sf_kc(k);
+  // TODO: domain check
 
   if kp == 1 {
     let cp = sf_sqrt(ι(1):V - c);
@@ -241,11 +286,11 @@ pub fn gauss_transform<V>(phi:V, c:V, k:V) -> V
   let rho = sf_sqrt(V::one - (k.sqr()/c));
   let c1 = c*((rho+1)/(kp+1)).sqr();
   let xi = sf_csc(phi).sqr();
-  let newgt = gauss_transform(psi1, c1, k1);
+  let newgt = pi_gauss_transform(psi1, c1, k1);
   (newgt*4/(kp+1) + (rho-1)*sf_ellint_f(phi,k) - sf_ellint_rc(xi-1, xi-c))/rho
 }
 
-////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 // for real parameters, x>=0, y!=0
 //TODO:RealValue
@@ -272,6 +317,8 @@ pub fn sym_rc_real<V:Value+Log+Ordered+Trig>(x:V, y:V) -> V {
     //sf_sqrt(x/(x-y))*sym_rc_real(x-y, -y)
   }
 }
+
+////////////////////////////////////////
 
 // for real x,y,z>0
 //TODO:RealValue
@@ -300,6 +347,7 @@ pub fn sym_rf_real<V:Value+Normed>(x:V, y:V, z:V) -> V {
   // return sf_sqrt_recip(mu)*(1+s2/5+s3/7+s2*s2/6+s2*s3*3/11);
 }
 
+////////////////////////////////////////
 // for real x,y,z>0
 //TODO:RealValue
 pub fn sym_rd_real<V:Value+Power>(x:V, y:V, z:V) -> V {
@@ -326,6 +374,7 @@ pub fn sym_rd_real<V:Value+Power>(x:V, y:V, z:V) -> V {
   sum + x.pow(ι(-1.5):V)
 }
 
+////////////////////////////////////////
 // for real x,y,z>0
 pub fn sym_rg_real<V:RealValue+Log+Trig>(x:V, y:V, z:V) -> V {
   // TODO: domain check
@@ -358,6 +407,7 @@ pub fn sym_rg_real<V:RealValue+Log+Trig>(x:V, y:V, z:V) -> V {
   ((t0.sqr()+theta*cn_sum)*sym_rc_real(tn.sqr()+theta*an.sqr(),tn.sqr()) + h0 + hn_sum)/2
 }
 
+////////////////////////////////////////
 // for real x,y,z>0
 pub fn sym_rj_real<V:RealValue+Log+Trig+Power>(x:V, y:V, z:V, p:V) -> V {
   // TODO: domain check
