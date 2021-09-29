@@ -31,6 +31,12 @@ simple_logger = "*"
 #accurate sum algorithms
 #accurate = "*"
 
+#ieee754 = "*"
+#micromath = "*"
+#twofloat = "*"
+
+# interval math?
+
 #approx = "*"
 #num-bigint = "*"
 #num-complex = "*"

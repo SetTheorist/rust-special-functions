@@ -1412,12 +1412,15 @@ fn main() {
     println!("rd(4,5,3) = {:e}", sf_ellint_rd(r64(4.0), r64(5.0), r64(3.0)));
     println!("rf(0.1,0.5,0.9) = {:e}", sf_ellint_rf(r64(0.1), r64(0.5), r64(0.9)));
     println!("rf(0.9,0.5,0.1) = {:e}", sf_ellint_rf(r64(0.9), r64(0.5), r64(0.1)));
-    println!("rg(3,4,5) = {:e}", ellint::impls::sym_rg_real(r64(3.0), r64(4.0), r64(5.0)));
-    println!("rg(3,5,4) = {:e}", ellint::impls::sym_rg_real(r64(3.0), r64(5.0), r64(4.0)));
-    println!("rg(5,4,3) = {:e}", ellint::impls::sym_rg_real(r64(5.0), r64(4.0), r64(3.0)));
-    println!("rg(5,3,4) = {:e}", ellint::impls::sym_rg_real(r64(5.0), r64(3.0), r64(4.0)));
-    println!("rg(4,3,5) = {:e}", ellint::impls::sym_rg_real(r64(4.0), r64(3.0), r64(5.0)));
-    println!("rg(4,5,3) = {:e}", ellint::impls::sym_rg_real(r64(4.0), r64(5.0), r64(3.0)));
+    println!("rg(3,4,5) = {:e}", sf_ellint_rg(r64(3.0), r64(4.0), r64(5.0)));
+    println!("rg(3,5,4) = {:e}", sf_ellint_rg(r64(3.0), r64(5.0), r64(4.0)));
+    println!("rg(5,4,3) = {:e}", sf_ellint_rg(r64(5.0), r64(4.0), r64(3.0)));
+    println!("rg(5,3,4) = {:e}", sf_ellint_rg(r64(5.0), r64(3.0), r64(4.0)));
+    println!("rg(4,3,5) = {:e}", sf_ellint_rg(r64(4.0), r64(3.0), r64(5.0)));
+    println!("rg(4,5,3) = {:e}", sf_ellint_rg(r64(4.0), r64(5.0), r64(3.0)));
+    println!("rj(1,4,5,3) = {:e}", sf_ellint_rj(r64(1.0), r64(4.0), r64(5.0), r64(3.0)));
+    println!("rj(4,1,5,3) = {:e}", sf_ellint_rj(r64(4.0), r64(1.0), r64(5.0), r64(3.0)));
+    println!("rj(4,1,3,5) = {:e}", sf_ellint_rj(r64(4.0), r64(1.0), r64(3.0), r64(5.0)));
   }
 }
 

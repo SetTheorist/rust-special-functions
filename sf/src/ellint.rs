@@ -28,6 +28,8 @@ pub trait EllipticIntegralSymmetric : Value {
   fn ellint_rc(self, y:Self) -> Self;
   fn ellint_rd(self, y:Self, z:Self) -> Self;
   fn ellint_rf(self, y:Self, z:Self) -> Self;
+  fn ellint_rg(self, y:Self, z:Self) -> Self;
+  fn ellint_rj(self, y:Self, z:Self, p:Self) -> Self;
 }
 
 #[inline]
@@ -49,8 +51,14 @@ pub fn sf_ellint_pi_inc<V:EllipticIntegralThird>(phi:V, c:V, k:V) -> V { k.ellin
 
 #[inline]
 pub fn sf_ellint_rc<V:EllipticIntegralSymmetric>(x:V, y:V) -> V { x.ellint_rc(y) }
+#[inline]
 pub fn sf_ellint_rd<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_rd(y, z) }
+#[inline]
 pub fn sf_ellint_rf<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_rf(y, z) }
+#[inline]
+pub fn sf_ellint_rg<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_rg(y, z) }
+#[inline]
+pub fn sf_ellint_rj<V:EllipticIntegralSymmetric>(x:V, y:V, z:V, p:V) -> V { x.ellint_rj(y, z, p) }
 
 #[inline]
 pub fn sf_kc<V:Value>(k:V) -> V {
@@ -103,6 +111,12 @@ impl EllipticIntegralSymmetric for r64 {
   }
   fn ellint_rf(self, y:Self, z:Self) -> Self {
     impls::sym_rf_real(self, y, z)
+  }
+  fn ellint_rg(self, y:Self, z:Self) -> Self {
+    impls::sym_rg_real(self, y, z)
+  }
+  fn ellint_rj(self, y:Self, z:Self, p:Self) -> Self {
+    impls::sym_rj_real(self, y, z, p)
   }
 }
 
@@ -342,6 +356,38 @@ pub fn sym_rg_real<V:RealValue+Log+Trig>(x:V, y:V, z:V) -> V {
   }
   // TODO: warn if failure to converge
   ((t0.sqr()+theta*cn_sum)*sym_rc_real(tn.sqr()+theta*an.sqr(),tn.sqr()) + h0 + hn_sum)/2
+}
+
+// for real x,y,z>0
+pub fn sym_rj_real<V:RealValue+Log+Trig+Power>(x:V, y:V, z:V, p:V) -> V {
+  // TODO: domain check
+  let half23 : V = (ι(0.5):V).pow(ι(2):V/3); // 2^(-2/3) TODO: move to constants?  or trait constant?
+  let mut scale = V::one;
+  let mut sum = V::zero;
+  let (mut x, mut y, mut z, mut p) = (x, y, z, p);
+  for n in 0..1000 {
+    let λ = sf_sqrt(x*y) + sf_sqrt(y*z) + sf_sqrt(z*x);
+    let α = p * (sf_sqrt(x) + sf_sqrt(y) + sf_sqrt(z)) + sf_sqrt(x*y*z);
+    let β = sf_sqrt(p) * (p + λ);
+    let old = sum;
+    if abs(α.sqr()/β.sqr() - 1) < V::epsilon*2 {
+      // optimization to reduce calls
+      sum += scale*3/α;
+    } else {
+      sum += scale*3*sym_rc_real(α.sqr(), β.sqr());
+    }
+    let mu = (x + y + z + p) / 4;
+    let xyzp_old = (x,y,z,p);
+    let eps = μ(x/mu-1).max(μ(y/mu-1)).max(μ(z/mu-1)).max(μ(p/mu-1));
+    x = (x + λ)*half23/mu;
+    y = (y + λ)*half23/mu;
+    z = (z + λ)*half23/mu;
+    p = (p + λ)*half23/mu;
+    scale *= mu.pow(ι(-1.5):V);
+    if eps<V::epsilon || xyzp_old==(x,y,z,p) || sum==old {print!("[{}]",n);break;}
+  }
+  // TODO: warn if failure to converge
+  scale*x.pow(ι(-1.5):V) + sum
 }
 
 }
