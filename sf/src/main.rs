@@ -1422,6 +1422,10 @@ fn main() {
     println!("rj(1,4,5,3) = {:e}", sf_ellint_rj(r64(1.0), r64(4.0), r64(5.0), r64(3.0)));
     println!("rj(4,1,5,3) = {:e}", sf_ellint_rj(r64(4.0), r64(1.0), r64(5.0), r64(3.0)));
     println!("rj(4,1,3,5) = {:e}", sf_ellint_rj(r64(4.0), r64(1.0), r64(3.0), r64(5.0)));
+    println!("cel(1,1,1,1) = {:e}", sf_ellint_cel(r64(1.0),r64(1.0),r64(1.0),r64(1.0)));
+    println!("el1(1,1) = {:e}", sf_ellint_el1(r64(1.0),r64(1.0)));
+    println!("el2(1,1,1,1) = {:e}", sf_ellint_el2(r64(1.0),r64(1.0),r64(1.0),r64(1.0)));
+    println!("el3(1,1,1) = {:e}", sf_ellint_el3(r64(1.0),r64(1.0),r64(1.0)));
   }
 }
 

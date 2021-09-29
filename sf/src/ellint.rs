@@ -68,13 +68,13 @@ pub fn sf_ellint_rg<V:EllipticIntegralSymmetric>(x:V, y:V, z:V) -> V { x.ellint_
 pub fn sf_ellint_rj<V:EllipticIntegralSymmetric>(x:V, y:V, z:V, p:V) -> V { x.ellint_rj(y, z, p) }
 
 #[inline]
-pub fn ellint_cel<V:EllipticIntegralBurlisch>(kc:V, p:V, a:V, b:V) -> V { kc.ellint_cel(p, a, b) }
+pub fn sf_ellint_cel<V:EllipticIntegralBurlisch>(kc:V, p:V, a:V, b:V) -> V { kc.ellint_cel(p, a, b) }
 #[inline]
-pub fn ellint_el1<V:EllipticIntegralBurlisch>(kc:V, x:V) -> V { kc.ellint_el1(x) }
+pub fn sf_ellint_el1<V:EllipticIntegralBurlisch>(kc:V, x:V) -> V { kc.ellint_el1(x) }
 #[inline]
-pub fn ellint_el2<V:EllipticIntegralBurlisch>(kc:V, x:V, a:V, b:V) -> V { kc.ellint_el2(x, a, b) }
+pub fn sf_ellint_el2<V:EllipticIntegralBurlisch>(kc:V, x:V, a:V, b:V) -> V { kc.ellint_el2(x, a, b) }
 #[inline]
-pub fn ellint_el3<V:EllipticIntegralBurlisch>(kc:V, x:V, p:V) -> V { kc.ellint_el3(x, p) }
+pub fn sf_ellint_el3<V:EllipticIntegralBurlisch>(kc:V, x:V, p:V) -> V { kc.ellint_el3(x, p) }
 
 #[inline]
 pub fn sf_kc<V:Value>(k:V) -> V {
