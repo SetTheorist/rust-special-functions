@@ -12,6 +12,7 @@ log = "*"
 simple_logger = "*"
 
 #plotters = "*"
+#cbindgen = "*"
 
 #for eigenvalue calcs:
 #nalgebra = "*"

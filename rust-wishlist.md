@@ -12,4 +12,6 @@
   - lifting all types not equivalent
     - 0+(-0) != -0
 
+- trait specialization and negative traits would help immensely
+
 - custom operators (infix) would be great, though highly unlikely
