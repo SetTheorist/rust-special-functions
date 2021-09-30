@@ -16,8 +16,10 @@
 #![allow(unused_imports)]
 #![allow(unused_parens)]
 #![allow(unused_variables)]
+#![feature(bench_black_box)]
 #![feature(const_fn_floating_point_arithmetic)]
 #![feature(const_trait_impl)]
+#![feature(destructuring_assignment)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
 //#![feature(marker_trait_attr)] // #[marker]
@@ -31,16 +33,16 @@
 //
 // loop { break returnValue; }  
 // no_std??
-// c.f. Haskell Numeric.Compensated (E.Kmett) vs. qd/Quad
+// c.f. Haskell Numeric.Compensated (E.Kmett) vs. qd/Wide
 //
 // use proc.macro. for high-precision constants:
 //   parse into 1,2,4,8 correctly rounded double sequences (& float?)
 //   (or precision on parameter)
 //   (or pass in constructor even?)
-//   e.g. const Quad::pi = float!(2;Quad(#0,#1);3.1415926535897932384626...)
+//   e.g. const Wide::pi = float!(2;Wide(#0,#1);3.1415926535897932384626...)
 // note mathematica can generate binary or hexadecimal floating-point:
 //   NumberForm[...] and BaseForm[...]
-//   e.g. const Quad::pi = float!(2;Quad(#0,#1);3.d4a349a4342...)
+//   e.g. const Wide::pi = float!(2;Wide(#0,#1);3.d4a349a4342...)
 
 
 /*
@@ -89,6 +91,87 @@ U+16Cx 	ᛀ 	ᛁ 	ᛂ 	ᛃ 	ᛄ 	ᛅ 	ᛆ 	ᛇ 	ᛈ 	ᛉ 	ᛊ 	ᛋ 	ᛌ 	ᛍ 	�
 U+16Dx 	ᛐ 	ᛑ 	ᛒ 	ᛓ 	ᛔ 	ᛕ 	ᛖ 	ᛗ 	ᛘ 	ᛙ 	ᛚ 	ᛛ 	ᛜ 	ᛝ 	ᛞ 	ᛟ
 U+16Ex 	ᛠ 	ᛡ 	ᛢ 	ᛣ 	ᛤ 	ᛥ 	ᛦ 	ᛧ 	ᛨ 	ᛩ 	ᛪ 	᛫ 	᛬ 	᛭ 	ᛮ 	ᛯ
 U+16Fx 	ᛰ 	ᛱ 	ᛲ 	ᛳ 	ᛴ 	ᛵ 	ᛶ 	ᛷ 	ᛸ
+
+  	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+U+210x 	℀ 	℁ 	ℂ 	℃ 	℄ 	℅ 	℆ 	ℇ 	℈ 	℉ 	ℊ 	ℋ 	ℌ 	ℍ 	ℎ 	ℏ
+U+211x 	ℐ 	ℑ 	ℒ 	ℓ 	℔ 	ℕ 	№ 	℗ 	℘ 	ℙ 	ℚ 	ℛ 	ℜ 	ℝ 	℞ 	℟
+U+212x 	℠ 	℡ 	™ 	℣ 	ℤ 	℥ 	Ω 	℧ 	ℨ 	℩ 	K 	Å 	ℬ 	ℭ 	℮ 	ℯ
+U+213x 	ℰ 	ℱ 	Ⅎ 	ℳ 	ℴ 	ℵ 	ℶ 	ℷ 	ℸ 	ℹ 	℺ 	℻ 	ℼ 	ℽ 	ℾ 	ℿ
+U+214x 	⅀ 	⅁ 	⅂ 	⅃ 	⅄ 	ⅅ 	ⅆ 	ⅇ 	ⅈ 	ⅉ 	⅊ 	⅋ 	⅌ 	⅍ 	ⅎ 	⅏
+*/
+
+macro_rules! time {
+  ($val:expr) => {
+    let beg = std::time::Instant::now();
+    match $val {
+      tmp => {
+        let end = std::time::Instant::now();
+        let time = (end - beg);
+        println!(
+          "[{}:{}] `{}' took {:?}",
+          std::file!(),
+          std::line!(),
+          std::stringify!($val),
+          time
+          );
+        tmp
+      }
+    }
+  };
+  ($($val:expr),+ $(,)?) => {
+    ($(time!($val)),+,)
+  };
+}
+
+// from https://gist.github.com/justanotherdot
+/*
+If you look, I've also included a pattern to pass the number of times you want 
+the benchmark to run. I default to ten runs instead of one-hundred here as code 
+under inspection may take a long time to run under one-hundred times. You will 
+notice that I'm using nanoseconds for everything, which lets me compute a 
+proper mean average without rounding.
+*/
+/*
+macro_rules! bench {
+    ($val:expr) => {
+        {
+            let mut mean = 0;
+            let times = 10;
+            for _ in 0..times {
+                let beg = std::time::Instant::now();
+                match $val {
+                    _ => {
+                        let end = std::time::Instant::now();
+                        mean += (end - beg).as_nanos();
+                    }
+                } 
+            }
+            mean /= times;
+            eprintln!("[{}:{}] `{}' took {} ns after {} runs", std::file!(), std::line!(), std::stringify!($val), mean, times);
+            $val
+        }
+    };
+    ($val:expr, $times:expr) => {
+        {
+            let mut mean = 0;
+            for _ in 0..$times {
+                let beg = std::time::Instant::now();
+                match $val {
+                    _ => {
+                        let end = std::time::Instant::now();
+                        mean += (end - beg).as_nanos();
+                    }
+                } 
+            }
+            mean /= $times;
+            eprintln!("[{}:{}] `{}' took {} ns after {} runs", std::file!(), std::line!(), std::stringify!($val), mean, $times);
+            $val
+        }
+    };
+    ($($val:expr),+ $(,)?) => {
+        ($(bench!($val)),+,)
+    };    
+}
 */
 
 mod agm;
@@ -114,13 +197,13 @@ mod log;
 mod numbers;
 mod orthopoly;
 mod poly;
-mod quad;
 mod real;
 mod sievert;
 mod theta;
 mod traits;
 mod trig;
 mod util;
+mod wide;
 mod zeta;
 
 use std::str::FromStr;
@@ -675,22 +758,22 @@ fn main() {
     println!("{:.16}", x);
   }
 
-  // quad
-  let qq = quad::Quad::new(11.0, 0.0) / 10.0;
+  // wide
+  let qq = wide::Wide::new(11.0, 0.0) / 10.0;
   println!("11/10:{}", qq);
   if false {
-    let q_pi = quad::Quad::from_str("3.14159265358979323846264338327950288419716939937510");
+    let q_pi = wide::Wide::from_str("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
     println!("{}", q_pi.unwrap());
-    let q_eulergamma = quad::Quad::from_str("0.57721566490153286060651209008240243104215933593992");
+    let q_eulergamma = wide::Wide::from_str("0.57721566490153286060651209008240243104215933593992");
     println!("{} {:?}", q_eulergamma.unwrap(), q_eulergamma);
-    let q_ln2 = quad::Quad::from_str("0.69314718055994530941723212145817656807").unwrap();
+    let q_ln2 = wide::Wide::from_str("0.69314718055994530941723212145817656807").unwrap();
     {
       let mut dsum = 1.0;
       let mut dt = 1.0;
       let dln2 = q_ln2.hi();
-      let mut qsum = quad::Quad::new(1.0, 0.0);
-      let mut t = quad::Quad::new(1.0, 0.0);
+      let mut qsum = wide::Wide::new(1.0, 0.0);
+      let mut t = wide::Wide::new(1.0, 0.0);
       for i in 1..28 {
         dt = dt * dln2 / (i as f64);
         dsum += dt;
@@ -702,26 +785,26 @@ fn main() {
 
     println!("{:?}", q_ln2);
     println!("-----");
-    let x = quad::Quad::new(1.0, 0.0);
-    let y = quad::Quad::new(0.0, 0.1);
+    let x = wide::Wide::new(1.0, 0.0);
+    let y = wide::Wide::new(0.0, 0.1);
     println!("{}", x);
     println!("{}", y);
-    println!("{}", quad::Quad::new(1.0, 0.1));
+    println!("{}", wide::Wide::new(1.0, 0.1));
     println!("{}", x + y);
-    println!("11/10:{}", quad::Quad::new(11.0, 0.0) / 10.0);
+    println!("11/10:{}", wide::Wide::new(11.0, 0.0) / 10.0);
     println!("{:?}", (x + y) * (x + y));
     println!("{}", (x + y) * (x + y));
     println!("{:?}", (x * y) + (x * y));
     println!("{}", (x * y) + (x * y));
     println!("{:?}", (x + y) * 10.0);
-    println!("{:?}", quad::Quad::new(1.0, 0.0) / 10.0);
-    println!("{:?}", (quad::Quad::new(1.0, 0.0) / 10.0) * 10.0);
-    println!("{:?}", quad::Quad::new(1.0, 0.1).scale2(3));
+    println!("{:?}", wide::Wide::new(1.0, 0.0) / 10.0);
+    println!("{:?}", (wide::Wide::new(1.0, 0.0) / 10.0) * 10.0);
+    println!("{:?}", wide::Wide::new(1.0, 0.1).scale2(3));
     println!("-----");
-    let mut z = quad::Quad::new(1.0, 0.0);
+    let mut z = wide::Wide::new(1.0, 0.0);
     z /= 10.0;
     println!("{}  {:?}", z, z);
-    println!("{}", quad::Quad::new(0.1, 0.0));
+    println!("{}", wide::Wide::new(0.1, 0.0));
   }
   /*
 
@@ -1426,6 +1509,45 @@ fn main() {
     println!("el1(1,1) = {:e}", sf_ellint_el1(r64(1.0),r64(1.0)));
     println!("el2(1,1,1,1) = {:e}", sf_ellint_el2(r64(1.0),r64(1.0),r64(1.0),r64(1.0)));
     println!("el3(1,1,1) = {:e}", sf_ellint_el3(r64(1.0),r64(1.0),r64(1.0)));
+    time!(std::hint::black_box(sf_ellint_el3(r64(1.0),r64(1.0),r64(1.0))));
+    /*
+    let mut x = r64::default();
+    time!({for i in 1..25000000{x+=std::hint::black_box(sf_exp(r64(1.0+(i as f64/1e8))));};()});
+    println!("{:e}", x);
+    let mut x = f64::default();
+    time!({for i in 1..25000000{x+=std::hint::black_box((1.0_f64+(i as f64/1e8)).exp());};()});
+    println!("{:e}", x);
+    let mut x = r64::default();
+    time!({for i in 1..25000000{x+=std::hint::black_box(exp::impls::fastexp(r64(1.0+(i as f64/1e8))));};()});
+    println!("{:e}", x);
+    let mut x = r64::default();
+    time!({for i in 1..25000000{x+=std::hint::black_box(exp::impls::fastexp2(r64(1.0+(i as f64/1e8))));};()});
+    println!("{:e}", x);
+    */
+  }
+  if true {
+    println!("j0={:e}", bessel::spher::j0(r64(1e-0)));
+    println!("j0={:e}", bessel::spher::j0(r64(1e-1)));
+    println!("j0={:e}", bessel::spher::j0(r64(1e-2)));
+    println!("j1={:e}", bessel::spher::j1(r64(1e-0)));
+    println!("j1={:e}", bessel::spher::j1(r64(1e-1)));
+    println!("j1={:e}", bessel::spher::j1(r64(1e-2)));
+    println!("j1b={:e}", bessel::spher::j_back(r64(1e-1),1));
+    println!("j2b={:e}", bessel::spher::j_back(r64(1e-1),2));
+    println!("j8b={:e}", bessel::spher::j_back(r64(1e-1),8));
+    println!("j1f={:e}", bessel::spher::j_fore(r64(1e-1),1));
+    println!("j2f={:e}", bessel::spher::j_fore(r64(1e-1),2));
+    println!("j8f={:e}", bessel::spher::j_fore(r64(1e-1),8));
+    println!("j1b={:e}", bessel::spher::j_back(r64(1e+1),1));
+    println!("j2b={:e}", bessel::spher::j_back(r64(1e+1),2));
+    println!("j8b={:e}", bessel::spher::j_back(r64(1e+1),8));
+    println!("j1f={:e}", bessel::spher::j_fore(r64(1e+1),1));
+    println!("j2f={:e}", bessel::spher::j_fore(r64(1e+1),2));
+    println!("j8f={:e}", bessel::spher::j_fore(r64(1e+1),8));
+    println!("j0={:e}", sf_bessel_spher_j(0, r64(1e-0)));
+    println!("j1={:e}", sf_bessel_spher_j(1, r64(1e-0)));
+    println!("j2={:e}", sf_bessel_spher_j(2, r64(1e-0)));
+    println!("j3={:e}", sf_bessel_spher_j(3, r64(1e-0)));
   }
 }
 

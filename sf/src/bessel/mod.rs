@@ -2,6 +2,7 @@ use crate::traits::*;
 
 pub mod impls;
 mod tests;
+pub mod spher;
 
 //
 //
@@ -69,6 +70,12 @@ pub trait BesselSpherJ<N: Additive + Embeds<isize>>: Value + Embeds<N> {
     self.bessel_spher_j(nu - 1) * (ι(nu): Self / self) - self.bessel_spher_j(nu + 1)
   }
 }
+#[inline]
+pub fn sf_bessel_spher_j<N, V:BesselSpherJ<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+{ z.bessel_spher_j(nu) }
+#[inline]
+pub fn sf_bessel_spher_j_ddz<N, V:BesselSpherJ<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+{ z.bessel_spher_j_ddz(nu) }
 
 //
 //
