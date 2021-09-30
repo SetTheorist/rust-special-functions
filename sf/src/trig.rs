@@ -4,6 +4,11 @@ use crate::exp::{sf_exp};
 
 // TODO: split into Trig and TrigExtra (TrigObscure?)
 
+// verF(z) = 2 F(z/2)^2
+// coF(z) = F(\pi/2 - z)
+// haF(z) = F(z)/2
+// exF(z) = F(z)-1
+
 // NB lots TODO here
 pub trait Trig: Value+Constants {
   // cosine
