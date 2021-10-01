@@ -88,7 +88,7 @@ pub fn j_back<V:Value+Normed+Trig>(n:isize, z:V) -> V {
   for j in (0..(tot-2)).rev() {
     arr[j] = arr[j+1]*((2*j+3)as isize)/z - arr[j+2];
   }
-  // nnn = (0:(n+NN)) .'; scale = sqrt(sum((2*nnn+1).*arr.^2));
+  // nnn = (0:(n+NN)).'; scale = sqrt(sum((2*nnn+1).*arr.^2));
   let scale = arr[0] / j0(z);
   arr[n as usize] / scale
 }
@@ -98,7 +98,6 @@ pub fn j_back<V:Value+Normed+Trig>(n:isize, z:V) -> V {
 // fn bessel_spher_i2(self, nu: N) -> Self;
 
 ////////////////////////////////////////////////////////////////////////////////
-// fn bessel_spher_k(self, nu: N) -> Self;
 
 use crate::real::*;
 impl BesselSpherK<isize> for r64 {
@@ -157,11 +156,65 @@ pub fn k_back<V:Value+Exp>(n:isize, z:V) -> V {
   for j in (0..(tot-2)).rev() {
     arr[j] = arr[j+1]*((2*j+3) as isize)/z + arr[j+2];
   }
-  // scale = sqrt(sum((2*nnn+1).*arr.^2));
+  // nnn=(0:(n+NN)).';scale = sqrt(sum((2*nnn+1).*arr.^2));
   let scale = arr[0] / k0(z);
-  (arr[tot-1] / scale).pari(n)
+  (arr[n as usize] / scale).pari(n)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// fn bessel_spher_y(self, nu: N) -> Self;
 
+use crate::real::*;
+impl BesselSpherY<isize> for r64 {
+  fn bessel_spher_y(self, nu:isize) -> Self {
+    if self.is_negreal() {
+      spher_y_real(nu, -self).pari(nu+1)
+    } else {
+      spher_y_real(nu, self)
+    }
+  }
+}
+
+// assume z>0, n>=0
+pub fn spher_y_real<V:Value+Trig+Float>(n:isize, z:V) -> V {
+  // sf_sqrt(V::PI/(z*2)) * sf_bessel_y(n+0.5, z)
+  if z == 0 {
+    -V::infinity
+  } else if n == 0 {
+    y0(z)
+  } else if n == 1 {
+    y1(z)
+  } else {
+    y_fore(n, z)
+  }
+}
+
+pub fn y0<V:Value+Trig>(z:V) -> V {
+  -sf_cos(z)/z
+}
+
+pub fn y1<V:Value+Trig>(z:V) -> V {
+  -(sf_cos(z)/z + sf_sin(z))/z
+}
+
+pub fn y_fore<V:Value+Trig>(n:isize, z:V) -> V {
+  let mut am2 = y0(z);
+  let mut am1 = y1(z);
+  for j in 2..=n {
+    (am2, am1) = (am1, am1*(2*j-1)/z - am2);
+  }
+  am1
+}
+
+// TODO: remove use of array
+pub fn y_back<V:Value+Trig>(n:isize, z:V) -> V {
+  const EXTRA : usize = 10;
+  let tot = EXTRA + 1 + (n as usize);
+  let mut arr = vec![V::zero; tot];
+  arr[tot-2] = V::one;
+  for j in (0..(tot-2)).rev() {
+    arr[j] = arr[j+1]*((2*j+3) as isize)/z - arr[j+2];
+  }
+  //nnn = (0:(n+NN)) .'; #scale = sqrt(sum((2*nnn+1) .* arr.^2));
+  let scale = arr[0] / y0(z);
+  arr[n as usize] / scale
+}

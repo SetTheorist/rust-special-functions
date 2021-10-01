@@ -53,6 +53,10 @@ pub trait BesselY<N: Additive + Embeds<isize>>: Value + Embeds<N> {
   }
 }
 
+
+// TODO: maybe remove genericity in N for spherical bessel functions
+// (force them to be only isize?)
+
 //
 //
 //
@@ -93,6 +97,8 @@ pub fn sf_bessel_spher_k<N, V:BesselSpherK<N>>(nu:N, z:V) -> V
 pub trait BesselSpherY<N: Additive + Embeds<isize>>: Value + Embeds<N> {
   fn bessel_spher_y(self, nu: N) -> Self;
 }
+pub fn sf_bessel_spher_y<N, V:BesselSpherY<N>>(nu:N, z:V) -> V
+  where N:Additive+Embeds<isize> { z.bessel_spher_y(nu) }
 
 ////////////////////////////////////////////////////////////////////////////////
 

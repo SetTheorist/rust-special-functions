@@ -1553,6 +1553,10 @@ fn main() {
     println!("k1={:e}", sf_bessel_spher_k(1, r64(1.0)));
     println!("k2={:e}", sf_bessel_spher_k(2, r64(1.0)));
     println!("k3={:e}", sf_bessel_spher_k(3, r64(1.0)));
+    println!("y0={:e}", sf_bessel_spher_y(0, r64(1.0)));
+    println!("y1={:e}", sf_bessel_spher_y(1, r64(1.0)));
+    println!("y2={:e}", sf_bessel_spher_y(2, r64(1.0)));
+    println!("y3={:e}", sf_bessel_spher_y(3, r64(1.0)));
   }
 }
 
