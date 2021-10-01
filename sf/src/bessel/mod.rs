@@ -71,11 +71,11 @@ pub trait BesselSpherJ<N: Additive + Embeds<isize>>: Value + Embeds<N> {
   }
 }
 #[inline]
-pub fn sf_bessel_spher_j<N, V:BesselSpherJ<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
-{ z.bessel_spher_j(nu) }
+pub fn sf_bessel_spher_j<N, V:BesselSpherJ<N>>(nu:N, z:V) -> V
+  where N:Additive+Embeds<isize> { z.bessel_spher_j(nu) }
 #[inline]
-pub fn sf_bessel_spher_j_ddz<N, V:BesselSpherJ<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
-{ z.bessel_spher_j_ddz(nu) }
+pub fn sf_bessel_spher_j_ddz<N, V:BesselSpherJ<N>>(nu:N, z:V) -> V
+  where N:Additive+Embeds<isize> { z.bessel_spher_j_ddz(nu) }
 
 //
 //
@@ -83,6 +83,9 @@ pub fn sf_bessel_spher_j_ddz<N, V:BesselSpherJ<N>>(nu: N, z: V) -> V where N:Add
 pub trait BesselSpherK<N: Additive + Embeds<isize>>: Value + Embeds<N> {
   fn bessel_spher_k(self, nu: N) -> Self;
 }
+#[inline]
+pub fn sf_bessel_spher_k<N, V:BesselSpherK<N>>(nu:N, z:V) -> V
+  where N:Additive+Embeds<isize> { z.bessel_spher_k(nu) }
 
 //
 //

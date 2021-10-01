@@ -177,6 +177,7 @@ macro_rules! bench {
 mod agm;
 mod airy;
 mod algorithm;
+mod api;
 mod basic;
 mod bessel;
 mod complex;
@@ -1532,22 +1533,26 @@ fn main() {
     println!("j1={:e}", bessel::spher::j1(r64(1e-0)));
     println!("j1={:e}", bessel::spher::j1(r64(1e-1)));
     println!("j1={:e}", bessel::spher::j1(r64(1e-2)));
-    println!("j1b={:e}", bessel::spher::j_back(r64(1e-1),1));
-    println!("j2b={:e}", bessel::spher::j_back(r64(1e-1),2));
-    println!("j8b={:e}", bessel::spher::j_back(r64(1e-1),8));
-    println!("j1f={:e}", bessel::spher::j_fore(r64(1e-1),1));
-    println!("j2f={:e}", bessel::spher::j_fore(r64(1e-1),2));
-    println!("j8f={:e}", bessel::spher::j_fore(r64(1e-1),8));
-    println!("j1b={:e}", bessel::spher::j_back(r64(1e+1),1));
-    println!("j2b={:e}", bessel::spher::j_back(r64(1e+1),2));
-    println!("j8b={:e}", bessel::spher::j_back(r64(1e+1),8));
-    println!("j1f={:e}", bessel::spher::j_fore(r64(1e+1),1));
-    println!("j2f={:e}", bessel::spher::j_fore(r64(1e+1),2));
-    println!("j8f={:e}", bessel::spher::j_fore(r64(1e+1),8));
+    println!("j1b={:e}", bessel::spher::j_back(1,r64(1e-1)));
+    println!("j2b={:e}", bessel::spher::j_back(2,r64(1e-1)));
+    println!("j8b={:e}", bessel::spher::j_back(8,r64(1e-1)));
+    println!("j1f={:e}", bessel::spher::j_fore(1,r64(1e-1)));
+    println!("j2f={:e}", bessel::spher::j_fore(2,r64(1e-1)));
+    println!("j8f={:e}", bessel::spher::j_fore(8,r64(1e-1)));
+    println!("j1b={:e}", bessel::spher::j_back(1,r64(1e+1)));
+    println!("j2b={:e}", bessel::spher::j_back(2,r64(1e+1)));
+    println!("j8b={:e}", bessel::spher::j_back(8,r64(1e+1)));
+    println!("j1f={:e}", bessel::spher::j_fore(1,r64(1e+1)));
+    println!("j2f={:e}", bessel::spher::j_fore(2,r64(1e+1)));
+    println!("j8f={:e}", bessel::spher::j_fore(8,r64(1e+1)));
     println!("j0={:e}", sf_bessel_spher_j(0, r64(1e-0)));
     println!("j1={:e}", sf_bessel_spher_j(1, r64(1e-0)));
     println!("j2={:e}", sf_bessel_spher_j(2, r64(1e-0)));
     println!("j3={:e}", sf_bessel_spher_j(3, r64(1e-0)));
+    println!("k0={:e}", sf_bessel_spher_k(0, r64(1.0)));
+    println!("k1={:e}", sf_bessel_spher_k(1, r64(1.0)));
+    println!("k2={:e}", sf_bessel_spher_k(2, r64(1.0)));
+    println!("k3={:e}", sf_bessel_spher_k(3, r64(1.0)));
   }
 }
 

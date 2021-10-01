@@ -205,7 +205,7 @@ pub fn μ<T: Normed>(x: T) -> T::NT { x.mu() }
 
 pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT> //+ Embeds<Complex<f64>>
 {
-  type RT: Field + Ordered;
+  type RT: RealValue;
   const I: Self;
   fn real(self) -> Self::RT;
   fn imag(self) -> Self::RT;
@@ -316,12 +316,14 @@ pub trait RealValue: Value+RealType {}
 impl<T> RealValue for T where T:Value+RealType {}
 
 pub trait ComplexValue: Value+ComplexType {}
-impl<T> ComplexValue for T where T:Value+ComplexType {}
+impl<T> ComplexValue for T where T:Value+ComplexType { }
 
 // TODO: maybe?
-pub trait RealComplexPair<R:RealValue,C:ComplexValue<RT=R>> {}
+//pub trait RealComplexPair<R:RealValue,C:ComplexValue<RT=R>> {}
 // TODO: maybe?
-pub trait NarrowWidePair<N:Value,W:Value> {}
+pub trait Widenable : Value {
+  type Wider : Value;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
