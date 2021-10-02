@@ -200,6 +200,7 @@ mod orthopoly;
 mod poly;
 mod real;
 mod sievert;
+mod solve;
 mod theta;
 mod traits;
 mod trig;
@@ -1570,6 +1571,12 @@ fn main() {
     println!("y3={:e}", sf_bessel_spher_y(3, r64(1.0)));
     println!("y7={:e}", sf_bessel_spher_y(7, r64(1.0)));
     println!("y8={:e}", sf_bessel_spher_y(8, r64(1.0)));
+  }
+  if true {
+    println!("{:?}", solve::solve_linear(r64(3.0), r64(2.0)));
+    println!("{:?}", solve::solve_quadratic(r64(-1.0), r64(0.0), r64(1.0)));
+    println!("{:?}", solve::solve_quadratic(c64::one, c64::zero, c64::one));
+    println!("{:?}", solve::solve_cubic(r64(-6.0), r64(11.0), r64(-6.0), r64(1.0)));
   }
 }
 

@@ -52,8 +52,10 @@ pub trait One: Base {
 pub trait Multiplication: Base + One + Mul<Self, Output = Self> + MulAssign<Self> {
   #[inline]
   fn sqr(self) -> Self { self * self }
+  fn cub(self) -> Self { self.sqr() * self }
 }
 pub fn sf_sqr<M:Multiplication>(x:M) -> M { x.sqr() }
+pub fn sf_cub<M:Multiplication>(x:M) -> M { x.cub() }
 
 impl<T: Multiplication> Power<usize> for T {
   #[inline]
