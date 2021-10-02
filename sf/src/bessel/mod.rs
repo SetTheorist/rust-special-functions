@@ -64,6 +64,12 @@ pub trait BesselSpherI<N: Additive + Embeds<isize>>: Value + Embeds<N> {
   fn bessel_spher_i1(self, nu: N) -> Self;
   fn bessel_spher_i2(self, nu: N) -> Self;
 }
+#[inline]
+pub fn sf_bessel_spher_i1<N, V:BesselSpherI<N>>(nu:N, z:V) -> V
+  where N:Additive+Embeds<isize> { z.bessel_spher_i1(nu) }
+#[inline]
+pub fn sf_bessel_spher_i2<N, V:BesselSpherI<N>>(nu:N, z:V) -> V
+  where N:Additive+Embeds<isize> { z.bessel_spher_i2(nu) }
 
 //
 //

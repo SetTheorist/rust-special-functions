@@ -5,6 +5,21 @@ use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// TODO: unify all backward recurrences also
+
+// assume n>0, z>0
+#[inline]
+pub fn forward_recurrence<V:Value,const MULT:isize>(n:isize, z:V, f0:V, f1:V) -> V {
+  let mut fm2 = f0;
+  let mut fm1 = f1;
+  for i in 2..=n {
+    (fm2, fm1) = (fm1, (fm1*(2*i-1)/z - fm2)*MULT);
+  }
+  fm1
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 use crate::real::*;
 impl BesselSpherJ<isize> for r64 {
   fn bessel_spher_j(self, nu:isize) -> Self {
@@ -26,7 +41,7 @@ pub fn j_repos<V:Value+Normed+Trig>(n:isize, z:V) -> V {
   } else if n == 1 {
     j1(z)
   } else if abs(z) >= ι(n):V::NT {
-    j_fore(n, z)
+    forward_recurrence::<_,1>(n, z, j0(z), j1(z))
   } else {
     j_back(n, z)
   }
@@ -68,15 +83,6 @@ pub fn j1<V:Value+Normed+Trig>(z:V) -> V {
   }
 }
 
-pub fn j_fore<V:Value+Normed+Trig>(n:isize, z:V) -> V {
-  let mut jm2 = j0(z);
-  let mut jm1 = j1(z);
-  for j in 2..=n {
-    (jm2, jm1) = (jm1, jm1*(2*j-1)/z - jm2);
-  }
-  jm1
-}
-
 pub fn j_back<V:Value+Normed+Trig>(n:isize, z:V) -> V {
   // TODO: domain check!
   const EXTRA : isize = 20;
@@ -94,8 +100,121 @@ pub fn j_back<V:Value+Normed+Trig>(n:isize, z:V) -> V {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// fn bessel_spher_i1(self, nu: N) -> Self;
+
+use crate::real::*;
+impl BesselSpherI<isize> for r64 {
+  fn bessel_spher_i1(self, nu:isize) -> Self {
+    if self.is_negreal() {
+      spher_i1_repos(nu, -self).pari(nu)
+    } else {
+      spher_i1_repos(nu, self)
+    }
+  }
+  fn bessel_spher_i2(self, nu:isize) -> Self {
+    if self.is_negreal() {
+      spher_i2_repos(nu, -self).pari(nu+1)
+    } else {
+      spher_i2_repos(nu, self)
+    }
+  }
+}
+
+
+pub fn spher_i1_repos<V:Value+Trig+Normed>(n:isize, z:V) -> V {
+  //sf_sqrt(V::PI/(z*2)) * sf_bessel_i(n+0.5, z)
+  if z == 0 {
+    if n == 0 {V::one} else {V::zero}
+  } else if n == 0 {
+    i1_0(z)
+  } else if n == 1 {
+    i1_1(z)
+  } else {
+    if abs(z) > ι(n):V::NT {
+      forward_recurrence::<_,-1>(n, z, i1_0(z), i1_1(z))
+    } else {
+      i1_back(n, z)
+    }
+  }
+}
+
+pub fn i1_0<V:Value+Trig>(z:V) -> V {
+  // TODO: test whether we should do series expansion
+  // for z~0
+  // if abs(z)*2 < V::NT::one {
+  //   algorithms::cum_prods_1((1..25).map(|i|z.sqr()/((2*i)*(2*i+1))).sum()
+  // }
+  sf_sinh(z)/z
+}
+
+pub fn i1_1<V:Value+Trig+Normed>(z:V) -> V {
+  if abs(z) < ι(0.5):V::NT {
+    // "mostly to get correct rounding"
+    let z2 = z.sqr();
+    let mut t = z2;
+    let mut sum = V::zero;
+    for n in 1..25 {
+      sum += t * (2*n);
+      t *= z2/((2*n)*(2*n+1));
+    }
+    sum / z
+  } else {
+    let iz = z.recip();
+    (-sf_sinh(z)*iz + sf_cosh(z))*iz
+  }
+}
+
+// TODO: eliminate usage of array
+pub fn i1_back<V:Value+Trig>(n:isize, z:V) -> V {
+  const EXTRA : usize = 10;
+  let tot = (n as usize)+1+EXTRA;
+  let mut arr = vec![V::zero; tot as usize];
+  arr[tot-2] = V::one;
+  for j in (0..(tot-2)).rev() {
+    arr[j] = arr[j+1]*((2*j+3) as isize)/z + arr[j+2];
+  }
+  // nnn=(0:(n+NN)).';scale = sqrt(sum((2*nnn+1).*arr.^2));
+  let scale = arr[0] / i1_0(z);
+  arr[n as usize] / scale
+}
+
+
 // fn bessel_spher_i2(self, nu: N) -> Self;
+pub fn spher_i2_repos<V:Value+Float+Trig+Normed>(n:isize, z:V) -> V {
+  //sf_sqrt(V::PI/(z*2)) * sf_bessel_i(n+0.5, z)
+  if z == 0 {
+    V::infinity
+  } else if n == 0 {
+    i2_0(z)
+  } else if n == 1 {
+    i2_1(z)
+  } else {
+    forward_recurrence::<_,-1>(n, z, i2_0(z), i2_1(z))
+  }
+}
+
+pub fn i2_0<V:Value+Trig>(z:V) -> V {
+  sf_cosh(z)/z
+}
+
+pub fn i2_1<V:Value+Trig>(z:V) -> V {
+  let iz = z.recip();
+  (-sf_cosh(z)*iz + sf_sinh(z))*iz
+}
+
+// TODO: eliminate usage of array
+pub fn i2_back<V:Value+Trig>(n:isize, z:V) -> V {
+  const EXTRA : usize = 10;
+  let tot = (n as usize)+1+EXTRA;
+  let mut arr = vec![V::zero; tot as usize];
+  arr[tot-2] = V::one;
+  for j in (0..(tot-2)).rev() {
+    arr[j] = arr[j+1]*((2*j+3) as isize)/z + arr[j+2];
+  }
+  // nnn=(0:(n+NN)).';scale = sqrt(sum((2*nnn+1).*arr.^2));
+  let scale = arr[0] / i2_0(z);
+  arr[n as usize] / scale
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -123,7 +242,7 @@ pub fn spher_k_real<V:Value+Float+Exp>(n:isize, z:V) -> V {
   } else if n == 1 {
     k1(z)
   } else {
-    k_fore(n, z)
+    forward_recurrence::<_,-1>(n, z, k0(z), -k1(z)).pari(n)
   }
 }
 
@@ -134,16 +253,6 @@ pub fn k0<V:Value+Exp>(z:V) -> V {
 pub fn k1<V:Value+Exp>(z:V) -> V {
   let iz = z.recip();
   V::PI/2 * sf_exp(-z) * (iz + 1)*iz
-}
-
-// n>0
-pub fn k_fore<V:Value+Exp>(n:isize, z:V) -> V {
-  let mut am2 = k0(z);
-  let mut am1 = -k1(z);
-  for j in 2..=n {
-    (am2, am1) = (am1, am2 - am1*(2*j-1)/z);
-  }
-  am1.pari(n)
 }
 
 // n>0
@@ -184,7 +293,7 @@ pub fn spher_y_real<V:Value+Trig+Float>(n:isize, z:V) -> V {
   } else if n == 1 {
     y1(z)
   } else {
-    y_fore(n, z)
+    forward_recurrence::<_,1>(n, z, y0(z), y1(z))
   }
 }
 
@@ -194,15 +303,6 @@ pub fn y0<V:Value+Trig>(z:V) -> V {
 
 pub fn y1<V:Value+Trig>(z:V) -> V {
   -(sf_cos(z)/z + sf_sin(z))/z
-}
-
-pub fn y_fore<V:Value+Trig>(n:isize, z:V) -> V {
-  let mut am2 = y0(z);
-  let mut am1 = y1(z);
-  for j in 2..=n {
-    (am2, am1) = (am1, am1*(2*j-1)/z - am2);
-  }
-  am1
 }
 
 // TODO: remove use of array

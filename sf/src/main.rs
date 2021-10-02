@@ -1527,36 +1527,49 @@ fn main() {
     */
   }
   if true {
-    println!("j0={:e}", bessel::spher::j0(r64(1e-0)));
-    println!("j0={:e}", bessel::spher::j0(r64(1e-1)));
-    println!("j0={:e}", bessel::spher::j0(r64(1e-2)));
-    println!("j1={:e}", bessel::spher::j1(r64(1e-0)));
-    println!("j1={:e}", bessel::spher::j1(r64(1e-1)));
-    println!("j1={:e}", bessel::spher::j1(r64(1e-2)));
-    println!("j1b={:e}", bessel::spher::j_back(1,r64(1e-1)));
-    println!("j2b={:e}", bessel::spher::j_back(2,r64(1e-1)));
-    println!("j8b={:e}", bessel::spher::j_back(8,r64(1e-1)));
-    println!("j1f={:e}", bessel::spher::j_fore(1,r64(1e-1)));
-    println!("j2f={:e}", bessel::spher::j_fore(2,r64(1e-1)));
-    println!("j8f={:e}", bessel::spher::j_fore(8,r64(1e-1)));
-    println!("j1b={:e}", bessel::spher::j_back(1,r64(1e+1)));
-    println!("j2b={:e}", bessel::spher::j_back(2,r64(1e+1)));
-    println!("j8b={:e}", bessel::spher::j_back(8,r64(1e+1)));
-    println!("j1f={:e}", bessel::spher::j_fore(1,r64(1e+1)));
-    println!("j2f={:e}", bessel::spher::j_fore(2,r64(1e+1)));
-    println!("j8f={:e}", bessel::spher::j_fore(8,r64(1e+1)));
+    //println!("i10={:e}", sf_bessel_spher_i1(0, r64(1e1)));
+    dbg!(sf_bessel_spher_i1(0, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i1(1, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i1(2, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i1(3, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i1(7, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i1(8, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i1(0, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i1(1, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i1(2, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i1(3, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i1(7, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i1(8, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i2(0, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i2(1, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i2(2, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i2(3, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i2(7, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i2(8, r64(1e1)).0);
+    dbg!(sf_bessel_spher_i2(0, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i2(1, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i2(2, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i2(3, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i2(7, r64(1e-1)).0);
+    dbg!(sf_bessel_spher_i2(8, r64(1e-1)).0);
     println!("j0={:e}", sf_bessel_spher_j(0, r64(1e-0)));
     println!("j1={:e}", sf_bessel_spher_j(1, r64(1e-0)));
     println!("j2={:e}", sf_bessel_spher_j(2, r64(1e-0)));
     println!("j3={:e}", sf_bessel_spher_j(3, r64(1e-0)));
+    println!("j7={:e}", sf_bessel_spher_j(7, r64(1e-0)));
+    println!("j8={:e}", sf_bessel_spher_j(8, r64(1e-0)));
     println!("k0={:e}", sf_bessel_spher_k(0, r64(1.0)));
     println!("k1={:e}", sf_bessel_spher_k(1, r64(1.0)));
     println!("k2={:e}", sf_bessel_spher_k(2, r64(1.0)));
     println!("k3={:e}", sf_bessel_spher_k(3, r64(1.0)));
+    println!("k7={:e}", sf_bessel_spher_k(7, r64(1.0)));
+    println!("k8={:e}", sf_bessel_spher_k(8, r64(1.0)));
     println!("y0={:e}", sf_bessel_spher_y(0, r64(1.0)));
     println!("y1={:e}", sf_bessel_spher_y(1, r64(1.0)));
     println!("y2={:e}", sf_bessel_spher_y(2, r64(1.0)));
     println!("y3={:e}", sf_bessel_spher_y(3, r64(1.0)));
+    println!("y7={:e}", sf_bessel_spher_y(7, r64(1.0)));
+    println!("y8={:e}", sf_bessel_spher_y(8, r64(1.0)));
   }
 }
 
