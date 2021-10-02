@@ -5,12 +5,17 @@ pub mod impls;
 pub trait Gamma {
   fn lngamma(self) -> Self;
   fn gamma(self) -> Self;
+
+  fn beta(self, b:Self) -> Self;
 }
 
 #[inline]
-pub fn sf_gamma<V: Gamma>(x: V) -> V { x.gamma() }
+pub fn sf_gamma<V: Gamma>(x:V) -> V { x.gamma() }
 #[inline]
-pub fn sf_lngamma<V: Gamma>(x: V) -> V { x.lngamma() }
+pub fn sf_lngamma<V: Gamma>(x:V) -> V { x.lngamma() }
+#[inline]
+pub fn sf_beta<V: Gamma>(a:V, b:V) -> V { a.beta(b) }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -33,6 +38,9 @@ impl Gamma for r64 {
     impls::lngamma_lanczos_15(self)
     //impls::gamma_spouge(11, self).log() // TODO
   }
+  fn beta(self, b:Self) -> Self {
+    sf_exp(self.lngamma() + b.lngamma() - (self+b).lngamma())
+  }
 }
 // TODO: quick and dirty for now
 use crate::complex::*;
@@ -48,6 +56,9 @@ impl Gamma for c64 {
   fn lngamma(self) -> Self {
     impls::lngamma_lanczos_15(self)
     //impls::gamma_spouge(11, self).log() // TODO
+  }
+  fn beta(self, b:Self) -> Self {
+    sf_exp(self.lngamma() + b.lngamma() - (self+b).lngamma())
   }
 }
 
