@@ -1577,6 +1577,9 @@ fn main() {
     println!("{:?}", solve::solve_quadratic(r64(-1.0), r64(0.0), r64(1.0)));
     println!("{:?}", solve::solve_quadratic(c64::one, c64::zero, c64::one));
     println!("{:?}", solve::solve_cubic(r64(-6.0), r64(11.0), r64(-6.0), r64(1.0)));
+    println!("{:?}", solve::solve_cubic(c64::one, c64::zero, c64::zero, c64::one));
+    println!("{:?}", solve::solve_quartic(r64(24.0), r64(-50.0), r64(35.0), r64(-10.0), r64(1.0)));
+    println!("{:?}", solve::solve_quartic(-c64::one, c64::zero, c64::zero, c64::zero, c64::one));
   }
 }
 
