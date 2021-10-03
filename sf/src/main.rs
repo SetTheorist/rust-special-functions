@@ -1666,5 +1666,10 @@ fn main() {
     println!("j2({:e})={:e}", z, sf_bessel_spher_j(2, z));
     println!("j3({:e})={:e}", z, sf_bessel_spher_j(3, z));
   }
+  if true {
+    println!("{:e}", sf_exp_men(3, r64(1.0)));
+    println!("{:e}", sf_exp_men(7, r64(1.0)));
+    println!("{:e}", sf_exp_men(12, r64(1.0)));
+  }
 }
 

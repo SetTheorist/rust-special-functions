@@ -9,10 +9,10 @@ pub trait Exp: Value {
   fn exp(self) -> Self;
 
   // $e^x-1$
-  fn exp_m1(self) -> Self { self.exp() - ι(1): Self } // TODO
+  fn exp_m1(self) -> Self { self.exp() - ι(1): Self }
 
   // $\frac{e^x-1}{x}$
-  fn exp_m1vx(self) -> Self { self.exp_m1() / self } // TODO
+  fn exp_m1vx(self) -> Self { self.exp_m1() / self }
 
   // $\sum_{k=0}^n\frac{x^k}{k!}$
   fn expn(self, _n: isize) -> Self { unimplemented!() } // TODO
@@ -26,6 +26,10 @@ pub trait Exp: Value {
 
 #[must_use]#[inline] pub fn sf_exp<V: Exp>(x: V) -> V { x.exp() }
 #[must_use]#[inline] pub fn sf_exp_m1<V: Exp>(x: V) -> V { x.exp_m1() }
+#[must_use]#[inline] pub fn sf_exp_m1vx<V: Exp>(x: V) -> V { x.exp_m1vx() }
+#[must_use]#[inline] pub fn sf_expn<V: Exp>(n:isize, x: V) -> V { x.expn(n) }
+#[must_use]#[inline] pub fn sf_exp_men<V: Exp>(n:isize, x: V) -> V { x.exp_men(n) }
+#[must_use]#[inline] pub fn sf_exp_menx<V: Exp>(n:isize, x: V) -> V { x.exp_menx(n) }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -33,6 +37,30 @@ use crate::real::*;
 impl Exp for r64 {
   #[inline] fn exp(self) -> Self { r64(self.0.exp()) }
   #[inline] fn exp_m1(self) -> Self { r64(self.0.exp_m1()) }
+  #[inline] fn exp_men(self, n:isize) -> Self {
+    // TODO: nan, etc.
+    if self.is_infinite() {
+      if self.is_posreal() {
+        return r64::infinity;
+      } else {
+        if n == 0 {
+          return r64::zero;
+        } else if n == 1 {
+          return -r64::one;
+        } else {
+          return r64::infinity.pari(n);
+        }
+      }
+    }
+    // TODO: check n>=0
+    if n == 0 {
+      self.exp()
+    } else if n == 1 {
+      self.exp_m1()
+    } else {
+      exp_men_contfrac(n, self)
+    }
+  }
 }
 
 use crate::complex::*;
@@ -41,6 +69,17 @@ impl Exp for c64 {
   fn exp(self) -> c64 {
     // TODO: temporary quick implementation
     c64::polar(sf_exp(self.re), self.im)
+  }
+  #[inline] fn exp_men(self, n:isize) -> Self {
+    // TODO: check n>=0
+    // TODO: nan, inf, etc.
+    if n == 0 {
+      self.exp()
+    } else if n == 1 {
+      self.exp_m1()
+    } else {
+      exp_men_contfrac(n, self)
+    }
   }
 }
 
@@ -136,50 +175,22 @@ pub mod impls {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+use crate::algorithm::{contfrac_modlentz};
+use crate::numbers::{sf_factorial_approx};
+pub fn exp_men_contfrac<V:Value>(n:isize, z:V) -> V {
+  let terms = (1..).map(|j:isize|(
+    (if j.is_oddint() {z*((j+1)/2)} else {-z*(n+j/2)}),
+    ι(n+1+j):V));
+  let cf = contfrac_modlentz(ι(n+1):V, terms, V::epsilon);
+  z.pow(n) / ((-z/cf + 1) * sf_factorial_approx(n as usize))
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 /*
-use crate::embed::*;
-use crate::value::{Value,RealValue,ComplexValue};
-use crate::trig::{Trig};
-use num::{Zero};
-use num::complex::{Complex};
-
-////////////////////////////////////////////////////////////////////////////////
-
-#[must_use = "method returns a new number and does not mutate the original value"]
-pub fn sf_exp_m1<V:Exp>(x:V) -> V { x.exp_m1() }
-#[must_use = "method returns a new number and does not mutate the original value"]
-pub fn sf_exp_m1vx<V:Exp>(x:V) -> V { x.exp_m1vx() }
-#[must_use = "method returns a new number and does not mutate the original value"]
-pub fn sf_expn<V:Exp>(x:V, n:isize) -> V { x.expn(n) }
-#[must_use = "method returns a new number and does not mutate the original value"]
-pub fn sf_exp_men<V:Exp>(x:V, n:isize) -> V { x.exp_men(n) }
-#[must_use = "method returns a new number and does not mutate the original value"]
-pub fn sf_exp_menx<V:Exp>(x:V, n:isize) -> V { x.exp_menx(n) }
-
-////////////////////////////////////////////////////////////////////////////////
-
-impl Exp for f64 {
-  fn exp(self) -> Self { sf_exp_real(self) }
-  fn exp_m1(self) -> Self { sf_exp_m1_real(self) }
-}
-
-impl Exp for Complex<f64> {
-  fn exp(self) -> Self { sf_exp_complex(self) }
-  fn exp_m1(self) -> Self { sf_exp_complex(self)-1.0 }
-}
-
-impl Ln for f64 {
-  fn ln(self) -> Self { sf_ln_real(self) }
-  fn ln_1p(self) -> Self { sf_ln_1p_real(self) }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-fn sf_exp_real<V:RealValue>(x:V) -> V
-{
+fn sf_exp_real<V:RealValue>(x:V) -> V {
   // positive real-part
   if x<V::zero() { return V::one()/sf_exp_real(-x); }
   // range-reduce
@@ -190,7 +201,6 @@ fn sf_exp_real<V:RealValue>(x:V) -> V
   let s = exp__powser(r, V::one());
   s.ldexp(n.dabs() as i32)
 }
-
 fn sf_exp_complex<V:ComplexValue>(x:V) -> V where V::RT:Trig {
   let er = sf_exp_real(x.real());
   if x.imag()!=V::RT::zero() {
@@ -200,7 +210,6 @@ fn sf_exp_complex<V:ComplexValue>(x:V) -> V where V::RT:Trig {
     ι(er)
   }
 }
-
 pub fn sf_exp_m1_real<V:RealValue>(x:V) -> V {
   if x.dabs() < 0.70 {
     exp__powser(x, V::zero())
@@ -208,6 +217,8 @@ pub fn sf_exp_m1_real<V:RealValue>(x:V) -> V {
     sf_exp_real(x) - V::one()
   }
 }
-
 */
-////////////////////////////////////////////////////////////////////////////////
+
+
+
+
