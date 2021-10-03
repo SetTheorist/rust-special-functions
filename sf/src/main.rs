@@ -1638,5 +1638,32 @@ fn main() {
     println!("si(1+I)={:e}", expint::sf_sinint(c64{re:r64::one,im:r64::one}));
     println!("si(-1+0I)={:e}", expint::sf_sinint(c64{re:-r64::one,im:r64::zero}));
   }
+  if true {
+    let z = c64{re:r64(1.0), im:r64(1.0)};
+    println!("j0({:e})={:e}", z, sf_bessel_spher_j(0, z));
+    println!("j1({:e})={:e}", z, sf_bessel_spher_j(1, z));
+    println!("j2({:e})={:e}", z, sf_bessel_spher_j(2, z));
+    println!("j3({:e})={:e}", z, sf_bessel_spher_j(3, z));
+    let z = -z;
+    println!("j0({:e})={:e}", z, sf_bessel_spher_j(0, z));
+    println!("j1({:e})={:e}", z, sf_bessel_spher_j(1, z));
+    println!("j2({:e})={:e}", z, sf_bessel_spher_j(2, z));
+    println!("j3({:e})={:e}", z, sf_bessel_spher_j(3, z));
+    let z = c64::I;
+    println!("j0({:e})={:e}", z, sf_bessel_spher_j(0, z));
+    println!("j1({:e})={:e}", z, sf_bessel_spher_j(1, z));
+    println!("j2({:e})={:e}", z, sf_bessel_spher_j(2, z));
+    println!("j3({:e})={:e}", z, sf_bessel_spher_j(3, z));
+    let z = c64::zero;
+    println!("j0({:e})={:e}", z, sf_bessel_spher_j(0, z));
+    println!("j1({:e})={:e}", z, sf_bessel_spher_j(1, z));
+    println!("j2({:e})={:e}", z, sf_bessel_spher_j(2, z));
+    println!("j3({:e})={:e}", z, sf_bessel_spher_j(3, z));
+    let z = r64::zero;
+    println!("j0({:e})={:e}", z, sf_bessel_spher_j(0, z));
+    println!("j1({:e})={:e}", z, sf_bessel_spher_j(1, z));
+    println!("j2({:e})={:e}", z, sf_bessel_spher_j(2, z));
+    println!("j3({:e})={:e}", z, sf_bessel_spher_j(3, z));
+  }
 }
 

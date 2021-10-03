@@ -23,7 +23,9 @@ pub fn forward_recurrence<V:Value,const MULT:isize>(n:isize, z:V, f0:V, f1:V) ->
 use crate::real::*;
 impl BesselSpherJ<isize> for r64 {
   fn bessel_spher_j(self, nu:isize) -> Self {
-    if self.is_negreal() {
+    if self == 0 {
+      return if nu==0 {Self::one} else {Self::zero};
+    } if self.is_negreal() {
       j_repos(nu, -self).pari(nu)
     } else {
       j_repos(nu, self)
@@ -31,12 +33,34 @@ impl BesselSpherJ<isize> for r64 {
   }
 }
 
+use crate::complex::*;
+impl BesselSpherJ<isize> for c64 {
+  fn bessel_spher_j(self, nu:isize) -> Self {
+    if self == 0 {
+      return if nu==0 {Self::one} else {Self::zero};
+    }
+    let res = 
+      if self.real().is_nonnegreal() {
+        j_repos(nu, self)
+      } else {
+        j_repos(nu, -self).pari(nu)
+      };
+    if self.is_imag() {
+      if nu.is_evenint() {
+        c64{re:res.re, im:r64::zero}
+      } else {
+        c64{re:r64::zero, im:res.im}
+      }
+    } else {
+      res
+    }
+  }
+}
+
 // assumes re(z)>=0
 pub fn j_repos<V:Value+Normed+Trig>(n:isize, z:V) -> V {
   // TODO: check n>=0
-  if z == 0 {
-    if n==0 {V::one} else {V::zero}
-  } else if n == 0 {
+  if n == 0 {
     j0(z)
   } else if n == 1 {
     j1(z)
