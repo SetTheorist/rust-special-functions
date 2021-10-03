@@ -4,6 +4,7 @@ use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 use crate::real::r64;
 use crate::traits::*;
+use crate::exp::*;
 use crate::trig::Trig;
 
 // TODO: Make generic on any RealValue type?
@@ -446,14 +447,6 @@ impl Power for c64 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-use crate::exp::{sf_exp, Exp};
-impl Exp for c64 {
-  fn exp(self) -> c64 {
-    // TODO: temporary quick implementation
-    c64::polar(sf_exp(self.re), self.im)
-  }
-}
 
 use crate::log::Log;
 impl Log for c64 {

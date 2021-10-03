@@ -309,11 +309,6 @@ impl Float for r64 {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-use crate::exp::Exp;
-impl Exp for r64 {
-  lift1!(exp, exp);
-}
-
 use crate::log::Log;
 impl Log for r64 {
   lift1!(log, ln);

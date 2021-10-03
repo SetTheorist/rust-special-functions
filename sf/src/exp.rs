@@ -9,10 +9,10 @@ pub trait Exp: Value {
   fn exp(self) -> Self;
 
   // $e^x-1$
-  fn exp_m1(self) -> Self { self.exp() - ι(1): Self }
+  fn exp_m1(self) -> Self { self.exp() - ι(1): Self } // TODO
 
   // $\frac{e^x-1}{x}$
-  fn exp_m1vx(self) -> Self { self.exp_m1() / self }
+  fn exp_m1vx(self) -> Self { self.exp_m1() / self } // TODO
 
   // $\sum_{k=0}^n\frac{x^k}{k!}$
   fn expn(self, _n: isize) -> Self { unimplemented!() } // TODO
@@ -24,8 +24,25 @@ pub trait Exp: Value {
   fn exp_menx(self, _n: isize) -> Self { unimplemented!() } // TODO
 }
 
-#[must_use = "method returns a new number and does not mutate the original value"]
-pub fn sf_exp<V: Exp>(x: V) -> V { x.exp() }
+#[must_use]#[inline] pub fn sf_exp<V: Exp>(x: V) -> V { x.exp() }
+#[must_use]#[inline] pub fn sf_exp_m1<V: Exp>(x: V) -> V { x.exp_m1() }
+
+////////////////////////////////////////////////////////////////////////////////
+
+use crate::real::*;
+impl Exp for r64 {
+  #[inline] fn exp(self) -> Self { r64(self.0.exp()) }
+  #[inline] fn exp_m1(self) -> Self { r64(self.0.exp_m1()) }
+}
+
+use crate::complex::*;
+impl Exp for c64 {
+  #[inline]
+  fn exp(self) -> c64 {
+    // TODO: temporary quick implementation
+    c64::polar(sf_exp(self.re), self.im)
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
