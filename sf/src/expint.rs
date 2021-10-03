@@ -16,6 +16,18 @@ pub trait LogInt {
 }
 #[inline] pub fn sf_logint<V:LogInt>(z:V) -> V { z.logint() }
 
+pub trait CoshInt {
+  fn coshint(self) -> Self;
+}
+#[inline] pub fn sf_coshint<V:CoshInt>(z:V) -> V { z.coshint() }
+
+pub trait SinhInt {
+  fn sinhint(self) -> Self;
+}
+#[inline] pub fn sf_sinhint<V:SinhInt>(z:V) -> V { z.sinhint() }
+
+////////////////////////////////////////////////////////////////////////////////
+
 use crate::real::*;
 impl ExpInt for r64 {
   fn expint_ei(self) -> Self { expint_ei_real(self) }
@@ -23,6 +35,12 @@ impl ExpInt for r64 {
 }
 impl LogInt for r64 {
   fn logint(self) -> Self { sf_expint_ei(sf_log(self)) }
+}
+impl CoshInt for r64 {
+  fn coshint(self) -> Self { (sf_expint_ei(self) - sf_expint_en(1, self))/2 }
+}
+impl SinhInt for r64 {
+  fn sinhint(self) -> Self { (sf_expint_ei(self) + sf_expint_en(1, self))/2 }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
