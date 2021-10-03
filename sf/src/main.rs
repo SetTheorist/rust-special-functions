@@ -98,6 +98,26 @@ U+211x 	ℐ 	ℑ 	ℒ 	ℓ 	℔ 	ℕ 	№ 	℗ 	℘ 	ℙ 	ℚ 	ℛ 	ℜ 	ℝ 	�
 U+212x 	℠ 	℡ 	™ 	℣ 	ℤ 	℥ 	Ω 	℧ 	ℨ 	℩ 	K 	Å 	ℬ 	ℭ 	℮ 	ℯ
 U+213x 	ℰ 	ℱ 	Ⅎ 	ℳ 	ℴ 	ℵ 	ℶ 	ℷ 	ℸ 	ℹ 	℺ 	℻ 	ℼ 	ℽ 	ℾ 	ℿ
 U+214x 	⅀ 	⅁ 	⅂ 	⅃ 	⅄ 	ⅅ 	ⅆ 	ⅇ 	ⅈ 	ⅉ 	⅊ 	⅋ 	⅌ 	⅍ 	ⅎ 	⅏
+
+ 	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+U+008x 	XXX 	XXX 	BPH 	NBH 	 IND 	NEL 	SSA 	ESA 	HTS 	HTJ 	VTS 	PLD 	PLU 	 RI   	SS2 	SS3
+U+009x 	DCS 	PU1 	PU2 	STS 	CCH 	 MW  	SPA 	EPA 	SOS 	XXX 	SCI  	CSI  	 ST  	OSC 	 PM  	APC
+U+00Ax 	NBSP 	¡ 	¢ 	£ 	¤ 	¥ 	¦ 	§ 	¨ 	© 	ª 	« 	¬ 	SHY 	® 	¯
+U+00Bx 	° 	± 	² 	³ 	´ 	µ 	¶ 	· 	¸ 	¹ 	º 	» 	¼ 	½ 	¾ 	¿
+U+00Cx 	À 	Á 	Â 	Ã 	Ä 	Å 	Æ 	Ç 	È 	É 	Ê 	Ë 	Ì 	Í 	Î 	Ï
+U+00Dx 	Ð 	Ñ 	Ò 	Ó 	Ô 	Õ 	Ö 	× 	Ø 	Ù 	Ú 	Û 	Ü 	Ý 	Þ 	ß
+U+00Ex 	à 	á 	â 	ã 	ä 	å 	æ 	ç 	è 	é 	ê 	ë 	ì 	í 	î 	ï
+U+00Fx 	ð 	ñ 	ò 	ó 	ô 	õ 	ö 	÷ 	ø 	ù 	ú 	û 	ü 	ý 	þ 	ÿ
+
+  	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
+U+010x 	Ā 	ā 	Ă 	ă 	Ą 	ą 	Ć 	ć 	Ĉ 	ĉ 	Ċ 	ċ 	Č 	č 	Ď 	ď
+U+011x 	Đ 	đ 	Ē 	ē 	Ĕ 	ĕ 	Ė 	ė 	Ę 	ę 	Ě 	ě 	Ĝ 	ĝ 	Ğ 	ğ
+U+012x 	Ġ 	ġ 	Ģ 	ģ 	Ĥ 	ĥ 	Ħ 	ħ 	Ĩ 	ĩ 	Ī 	ī 	Ĭ 	ĭ 	Į 	į
+U+013x 	İ 	ı 	Ĳ 	ĳ 	Ĵ 	ĵ 	Ķ 	ķ 	ĸ 	Ĺ 	ĺ 	Ļ 	ļ 	Ľ 	ľ 	Ŀ
+U+014x 	ŀ 	Ł 	ł 	Ń 	ń 	Ņ 	ņ 	Ň 	ň 	ŉ 	Ŋ 	ŋ 	Ō 	ō 	Ŏ 	ŏ
+U+015x 	Ő 	ő 	Œ 	œ 	Ŕ 	ŕ 	Ŗ 	ŗ 	Ř 	ř 	Ś 	ś 	Ŝ 	ŝ 	Ş 	ş
+U+016x 	Š 	š 	Ţ 	ţ 	Ť 	ť 	Ŧ 	ŧ 	Ũ 	ũ 	Ū 	ū 	Ŭ 	ŭ 	Ů 	ů
+U+017x 	Ű 	ű 	Ų 	ų 	Ŵ 	ŵ 	Ŷ 	ŷ 	Ÿ 	Ź 	ź 	Ż 	ż 	Ž 	ž 	ſ
 */
 
 macro_rules! time {
@@ -1604,6 +1624,11 @@ fn main() {
     println!("en(5,0.1)={:e}", expint::sf_expint_en(5,r64(0.1)));
     println!("en(5,1.0)={:e}", expint::sf_expint_en(5,r64(1.0)));
     println!("en(5,3.0)={:e}", expint::sf_expint_en(5,r64(3.0)));
+    println!("ci(0.5)={:e}", expint::sf_cosint(r64(0.5)));
+    println!("ci(2.5)={:e}", expint::sf_cosint(r64(2.5)));
+    println!("ci(9.5)={:e}", expint::sf_cosint(r64(9.5)));
+    println!("ci(1+I)={:e}", expint::sf_cosint(c64{re:r64::one,im:r64::one}));
+    println!("ci(-1+0I)={:e}", expint::sf_cosint(c64{re:-r64::one,im:r64::zero}));
   }
 }
 

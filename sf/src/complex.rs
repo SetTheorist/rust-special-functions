@@ -28,7 +28,8 @@ impl std::fmt::Display for c64 {
     std::fmt::Display::fmt(&self.re, f)?;
     if self.im >= ι(0) { write!(f, "+")?; }
     std::fmt::Display::fmt(&self.im, f)?;
-    write!(f, "ι")
+    //write!(f, "ι")
+    write!(f, "î")
   }
 }
 
@@ -37,7 +38,8 @@ impl std::fmt::LowerExp for c64 {
     std::fmt::LowerExp::fmt(&self.re, f)?;
     if self.im >= ι(0) { write!(f, "+")?; }
     std::fmt::LowerExp::fmt(&self.im, f)?;
-    write!(f, "ι")
+    //write!(f, "ι")
+    write!(f, "î")
   }
 }
 
@@ -46,7 +48,8 @@ impl std::fmt::UpperExp for c64 {
     std::fmt::UpperExp::fmt(&self.re, f)?;
     if self.im >= ι(0) { write!(f, "+")?; }
     std::fmt::UpperExp::fmt(&self.im, f)?;
-    write!(f, "ι")
+    //write!(f, "ι")
+    write!(f, "î")
   }
 }
 

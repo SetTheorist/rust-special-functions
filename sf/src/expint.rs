@@ -16,6 +16,11 @@ pub trait LogInt {
 }
 #[inline] pub fn sf_logint<V:LogInt>(z:V) -> V { z.logint() }
 
+pub trait CosInt {
+  fn cosint(self) -> Self;
+}
+#[inline] pub fn sf_cosint<V:CosInt>(z:V) -> V { z.cosint() }
+
 pub trait CoshInt {
   fn coshint(self) -> Self;
 }
@@ -25,6 +30,11 @@ pub trait SinhInt {
   fn sinhint(self) -> Self;
 }
 #[inline] pub fn sf_sinhint<V:SinhInt>(z:V) -> V { z.sinhint() }
+
+pub trait SinInt {
+  fn sinint(self) -> Self;
+}
+#[inline] pub fn sf_sinint<V:SinInt>(z:V) -> V { z.sinint() }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -36,12 +46,21 @@ impl ExpInt for r64 {
 impl LogInt for r64 {
   fn logint(self) -> Self { sf_expint_ei(sf_log(self)) }
 }
+impl CosInt for r64 {
+  fn cosint(self) -> Self { cosint_real(self) }
+}
 impl CoshInt for r64 {
   fn coshint(self) -> Self { (sf_expint_ei(self) - sf_expint_en(1, self))/2 }
 }
 impl SinhInt for r64 {
   fn sinhint(self) -> Self { (sf_expint_ei(self) + sf_expint_en(1, self))/2 }
 }
+
+use crate::complex::*;
+impl CosInt for c64 {
+  fn cosint(self) -> Self { cosint_complex(self) }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -148,6 +167,50 @@ pub fn expint_en_contfrac<V:Value+Exp>(n:isize, z:V) -> V {
     fj *= cj*dj;
   }
   fj * sf_exp(-z)
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+pub fn cosint_real<V:RealValue+Log>(z:V) -> V where V::CT:Exp {
+  if abs(z) < ι(5):V::NT {
+    cosint_series(z)
+  } else if z.is_nonnegreal() {
+    -e1_contfrac(V::CT::I * z).real()
+  } else {
+    V::nan
+  }
+}
+pub fn cosint_complex<V:ComplexValue+Exp+Log>(z:V) -> V {
+  if abs(z) < ι(5):V::NT {
+    cosint_series(z)
+  } else {
+    if z.is_real() {
+      ι(-e1_contfrac(V::I * z).real()):V + (if z.is_negreal() {V::PI*V::I} else {ι(0):V})
+    } else {
+      -(e1_contfrac(V::I*z) + e1_contfrac(-V::I*z))/2
+    }
+  }
+}
+
+// TODO: use Kahan (use Wide value of constant to start?)
+pub fn cosint_series<V:Value+Log>(z:V) -> V {
+  let mut sum  = V::EULER_GAMMA + sf_log(z);
+  let mut t = V::one;
+  let z2 = -z.sqr();
+  for n in 1..1000 {
+    t *= z2/((2*n-1)*(2*n));
+    let old_sum = sum;
+    sum += t/(2*n);
+    if sum == old_sum {break;}
+  }
+  sum
+}
+
+use crate::algorithm::{contfrac_modlentz};
+// continued fraction for E_1(z)
+pub fn e1_contfrac<V:Value+Exp>(z:V) -> V {
+  let terms = (1..).map(|n|(ι((n+1)/2):V, if n.is_evenint(){z}else{V::one}));
+  sf_exp(-z)/contfrac_modlentz(z, terms, V::epsilon)
 }
 
 

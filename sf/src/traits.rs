@@ -205,9 +205,9 @@ pub fn signum<T: Normed>(x: T) -> T { x.signum() }
 pub fn mu<T: Normed>(x: T) -> T::NT { x.mu() }
 pub fn μ<T: Normed>(x: T) -> T::NT { x.mu() }
 
-pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT> //+ Embeds<Complex<f64>>
+pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT>
 {
-  type RT: RealValue;
+  type RT: RealValue<CT=Self>;
   const I: Self;
   fn real(self) -> Self::RT;
   fn imag(self) -> Self::RT;
@@ -227,7 +227,9 @@ pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT> //+ Embed
   fn root_of_unity(n:isize) -> Self;
 }
 
-pub trait RealType: Base + Normed<NT = Self> + Ordered {}
+pub trait RealType: Base + Normed<NT = Self> + Ordered {
+  type CT: ComplexValue<RT=Self>;
+}
 
 pub trait Classify {
   fn is_nan(self) -> bool;

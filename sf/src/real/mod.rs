@@ -227,7 +227,9 @@ impl Normed for r64 {
   fn fabs(self) -> f64 { self.abs().0 }
   fn mu(self) -> Self { self.abs() }
 }
-impl RealType for r64 {}
+impl RealType for r64 {
+  type CT = crate::complex::c64;
+}
 impl Bounded for r64 {
   const MIN_VALUE: r64 = r64(f64::MIN);
   const MAX_VALUE: r64 = r64(f64::MAX);
