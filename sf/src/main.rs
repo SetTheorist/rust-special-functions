@@ -187,6 +187,7 @@ mod dual;
 mod ellint;
 mod erf;
 mod exp;
+mod expint;
 mod f16;
 mod gamma;
 mod hypergeom;
@@ -1573,13 +1574,36 @@ fn main() {
     println!("y8={:e}", sf_bessel_spher_y(8, r64(1.0)));
   }
   if true {
+    println!("{:?}", sf_sqrt(c64::rect(r64(0.0),r64(1.0))));
     println!("{:?}", solve::solve_linear(r64(3.0), r64(2.0)));
     println!("{:?}", solve::solve_quadratic(r64(-1.0), r64(0.0), r64(1.0)));
     println!("{:?}", solve::solve_quadratic(c64::one, c64::zero, c64::one));
     println!("{:?}", solve::solve_cubic(r64(-6.0), r64(11.0), r64(-6.0), r64(1.0)));
-    println!("{:?}", solve::solve_cubic(c64::one, c64::zero, c64::zero, c64::one));
+    println!("{:?}", solve::solve_cubic(-c64::one, c64::one, c64::one, c64::one));
     println!("{:?}", solve::solve_quartic(r64(24.0), r64(-50.0), r64(35.0), r64(-10.0), r64(1.0)));
-    println!("{:?}", solve::solve_quartic(-c64::one, c64::zero, c64::zero, c64::zero, c64::one));
+    println!("{:?}", solve::solve_quartic(c64::one, c64::one, c64::one, c64::one, c64::one));
+  }
+  if true {
+    println!("ψ(-10.1)={:e}", sf_digamma(r64(-10.1)));
+    println!("ψ(0.1)={:e}", sf_digamma(r64(0.1)));
+    println!("ψ(2)={:e}", sf_digamma(r64(2.0)));
+    println!("ψ(10.1)={:e}", sf_digamma(r64(10.1)));
+    println!("ei(0.1)={:e}", expint::sf_expint_ei(r64(0.1)));
+    println!("ei(1.0)={:e}", expint::sf_expint_ei(r64(1.0)));
+    println!("ei(21.0)={:e}", expint::sf_expint_ei(r64(21.0)));
+    println!("ei(51.0)={:e}", expint::sf_expint_ei(r64(51.0)));
+    println!("en(0,0.1)={:e}", expint::sf_expint_en(0,r64(0.1)));
+    println!("en(0,1.0)={:e}", expint::sf_expint_en(0,r64(1.0)));
+    println!("en(0,3.0)={:e}", expint::sf_expint_en(0,r64(3.0)));
+    println!("en(1,0.1)={:e}", expint::sf_expint_en(1,r64(0.1)));
+    println!("en(1,1.0)={:e}", expint::sf_expint_en(1,r64(1.0)));
+    println!("en(1,3.0)={:e}", expint::sf_expint_en(1,r64(3.0)));
+    println!("en(2,0.1)={:e}", expint::sf_expint_en(2,r64(0.1)));
+    println!("en(2,1.0)={:e}", expint::sf_expint_en(2,r64(1.0)));
+    println!("en(2,3.0)={:e}", expint::sf_expint_en(2,r64(3.0)));
+    println!("en(5,0.1)={:e}", expint::sf_expint_en(5,r64(0.1)));
+    println!("en(5,1.0)={:e}", expint::sf_expint_en(5,r64(1.0)));
+    println!("en(5,3.0)={:e}", expint::sf_expint_en(5,r64(3.0)));
   }
 }
 

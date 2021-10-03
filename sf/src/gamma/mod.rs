@@ -5,14 +5,16 @@ pub mod impls;
 pub trait Gamma {
   fn lngamma(self) -> Self;
   fn gamma(self) -> Self;
-
   fn beta(self, b:Self) -> Self;
+  fn digamma(self) -> Self;
 }
 
 #[inline]
 pub fn sf_gamma<V: Gamma>(x:V) -> V { x.gamma() }
 #[inline]
 pub fn sf_lngamma<V: Gamma>(x:V) -> V { x.lngamma() }
+#[inline]
+pub fn sf_digamma<V: Gamma>(x:V) -> V { x.digamma() }
 #[inline]
 pub fn sf_beta<V: Gamma>(a:V, b:V) -> V { a.beta(b) }
 
@@ -38,6 +40,9 @@ impl Gamma for r64 {
     impls::lngamma_lanczos_15(self)
     //impls::gamma_spouge(11, self).log() // TODO
   }
+  fn digamma(self) -> Self {
+    impls::digamma(self)
+  }
   fn beta(self, b:Self) -> Self {
     sf_exp(self.lngamma() + b.lngamma() - (self+b).lngamma())
   }
@@ -56,6 +61,10 @@ impl Gamma for c64 {
   fn lngamma(self) -> Self {
     impls::lngamma_lanczos_15(self)
     //impls::gamma_spouge(11, self).log() // TODO
+  }
+  fn digamma(self) -> Self {
+    todo!()
+    //impls::digamma(self)
   }
   fn beta(self, b:Self) -> Self {
     sf_exp(self.lngamma() + b.lngamma() - (self+b).lngamma())

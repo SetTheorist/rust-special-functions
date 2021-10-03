@@ -1,8 +1,67 @@
 use crate::algorithm::{contfrac_modlentz, sum_series};
 use crate::exp::{sf_exp, Exp};
 use crate::log::{sf_log, Log};
-use crate::numbers::{sf_bernoulli_number_approx, sf_factorial_approx};
+use crate::trig::{sf_tan, Trig};
+use crate::numbers::{sf_bernoulli_number_scaled_approx, sf_bernoulli_number_approx, sf_factorial_approx};
 use crate::traits::*;
+
+////////////////////////////////////////////////////////////////////////////////
+
+// TODO: clean up complex (should actually work, just clean up)
+pub fn digamma<V:RealValue+Float+Log+Trig>(z:V) -> V {
+  if z.is_nonposint() {
+    V::infinity
+  } else if abs(z)<=ι(10):V {
+    digamma_series(z)
+  } else {
+    digamma_asympt(z)
+  }
+}
+
+pub fn digamma_series<V:RealValue+Log>(z:V) -> V {
+  let mut sum = -V::EULER_GAMMA - z.recip();
+  let mut res = sum;
+  let b2 = ι(sf_bernoulli_number_scaled_approx(2)):V * 1; // TODO
+  let b4 = ι(sf_bernoulli_number_scaled_approx(4)):V * 6; // TODO
+  let b6 = ι(sf_bernoulli_number_scaled_approx(6)):V * 120; // TODO
+  let b8 = ι(sf_bernoulli_number_scaled_approx(8)):V * 5040; // TODO
+  for k in 1..1000 {
+    let trm = z / ((z+k)*k);
+    sum += trm;
+    let old_res = res;
+    let k2 = (ι(k):V).pow(-2);
+    let kz2 = (z+k).pow(-2);
+    res = sum + sf_log((z+k)/k) - trm/2
+      + b2*(k2 - kz2)
+      + b4*(k2.pow(2) - kz2.pow(2))
+      + b6*(k2.pow(3) - kz2.pow(3))
+      + b8*(k2.pow(4) - kz2.pow(4));
+  }
+  res
+}
+
+// for large z with |arg z|<π
+// TODO: check domain
+pub fn digamma_asympt<V:RealValue+Log+Trig>(z:V) -> V {
+  if z < ι(0.5):V {
+    return digamma_asympt(V::one - z) - V::PI/sf_tan(V::PI*z);
+  }
+  let z_2 = z.sqr().recip();
+  let mut z2m = V::one;
+  let mut t = sf_log(z) - (z*2).recip();
+  let mut sum = t;
+  for m in 0..1000 {
+    z2m *= z_2;
+    let old_t = t;
+    let bm : V = ι(sf_bernoulli_number_approx((2*m+2) as usize)); // TODO
+    t = z2m * bm / (2*m+2);
+    let old_sum = sum;
+    sum -= t;
+    if sum==old_sum || abs(t)>abs(old_t) {break;}
+  }
+  sum
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //

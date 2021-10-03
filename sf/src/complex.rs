@@ -303,17 +303,18 @@ impl PartialEq<r64> for c64 {
 impl Constants for c64 {
   const nan: c64 = c64 { re: r64::nan, im: r64::nan };
 
-  const E: c64 = c64 { re:r64(2.7182818284590452354), im:r64::zero };
-  const FRAC_1_E: c64 = c64 { re:r64(0.3678794411714423215), im:r64::zero };
-  const PI: c64 = c64 { re:r64(3.1415926535897932385), im:r64::zero };
-  const FRAC_1_PI: c64 = c64 { re:r64(0.31830988618379067154), im:r64::zero };
-  const FRAC_PI_2: c64 = c64 { re:r64(1.5707963267948966192), im:r64::zero };
-  const SQRT2PI: c64 = c64 { re:r64(2.5066282746310005024), im:r64::zero };
-  const FRAC_1_SQRT2PI: c64 = c64 { re:r64(0.39894228040143267794), im:r64::zero };
-  const FRAC_1_SQRTPI: c64 = c64 { re:r64(0.56418958354775628695), im:r64::zero };
-  const LOG2: c64 = c64 { re:r64(0.69314718055994530942), im:r64::zero };
-  const FRAC_1_LOG2: c64 = c64 { re:r64(1.4426950408889634074), im:r64::zero };
-  const FRAC_LOG2PI_2: c64 = c64 { re:r64(0.91893853320467274178), im:r64::zero };
+  const E: c64              = c64 { re:r64::E, im:r64::zero };
+  const FRAC_1_E: c64       = c64 { re:r64::FRAC_1_E, im:r64::zero };
+  const PI: c64             = c64 { re:r64::PI, im:r64::zero };
+  const FRAC_1_PI: c64      = c64 { re:r64::FRAC_1_PI, im:r64::zero };
+  const FRAC_PI_2: c64      = c64 { re:r64::FRAC_PI_2, im:r64::zero };
+  const SQRT2PI: c64        = c64 { re:r64::SQRT2PI, im:r64::zero };
+  const FRAC_1_SQRT2PI: c64 = c64 { re:r64::FRAC_1_SQRT2PI, im:r64::zero };
+  const FRAC_1_SQRTPI: c64  = c64 { re:r64::FRAC_1_SQRTPI, im:r64::zero };
+  const LOG2: c64           = c64 { re:r64::LOG2, im:r64::zero };
+  const FRAC_1_LOG2: c64    = c64 { re:r64::FRAC_1_LOG2, im:r64::zero };
+  const FRAC_LOG2PI_2: c64  = c64 { re:r64::FRAC_LOG2PI_2, im:r64::zero };
+  const EULER_GAMMA: c64    = c64 { re:r64::EULER_GAMMA, im:r64::zero };
 }
 
 impl Classify for c64 {

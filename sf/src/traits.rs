@@ -309,6 +309,8 @@ pub trait Constants {
   const FRAC_1_LOG2: Self;
   // $\log(2\pi)/2 = \log(\sqrt{2\pi})$
   const FRAC_LOG2PI_2: Self;
+  // Euler's gamma $\gamma$
+  const EULER_GAMMA: Self;
 }
 
 

@@ -34,6 +34,7 @@ pub fn solve_cubic<V:Value+Trig>(a:V, b:V, c:V, d:V) -> (V,V,V) {
     // get equivalent "depressed" cubic: t^3+pt+q=0
     let p = (b*d*3 - c.sqr())/(d.sqr()*3);
     let q = (c.cub()*2 - b*c*d*9 + a*d.sqr()*27)/(d.cub()*27);
+    // TODO: handle case when p==0 (cube-root * roots-of-unity)
     // trigonometric approach
     let t = sf_sqrt(-p*4/3);
     let α = sf_acos(-q*4/t.cub());
