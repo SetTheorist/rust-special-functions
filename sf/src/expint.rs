@@ -272,12 +272,12 @@ pub fn sinint_real<V:RealValue+BesselSpherJ<isize>+Normed+Trig>(z:V) -> V where 
   }
 }
 
-pub fn sinint_complex<V:ComplexValue+/*BesselSpherJ<isize>+*/Exp+Normed+Trig>(z:V) -> V {
+pub fn sinint_complex<V:ComplexValue+BesselSpherJ<isize>+Exp+Normed+Trig>(z:V) -> V {
   let mult = if z.is_imag() {V::I} else {V::one};
   if abs(z) < ι(5):V::NT {
     mult * sinint_series(z)
-  //} else if abs(z) < ι(10):V::NT {
-  //  mult * sinint_bessel_series(z) // TODO: unlock when complex bessel implemented
+  } else if abs(z) < ι(10):V::NT {
+    mult * sinint_bessel_series(z)
   } else if abs(z) < ι(50):V::NT {
     if z.is_real() {
       mult * (V::PI/2 + ι(e1_contfrac(V::I*z).imag()):V)
@@ -309,6 +309,7 @@ pub fn sinint_bessel_series<V:Value+BesselSpherJ<isize>>(z:V) -> V {
   for n in 0..1000 {
     let old_sum = sum;
     sum += j(n).sqr();
+    if sum == old_sum {break;}
   }
   sum * V::PI
 }

@@ -1637,6 +1637,7 @@ fn main() {
     println!("si(19.5)={:e}", expint::sf_sinint(r64(19.5)));
     println!("si(1+I)={:e}", expint::sf_sinint(c64{re:r64::one,im:r64::one}));
     println!("si(-1+0I)={:e}", expint::sf_sinint(c64{re:-r64::one,im:r64::zero}));
+    println!("si(9.5+I)={:e}", expint::sf_sinint(c64::I+r64(9.5)));
   }
   if true {
     let z = c64{re:r64(1.0), im:r64(1.0)};
