@@ -1627,8 +1627,16 @@ fn main() {
     println!("ci(0.5)={:e}", expint::sf_cosint(r64(0.5)));
     println!("ci(2.5)={:e}", expint::sf_cosint(r64(2.5)));
     println!("ci(9.5)={:e}", expint::sf_cosint(r64(9.5)));
+    println!("ci(19.5)={:e}", expint::sf_cosint(r64(19.5)));
     println!("ci(1+I)={:e}", expint::sf_cosint(c64{re:r64::one,im:r64::one}));
     println!("ci(-1+0I)={:e}", expint::sf_cosint(c64{re:-r64::one,im:r64::zero}));
+    println!("si(-1)={:e}", expint::sf_sinint(-r64(1.0)));
+    println!("si(0.5)={:e}", expint::sf_sinint(r64(0.5)));
+    println!("si(2.5)={:e}", expint::sf_sinint(r64(2.5)));
+    println!("si(9.5)={:e}", expint::sf_sinint(r64(9.5)));
+    println!("si(19.5)={:e}", expint::sf_sinint(r64(19.5)));
+    println!("si(1+I)={:e}", expint::sf_sinint(c64{re:r64::one,im:r64::one}));
+    println!("si(-1+0I)={:e}", expint::sf_sinint(c64{re:-r64::one,im:r64::zero}));
   }
 }
 

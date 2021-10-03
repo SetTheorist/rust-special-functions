@@ -202,7 +202,6 @@ pub fn fabs<T: Normed>(x: T) -> f64 { x.fabs() }
 #[inline]
 pub fn signum<T: Normed>(x: T) -> T { x.signum() }
 #[inline]
-pub fn mu<T: Normed>(x: T) -> T::NT { x.mu() }
 pub fn μ<T: Normed>(x: T) -> T::NT { x.mu() }
 
 pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT>

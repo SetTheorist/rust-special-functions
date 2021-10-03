@@ -1,7 +1,9 @@
 use crate::traits::*;
+use crate::bessel::*;
 use crate::exp::*;
 use crate::gamma::*;
 use crate::log::*;
+use crate::trig::*;
 use crate::numbers::{sf_factorial_approx};
 
 pub trait ExpInt {
@@ -52,6 +54,9 @@ impl CosInt for r64 {
 impl CoshInt for r64 {
   fn coshint(self) -> Self { (sf_expint_ei(self) - sf_expint_en(1, self))/2 }
 }
+impl SinInt for r64 {
+  fn sinint(self) -> Self { sinint_real(self) }
+}
 impl SinhInt for r64 {
   fn sinhint(self) -> Self { (sf_expint_ei(self) + sf_expint_en(1, self))/2 }
 }
@@ -59,6 +64,9 @@ impl SinhInt for r64 {
 use crate::complex::*;
 impl CosInt for c64 {
   fn cosint(self) -> Self { cosint_complex(self) }
+}
+impl SinInt for c64 {
+  fn sinint(self) -> Self { sinint_complex(self) }
 }
 
 
@@ -211,6 +219,105 @@ use crate::algorithm::{contfrac_modlentz};
 pub fn e1_contfrac<V:Value+Exp>(z:V) -> V {
   let terms = (1..).map(|n|(ι((n+1)/2):V, if n.is_evenint(){z}else{V::one}));
   sf_exp(-z)/contfrac_modlentz(z, terms, V::epsilon)
+}
+
+// doesn't appear to have much accuracy
+// TODO: investigate if is useful for _very_ large values
+pub fn cosint_asympt<V:Value+Normed+Trig>(z:V) -> V {
+  // if z.real() < 0 { z = -z; }
+  sf_sin(z)*cosint_asympt_f(z) - sf_cos(z)*cosint_asympt_g(z)
+}
+
+pub fn cosint_asympt_f<V:Value+Normed>(z:V) -> V {
+  let mut t = V::one;
+  let mut sum = V::one;
+  let z2 = -z.sqr().recip();
+  for n in 1..1000 {
+    let old_t = t;
+    t *= z2*(2*n)*(2*n-1);
+    if abs(t) > abs(old_t) {break;}
+    let old_sum = sum;
+    sum += t;
+    if old_sum == sum {break;}
+  }
+  sum / z
+}
+
+pub fn cosint_asympt_g<V:Value+Normed>(z:V) -> V {
+  let mut t = V::one;
+  let mut sum = V::one;
+  let z2 = -z.sqr().recip();
+  for n in 1..1000 {
+    let old_t = t;
+    t *= z2*(2*n)*(2*n+1);
+    if abs(t) > abs(old_t) {break;}
+    let old_sum = sum;
+    sum += t;
+    if old_sum == sum {break;}
+  }
+  sum / z.sqr()
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+pub fn sinint_real<V:RealValue+Normed+Trig>(z:V) -> V where V::CT:Exp {
+  if abs(z) < ι(5):V::NT {
+    sinint_series(z)
+  //} else if abs(z) < ι(10):V::NT {
+  //  sinint_besseries(z) // TODO: need J_{n+1/2}() impls
+  } else if abs(z) < ι(50):V::NT {
+    V::PI/2 + e1_contfrac(V::CT::I*z).imag()
+  } else {
+    sinint_asympt(z)
+  }
+}
+
+pub fn sinint_complex<V:ComplexValue+Exp+Normed+Trig>(z:V) -> V {
+  let mult = if z.is_imag() {V::I} else {V::one};
+  if abs(z) < ι(5):V::NT {
+    mult * sinint_series(z)
+  //} else if abs(z) < ι(10):V::NT {
+  //  mult * sinint_besseries(z) // TODO: need J_{n+1/2}() impls
+  } else if abs(z) < ι(50):V::NT {
+    if z.is_real() {
+      mult * (V::PI/2 + ι(e1_contfrac(V::I*z).imag()):V)
+    } else {
+      mult * (V::PI/2 + V::I/2 * (e1_contfrac(-V::I*z) - e1_contfrac(V::I*z)))
+    }
+  } else {
+    mult * sinint_asympt(z)
+  }
+}
+
+pub fn sinint_series<V:Value>(z:V) -> V {
+  let mut sum = z;
+  let mut t = z;
+  let z2 = -z.sqr();
+  for n in 1..1000 {
+    t *= z2/((2*n)*(2*n+1));
+    let old_sum = sum;
+    sum += t/(2*n+1);
+    if sum == old_sum {break;}
+  }
+  sum
+}
+
+pub fn sinint_bessel_series<V:Value+BesselJ<V>>(z:V) -> V {
+  let mut sum = V::zero;
+  for n in 0..1000 {
+    let old_sum = sum;
+    sum += sf_bessel_j(ι(0.5):V + n, z/2).sqr(); // TODO
+  }
+  sum * V::PI
+}
+
+// TODO: sort out complex/real issues
+pub fn sinint_asympt<V:Value+Normed+Trig>(z:V) -> V {
+  //if z.real() < V::RT::zero {
+  //  -sinint_asympt(-z)
+  //} else {
+    V::PI/2 - sf_cos(z)*cosint_asympt_f(z) - sf_sin(z)*cosint_asympt_g(z)
+  //}
 }
 
 
