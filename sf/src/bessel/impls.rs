@@ -2,13 +2,28 @@ use crate::algorithm::sum_series;
 use crate::gamma::{sf_gamma, Gamma};
 use crate::traits::*;
 use crate::trig::*;
+use crate::exp::{sf_exp,Exp};
+use crate::numbers::{sf_factorial_approx};
 
-// TODO: separate type for nu and z
-// (probably need to cleanup trait handling for integral value types first...)
-// (sf_gamma may be implemented more efficiently, e.g. for integral types)
-pub fn bessel_j_series<V: Value + Gamma + Power>(nu: V, z: V) -> V {
+////////////////////////////////////////////////////////////////////////////////
+
+// TODO: make generic version of the forward / backward recurrence computations
+
+////////////////////////////////////////////////////////////////////////////////
+
+// TODO: clean up handling of nu type
+pub fn bessel_j_series_int<V: Value + Gamma + Power>(nu:isize, z:V) -> V {
   let z2 = -(z / 2).sqr();
   let terms = (1..).scan(ι(1): V, |s, m| {
+    *s *= z2 / m / (nu + m);
+    Some(*s)
+  });
+  let terms = std::iter::once(ι(1)).chain(terms);
+  sum_series(terms, V::epsilon) * (z / 2).pow(nu) / sf_factorial_approx(nu as usize)
+}
+pub fn bessel_j_series<V: Value + Gamma + Power>(nu:V, z:V) -> V {
+  let z2 = -(z / 2).sqr();
+  let terms = (1..).scan(ι(1):V, |s, m| {
     *s *= z2 / m / (nu + m);
     Some(*s)
   });
@@ -19,7 +34,7 @@ pub fn bessel_j_series<V: Value + Gamma + Power>(nu: V, z: V) -> V {
 // for |z|>>nu, |arg z|<pi
 // z needs to be fairly large for this to to be accurate
 // TODO: separate type for nu and z
-pub fn bessel_j_asymp_z<V: Value + Trig>(nu: V, z: V) -> V {
+pub fn bessel_j_asymp_z<V:Value+Trig>(nu:V, z:V) -> V {
   let chi = z - (nu / 2 + 0.25) * V::PI;
   let mu = nu.sqr() * 4;
   (ι(2): V / (V::PI * z)).sqrt() * (asymp_even(nu, z) * sf_cos(chi) - asymp_odd(nu, z) * sf_sin(chi))
@@ -97,3 +112,55 @@ pub fn bessel_j_recur_back<V: Value>(maxm: isize, n: isize, z: V) -> V {
   }
   res / scale.sqrt()
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+pub fn bessel_i_series_int<V:Value+Gamma+Power>(nu:isize, z:V) -> V {
+  let z2 = (z / 2).sqr();
+  let terms = (1..).scan(ι(1): V, |s, m| {
+    *s *= z2 / m / (nu + m);
+    Some(*s)
+  });
+  let terms = std::iter::once(ι(1)).chain(terms);
+  sum_series(terms, V::epsilon) * (z / 2).pow(nu) / sf_factorial_approx(nu as usize)
+}
+pub fn bessel_i_series<V:Value+Gamma+Power>(nu:V, z:V) -> V {
+  let z2 = (z / 2).sqr();
+  let terms = (1..).scan(ι(1): V, |s, m| {
+    *s *= z2 / m / (nu + m);
+    Some(*s)
+  });
+  let terms = std::iter::once(ι(1)).chain(terms);
+  sum_series(terms, V::epsilon) * (z / 2).pow(nu) / sf_gamma(nu + 1)
+}
+
+// assumes nu>=0
+// adaptation of Miller's method
+// TODO: not clear that when this is the method of choice...
+pub fn bessel_i_order_recur<V:Value+Exp>(nu:isize, z:V) -> V {
+  const EXTRA : isize = 100; // TODO: need to compute appropriate bounds here...
+  let tot = (nu+EXTRA+1) as usize;
+  let mut rs = vec![V::zero; tot];
+  let iz = z.recip();
+  rs[tot-1] = iz*(2*tot as isize);
+  for j in (0..(tot-1)).rev() {
+    rs[j] = (rs[j+1] + iz*(2*(j+1) as isize)).recip();
+  }
+  let mut numer = sf_exp(z);
+  for j in 0..(nu as usize) {
+    numer *= rs[j];
+  }
+  let mut denom = V::one;
+  for j in (1..tot).rev() {
+    denom = denom * rs[j] + 1;
+  }
+  denom = denom * 2 * rs[0] + 1;
+  numer / denom
+}
+
+// useful for recurrence normalization:
+// \sum_{i=-\infty}^\infty I_{2n+1}(x) = sinh(x)
+// \sum_{i=0}^\infty I_{2n+1}(x) = sinh(x)/2
+//
+// \sum_{i=-\infty}^\infty I_{2n}(x) = cosh(x)
+// I_0(x)/2 + \sum_{i=1}^\infty I_{2n}(x) = cosh(x)/2

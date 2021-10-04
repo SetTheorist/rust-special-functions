@@ -1698,6 +1698,37 @@ fn main() {
 
     println!("{:?}", data::parse_hex_f64s(spi));
     for x in data::parse_hex_f64s(spi) {print!(" {:e}", x);} println!();
+
+    let sx = "3p4";
+    println!("{:?}", data::parse_hex_f64s(sx));
+    let sx = "3p-4";
+    println!("{:?}", data::parse_hex_f64s(sx));
+  }
+  if true {
+    println!("I31(1/2)={:e}", bessel::impls::bessel_i_series_int(31, r64(0.5)));
+    println!("I31(1/2)={:e}", bessel::impls::bessel_i_series(ι(31), r64(0.5)));
+    println!("I31(1/2)={:e}", bessel::impls::bessel_i_order_recur(31, r64(0.5)));
+    println!("I9(1/2)={:e}", bessel::impls::bessel_i_series_int(9, r64(0.5)));
+    println!("I9(1/2)={:e}", bessel::impls::bessel_i_series(ι(9), r64(0.5)));
+    println!("I9(1/2)={:e}", bessel::impls::bessel_i_order_recur(9, r64(0.5)));
+    println!("I1(1/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(0.5)));
+    println!("I1(1/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(0.5)));
+    println!("I1(1/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(0.5)));
+    println!("I1(31/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(15.5)));
+    println!("I1(31/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(15.5)));
+    println!("I1(31/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(15.5)));
+    println!("I1(401/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(200.5)));
+    println!("I1(401/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(200.5)));
+    println!("I1(401/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(200.5)));
+    println!("I1(-1/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(-0.5)));
+    println!("I1(-1/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(-0.5)));
+    println!("I1(-1/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(-0.5)));
+    println!("I1(-31/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(-15.5)));
+    println!("I1(-31/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(-15.5)));
+    println!("I1(-31/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(-15.5)));
+    println!("I1(401/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(-200.5)));
+    println!("I1(401/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(-200.5)));
+    println!("I1(401/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(-200.5)));
   }
 }
 

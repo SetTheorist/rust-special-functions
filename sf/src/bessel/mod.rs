@@ -114,7 +114,7 @@ pub mod real_impls {
 
   impl BesselJ<isize> for r64 {
     fn bessel_j(self, nu: isize) -> Self {
-      // for n integral, J_n(-z) = (-)^n J(z)
+      // for n integral, J_n(-z) = (-)^n J_n(z)
       if self < r64::zero {
         return (-self).bessel_j(nu).pari(nu);
       }
@@ -125,12 +125,28 @@ pub mod real_impls {
 
       // TODO: clean this up (rough sketch for now)
       if self <= ι(2) {
-        impls::bessel_j_series(ι(nu), self)
+        impls::bessel_j_series_int(nu, self)
       } else if self >= ι(15) {
         impls::bessel_j_asymp_z(ι(nu), self)
       } else {
         impls::bessel_j_recur_back(20 + 2 * nu + (self.abs().rint()), nu, self)
       }
+    }
+  }
+
+  impl BesselI<isize> for r64 {
+    fn bessel_i(self, nu: isize) -> Self {
+      // for n integral, I_n(-z) = (-)^n I_n(z)
+      if self < r64::zero {
+        return (-self).bessel_i(nu).pari(nu);
+      }
+      // I_{-n}(z) = I_n(z)
+      if nu < 0 {
+        return self.bessel_i(-nu);
+      }
+
+      // TODO: need asymptotic, etc.
+      impls::bessel_i_series_int(nu, self)
     }
   }
 }

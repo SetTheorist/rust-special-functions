@@ -23,7 +23,7 @@ pub fn sf_beta<V: Gamma>(a:V, b:V) -> V { a.beta(b) }
 
 // TODO: quick and dirty for now
 use crate::real::*;
-//use crate::log::{Log};
+use crate::log::{sf_log, Log};
 use crate::exp::{sf_exp, Exp};
 use crate::traits::Constants;
 use crate::trig::{sf_cos, sf_sin};
@@ -33,12 +33,12 @@ impl Gamma for r64 {
       // gamma(z) = pi/(sin(pi*z) * gamma(1-z))
       return r64::PI / (sf_sin(self * r64::PI) * (1 - self).gamma());
     }
-    //impls::gamma_spouge(11, self)
-    sf_exp(impls::lngamma_lanczos_15(self))
+    impls::gamma_spouge(11, self)
+    //sf_exp(impls::lngamma_lanczos_15(self)) // TODO: this has terrible accuracy?!
   }
   fn lngamma(self) -> Self {
-    impls::lngamma_lanczos_15(self)
-    //impls::gamma_spouge(11, self).log() // TODO
+    //impls::lngamma_lanczos_15(self) // TODO
+    sf_log(impls::gamma_spouge(11, self)) // TODO
   }
   fn digamma(self) -> Self {
     impls::digamma(self)
