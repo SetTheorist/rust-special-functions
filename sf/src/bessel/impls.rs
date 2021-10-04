@@ -1,9 +1,11 @@
 use crate::algorithm::sum_series;
-use crate::gamma::{sf_gamma, Gamma};
+use crate::gamma::{sf_gamma, sf_digamma, Gamma};
 use crate::traits::*;
 use crate::trig::*;
 use crate::exp::{sf_exp,Exp};
+use crate::log::{sf_log,Log};
 use crate::numbers::{sf_factorial_approx};
+use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -111,6 +113,27 @@ pub fn bessel_j_recur_back<V: Value>(maxm: isize, n: isize, z: V) -> V {
     }
   }
   res / scale.sqrt()
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+pub fn bessel_y_series_int<V:Value+BesselJ<isize>+Gamma+Log>(n:isize, z:V) -> V {
+  let z22 = (z/2).sqr();
+  let mut sum = V::FRAC_1_PI * 2 * sf_log(z/2) * sf_bessel_j(n,z);
+  let mut t = -(z/2).pow(-n) * V::FRAC_1_PI * sf_factorial_approx((n-1) as usize);
+  for k in 0..n {
+    sum += t;
+    t *= z22 / (k+1) / (n-k-1);
+  }
+  let mut t = -(z/2).pow(n) * V::FRAC_1_PI;
+  for k in 0..1000 {
+    let old_sum = sum;
+    sum += t * (sf_digamma(ι(k+1):V) + sf_digamma(ι(n+k+1):V));
+    if sum != sum {break;}
+    if old_sum == sum {break;}
+    t *= -z22 / (k+1) / (n+k+1);
+  }
+  sum
 }
 
 ////////////////////////////////////////////////////////////////////////////////

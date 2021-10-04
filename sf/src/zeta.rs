@@ -32,7 +32,7 @@ pub mod impls {
         + vn.pow(-s - 9)
           * (s * (s + 1) * (s + 2) * (s + 3) * (s + 4) * (s + 5) * (s + 6) * (s + 7) * (s + 8) / 239500800);
       if μ(res - old) <= μ(res) * eps && n > 2 {
-        ::log::debug!("zeta_series_em9::<{}>({},{}) converged in {} iterations", std::any::type_name::<V>(), s, eps, n);
+        //::log::debug!("zeta_series_em9::<{}>({},{}) converged in {} iterations", std::any::type_name::<V>(), s, eps, n);
         break;
       }
       old = res;
@@ -56,7 +56,7 @@ pub mod impls {
         + vn.pow(-s - 9)
           * (s * (s + 1) * (s + 2) * (s + 3) * (s + 4) * (s + 5) * (s + 6) * (s + 7) * (s + 8) / 239500800);
       if μ(res - old) <= μ(res) * eps && n > 2 {
-        ::log::debug!("zeta_m1_series_em9::<{}>({},{}) converged in {} iterations", std::any::type_name::<V>(), s, eps, n);
+        //::log::debug!("zeta_m1_series_em9::<{}>({},{}) converged in {} iterations", std::any::type_name::<V>(), s, eps, n);
         break;
       }
       old = res;
@@ -129,7 +129,7 @@ pub fn hurwitz_series_em<V:Value+Power>(z:V, a:V) -> V {
       + (a+n).pow(-z-5)*em3 - (a+n).pow(-z-7)*em4
       + (a+n).pow(-z-9)*em5;
     if res==ores && res==oores {
-      ::log::debug!("hurwitz_zeta_em::<{}>({},{}) converged in {} iterations", std::any::type_name::<V>(), z, a, n);
+      //::log::debug!("hurwitz_zeta_em::<{}>({},{}) converged in {} iterations", std::any::type_name::<V>(), z, a, n);
       break;
     }
   }
