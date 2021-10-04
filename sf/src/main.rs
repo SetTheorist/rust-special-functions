@@ -201,6 +201,7 @@ mod api;
 mod basic;
 mod bessel;
 mod complex;
+mod data;
 mod dawson;
 mod debye;
 mod dual;
@@ -1670,6 +1671,33 @@ fn main() {
     println!("{:e}", sf_exp_men(3, r64(1.0)));
     println!("{:e}", sf_exp_men(7, r64(1.0)));
     println!("{:e}", sf_exp_men(12, r64(1.0)));
+  }
+  if true {
+    print!(":"); for x in 0..(-1) {print!("<{}>", x);} println!(":");
+    print!(":"); for x in (0..(-1)).step_by(2) {print!("<{}>", x);} println!(":");
+    println!("{:016X}", 1.0_f64.to_bits());
+    let bytes = [
+      0b11001001,0b00001111,0b11011010,0b10100010,
+      0b00100001,0b01101000,0b11000010,0b00110100,
+      0b11000100,0b11000110,0b01100010,0b10001011,
+      0b10000000,0b11011100,0b00011100,0b11010001,
+      0b00101001,0b00000010,0b01001110,0b00001000,];
+    let (f1,n) = data::parse_bytes_f64(&bytes, 1, 0);
+    let (f2,n) = data::parse_bytes_f64(&bytes, 1-(n as isize), n);
+    println!("{:.30e} {:.30e}", f1, f2);
+    println!("{}", wide::Wide::new(f1,f2));
+
+    let spi = "3.243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89452821e638d01377be";
+    let stb = data::string_to_bytes(&spi);
+    println!("{:?}\n{:?}", spi, stb);
+    for x in stb.0.iter() { print!("{:02X}", x); } println!();
+    let (f1,n1) = data::parse_bytes_f64(&stb.0, stb.1 as isize - 1, 0);
+    let (f2,n2) = data::parse_bytes_f64(&stb.0, stb.1 as isize - 1 - (n1 as isize), n1);
+    println!("{:e} {}", f1, n1);
+    println!("{:e} {}", f2, n2);
+
+    println!("{:?}", data::parse_hex_f64s(spi));
+    for x in data::parse_hex_f64s(spi) {print!(" {:e}", x);} println!();
   }
 }
 
