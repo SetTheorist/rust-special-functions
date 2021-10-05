@@ -44,6 +44,12 @@ impl Erf for r64 {
   }
 }
 
+impl ErfInv for r64 {
+  fn erf_inv(self) -> r64 {
+    impls::erf_inv(self)
+  }
+}
+
 use crate::complex::{*};
 // TODO: quick-crude for now; replace with better approach
 impl Erf for c64 {
@@ -71,3 +77,30 @@ pub fn erf_ss(x:r64) -> r64 {
 }
 */
 
+////////////////////////////////////////////////////////////////////////////////
+
+// quick-and-dirty
+pub fn erf_inv<V:RealValue+Erf+Exp+Float>(z:V) -> V {
+  if z<ι(-1) || z>ι(1) { return V::nan; }
+  else if z == -1 {
+    return -V::infinity;
+  } else if z == 1 {
+    return V::infinity;
+  } else if z == 0 {
+    return V::zero;
+  }
+  // quick approximation, could do better, but good enough to get the job done
+  // with Halley (though could be more efficient)
+  let c = V::FRAC_1_SQRTPI * 2;
+  let t = z / c;
+  let t2 = t.sqr();
+  let mut r = t*(V::one + t2/3*(V::one + t2/10*(ι(7):V + t2*127/21)));
+  for i in 0..20 {
+    let o = r;
+    let f = sf_erf(r) - z;
+    let df = sf_exp(-r.sqr()) * c;
+    r -= f / (df + r * f);
+    if r == o {print!("<{}>",i);break;}
+  }
+  r
+}

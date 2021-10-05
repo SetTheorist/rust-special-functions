@@ -233,7 +233,6 @@ mod zeta;
 use std::str::FromStr;
 use std::time::Instant;
 
-//use crate::erf::{*};
 //use crate::kahan::{*};
 //use crate::num::complex::{Complex};
 use crate::algorithm::*;
@@ -242,6 +241,7 @@ use crate::complex::*;
 use crate::dawson::*;
 use crate::dual::*;
 use crate::ellint::*;
+use crate::erf::{*};
 use crate::exp::*;
 use crate::gamma::*;
 use crate::integration::Integrator;
@@ -1752,6 +1752,15 @@ fn main() {
     println!("β(-1,2,3)={:e}", sf_beta_inc(r64(-1.0), ι(2), ι(3)));
     println!("β(3,2,3)={:e}", sf_beta_inc(r64(3.0), ι(2), ι(3)));
     println!("I(3,2,3)={:e}", sf_beta_inc_i(r64(0.2), ι(2), ι(3)));
+  }
+
+  if true {
+    println!("{:e}", sf_erf_inv(r64(0.9)));
+    println!("{:e}", sf_erf_inv(r64(0.5)));
+    println!("{:e}", sf_erf_inv(r64(0.25)));
+    println!("{:e}", sf_erf_inv(r64(0.01)));
+    println!("{:e}", sf_erf_inv(r64(0.0)));
+    println!("{:e}", sf_erf_inv(r64(-0.5)));
   }
 }
 
