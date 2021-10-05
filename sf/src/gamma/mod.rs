@@ -25,16 +25,22 @@ pub trait IncompleteGamma {
   fn gamma_inc_p(self, x:Self) -> Self;
   // $ = \frac{\Gamma(a,x)}{\Gamma(a)} $
   fn gamma_inc_q(self, x:Self) -> Self;
+
+  fn beta_inc(self, a:Self, b:Self) -> Self;
+  fn beta_inc_i(self, a:Self, b:Self) -> Self;
 }
 #[inline] pub fn sf_gamma_inc<V:IncompleteGamma>(a:V, x:V) -> V { a.gamma_inc(x) }
 #[inline] pub fn sf_gamma_inc_co<V:IncompleteGamma>(a:V, x:V) -> V { a.gamma_inc_co(x) }
 #[inline] pub fn sf_gamma_inc_p<V:IncompleteGamma>(a:V, x:V) -> V { a.gamma_inc_p(x) }
 #[inline] pub fn sf_gamma_inc_q<V:IncompleteGamma>(a:V, x:V) -> V { a.gamma_inc_q(x) }
+#[inline] pub fn sf_beta_inc<V:IncompleteGamma>(x:V, a:V, b:V) -> V { x.beta_inc(a, b) }
+#[inline] pub fn sf_beta_inc_i<V:IncompleteGamma>(x:V, a:V, b:V) -> V { x.beta_inc_i(a, b) }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // TODO: quick and dirty for now
+// TODO: need to get good implementation!
 use crate::real::*;
 use crate::log::{sf_log, Log};
 use crate::exp::{sf_exp, Exp};
@@ -76,10 +82,18 @@ impl IncompleteGamma for r64 {
   fn gamma_inc_q(self, x:Self) -> Self {
     self.gamma_inc_co(x)/sf_gamma(self)  // TODO
   }
+
+  fn beta_inc(self, a:Self, b:Self) -> Self {
+    impls::beta_inc_contfrac(self, a, b) // TODO
+  }
+  fn beta_inc_i(self, a:Self, b:Self) -> Self {
+    self.beta_inc(a, b) / sf_beta(a, b) // TODO
+  }
 }
 
 
 // TODO: quick and dirty for now
+// TODO: need to get good implementation!
 use crate::complex::*;
 impl Gamma for c64 {
   fn gamma(self) -> Self {
@@ -103,3 +117,24 @@ impl Gamma for c64 {
   }
 }
 
+// TODO: these are _VERY_ primitive implementations for now!
+impl IncompleteGamma for c64 {
+  fn gamma_inc(self, x:Self) -> Self {
+    sf_gamma(self) - self.gamma_inc_co(x) // TODO
+  }
+  fn gamma_inc_co(self, x:Self) -> Self {
+    impls::gamma_inc_co_contfrac(self, x) // TODO
+  }
+  fn gamma_inc_p(self, x:Self) -> Self {
+    Self::one - self.gamma_inc_co(x)/sf_gamma(self)  // TODO
+  }
+  fn gamma_inc_q(self, x:Self) -> Self {
+    self.gamma_inc_co(x)/sf_gamma(self)  // TODO
+  }
+  fn beta_inc(self, a:Self, b:Self) -> Self {
+    todo!() // TODO: contfrac doesn't work for complex
+  }
+  fn beta_inc_i(self, a:Self, b:Self) -> Self {
+    todo!() // TODO
+  }
+}

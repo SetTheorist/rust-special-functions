@@ -5,6 +5,8 @@ use crate::trig::{sf_tan, Trig};
 use crate::numbers::{sf_bernoulli_number_scaled_approx, sf_bernoulli_number_approx, sf_factorial_approx};
 use crate::traits::*;
 
+use super::*;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // TODO: clean up complex (should actually work, just clean up)
@@ -73,6 +75,27 @@ pub fn gamma_inc_co_contfrac<V:Value+Exp+Log+Power>(a:V, z:V) -> V {
   } else {
     z.pow(a) * sf_exp(-z) / cf
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// TODO: direct quadrature?
+
+//TODO: domain check
+pub fn beta_inc_contfrac<V:RealValue+Power+Gamma>(x:V, a:V, b:V) -> V {
+  if a>ι(1):V && b>ι(1):V && x>(a-1)/(a+b-2) {
+    return sf_beta(a,b) - beta_inc_contfrac(V::one-x, b, a)
+  }
+  let terms = (1..).map(|j|(
+    if j.is_evenint() {
+      let n = (j-2)/2;
+      x * (n+1) * (b-n-1) / (a+2*n+1) / (a+2*n+2)
+    } else {
+      let n = (j-1)/2;
+      -x * (a+n) * (a+b+n) / (a+2*n) / (a+2*n+1)
+    }, V::one));
+  let cf = contfrac_modlentz(V::one, terms, V::epsilon);
+  x.pow(a) * (-x+1).pow(b) / (a*cf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

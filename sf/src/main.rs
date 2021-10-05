@@ -1744,6 +1744,14 @@ fn main() {
     println!("γ(7,2)={:e}", sf_gamma_inc(ι(7), r64(2.0)));
     println!("P(2,3)={:e}", sf_gamma_inc_p(ι(2), r64(3.0)));
     println!("Q(2,3)={:e}", sf_gamma_inc_q(ι(2), r64(3.0)));
+    println!("Γ(-2.5,2)={:e}", sf_gamma_inc_co(r64(-2.5), r64(2.0)));
+    println!("Γ(2+I)={:e}", sf_gamma(c64::I+2));
+    println!("γ(2+I,2)={:e}", sf_gamma_inc(c64::I+2, ι(2):c64));
+    println!("Γ(2+I,2)={:e}", sf_gamma_inc_co(c64::I+2, ι(2):c64));
+    println!("β(1/2,2,3)={:e}", sf_beta_inc(r64(0.5), ι(2), ι(3)));
+    println!("β(-1,2,3)={:e}", sf_beta_inc(r64(-1.0), ι(2), ι(3)));
+    println!("β(3,2,3)={:e}", sf_beta_inc(r64(3.0), ι(2), ι(3)));
+    println!("I(3,2,3)={:e}", sf_beta_inc_i(r64(0.2), ι(2), ι(3)));
   }
 }
 

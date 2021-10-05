@@ -5,6 +5,8 @@ use crate::traits::*;
 // Simpson's
 // Gaussian &c.
 // adaptive? (may not need for purposes of spec.fun. implementations)
+//
+// extrapolation / sequence acceleration?
 
 // TODO: lots of other possibilities,
 // including returning a lot more information...
