@@ -9,14 +9,27 @@ pub trait Gamma {
   fn digamma(self) -> Self;
 }
 
-#[inline]
-pub fn sf_gamma<V: Gamma>(x:V) -> V { x.gamma() }
-#[inline]
-pub fn sf_lngamma<V: Gamma>(x:V) -> V { x.lngamma() }
-#[inline]
-pub fn sf_digamma<V: Gamma>(x:V) -> V { x.digamma() }
-#[inline]
-pub fn sf_beta<V: Gamma>(a:V, b:V) -> V { a.beta(b) }
+#[inline] pub fn sf_gamma<V:Gamma>(x:V) -> V { x.gamma() }
+#[inline] pub fn sf_lngamma<V:Gamma>(x:V) -> V { x.lngamma() }
+#[inline] pub fn sf_digamma<V:Gamma>(x:V) -> V { x.digamma() }
+#[inline] pub fn sf_beta<V:Gamma>(a:V, b:V) -> V { a.beta(b) }
+
+pub trait IncompleteGamma {
+  // $\gamma(a,x) = \int_0^x t^{a-1}e^{-t}\,dx $
+  fn gamma_inc(self, x:Self) -> Self;
+  // $\Gamma(a,x) = \int_x^\infty t^{a-1}e^{-t}\,dx $
+  fn gamma_inc_co(self, x:Self) -> Self;
+
+  // TODO: maybe use better names? e.g. gamma_incomplete_scaled_lower???
+  // $ = \frac{\gamma(a,x)}{\Gamma(a)} $
+  fn gamma_inc_p(self, x:Self) -> Self;
+  // $ = \frac{\Gamma(a,x)}{\Gamma(a)} $
+  fn gamma_inc_q(self, x:Self) -> Self;
+}
+#[inline] pub fn sf_gamma_inc<V:IncompleteGamma>(a:V, x:V) -> V { a.gamma_inc(x) }
+#[inline] pub fn sf_gamma_inc_co<V:IncompleteGamma>(a:V, x:V) -> V { a.gamma_inc_co(x) }
+#[inline] pub fn sf_gamma_inc_p<V:IncompleteGamma>(a:V, x:V) -> V { a.gamma_inc_p(x) }
+#[inline] pub fn sf_gamma_inc_q<V:IncompleteGamma>(a:V, x:V) -> V { a.gamma_inc_q(x) }
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +60,25 @@ impl Gamma for r64 {
     sf_exp(self.lngamma() + b.lngamma() - (self+b).lngamma())
   }
 }
+
+// TODO: negative, etc.!
+// TODO: these are _VERY_ primitive implementations for now!
+impl IncompleteGamma for r64 {
+  fn gamma_inc(self, x:Self) -> Self {
+    sf_gamma(self) - self.gamma_inc_co(x) // TODO
+  }
+  fn gamma_inc_co(self, x:Self) -> Self {
+    impls::gamma_inc_co_contfrac(self, x) // TODO
+  }
+  fn gamma_inc_p(self, x:Self) -> Self {
+    Self::one - self.gamma_inc_co(x)/sf_gamma(self)  // TODO
+  }
+  fn gamma_inc_q(self, x:Self) -> Self {
+    self.gamma_inc_co(x)/sf_gamma(self)  // TODO
+  }
+}
+
+
 // TODO: quick and dirty for now
 use crate::complex::*;
 impl Gamma for c64 {

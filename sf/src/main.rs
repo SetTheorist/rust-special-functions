@@ -1732,6 +1732,18 @@ fn main() {
     println!("Y1(1/2)={:e}", bessel::impls::bessel_y_series_int(1, r64(0.5)));
     println!("Y1(7.25)={:e}", bessel::impls::bessel_y_series_int(1, r64(7.25)));
     println!("Y4(1/2)={:e}", bessel::impls::bessel_y_series_int(4, r64(0.5)));
+    println!("Y1(7.25)={:e}", bessel::impls::bessel_y_asymp_z(ι(1), r64(7.25)));
+  }
+
+  if true {
+    println!("Γ(1,2)={:e}", sf_gamma_inc_co(ι(1), r64(2.0)));
+    println!("Γ(7,2)={:e}", sf_gamma_inc_co(ι(7), r64(2.0)));
+    println!("Γ(1,7)={:e}", sf_gamma_inc_co(ι(1), r64(7.0)));
+    println!("γ(1,2)={:e}", sf_gamma_inc(ι(1), r64(2.0)));
+    println!("γ(1,7)={:e}", sf_gamma_inc(ι(1), r64(7.0)));
+    println!("γ(7,2)={:e}", sf_gamma_inc(ι(7), r64(2.0)));
+    println!("P(2,3)={:e}", sf_gamma_inc_p(ι(2), r64(3.0)));
+    println!("Q(2,3)={:e}", sf_gamma_inc_q(ι(2), r64(3.0)));
   }
 }
 

@@ -62,6 +62,18 @@ pub fn digamma_asympt<V:RealValue+Log+Trig>(z:V) -> V {
   sum
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+pub fn gamma_inc_co_contfrac<V:Value+Exp+Log+Power>(a:V, z:V) -> V {
+  let terms = (1..).map(|j|if j.is_evenint(){(ι(j/2):V,z)}else{(-a+((j+1)/2),V::one)});
+  let cf = contfrac_modlentz(z, terms, V::epsilon);
+  // TDOO: this is a very simple-minded check
+  if abs(z)>ι(100):V::NT || abs(a)>ι(100):V::NT {
+    sf_exp(a * sf_log(z) - z - sf_log(cf))
+  } else {
+    z.pow(a) * sf_exp(-z) / cf
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //

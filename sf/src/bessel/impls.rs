@@ -41,11 +41,6 @@ pub fn bessel_j_asymp_z<V:Value+Trig>(nu:V, z:V) -> V {
   let mu = nu.sqr() * 4;
   (ι(2): V / (V::PI * z)).sqrt() * (asymp_even(nu, z) * sf_cos(chi) - asymp_odd(nu, z) * sf_sin(chi))
 }
-pub fn bessel_y_asymp_z<V: Value + Trig>(nu: V, z: V) -> V {
-  let chi = z - (nu / 2 + 0.25) * V::PI;
-  let mu = nu.sqr() * 4;
-  (ι(2): V / (V::PI * z)).sqrt() * (asymp_even(nu, z) * sf_sin(chi) + asymp_odd(nu, z) * sf_cos(chi))
-}
 fn asymp_even<V: Value>(nu: V, z: V) -> V {
   let mu = nu.sqr() * 4;
   let mut res: V = ι(1);
@@ -134,6 +129,17 @@ pub fn bessel_y_series_int<V:Value+BesselJ<isize>+Gamma+Log>(n:isize, z:V) -> V 
     t *= -z22 / (k+1) / (n+k+1);
   }
   sum
+}
+
+pub fn bessel_y_asymp_z<V:Value+Trig>(nu:V, z:V) -> V {
+  let chi = z - (nu / 2 + 0.25) * V::PI;
+  let mu = nu.sqr() * 4;
+  (ι(2): V / (V::PI * z)).sqrt() * (asymp_even(nu, z) * sf_sin(chi) + asymp_odd(nu, z) * sf_cos(chi))
+}
+
+// for large nu>0
+pub fn bessel_y_asymp_nu_1<V:Value+Exp+Power>(nu:V, z:V) -> V {
+  -sf_sqrt(V::FRAC_1_PI*2/nu)*(V::E*z/(nu*2)).pow(-nu)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
