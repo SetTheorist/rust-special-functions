@@ -1762,5 +1762,49 @@ fn main() {
     println!("{:e}", sf_erf_inv(r64(0.0)));
     println!("{:e}", sf_erf_inv(r64(-0.5)));
   }
+
+  if true {
+    let x = f16::f16(0x0000);
+    println!("{:?}", x);
+    let x = f16::f16(0x5555);
+    println!("{:?}", x);
+    let x = f16::f16::from_f32(1.5);
+    println!("{:?}", x);
+    let x = f16::f16::from_f32(2.0);
+    println!("{:?}", x);
+    println!("{:?}", x*x);
+    let x = f16::f16(0x4010);
+    println!("{:?}", x);
+    println!("{:?}", x*x);
+    println!("{:?}", x*x*x);
+    println!("{:?}", x*x*x*x);
+    println!("{:?}", x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
+    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
+    let x = f16::f16(0x4010);
+    println!("{:?}", x);
+    println!("{:?}", x+x);
+    println!("{:?}", x+x+x);
+    println!("{:?}", x+x+x+x);
+    println!("{:?}", x+x+x+x+x);
+    println!("{:?}", x+x+x+x+x+x);
+    println!("{:?}", x+x+x+x+x+x+x);
+    println!("{:?}", x+x+x+x+x+x+x+x);
+    println!("{:?}", x+x+x+x+x+x+x+x+x);
+    println!("{:?}", x+x+x+x+x+x+x+x+x+x);
+    println!("{:?}", x+x+x+x+x+x+x+x+x+x+x);
+    let x = f16::f16(0x4010);
+    println!("{:?}", x+x*x*x+x+x);
+  }
 }
 
