@@ -1805,6 +1805,26 @@ fn main() {
     println!("{:?}", x+x+x+x+x+x+x+x+x+x+x);
     let x = f16::f16(0x4010);
     println!("{:?}", x+x*x*x+x+x);
+    let x = f16::f16::from_f32(-13.125);
+    println!("{:?}", x);
+    let x = f16::f16::from_f32(3.14);
+    println!("{:?}", x);
+    println!("{:?}", x.prev());
+    println!("{:?}", x.next());
+    let x = f16::f16::from_f32(0.0);
+    println!("{:?}", x);
+    let x = f16::f16::from_f32(f32::INFINITY);
+    println!("{:?}", x);
+    let x = f16::f16::from_f32(f32::NAN);
+    println!("{:?}", x);
+    let x = f16::f16(0x7C01);
+    println!("{:?}", x);
+    let x = f16::f16::from_f32(0.5);
+    let mut y = x;
+    for _ in 0 .. 20 {
+      y = y * x;
+      println!("{:?}", y);
+    }
   }
 }
 

@@ -20,7 +20,7 @@ impl std::fmt::Debug for f16 {
     write!(f, "[{:04X}:{}1.{:010b}p{:+}~{:e}]", self.0,
       if self.0&SIGNB==0{'+'}else{'-'},
       self.0&MANB,
-      (((self.0&EXPB)>>10) as i16)-BIAS,
+      e(self.0),
       self.to_f32()
       )
   }
@@ -31,23 +31,60 @@ impl f16 {
   #[inline] pub fn to_bits(self) -> u16 { self.0 }
   #[inline] pub fn from_bits(b:u16) -> f16 { f16(b) }
 
-  // TODO: macro-ify this to make cleaner
+  #[inline] pub fn is_zero(&self) -> bool {
+    (self.0 & !SIGNB) == 0
+  }
+  #[inline] pub fn is_subnormal(&self) -> bool {
+    (self.0 & EXPB) == 0 && (self.0 & MANB) != 0
+  }
+  #[inline] pub fn is_nan(&self) -> bool {
+    (self.0 & EXPB == EXPB) && (self.0 & MANB != 0)
+  }
+  #[inline] pub fn is_infinite(&self) -> bool {
+    (self.0 & EXPB == EXPB) && (self.0 & MANB == 0)
+  }
+
   #[inline]
   pub fn to_f32(self) -> f32 {
-    // TODO: this is only correct for normal numbers
-    let s : u32 = ((self.0&SIGNB) as u32);
+    // TODO: clean up special cases
+    let s : u32 = ((self.0&SIGNB) as u32) << 16;
+    if self.is_zero() {
+      return f32::from_bits(s);
+    } else if self.is_nan() {
+      return f32::from_bits(s | 0x7F800001);
+    } else if self.is_infinite() {
+      return f32::from_bits(s | 0x7F800000);
+    } else if self.is_subnormal() {
+      // TODO: buggy
+      let n = (self.0&MANB).leading_zeros() - 6 + 1;
+      let m = (((self.0&MANB << n) & MANB) as u32) << 13;
+      let e = ((MINE as i32) - (n as i32) + 127) as u32;
+      return f32::from_bits(s | e<<23 | m);
+    }
     let e : u32 = (((((self.0&EXPB)>>10)as i16 - BIAS)+127) as u32);
     let m : u32 = ((self.0&MANB) as u32);
-    f32::from_bits(s<<16|e<<23|m<<13)
+    f32::from_bits(s | e<<23 | m<<13)
   }
   #[inline]
   pub fn from_f32(x:f32) -> f16 {
-    // TODO: this is only correct for normal numbers
-    // TODO: I'm not sure it's correct at all!
     let b = x.to_bits();
     let s : u16 = ((b&(1<<31))>>16) as u16;
+    if x == 0.0 {
+      // zero
+      return f16(s);
+    } else if !x.is_finite() {
+      if b&0x7FFFFF == 0 {
+        // inf
+        return f16(s|0b0111_1100_0000_0000);
+      } else {
+        // nan
+      }
+    } else if x.is_subnormal() {
+      todo!()
+    }
     let e : u16 = ((((((b>>23)&0xFF) as i16)-127)+BIAS) as u16)<<10;
-    let m : u16 = ((b&0x3FFFFF)>>12) as u16;
+    let m : u16 = ((b&0x7FFFFF)>>10) as u16;
+    let m = round(m) >> 3;
     f16(s|e|m)
   }
   #[inline]
@@ -63,6 +100,9 @@ impl f16 {
   pub fn negative(self) -> bool {
     self.0&SIGNB != 0
   }
+
+  #[inline] pub fn prev(self) -> f16 { f16(self.0-1) }
+  #[inline] pub fn next(self) -> f16 { f16(self.0+1) }
 }
 
 //[s:1][e:5][m:10(+1)]
@@ -73,7 +113,7 @@ fn s(x:u16) -> u16 {
 }
 #[inline]
 fn e(x:u16) -> i16 {
-  (((x & EXPB) >> 10) as i16) - BIAS
+  ((((x & EXPB) >> 10) as i16) - BIAS) + (if x&EXPB==0 {1}else{0})
 }
 #[inline]
 fn m(x:u16) -> u16 {
@@ -88,6 +128,7 @@ fn split(x:u16) -> (u16,i16,u16) {
   let mut e = e(x);
   let mut m = m(x);
   if m != 0 {
+    //if m & IMPB == 0 { e += 1; }
     while m & IMPB == 0 {
       m <<= 1;
       e -= 1;
@@ -146,9 +187,10 @@ pub fn make(s:u16, e:i16, m:u16) -> u16 {
 fn neg(a:u16) -> u16 {
   a ^ SIGNB
 }
+
 #[inline]
-// TODO: doesn't handle nan or inf
 fn add(a:u16, b:u16) -> u16 {
+  // TODO: doesn't handle nan or inf
   if s(a) != s(b) { return sub(a, neg(b)); }
   if e(a) < e(b) { return add(b, a); }
   let (sa, ea, ma) = split(a);
@@ -165,11 +207,21 @@ fn add(a:u16, b:u16) -> u16 {
 }
 #[inline]
 fn sub(a:u16, b:u16) -> u16 {
+  // TODO: doesn't handle nan or inf
+  if s(a) != s(b) { return sub(a, neg(b)); }
   todo!()
 }
 #[inline]
-// TODO: doesn't handle nan or inf
 fn mul(a:u16, b:u16) -> u16 {
+  // TODO: cleanup special cases
+  if f16(a).is_nan() { return a; }
+  if f16(b).is_nan() { return b; }
+  if f16(a).is_infinite() && f16(b).is_zero() { return 0b0111_1100_0000_0001; }
+  if f16(a).is_zero() && f16(b).is_infinite() { return 0b0111_1100_0000_0010; }
+  if f16(a).is_infinite() || f16(b).is_infinite() {
+    return 0b0111_1100_0000_0000 | ((a&SIGNB)^(b&SIGNB));
+  }
+
   let (sa, ea, ma) = split(a);
   let (sb, eb, mb) = split(b);
   let s = sa ^ sb;
