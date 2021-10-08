@@ -32,6 +32,12 @@ pub trait BesselI<N: Additive + Embeds<isize>>: Value + Embeds<N> {
     (self.bessel_i(nu - 1) + self.bessel_i(nu + 1)) / 2
   }
 }
+#[inline]
+pub fn sf_bessel_i<N, V:BesselI<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+{ z.bessel_i(nu) }
+#[inline]
+pub fn sf_bessel_i_ddz<N, V:BesselI<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+{ z.bessel_i_ddz(nu) }
 
 //
 //
@@ -42,6 +48,12 @@ pub trait BesselK<N: Additive + Embeds<isize>>: Value + Embeds<N> {
     (self.bessel_k(nu - 1) + self.bessel_k(nu + 1)) / 2
   }
 }
+#[inline]
+pub fn sf_bessel_k<N, V:BesselK<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+{ z.bessel_k(nu) }
+#[inline]
+pub fn sf_bessel_k_ddz<N, V:BesselK<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+{ z.bessel_k_ddz(nu) }
 
 //
 //
@@ -147,6 +159,22 @@ pub mod real_impls {
 
       // TODO: need asymptotic, etc.
       impls::bessel_i_series_int(nu, self)
+    }
+  }
+  impl BesselK<isize> for r64 {
+    fn bessel_k(self, nu: isize) -> Self {
+      if self == 0 {
+        return r64::infinity;
+      }
+      if self.is_negreal() {
+        return r64::nan;
+      }
+      // K_{-n}(z) = K_{n}(z)
+      if nu < 0 {
+        return self.bessel_k(-nu);
+      }
+      // TODO: this has unacceptably low accuracy
+      impls::bessel_k_series_int(nu, self)
     }
   }
 }

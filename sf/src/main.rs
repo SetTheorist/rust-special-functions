@@ -1755,6 +1755,24 @@ fn main() {
   }
 
   if true {
+    println!("K(0,1/4)={:e}", sf_bessel_k(0, r64(0.25)));
+    println!("K(5,1/4)={:e}", sf_bessel_k(5, r64(0.25)));
+    println!("K(0,1/2)={:e}", sf_bessel_k(0, r64(0.5)));
+    println!("K(1,1/2)={:e}", sf_bessel_k(1, r64(0.5)));
+    println!("K(2,1/2)={:e}", sf_bessel_k(2, r64(0.5)));
+    println!("K(3,1/2)={:e}", sf_bessel_k(3, r64(0.5)));
+    println!("K(4,1/2)={:e}", sf_bessel_k(4, r64(0.5)));
+    println!("K(5,1/2)={:e}", sf_bessel_k(5, r64(0.5)));
+    println!("K(6,1/2)={:e}", sf_bessel_k(6, r64(0.5)));
+    println!("K(6,3+1/2)={:e}", sf_bessel_k(6, r64(3.5)));
+    println!("K(6,3+1/2)~{:e}", bessel::impls::bessel_k_asymp_z(ι(6), r64(3.5)));
+    println!("K(6,23+1/2)~{:e}", bessel::impls::bessel_k_asymp_z(ι(6), r64(23.5)));
+    println!("K(0,23+1/2)~{:e}", bessel::impls::bessel_k_asymp_z(ι(0), r64(23.5)));
+    println!("K(0,93+1/2)~{:e}", bessel::impls::bessel_k_asymp_z(ι(0), r64(93.5)));
+    println!("I(0,23+1/2)~{:e}", bessel::impls::bessel_i_asymp_z(ι(0), r64(23.5)));
+  }
+
+  if false {
     println!("{:e}", sf_erf_inv(r64(0.9)));
     println!("{:e}", sf_erf_inv(r64(0.5)));
     println!("{:e}", sf_erf_inv(r64(0.25)));
@@ -1763,7 +1781,7 @@ fn main() {
     println!("{:e}", sf_erf_inv(r64(-0.5)));
   }
 
-  if true {
+  if false {
     let x = f16::f16(0x0000);
     println!("{:?}", x);
     let x = f16::f16(0x5555);

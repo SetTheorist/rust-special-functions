@@ -187,9 +187,59 @@ pub fn bessel_i_order_recur<V:Value+Exp>(nu:isize, z:V) -> V {
   numer / denom
 }
 
+pub fn bessel_i_asymp_z<V:Value+Exp>(nu:V, z:V) -> V {
+  sf_exp(z) / sf_sqrt(V::PI*2*z) * asymp_all(nu, -z)
+}
+
+
 // useful for recurrence normalization:
 // \sum_{i=-\infty}^\infty I_{2n+1}(x) = sinh(x)
 // \sum_{i=0}^\infty I_{2n+1}(x) = sinh(x)/2
 //
 // \sum_{i=-\infty}^\infty I_{2n}(x) = cosh(x)
 // I_0(x)/2 + \sum_{i=1}^\infty I_{2n}(x) = cosh(x)/2
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+pub fn bessel_k_series_int<V:Value+BesselI<isize>+Gamma+Log>(n:isize, z:V) -> V {
+  let z22 = (z/2).sqr();
+  let mut sum = sf_log(z/2) * sf_bessel_i(n,z).pari(n+1);
+  let mut t = if n==0 {V::one/2} else {(z/2).pow(-n)/2 * sf_factorial_approx((n-1) as usize)};
+  for k in 0..n {
+    sum += t;
+    t *= -z22 / (k+1) / (n-k-1);
+  }
+  let mut t = (z/2).pow(n).pari(n)/2;
+  for k in 0..1000 {
+    let old_sum = sum;
+    sum += t * (sf_digamma(ι(k+1):V) + sf_digamma(ι(n+k+1):V));
+    if sum != sum {break;}
+    if old_sum == sum {break;}
+    t *= z22 / (k+1) / (n+k+1);
+  }
+  sum
+}
+
+pub fn bessel_k_asymp_z<V:Value+Exp>(nu:V, z:V) -> V {
+  sf_sqrt(V::FRAC_PI_2/z) * sf_exp(-z) * asymp_all(nu, z)
+}
+
+fn asymp_all<V: Value>(nu: V, z: V) -> V {
+  let mu = nu.sqr() * 4;
+  let mut res: V = ι(1);
+  let mut term: V = ι(1);
+  let z8 = (z * 8);
+  for k in 1..1000 {
+    let old_term = term;
+    term *= (mu - (2 * k - 1).sqr()) / (z8 * k);
+    let old_res = res;
+    res += term;
+    if res == old_res || μ(term) > μ(old_term) && ι(k):V::NT > abs(nu) {
+      res = old_res;
+      break;
+    }
+  }
+  res
+}
+

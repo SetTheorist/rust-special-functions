@@ -1,7 +1,6 @@
 use crate::traits::ι;
 
 pub fn sf_factorial_approx(n: usize) -> f64 {
-  //if n==0 { return 1.0; }
   (1..=n).map(|i| i as f64).product()
 }
 
