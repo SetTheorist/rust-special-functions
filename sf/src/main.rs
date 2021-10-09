@@ -220,6 +220,7 @@ mod log;
 mod numbers;
 mod orthopoly;
 mod poly;
+mod polylog;
 mod real;
 mod sievert;
 mod solve;
@@ -250,6 +251,7 @@ use crate::numbers::*;
 use crate::orthopoly::chebyshev_t::*;
 use crate::orthopoly::*;
 use crate::poly::*;
+use crate::polylog::*;
 use crate::real::*;
 use crate::theta::*;
 use crate::traits::*;
@@ -1382,7 +1384,7 @@ fn main() {
         trig::sf_sin(r64(1.0)).0);
     }
   }
-  if true {
+  if false {
     use crate::agm::*;
     println!("-----");
     println!("AGM:");
@@ -1394,7 +1396,7 @@ fn main() {
     //println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), r64(1.0), None));
     //println!("{:?}", agm::impls::impl_vec(r64(1.0), sf_sqrt(ι(2)), r64(1.0), Some(r64(1.0))));
   }
-  if true {
+  if false {
     println!("-----");
     println!("Elliptic:");
     println!("k(1.5) = {:e}", sf_ellint_k(r64(1.5)));
@@ -1406,7 +1408,7 @@ fn main() {
     println!("f = {:e}", ellint::impls::ell_f(r64::PI/4, r64(0.5)));
     //println!("k = {:e}", sf_ellint_k(c64{re:r64(0.5),im:r64(0.1)}));
   }
-  if true {
+  if false {
     println!("-----");
     println!("Theta:");
     println!("th_1 = {:e}", sf_theta_1(r64(2.0), r64(1.0)/3));
@@ -1440,7 +1442,7 @@ fn main() {
     println!("{}", bb*bb);
     println!("{}", bb*bb*bb*bb);
   }
-  if true {
+  if false {
     println!("-----");
     println!("Jacobi:");
     let z = r64(2.0);
@@ -1488,7 +1490,7 @@ fn main() {
     */
   }
   //println!("{:e} {:e}", sf_tan(r64(1.0)), trig::impls::tan_contfrac(r64(1.0)));
-  if true {
+  if false {
     println!("-----");
     println!("Hurwitz Zeta:");
     println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(r64(11.0),r64(2.25)));
@@ -1499,7 +1501,7 @@ fn main() {
     println!("{:e}", zeta::impls_hurwitz::hurwitz_series_em(c64::I*3+r64(4.5),c64::I*3+r64(0.25)));
     println!("{:e}  {:e}", zeta::impls_hurwitz::hurwitz_series_em(r64(4.5),r64(1.00)), zeta::impls::zeta_series_em9(r64(4.5),r64::epsilon));
   }
-  if true {
+  if false {
     println!("-----");
     println!("Elliptic:");
     println!("e(..) = {:e}", sf_ellint_e(r64(1.5)));
@@ -1549,7 +1551,7 @@ fn main() {
     println!("{:e}", x);
     */
   }
-  if true {
+  if false {
     //println!("i10={:e}", sf_bessel_spher_i1(0, r64(1e1)));
     dbg!(sf_bessel_spher_i1(0, r64(1e1)).0);
     dbg!(sf_bessel_spher_i1(1, r64(1e1)).0);
@@ -1594,7 +1596,7 @@ fn main() {
     println!("y7={:e}", sf_bessel_spher_y(7, r64(1.0)));
     println!("y8={:e}", sf_bessel_spher_y(8, r64(1.0)));
   }
-  if true {
+  if false {
     println!("{:?}", sf_sqrt(c64::rect(r64(0.0),r64(1.0))));
     println!("{:?}", solve::solve_linear(r64(3.0), r64(2.0)));
     println!("{:?}", solve::solve_quadratic(r64(-1.0), r64(0.0), r64(1.0)));
@@ -1604,7 +1606,7 @@ fn main() {
     println!("{:?}", solve::solve_quartic(r64(24.0), r64(-50.0), r64(35.0), r64(-10.0), r64(1.0)));
     println!("{:?}", solve::solve_quartic(c64::one, c64::one, c64::one, c64::one, c64::one));
   }
-  if true {
+  if false {
     println!("ψ(-10.1)={:e}", sf_digamma(r64(-10.1)));
     println!("ψ(0.1)={:e}", sf_digamma(r64(0.1)));
     println!("ψ(2)={:e}", sf_digamma(r64(2.0)));
@@ -1640,7 +1642,7 @@ fn main() {
     println!("si(-1+0I)={:e}", expint::sf_sinint(c64{re:-r64::one,im:r64::zero}));
     println!("si(9.5+I)={:e}", expint::sf_sinint(c64::I+r64(9.5)));
   }
-  if true {
+  if false {
     let z = c64{re:r64(1.0), im:r64(1.0)};
     println!("j0({:e})={:e}", z, sf_bessel_spher_j(0, z));
     println!("j1({:e})={:e}", z, sf_bessel_spher_j(1, z));
@@ -1667,12 +1669,12 @@ fn main() {
     println!("j2({:e})={:e}", z, sf_bessel_spher_j(2, z));
     println!("j3({:e})={:e}", z, sf_bessel_spher_j(3, z));
   }
-  if true {
+  if false {
     println!("{:e}", sf_exp_men(3, r64(1.0)));
     println!("{:e}", sf_exp_men(7, r64(1.0)));
     println!("{:e}", sf_exp_men(12, r64(1.0)));
   }
-  if true {
+  if false {
     print!(":"); for x in 0..(-1) {print!("<{}>", x);} println!(":");
     print!(":"); for x in (0..(-1)).step_by(2) {print!("<{}>", x);} println!(":");
     println!("{:016X}", 1.0_f64.to_bits());
@@ -1704,7 +1706,7 @@ fn main() {
     let sx = "3p-4";
     println!("{:?}", data::parse_hex_f64s(sx));
   }
-  if true {
+  if false {
     println!("I31(1/2)={:e}", bessel::impls::bessel_i_series_int(31, r64(0.5)));
     println!("I31(1/2)={:e}", bessel::impls::bessel_i_series(ι(31), r64(0.5)));
     println!("I31(1/2)={:e}", bessel::impls::bessel_i_order_recur(31, r64(0.5)));
@@ -1735,7 +1737,7 @@ fn main() {
     println!("Y1(7.25)={:e}", bessel::impls::bessel_y_asymp_z(ι(1), r64(7.25)));
   }
 
-  if true {
+  if false {
     println!("Γ(1,2)={:e}", sf_gamma_inc_co(ι(1), r64(2.0)));
     println!("Γ(7,2)={:e}", sf_gamma_inc_co(ι(7), r64(2.0)));
     println!("Γ(1,7)={:e}", sf_gamma_inc_co(ι(1), r64(7.0)));
@@ -1754,7 +1756,7 @@ fn main() {
     println!("I(3,2,3)={:e}", sf_beta_inc_i(r64(0.2), ι(2), ι(3)));
   }
 
-  if true {
+  if false {
     println!("K(0,1/4)={:e}", sf_bessel_k(0, r64(0.25)));
     println!("K(5,1/4)={:e}", sf_bessel_k(5, r64(0.25)));
     println!("K(0,1/2)={:e}", sf_bessel_k(0, r64(0.5)));
@@ -1842,6 +1844,45 @@ fn main() {
     for _ in 0 .. 20 {
       y = y * x;
       println!("{:?}", y);
+    }
+  }
+  if true {
+    println!("L(-2)={:e}", sf_dilog(r64(-2.0)));
+    println!("L(-1)={:e}", sf_dilog(-r64::one));
+    println!("L(0)={:e}", sf_dilog(r64::zero));
+    println!("L(1/64)={:e}", sf_dilog(r64::one/64));
+    println!("L(1/8)={:e}", sf_dilog(r64(0.125)));
+    println!("L(1/4)={:e}", sf_dilog(r64(0.25)));
+    println!("L(1/2)={:e}", sf_dilog(r64(0.5)));
+    println!("L(15/16)={:e}", sf_dilog(r64::one*15/16));
+    println!("L(1)={:e}", sf_dilog(r64::one));
+
+    println!("L(1/2)={:e}", polylog::impls::dilog_series(r64(0.5)));
+    println!("L(1/2)={:e}", polylog::impls::dilog_zeta_series(r64(0.5)));
+    println!("L(7/8)={:e}", polylog::impls::dilog_series(r64(7.0)/8));
+    println!("L(7/8)={:e}", polylog::impls::dilog_zeta_series(r64(7.0)/8));
+  }
+  if false {
+    // aitken acceleration
+    //let ait = |x0,x1,x2|(x0*x2-x1*x1)/(x0+x2-x1*2);
+    let ait = |x0,x1,x2| x2 - (x2-x1)*(x2-x1)/((x2-x1)-(x1-x0));
+    let n : usize = 18;
+    let z = r64(0.5);
+    let at = (1..=n).map(|i|i as isize).map(|i|z.pow(i)/(i*i));
+    let a0 = at.scan(r64(0.0), |s,t|{*s+=t;Some(*s)}).collect::<Vec<_>>();
+    let a1 = &a0.windows(3).map(|x|ait(x[0],x[1],x[2])).collect::<Vec<_>>();
+    let a2 = &a1.windows(3).map(|x|ait(x[0],x[1],x[2])).collect::<Vec<_>>();
+    let a3 = &a2.windows(3).map(|x|ait(x[0],x[1],x[2])).collect::<Vec<_>>();
+    let a4 = &a3.windows(3).map(|x|ait(x[0],x[1],x[2])).collect::<Vec<_>>();
+    let a5 = &a4.windows(3).map(|x|ait(x[0],x[1],x[2])).collect::<Vec<_>>();
+    let a6 = &a5.windows(3).map(|x|ait(x[0],x[1],x[2])).collect::<Vec<_>>();
+    for i in 0..n {
+      print!("  {:22.16e}", a0[i].0 as f64);
+      if i<n-2 {print!("  {:22.16e}", a1[i].0 as f64)} else {print!("  {:22}", "")};
+      if i<n-4 {print!("  {:22.16e}", a2[i].0 as f64)} else {print!("  {:22}", "")};
+      if i<n-6 {print!("  {:22.16e}", a3[i].0 as f64)} else {print!("  {:22}", "")};
+      if i<n-8 {print!("  {:22.16e}", a4[i].0 as f64)} else {print!("  {:22}", "")};
+      println!();
     }
   }
 }
