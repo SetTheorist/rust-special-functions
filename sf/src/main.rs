@@ -219,6 +219,7 @@ mod lambert;
 mod log;
 mod numbers;
 mod orthopoly;
+mod pcf;
 mod poly;
 mod polylog;
 mod real;
@@ -1884,6 +1885,31 @@ fn main() {
       if i<n-8 {print!("  {:22.16e}", a4[i].0 as f64)} else {print!("  {:22}", "")};
       println!();
     }
+  }
+  if true {
+    println!("{:e}", pcf::impls::uv_even(r64(1.0),r64(0.5)));
+    println!("{:e}", pcf::impls::uv_even2(r64(1.0),r64(0.5)));
+    println!("{:e}", pcf::impls::uv_even(r64(1.0),r64(2.5)));
+    println!("{:e}", pcf::impls::uv_even2(r64(1.0),r64(2.5)));
+    println!("{:e}", pcf::impls::uv_odd(r64(1.0),r64(0.5)));
+    println!("{:e}", pcf::impls::uv_odd2(r64(1.0),r64(0.5)));
+    println!("{:e}", pcf::impls::uv_odd(r64(1.0),r64(2.5)));
+    println!("{:e}", pcf::impls::uv_odd2(r64(1.0),r64(2.5)));
+    println!("{:e} {:e}",
+      pcf::impls::uv_series::<_,true,true>(r64(0.5),r64(0.5)).0,
+      pcf::impls::uv_series::<_,true,true>(r64(0.5),r64(0.5)).1);
+    println!("{:e} {:e}",
+      pcf::impls::uv_series::<_,true,true>(r64(1.0),r64(0.5)).0,
+      pcf::impls::uv_series::<_,true,true>(r64(1.0),r64(0.5)).1);
+    println!("{:e} {:e}",
+      pcf::impls::uv_series::<_,true,true>(r64(1.0),r64(1.0)).0,
+      pcf::impls::uv_series::<_,true,true>(r64(1.0),r64(1.0)).1);
+    println!("{:e}", pcf::impls::u_recur_up(r64(7.0), r64(0.5)));
+    println!("{:e}", pcf::impls::u_recur_up(r64(7.0), r64(1.0)));
+    println!("{:e}", pcf::impls::u_recur_up(r64(18.0), r64(1.0)));
+    println!("{:e}", pcf::impls::u_asymp_z(r64(1.0), r64(30.0)));
+    println!("{:e}", pcf::impls::u_asymp_z(r64(3.0), r64(30.0)));
+    println!("{:e}", pcf::impls::u_asymp_z(r64(1.0), r64(40.0)));
   }
 }
 

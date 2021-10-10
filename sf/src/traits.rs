@@ -298,6 +298,8 @@ pub trait Constants {
   const FRAC_1_PI: Self;
   // $\pi/2$
   const FRAC_PI_2: Self;
+  // $\sqrt(\pi)$
+  const SQRTPI: Self;
   // $\sqrt(2\pi)$
   const SQRT2PI: Self;
   // $1/\sqrt(2\pi)$
