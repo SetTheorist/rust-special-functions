@@ -120,6 +120,14 @@ pub fn uv_odd2<V:Value+Exp>(a:V, z:V) -> V {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// quadrature
+//  exp(-z^2/4)/Gamma(a+1/2) * \int_0^\infty t^(a-1/2)*exp(-t^2/2-z*t) dt
+// 
+
+////////////////////////////////////////////////////////////////////////////////
+
+// reasonable for large a and small z
+// assume a>0
 pub fn u_recur_up<A:RealValue,V:Value+Power+Gamma+Exp+Trig>(a:A, z:V) -> V
   where V:Embeds<A>
 {
@@ -131,6 +139,59 @@ pub fn u_recur_up<A:RealValue,V:Value+Power+Gamma+Exp+Trig>(a:A, z:V) -> V
     let mm = (m2 - z*m1) / (afrac + n - 0.5);
     m2 = m1;
     m1 = mm;
+  }
+  m1
+}
+
+// better for z>1? but still need initial values
+pub fn u_recur_dn<A:RealValue,V:Value+Power+Gamma+Exp+Trig>(a:A, z:V) -> V
+  where V:Embeds<A>
+{
+  const EXTRA : isize = 100;
+  let nn = a.trunc();
+  let afrac = a - nn;
+  let (u0,_) = uv_series::<_,true,false>(ι(afrac), z);
+  let mut m2 = V::zero;
+  let mut m1 = V::one;
+  let mut mn = V::zero;
+  for n in (0..(nn.rint()+EXTRA)).rev() {
+    let mm = z*m1 + m2*(afrac + n+1 + 0.5);
+    m2 = m1;
+    m1 = mm;
+    if nn == n { mn = mm; }
+  }
+  mn * u0/m1
+}
+
+// better for z>1? works a bit better when previous fails (if z>>1)?
+pub fn u_recur_dn2<A:RealValue+Gamma,V:Value+Power<A>+Exp+Trig>(a:A, z:V) -> V
+  where V:Embeds<A>
+{
+  // assume a>0
+  const EXTRA : isize = 100;
+  let nn = a.trunc();
+  let afrac = a - nn;
+  let z2 = z/2;
+
+  let aa = a + EXTRA + 2;
+  let p = sf_sqrt(aa);
+  let p2 = p*2;
+  let zp = z2/p2;
+  let v = -z2.pow(3)/(p*3) - zp.pow(2) - (z2 - z2.pow(5)*2/5)/p2.pow(3) + zp.pow(4)*2;
+  let mut m2 = V::SQRTPI/((ι(2):V).pow(aa/2+0.25)*sf_gamma(aa/2+0.75))*sf_exp(-z*p+v);
+
+  let aa = a + EXTRA + 1;
+  let p = sf_sqrt(aa);
+  let p2 = p*2;
+  let zp = z2/p2;
+  let v = -z2.pow(3)/(p*3) - zp.pow(2) - (z2 - z2.pow(5)*2/5)/p2.pow(3) + zp.pow(4)*2;
+  let mut m1 = V::SQRTPI/((ι(2):V).pow(aa/2+0.25)*sf_gamma(aa/2+0.75))*sf_exp(-z*p+v);
+  
+  for n in (0..(nn.rint()+EXTRA+1)).rev() {
+    let mm = m1*z + m2*(afrac + n+1 + 0.5);
+    m2 = m1;
+    m1 = mm;
+    if nn == n {break;}
   }
   m1
 }

@@ -7,18 +7,18 @@ pub mod spher;
 //
 //
 //
-pub trait BesselJ<N: Additive+Embeds<isize>>: Value + Embeds<N> {
-  fn bessel_j(self, nu: N) -> Self;
-  fn bessel_j_ddz(self, nu: N) -> Self {
+pub trait BesselJ<N:Additive+Embeds<isize>>: Value + Embeds<N> {
+  fn bessel_j(self, nu:N) -> Self;
+  fn bessel_j_ddz(self, nu:N) -> Self {
     (self.bessel_j(nu - 1) - self.bessel_j(nu + 1)) / 2
   }
 }
 
 #[inline]
-pub fn sf_bessel_j<N, V:BesselJ<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+pub fn sf_bessel_j<N, V:BesselJ<N>>(nu:N, z:V) -> V where N:Additive+Embeds<isize>,
 { z.bessel_j(nu) }
 #[inline]
-pub fn sf_bessel_j_ddz<N, V:BesselJ<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+pub fn sf_bessel_j_ddz<N, V:BesselJ<N>>(nu:N, z:V) -> V where N:Additive+Embeds<isize>,
 { z.bessel_j_ddz(nu) }
 
 // TODO: Hankel^1, Hankel^2 also
@@ -26,41 +26,41 @@ pub fn sf_bessel_j_ddz<N, V:BesselJ<N>>(nu: N, z: V) -> V where N:Additive+Embed
 //
 //
 //
-pub trait BesselI<N: Additive + Embeds<isize>>: Value + Embeds<N> {
+pub trait BesselI<N:Additive+Embeds<isize>>: Value + Embeds<N> {
   fn bessel_i(self, nu: N) -> Self;
   fn bessel_i_ddz(self, nu: N) -> Self {
     (self.bessel_i(nu - 1) + self.bessel_i(nu + 1)) / 2
   }
 }
 #[inline]
-pub fn sf_bessel_i<N, V:BesselI<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+pub fn sf_bessel_i<N, V:BesselI<N>>(nu:N, z:V) -> V where N:Additive+Embeds<isize>,
 { z.bessel_i(nu) }
 #[inline]
-pub fn sf_bessel_i_ddz<N, V:BesselI<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+pub fn sf_bessel_i_ddz<N, V:BesselI<N>>(nu:N, z:V) -> V where N:Additive+Embeds<isize>,
 { z.bessel_i_ddz(nu) }
 
 //
 //
 //
-pub trait BesselK<N: Additive + Embeds<isize>>: Value + Embeds<N> {
+pub trait BesselK<N:Additive+Embeds<isize>>: Value + Embeds<N> {
   fn bessel_k(self, nu: N) -> Self;
   fn bessel_k_ddz(self, nu: N) -> Self {
     (self.bessel_k(nu - 1) + self.bessel_k(nu + 1)) / 2
   }
 }
 #[inline]
-pub fn sf_bessel_k<N, V:BesselK<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+pub fn sf_bessel_k<N, V:BesselK<N>>(nu:N, z:V) -> V where N:Additive+Embeds<isize>,
 { z.bessel_k(nu) }
 #[inline]
-pub fn sf_bessel_k_ddz<N, V:BesselK<N>>(nu: N, z: V) -> V where N:Additive+Embeds<isize>,
+pub fn sf_bessel_k_ddz<N, V:BesselK<N>>(nu:N, z:V) -> V where N:Additive+Embeds<isize>,
 { z.bessel_k_ddz(nu) }
 
 //
 //
 //
-pub trait BesselY<N: Additive + Embeds<isize>>: Value + Embeds<N> {
-  fn bessel_y(self, nu: N) -> Self;
-  fn bessel_y_ddz(self, nu: N) -> Self {
+pub trait BesselY<N:Additive+Embeds<isize>>: Value + Embeds<N> {
+  fn bessel_y(self, nu:N) -> Self;
+  fn bessel_y_ddz(self, nu:N) -> Self {
     (self.bessel_y(nu - 1) - self.bessel_y(nu + 1)) / 2
   }
 }
@@ -72,9 +72,9 @@ pub trait BesselY<N: Additive + Embeds<isize>>: Value + Embeds<N> {
 //
 //
 //
-pub trait BesselSpherI<N: Additive + Embeds<isize>>: Value + Embeds<N> {
-  fn bessel_spher_i1(self, nu: N) -> Self;
-  fn bessel_spher_i2(self, nu: N) -> Self;
+pub trait BesselSpherI<N:Additive+Embeds<isize>>: Value + Embeds<N> {
+  fn bessel_spher_i1(self, nu:N) -> Self;
+  fn bessel_spher_i2(self, nu:N) -> Self;
 }
 #[inline]
 pub fn sf_bessel_spher_i1<N, V:BesselSpherI<N>>(nu:N, z:V) -> V
@@ -86,10 +86,10 @@ pub fn sf_bessel_spher_i2<N, V:BesselSpherI<N>>(nu:N, z:V) -> V
 //
 //
 //
-pub trait BesselSpherJ<N: Additive + Embeds<isize>>: Value + Embeds<N> {
-  fn bessel_spher_j(self, nu: N) -> Self;
-  fn bessel_spher_j_ddz(self, nu: N) -> Self {
-    self.bessel_spher_j(nu - 1) * (ι(nu): Self / self) - self.bessel_spher_j(nu + 1)
+pub trait BesselSpherJ<N:Additive+Embeds<isize>>: Value + Embeds<N> {
+  fn bessel_spher_j(self, nu:N) -> Self;
+  fn bessel_spher_j_ddz(self, nu:N) -> Self {
+    self.bessel_spher_j(nu - 1) * (ι(nu):Self / self) - self.bessel_spher_j(nu + 1)
   }
 }
 #[inline]
@@ -102,8 +102,8 @@ pub fn sf_bessel_spher_j_ddz<N, V:BesselSpherJ<N>>(nu:N, z:V) -> V
 //
 //
 //
-pub trait BesselSpherK<N: Additive + Embeds<isize>>: Value + Embeds<N> {
-  fn bessel_spher_k(self, nu: N) -> Self;
+pub trait BesselSpherK<N:Additive+Embeds<isize>>: Value + Embeds<N> {
+  fn bessel_spher_k(self, nu:N) -> Self;
 }
 #[inline]
 pub fn sf_bessel_spher_k<N, V:BesselSpherK<N>>(nu:N, z:V) -> V
@@ -112,8 +112,8 @@ pub fn sf_bessel_spher_k<N, V:BesselSpherK<N>>(nu:N, z:V) -> V
 //
 //
 //
-pub trait BesselSpherY<N: Additive + Embeds<isize>>: Value + Embeds<N> {
-  fn bessel_spher_y(self, nu: N) -> Self;
+pub trait BesselSpherY<N:Additive+Embeds<isize>>: Value + Embeds<N> {
+  fn bessel_spher_y(self, nu:N) -> Self;
 }
 pub fn sf_bessel_spher_y<N, V:BesselSpherY<N>>(nu:N, z:V) -> V
   where N:Additive+Embeds<isize> { z.bessel_spher_y(nu) }
@@ -125,7 +125,7 @@ pub mod real_impls {
   use crate::real::*;
 
   impl BesselJ<isize> for r64 {
-    fn bessel_j(self, nu: isize) -> Self {
+    fn bessel_j(self, nu:isize) -> Self {
       // for n integral, J_n(-z) = (-)^n J_n(z)
       if self < r64::zero {
         return (-self).bessel_j(nu).pari(nu);
@@ -147,7 +147,7 @@ pub mod real_impls {
   }
 
   impl BesselI<isize> for r64 {
-    fn bessel_i(self, nu: isize) -> Self {
+    fn bessel_i(self, nu:isize) -> Self {
       // for n integral, I_n(-z) = (-)^n I_n(z)
       if self < r64::zero {
         return (-self).bessel_i(nu).pari(nu);
@@ -161,8 +161,24 @@ pub mod real_impls {
       impls::bessel_i_series_int(nu, self)
     }
   }
+  impl BesselI<r64> for r64 {
+    fn bessel_i(self, nu:r64) -> Self {
+      if nu.is_int() {
+        self.bessel_i(nu.rint())
+      } else if self < r64::zero {
+        r64::nan
+      } else if self == 0 {
+        if nu.is_negreal() {-r64::infinity}
+        else if nu.is_zero() {r64::one}
+        else {r64::zero}
+      } else {
+        // TODO: need asymptotic, etc.
+        impls::bessel_i_series(nu, self)
+      }
+    }
+  }
   impl BesselK<isize> for r64 {
-    fn bessel_k(self, nu: isize) -> Self {
+    fn bessel_k(self, nu:isize) -> Self {
       if self == 0 {
         return r64::infinity;
       }

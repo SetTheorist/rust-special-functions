@@ -166,12 +166,14 @@ pub fn bessel_i_series<V:Value+Gamma+Power>(nu:V, z:V) -> V {
 // assumes nu>=0
 // adaptation of Miller's method
 // TODO: not clear that when this is the method of choice...
-pub fn bessel_i_order_recur<V:Value+Exp>(nu:isize, z:V) -> V {
-  const EXTRA : isize = 100; // TODO: need to compute appropriate bounds here...
+pub fn bessel_i_order_recur<V:Value+Exp>(nu:isize, z:V, j:bool, EXTRA:isize) -> V {
+  //const EXTRA : isize = 100; // TODO: need to compute appropriate bounds here...
   let tot = (nu+EXTRA+1) as usize;
   let mut rs = vec![V::zero; tot];
   let iz = z.recip();
-  rs[tot-1] = iz*(2*tot as isize);
+  //if j { rs[tot-1] = z/2*(ι(tot as isize-1):V/((tot as isize).pow(2)));}
+  if j { rs[tot-1] = z/(2*(tot) as isize); }
+  else { rs[tot-1] = iz*(2*(tot) as isize); }
   for j in (0..(tot-1)).rev() {
     rs[j] = (rs[j+1] + iz*(2*(j+1) as isize)).recip();
   }
@@ -219,6 +221,11 @@ pub fn bessel_k_series_int<V:Value+BesselI<isize>+Gamma+Log>(n:isize, z:V) -> V 
     t *= z22 / (k+1) / (n+k+1);
   }
   sum
+}
+
+// requires that nu is NOT an integer
+pub fn bessel_k_connection<N:Value+Trig,V:Value+BesselI<N>+Embeds<N>>(nu:N, z:V) -> V {
+  V::FRAC_PI_2 * (sf_bessel_i(-nu, z) - sf_bessel_i(nu, z)) / sf_sin_pix(nu)
 }
 
 pub fn bessel_k_asymp_z<V:Value+Exp>(nu:V, z:V) -> V {
