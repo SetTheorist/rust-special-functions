@@ -1921,6 +1921,7 @@ fn main() {
   }
 
   if true {
+    println!("-----");
     println!("I(1/3,1/2)={:e}", sf_bessel_i(r64(1.0)/3, r64(0.5)));
     println!("I(1/3,1)={:e}", sf_bessel_i(r64(1.0)/3, r64(1.0)));
     println!("I(1/3,1)={:e}", sf_bessel_i(r64(1.0)/3, r64(2.0)));
@@ -1939,6 +1940,38 @@ fn main() {
     println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), true, 20)-2.9154668224891856826e9);
     println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), false, 100)-2.9154668224891856826e9);
     println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), true, 100)-2.9154668224891856826e9);
+  }
+
+  if true {
+    println!("-----");
+    println!("I(1,10)={:e}", sf_bessel_i(r64(1.0), r64(10.0)));
+    println!("I(1,10)~{:e}", bessel::impls::bessel_i_asymp_z(r64(1.0), r64(10.0)));
+    println!("I(1,15)={:e}", sf_bessel_i(r64(1.0), r64(15.0)));
+    println!("I(1,15)~{:e}", bessel::impls::bessel_i_asymp_z(r64(1.0), r64(15.0)));
+    println!("I(1,20)={:e}", sf_bessel_i(r64(1.0), r64(20.0)));
+    println!("I(1,20)~{:e}", bessel::impls::bessel_i_asymp_z(r64(1.0), r64(20.0)));
+    println!("I(8,10)={:e}", sf_bessel_i(r64(8.0), r64(10.0)));
+    println!("I(8,10)~{:e}", bessel::impls::bessel_i_asymp_z(r64(8.0), r64(10.0)));
+    println!("I(8,15)={:e}", sf_bessel_i(r64(8.0), r64(15.0)));
+    println!("I(8,15)~{:e}", bessel::impls::bessel_i_asymp_z(r64(8.0), r64(15.0)));
+    println!("I(8,20)={:e}", sf_bessel_i(r64(8.0), r64(20.0)));
+    println!("I(8,20)~{:e}", bessel::impls::bessel_i_asymp_z(r64(8.0), r64(20.0)));
+  }
+
+  if true {
+    println!("-----");
+
+    let mut x = r64::default();
+    time!({for i in 1..25000000{x+=std::hint::black_box(exp::impls::exp_minimax(r64(1.0+(i as f64/1e8))));};()});
+    println!("{:e}", x);
+
+    let mut x = r64::default();
+    time!({for i in 1..25000000{x+=std::hint::black_box(exp::impls::exp_minimax2(r64(1.0+(i as f64/1e8))));};()});
+    println!("{:e}", x);
+
+    let mut x = r64::default();
+    time!({for i in 1..25000000{x+=std::hint::black_box(exp::impls::exp_padex(r64(1.0+(i as f64/1e8))));};()});
+    println!("{:e}", x);
   }
 }
 

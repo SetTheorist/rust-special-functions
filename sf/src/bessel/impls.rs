@@ -237,15 +237,14 @@ fn asymp_all<V: Value>(nu: V, z: V) -> V {
   let mut res: V = ι(1);
   let mut term: V = ι(1);
   let z8 = (z * 8);
+  let mut old_res = V::zero;
   for k in 1..1000 {
     let old_term = term;
-    term *= (mu - (2 * k - 1).sqr()) / (z8 * k);
-    let old_res = res;
+    term *= (mu - (2*k-1).sqr()) / (z8 * k);
+    if μ(term) > μ(old_term) && abs(nu) < ι(k) {res=old_res;break;}
+    old_res = res;
     res += term;
-    if res == old_res || μ(term) > μ(old_term) && ι(k):V::NT > abs(nu) {
-      res = old_res;
-      break;
-    }
+    if res == old_res {break;}
   }
   res
 }

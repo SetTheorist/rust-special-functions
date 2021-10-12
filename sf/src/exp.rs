@@ -102,6 +102,12 @@ pub mod impls {
     let f = x - V::LOG2*n;
     exp_minimax2(f).ldexp(n)
   }
+  #[inline]
+  pub fn fastexp3<V:Value+Constants+Float+Ordered>(x:V) -> V {
+    let n = (x / V::LOG2).floor().rint();
+    let f = x - V::LOG2*n;
+    exp_padex(f).ldexp(n)
+  }
 
   // Mathematica:
   // Needs["FunctionApproximations`"]
@@ -136,6 +142,13 @@ pub mod impls {
       x*(ι(0.00259839865885544085883496403080):V + 
       x*(ι(-0.000162072980546095283677686506322):V + 
       x*(ι(4.90479980418143115258929318335e-6):V)))))))
+  }
+  #[inline]
+  pub fn exp_padex<V:Value>(x:V) -> V {
+    let x2 = x.sqr();
+    let p = ((x2*(1.0/420.0/72.0) + (1.0/72.0))*x2 + 1);
+    let q = ((x2*(1.0/112.0/9.0) + (1.0/9.0))*x2 + 1);
+    V::one + x*p/(q-x*p*0.5)
   }
 
   #[inline]
