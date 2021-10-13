@@ -23,7 +23,7 @@ impl Dilog for r64 {
       r64::PI.sqr()/6
     } else if z > ι(0.5) {
       // L(z) + L(1-z) = pi^2/6 - log(z)log(1-z)
-      r64::PI.sqr()/6 - sf_log(z)*sf_log_1p(z) - dilog_series(r64::one - z)
+      r64::PI.sqr()/6 - sf_log(z)*sf_log_1p(-z) - dilog_series(r64::one - z)
     } else if abs(z) <= r64(2.0)/3 {
       // radius of convergence = 1
       dilog_series(z)
