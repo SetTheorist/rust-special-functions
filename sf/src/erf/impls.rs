@@ -56,7 +56,9 @@ use crate::complex::{*};
 // TODO: quick-crude for now; replace with better approach
 impl Erf for c64 {
   fn erf(self) -> c64 {
-    if μ(self) < r64::one {
+    if self.real() < r64::zero {
+      -(-self).erf()
+    } else if μ(self) < r64::one {
       impls::erf_series(self)
     } else {
       c64::one - impls::erfc_contfrac2(self)
