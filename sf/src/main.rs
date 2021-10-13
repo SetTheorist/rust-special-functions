@@ -259,13 +259,48 @@ use crate::traits::*;
 use crate::trig::*;
 
 fn rel(ex: f64, ap: f64) -> f64 {
+  let ε = f64::EPSILON;
+  let l10 = 10.0_f64.ln();
   if ex == ap {
-    return -17.0;
+    ε.ln()/l10
+  } else {
+    ((ex - ap).abs() / (ε*ε + ex.abs())).ln() / l10
   }
-  ((ex - ap).abs() / (1e-20 + ex.abs())).ln() / 10.0_f64.ln()
 }
 
 // literate programming?〚 〛
+
+use std::io::{self,BufRead};
+fn test_gamma() {
+  let file = std::fs::File::open("./data/gamma.real.csv").unwrap();
+  let mut t = Vec::new();
+  for line in io::BufReader::new(file).lines() {
+    if let Ok(line) = line {
+      let v = line.split(",").collect::<Vec<_>>();
+      let x : f64 = v[0].parse().unwrap();
+      let fx : f64 = v[1].parse().unwrap();
+      t.push((x,fx));
+    }
+  }
+  let t = t.into_iter().map(|(x,fx)|{
+    let apx = sf_gamma(r64(x)).0;(x,rel(fx,apx))})
+    .collect::<Vec<_>>();
+
+  let lo = -17.0;
+  let hi = 0.0;
+  let dat = plotlib::repr::Plot::new(t)
+    .point_style(
+      plotlib::style::PointStyle::new()
+      .marker(plotlib::style::PointMarker::Circle)
+      .colour("#113355")
+      .size(0.5));
+  let v = plotlib::view::ContinuousView::new()  
+    .add(dat)
+    .y_range(lo, hi)
+    .x_label("x")
+    .y_label("Gamma(x) relative error");
+  plotlib::page::Page::single(&v).save("gamma_real_error.svg").expect("saving svg");
+}
 
 /*
 extern crate plotlib;
@@ -1958,7 +1993,7 @@ fn main() {
     println!("I(8,20)~{:e}", bessel::impls::bessel_i_asymp_z(r64(8.0), r64(20.0)));
   }
 
-  if true {
+  if false {
     println!("-----");
 
     let mut x = r64::default();
@@ -1972,6 +2007,10 @@ fn main() {
     let mut x = r64::default();
     time!({for i in 1..25000000{x+=std::hint::black_box(exp::impls::exp_padex(r64(1.0+(i as f64/1e8))));};()});
     println!("{:e}", x);
+  }
+
+  if true {
+    test_gamma();
   }
 }
 

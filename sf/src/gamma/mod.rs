@@ -52,8 +52,18 @@ impl Gamma for r64 {
       // gamma(z) = pi/(sin(pi*z) * gamma(1-z))
       return r64::PI / (sf_sin(self * r64::PI) * (1 - self).gamma());
     }
-    impls::gamma_spouge(11, self)
     //sf_exp(impls::lngamma_lanczos_15(self)) // TODO: this has terrible accuracy?!
+    //sf_exp(impls::lngamma_lanczos_11(self)) // TODO: this has terrible accuracy?!
+    let mut mult = r64(1.0);
+    let mut x = self;
+    //while x > r64(8.0)
+    while x > r64(3.0)
+    {
+      x = x - 1.0;
+      mult *= x;
+    }
+    //mult * sf_exp(impls::lngamma_lanczos_7(x)) // TODO
+    mult * impls::gamma_spouge(11, x)
   }
   fn lngamma(self) -> Self {
     //impls::lngamma_lanczos_15(self) // TODO

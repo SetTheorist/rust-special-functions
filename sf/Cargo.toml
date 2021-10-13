@@ -11,6 +11,8 @@ log = "*"
 #for applications:
 simple_logger = "*"
 
+plotlib = "*"
+
 #plotters = "*"
 #cbindgen = "*"
 
@@ -46,5 +48,4 @@ simple_logger = "*"
 #num-rational = "*"
 #num-traits = "*"
 #num = "*"
-#plotlib = "*"
 #qd = "*"
