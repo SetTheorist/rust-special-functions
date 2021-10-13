@@ -29,7 +29,9 @@ use crate::real::{*};
 // TODO: quick-crude for now; replace with better approach
 impl Erf for r64 {
   fn erf(self) -> r64 {
-    if self.abs() < r64::one {
+    if self < r64::zero {
+      -(-self).erf()
+    } else if self.abs() < r64::one {
       impls::erf_series(self)
     } else {
       r64::one - impls::erfc_contfrac2(self)

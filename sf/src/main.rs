@@ -262,7 +262,7 @@ fn rel(ex: f64, ap: f64) -> f64 {
   let ε = f64::EPSILON;
   let l10 = 10.0_f64.ln();
   if ex == ap {
-    ε.ln()/l10
+    ε.ln()/l10 - 1.0
   } else {
     ((ex - ap).abs() / (ε*ε + ex.abs())).ln() / l10
   }
@@ -300,6 +300,36 @@ fn test_gamma() {
     .x_label("x")
     .y_label("Gamma(x) relative error");
   plotlib::page::Page::single(&v).save("gamma_real_error.svg").expect("saving svg");
+}
+fn test_erf() {
+  let file = std::fs::File::open("./data/erf.real.csv").unwrap();
+  let mut t = Vec::new();
+  for line in io::BufReader::new(file).lines() {
+    if let Ok(line) = line {
+      let v = line.split(",").collect::<Vec<_>>();
+      let x : f64 = v[0].parse().unwrap();
+      let fx : f64 = v[1].parse().unwrap();
+      t.push((x,fx));
+    }
+  }
+  let t = t.into_iter().map(|(x,fx)|{
+    let apx = sf_erf(r64(x)).0;(x,rel(fx,apx))})
+    .collect::<Vec<_>>();
+
+  let lo = -17.0;
+  let hi = 0.0;
+  let dat = plotlib::repr::Plot::new(t)
+    .point_style(
+      plotlib::style::PointStyle::new()
+      .marker(plotlib::style::PointMarker::Circle)
+      .colour("#113355")
+      .size(0.5));
+  let v = plotlib::view::ContinuousView::new()  
+    .add(dat)
+    .y_range(lo, hi)
+    .x_label("x")
+    .y_label("Erf(x) relative error");
+  plotlib::page::Page::single(&v).save("erf_real_error.svg").expect("saving svg");
 }
 
 /*
@@ -2010,6 +2040,7 @@ fn main() {
   }
 
   if true {
+    test_erf();
     test_gamma();
   }
 }
