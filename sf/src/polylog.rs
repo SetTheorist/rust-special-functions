@@ -47,7 +47,7 @@ pub fn dilog_series<V:Value>(z:V) -> V {
     t *= z;
     let old = sum;
     sum += t/(n*n);
-    if sum == old {print!("-{}-",n);break;}
+    if sum == old {break;}
   }
   sum
 }
@@ -64,7 +64,7 @@ pub fn dilog_zeta_series<V:Value+Log>(z:V) -> V {
   for n in (3..1000).step_by(2) {
     let old = sum;
     sum += t * ι(-sf_bernoulli_number_approx((n-1) as usize)):V / (n-1);
-    if sum == old {print!("!{}!",n);break;}
+    if sum == old {break;}
     t *= ln2z/((n+1)*(n+2));
   }
   sum
@@ -91,7 +91,7 @@ pub fn dilog_series_em3<V:Value+ExpInt+Log>(z:V) -> V {
       - bn6*(lnz.pow(5) - lnz.pow(4)*10/n + lnz.pow(3)*60/n2 - lnz.pow(2)*240/n.pow(3)
               + lnz*600/n.pow(4) - ι(720):V/n.pow(5))*t/n2;
     //if μ(old-res)<V::epsilon*μ(res)*1024 {print!("*{}*",n);break;}
-    if old==res {print!("+{}+",n);break;}
+    if old==res {break;}
   }
   res
 }

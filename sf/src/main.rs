@@ -301,6 +301,47 @@ fn test_gamma() {
     .y_label("Gamma(x) relative error");
   plotlib::page::Page::single(&v).save("gamma_real_error.svg").expect("saving svg");
 }
+fn test_airy() {
+  let file = std::fs::File::open("./data/airy.real.csv").unwrap();
+  let mut t = Vec::new();
+  for line in io::BufReader::new(file).lines() {
+    if let Ok(line) = line {
+      let v = line.split(",").collect::<Vec<_>>();
+      let x : f64 = v[0].parse().unwrap();
+      let ax : f64 = v[1].parse().unwrap();
+      let bx : f64 = v[2].parse().unwrap();
+      t.push((x,ax,bx));
+    }
+  }
+  let ta = t.iter().map(|&(x,ax,_)|{
+    let apx = airy::sf_airy_ai(r64(x)).0;(x,rel(ax,apx))})
+    .collect::<Vec<_>>();
+  let tb = t.iter().map(|&(x,_,bx)|{
+    let apx = airy::sf_airy_bi(r64(x)).0;(x,rel(bx,apx))})
+    .collect::<Vec<_>>();
+
+  let lo = -17.0;
+  let hi = 0.0;
+  let dat_a = plotlib::repr::Plot::new(ta)
+    .point_style(
+      plotlib::style::PointStyle::new()
+      .marker(plotlib::style::PointMarker::Circle)
+      .colour("#1133EE")
+      .size(0.5));
+  let dat_b = plotlib::repr::Plot::new(tb)
+    .point_style(
+      plotlib::style::PointStyle::new()
+      .marker(plotlib::style::PointMarker::Circle)
+      .colour("#EE3311")
+      .size(0.5));
+  let v = plotlib::view::ContinuousView::new()  
+    .add(dat_a)
+    .add(dat_b)
+    .y_range(lo, hi)
+    .x_label("x")
+    .y_label("Airy Ai(x),Bi(x) relative error");
+  plotlib::page::Page::single(&v).save("airy_real_error.svg").expect("saving svg");
+}
 fn test_dilog() {
   let file = std::fs::File::open("./data/dilog.real.csv").unwrap();
   let mut t = Vec::new();
@@ -2070,10 +2111,34 @@ fn main() {
   }
 
   if true {
+    println!("----- Airy -----");
+    println!("Ai(1) = {:e}", airy::sf_airy_ai(r64(1.0)));
+    println!("Ai(5) = {:e}", airy::sf_airy_ai(r64(5.0)));
+    println!("Ai(5) ~ {:e}", airy::impls::ai_asympt_pos(r64(5.0)));
+    println!("Ai(10) = {:e}", airy::sf_airy_ai(r64(10.0)));
+    println!("Ai(10) ~ {:e}", airy::impls::ai_asympt_pos(r64(10.0)));
+    println!("Ai(20) = {:e}", airy::sf_airy_ai(r64(20.0)));
+    println!("Ai(20) ~ {:e}", airy::impls::ai_asympt_pos(r64(20.0)));
+    println!();
+    println!("Ai(-1) = {:e}", airy::sf_airy_ai(r64(-1.0)));
+    println!("Ai(-5) = {:e}", airy::sf_airy_ai(r64(-5.0)));
+    println!("Ai(-10) = {:e}", airy::sf_airy_ai(r64(-10.0)));
+    println!("Ai(-10) ~ {:e}", airy::impls::ai_asympt_neg(r64(-10.0)));
+    println!("Ai(-20) = {:e}", airy::sf_airy_ai(r64(-20.0)));
+    println!("Ai(-20) ~ {:e}", airy::impls::ai_asympt_neg(r64(-20.0)));
+    println!("Ai(-30) = {:e}", airy::sf_airy_ai(r64(-30.0)));
+    println!("Ai(-30) ~ {:e}", airy::impls::ai_asympt_neg(r64(-30.0)));
+    println!("Ai(-40) = {:e}", airy::sf_airy_ai(r64(-40.0)));
+    println!("Ai(-40) ~ {:e}", airy::impls::ai_asympt_neg(r64(-40.0)));
+    println!("Ai(-50) = {:e}", airy::sf_airy_ai(r64(-50.0)));
+    println!("Ai(-50) ~ {:e}", airy::impls::ai_asympt_neg(r64(-50.0)));
+  }
+
+  if true {
+    test_airy();
     test_dilog();
     test_erf();
     test_gamma();
-    println!("{:e}", sf_dilog(r64(0.5)));
   }
 }
 
