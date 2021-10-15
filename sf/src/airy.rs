@@ -20,7 +20,9 @@ use crate::real::*;
 // TODO: need methods for intermediate cases (and generally more accurate approach)
 impl Airy for r64 {
   fn airy_ai(self) -> Self {
-    if self >= ι(6) {
+    if self >= ι(1.8) {
+      ai_integ_pos(self)
+    } else if self >= ι(10) {
       ai_asympt_pos(self)
     } else if self <= ι(-7) {
       ai_asympt_neg(self)
@@ -208,6 +210,18 @@ pub fn bi_asympt_neg<V:Value+Normed+Power+Trig>(z:V) -> V {
   let cos = sf_cos(ζ - V::PI*0.25);
   let sin = sf_sin(ζ - V::PI*0.25);
   V::FRAC_1_SQRTPI*z.pow(ι(-0.25):V)*(-sin*sum_even + cos*sum_odd)
+}
+
+pub fn ai_integ_pos<V:Value+Exp+Power>(z:V) -> V {
+  // 1/(\sqrt{\pi} 46^{1/6} \Gamma(5/6))
+  let ig56 : V = ι(0.26218399708832294968);
+  let ζ = z.pow(ι(1.5):V)*2/3;
+  let o6 = -V::one / 6;
+  let mut sum = V::zero;
+  for (x,w) in crate::integration::GAUSS_LAGUERRE_23__MINUS16_XW.iter().map(|(x,w)|(ι(*x):V,ι(*w):V)) {
+    sum += w*(x/ζ + 2).pow(o6);
+  }
+  sum * sf_exp(-ζ) * ζ.pow(o6) * ig56
 }
 
 }

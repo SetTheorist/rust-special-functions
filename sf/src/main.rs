@@ -319,6 +319,11 @@ fn test_airy() {
   let tb = t.iter().map(|&(x,_,bx)|{
     let apx = airy::sf_airy_bi(r64(x)).0;(x,rel(bx,apx))})
     .collect::<Vec<_>>();
+  /*
+  let ti = t.iter().map(|&(x,ax,_)|{
+    let apx = airy::impls::ai_integ_pos(r64(x)).0;(x,rel(ax,apx))})
+    .collect::<Vec<_>>();
+  */
 
   let lo = -17.0;
   let hi = 0.0;
@@ -334,9 +339,18 @@ fn test_airy() {
       .marker(plotlib::style::PointMarker::Circle)
       .colour("#EE3311")
       .size(0.5));
+  /*
+  let dat_i = plotlib::repr::Plot::new(ti)
+    .point_style(
+      plotlib::style::PointStyle::new()
+      .marker(plotlib::style::PointMarker::Circle)
+      .colour("#33EE11")
+      .size(0.5));
+  */
   let v = plotlib::view::ContinuousView::new()  
     .add(dat_a)
     .add(dat_b)
+    //.add(dat_i)
     .y_range(lo, hi)
     .x_label("x")
     .y_label("Airy Ai(x),Bi(x) relative error");
@@ -2113,7 +2127,9 @@ fn main() {
   if true {
     println!("----- Airy -----");
     println!("Ai(1) = {:e}", airy::sf_airy_ai(r64(1.0)));
+    println!("Ai(1) : {:e}", airy::impls::ai_integ_pos(r64(1.0)));
     println!("Ai(5) = {:e}", airy::sf_airy_ai(r64(5.0)));
+    println!("Ai(5) : {:e}", airy::impls::ai_integ_pos(r64(5.0)));
     println!("Ai(5) ~ {:e}", airy::impls::ai_asympt_pos(r64(5.0)));
     println!("Ai(10) = {:e}", airy::sf_airy_ai(r64(10.0)));
     println!("Ai(10) ~ {:e}", airy::impls::ai_asympt_pos(r64(10.0)));
