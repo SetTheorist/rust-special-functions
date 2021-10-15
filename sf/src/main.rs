@@ -313,44 +313,40 @@ fn test_airy() {
       t.push((x,ax,bx));
     }
   }
-  let ta = t.iter().map(|&(x,ax,_)|{
-    let apx = airy::sf_airy_ai(r64(x)).0;(x,rel(ax,apx))})
-    .collect::<Vec<_>>();
-  let tb = t.iter().map(|&(x,_,bx)|{
-    let apx = airy::sf_airy_bi(r64(x)).0;(x,rel(bx,apx))})
-    .collect::<Vec<_>>();
-  /*
-  let ti = t.iter().map(|&(x,ax,_)|{
-    let apx = airy::impls::ai_integ_pos(r64(x)).0;(x,rel(ax,apx))})
-    .collect::<Vec<_>>();
-  */
 
   let lo = -17.0;
   let hi = 0.0;
+  let ta = t.iter().map(|&(x,ax,_)|{
+    let apx = airy::sf_airy_ai(r64(x)).0;(x,rel(ax,apx))})
+    .collect::<Vec<_>>();
   let dat_a = plotlib::repr::Plot::new(ta)
     .point_style(
       plotlib::style::PointStyle::new()
       .marker(plotlib::style::PointMarker::Circle)
       .colour("#1133EE")
       .size(0.5));
+  let tb = t.iter().map(|&(x,_,bx)|{
+    let apx = airy::sf_airy_bi(r64(x)).0;(x,rel(bx,apx))})
+    .collect::<Vec<_>>();
   let dat_b = plotlib::repr::Plot::new(tb)
     .point_style(
       plotlib::style::PointStyle::new()
       .marker(plotlib::style::PointMarker::Circle)
       .colour("#EE3311")
       .size(0.5));
-  /*
+  let ti = t.iter().map(|&(x,ax,_)|{
+    let apx = airy::impls::airy_series__wide(ι(x)).0.hi();(x,rel(ax,apx))})
+    .collect::<Vec<_>>();
   let dat_i = plotlib::repr::Plot::new(ti)
     .point_style(
       plotlib::style::PointStyle::new()
       .marker(plotlib::style::PointMarker::Circle)
       .colour("#33EE11")
       .size(0.5));
-  */
   let v = plotlib::view::ContinuousView::new()  
     .add(dat_a)
     .add(dat_b)
-    //.add(dat_i)
+    .add(dat_i)
     .y_range(lo, hi)
     .x_label("x")
     .y_label("Airy Ai(x),Bi(x) relative error");

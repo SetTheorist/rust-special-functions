@@ -3,7 +3,7 @@ use std::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd)] // Eq,Ord
-pub struct Wide(f64, f64);
+pub struct Wide(pub f64, pub f64);
 
 impl From<f64> for Wide {
   fn from(x: f64) -> Wide { Wide(x, 0.0) }

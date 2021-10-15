@@ -4,15 +4,15 @@ use std::ops::{Add, AddAssign, Sub, SubAssign};
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct Kahan<T>(pub T, pub T);
 
-impl<T: Default> Kahan<T> {
+impl<T:Default> Kahan<T> {
   #[inline]
-  pub fn new(t0: T) -> Self { Kahan(t0, T::default()) }
+  pub fn new(t0:T) -> Self { Kahan(t0, T::default()) }
 }
 
-impl<T: Additive> Add<T> for Kahan<T> {
+impl<T:Additive> Add<T> for Kahan<T> {
   type Output = Self;
   #[inline]
-  fn add(self, t: T) -> Self {
+  fn add(self, t:T) -> Self {
     let x = self.0;
     let y = t + self.1;
     let sum = x + y;
@@ -20,31 +20,49 @@ impl<T: Additive> Add<T> for Kahan<T> {
   }
 }
 
-impl<T: Additive> AddAssign<T> for Kahan<T> {
+// TODO: not correct
+impl<T:Additive> Add<Kahan<T>> for Kahan<T> {
+  type Output = Self;
   #[inline]
-  fn add_assign(&mut self, t: T) { *self = *self + t; }
+  fn add(self, t:Kahan<T>) -> Self {
+    (self + t.0) + t.1
+  }
 }
 
-impl<T: Additive> Sub<T> for Kahan<T> {
+impl<T:Additive> AddAssign<T> for Kahan<T> {
+  #[inline]
+  fn add_assign(&mut self, t:T) { *self = *self + t; }
+}
+
+impl<T:Additive> Sub<T> for Kahan<T> {
   type Output = Self;
   #[inline]
-  fn sub(self, t: T) -> Self { self.add(-t) }
+  fn sub(self, t:T) -> Self { self.add(-t) }
 }
-impl<T: Additive> SubAssign<T> for Kahan<T> {
+impl<T:Additive> SubAssign<T> for Kahan<T> {
   #[inline]
-  fn sub_assign(&mut self, t: T) { self.add_assign(-t); }
+  fn sub_assign(&mut self, t:T) { self.add_assign(-t); }
 }
-impl<T: Additive> Sub<Kahan<T>> for Kahan<T> {
+impl<T:Additive> Sub<Kahan<T>> for Kahan<T> {
   type Output = Self;
   #[inline]
-  fn sub(self, t: Kahan<T>) -> Self { self - t.0 }
+  fn sub(self, t:Kahan<T>) -> Self { self - t.0 }
 }
+
+// TODO: not correct
+impl <T:Multiplication> std::ops::Mul<T> for Kahan<T> {
+  type Output = Self;
+  #[inline]
+  fn mul(self, t:T) -> Self { Kahan(self.0*t,self.1*t) }
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 pub trait KSum<A> {
   fn ksum(self) -> A;
 }
 
-impl<A: Additive + Default, I: IntoIterator<Item = A> + Sized> KSum<A> for I {
+impl<A:Additive+Default, I:IntoIterator<Item=A>+Sized> KSum<A> for I {
   fn ksum(self) -> A { self.into_iter().fold(Kahan::<A>::default(), |a, b| a + b).0 }
 }
 /*

@@ -51,10 +51,14 @@ impl Airy for r64 {
 // may be from lngamma, perhaps
 pub fn airy_series<V:Value+Exp+Gamma+Log>(z:V) -> (V,V) {
   // TODO: precompute these fixed constants
-  let ai_0  =  sf_exp(-sf_log(ι(3):V)*2/3 - sf_lngamma(ι(2):V/3));
-  let dai_0 = -sf_exp(-sf_log(ι(3):V)*1/3 - sf_lngamma(ι(1):V/3));
-  let bi_0  =  sf_exp(-sf_log(ι(3):V)*1/6 - sf_lngamma(ι(2):V/3));
-  let dbi_0 =  sf_exp( sf_log(ι(3):V)*1/6 - sf_lngamma(ι(1):V/3));
+  //let ai_0  =  sf_exp(-sf_log(ι(3):V)*2/3 - sf_lngamma(ι(2):V/3));
+  //let dai_0 = -sf_exp(-sf_log(ι(3):V)*1/3 - sf_lngamma(ι(1):V/3));
+  //let bi_0  =  sf_exp(-sf_log(ι(3):V)*1/6 - sf_lngamma(ι(2):V/3));
+  //let dbi_0 =  sf_exp( sf_log(ι(3):V)*1/6 - sf_lngamma(ι(1):V/3));
+  let ai_0  : V = ι( 0.35502805388781723926);
+  let dai_0 : V = ι(-0.25881940379280679841);
+  let bi_0  : V = ι( 0.61492662744600073515);
+  let dbi_0 : V = ι( 0.44828835735382635791);
   let s1 = aibi_1(z);
   let s2 = aibi_2(z);
   let ai = ai_0*s1 + dai_0*s2;
@@ -89,6 +93,51 @@ pub fn aibi_2<V:Value>(z:V) -> V {
   }
   res
 }
+
+use crate::wide::*;
+pub fn airy_series__wide(z:Wide) -> (Wide,Wide) {
+  // TODO: procmacro to do all this at compile time!
+  //let ai_0  : Wide =  "0.3550280538878172392600631860041831763980".parse().unwrap();
+  //let dai_0 : Wide = "-0.2588194037928067984051835601892039634791".parse().unwrap();
+  //let bi_0  : Wide =  "0.6149266274460007351509223690936135535947".parse().unwrap();
+  //let dbi_0 : Wide =  "0.4482883573538263579148237103988283908662".parse().unwrap();
+  const ai_0  : Wide = Wide( 3.550280538878172e-1, 2.0523363243621203e-17);
+  const dai_0 : Wide = Wide(-2.588194037928068e-1, 2.522243111610832e-17);
+  const bi_0  : Wide = Wide( 6.149266274460007e-1, 5.089920779489141e-17);
+  const dbi_0 : Wide = Wide( 4.482883573538264e-1,-2.5363237774417318e-17);
+  let s1 = aibi_1__wide(z);
+  let s2 = aibi_2__wide(z);
+  let ai = ai_0*s1 + dai_0*s2;
+  let bi = bi_0*s1 + dbi_0*s2;
+  (ai,bi)
+}
+pub fn aibi_1__wide(z:Wide) -> Wide {
+  let mut res = Wide::one;
+  let mut term = Wide::one;
+  let z3 = z*z*z;
+  for n in 1..1000 {
+    term *= z3 * (n*3-2) / ((n*3)*(n*3-1)*(n*3-2));
+    let old_res = res;
+    res += term;
+    if res == old_res { break; }
+    //if (res-old_res).abs() < res.abs()*f64::EPSILON/1024 { break; }
+  }
+  res
+}
+pub fn aibi_2__wide(z:Wide) -> Wide {
+  let mut res = z;
+  let mut term = z;
+  let z3 = z*z*z;
+  for n in 1..1000 {
+    term *= z3 * (n*3-1) / ((n*3+1)*(n*3)*(n*3-1));
+    let old_res = res;
+    res += term;
+    if res == old_res { break; }
+    //if (res-old_res).abs() < res.abs()*f64::EPSILON/1024 { break; }
+  }
+  res
+}
+
 
 // for |ph(z)|<=π-δ
 pub fn ai_asympt_pos<V:Value+Exp+Normed+Power>(z:V) -> V {
