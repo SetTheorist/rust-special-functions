@@ -382,30 +382,42 @@ impl PartialEq<isize> for Wide {
 impl std::str::FromStr for Wide {
   type Err = ();
   fn from_str(s: &str) -> Result<Self, ()> {
-    if s.is_empty() {
-      return Err(());
-    }
+    if s.is_empty() { return Err(()); }
     let mut neg = false;
     let mut dec = false;
     let mut e = 0;
     let mut q = Wide(0.0, 0.0);
+    let mut mantissa = true;
+    let mut exp_neg = false;
+    let mut expo = 0;
     for c in s.chars() {
-      match c {
-        '-' => { neg = true; }
-        '+' => {}
-        '.' => { dec = true; }
-        //'e' => { }
-        d => {
-          let v = ((d as u8) - b'0') as f64;
-          if !(0.0<=v && v<=9.0) {
-            return Err(());
+      if mantissa {
+        match c {
+          '-' => { neg = true; }
+          '+' => {}
+          '.' => { dec = true; }
+          'e' => { mantissa = false; }
+          d => {
+            let v = ((d as u8) - b'0') as f64;
+            if !(0.0<=v && v<=9.0) { return Err(()); }
+            q = q * 10.0 + v;
+            if dec { e -= 1; }
           }
-          q = q * 10.0 + v;
-          if dec { e -= 1; }
+        }
+      } else {
+        match c {
+          '-' => { exp_neg = true; }
+          '+' => {}
+          d => {
+            let v = ((d as u8) - b'0') as isize;
+            if !(0<=v && v<=9) { return Err(()); }
+            expo = expo * 10 + v;
+          }
         }
       }
     }
-    q = q.scale10(e);
+    if exp_neg { expo = -expo; }
+    q = q.scale10(e + expo);
     Ok(if neg { -q } else { q })
   }
 }
