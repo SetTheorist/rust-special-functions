@@ -94,6 +94,35 @@ pub fn aibi_2<V:Value>(z:V) -> V {
   res
 }
 
+pub fn airy_series__combined<V:Value+Exp+Gamma+Log>(z:V) -> (V,V) {
+  // TODO: precompute these fixed constants
+  //let ai_0  =  sf_exp(-sf_log(ι(3):V)*2/3 - sf_lngamma(ι(2):V/3));
+  //let dai_0 = -sf_exp(-sf_log(ι(3):V)*1/3 - sf_lngamma(ι(1):V/3));
+  //let bi_0  =  sf_exp(-sf_log(ι(3):V)*1/6 - sf_lngamma(ι(2):V/3));
+  //let dbi_0 =  sf_exp( sf_log(ι(3):V)*1/6 - sf_lngamma(ι(1):V/3));
+  let ai_0  : V = ι( 0.35502805388781723926);
+  let dai_0 : V = ι(-0.25881940379280679841);
+  let bi_0  : V = ι( 0.61492662744600073515);
+  let dbi_0 : V = ι( 0.44828835735382635791);
+
+  let z3 = z*z*z;
+  let mut term_1 = V::one;
+  let mut term_2 = z;
+  let mut ai = ai_0 + dai_0*z;
+  let mut bi = bi_0 + dbi_0*z;
+  for n in 1..1000 {
+    let old_ai = ai;
+    let old_bi = bi;
+    term_1 *= z3 * (n*3-2) / ((n*3)*(n*3-1)*(n*3-2));
+    term_2 *= z3 * (n*3-1) / ((n*3+1)*(n*3)*(n*3-1));
+    ai += ai_0*term_1 + dai_0*term_2;
+    bi += bi_0*term_1 + dbi_0*term_2;
+    if ai == old_ai && bi == old_bi {break;}
+  }
+  (ai,bi)
+}
+
+
 use crate::wide::*;
 pub fn airy_series__wide(z:Wide) -> (Wide,Wide) {
   // TODO: procmacro to do all this at compile time!
@@ -262,7 +291,7 @@ pub fn bi_asympt_neg<V:Value+Normed+Power+Trig>(z:V) -> V {
 }
 
 pub fn ai_integ_pos<V:Value+Exp+Power>(z:V) -> V {
-  // 1/(\sqrt{\pi} 46^{1/6} \Gamma(5/6))
+  // 1/(\sqrt{\pi} 48^{1/6} \Gamma(5/6))
   let ig56 : V = ι(0.26218399708832294968);
   let ζ = z.pow(ι(1.5):V)*2/3;
   let o6 = -V::one / 6;
@@ -271,6 +300,38 @@ pub fn ai_integ_pos<V:Value+Exp+Power>(z:V) -> V {
     sum += w*(x/ζ + 2).pow(o6);
   }
   sum * sf_exp(-ζ) * ζ.pow(o6) * ig56
+}
+
+
+// computes a^(-1/6) for wide number
+fn wide_neg16_power(a:Wide) -> Wide {
+  // initial guess
+  let x = Wide(a.hi().powf(-1.0/6.0),0.0);
+  // one step of Newton
+  let x = x*(-a*x.pow(6_isize)+7.0)/6.0;
+  x
+}
+// computes a^(3/2) for wide number
+#[inline]
+fn wide_32_power(a:Wide) -> Wide {
+  (a*a*a).sqrt()
+}
+
+use crate::wide::*;
+pub fn ai_integ_pos__wide(z:Wide) -> Wide {
+  // 1/(\sqrt{\pi} 48^{1/6} \Gamma(5/6))
+  let ig56 : Wide = "0.2621839970883229496786247788550868016857".parse().unwrap();
+  let ζ = wide_32_power(z)*2/3;
+  let o6 = -Wide::one / 6;
+  let mut sum = Wide::zero;
+  for (x,w) in
+    crate::integration::GAUSS_LAGUERRE_41__MINUS16_XW__STRING
+    .iter()
+    .map(|(x,w)|(x.parse().unwrap():Wide, w.parse().unwrap():Wide))
+  {
+    sum += w*wide_neg16_power(x/ζ + 2)
+  }
+  sum * (-ζ).exp() * wide_neg16_power(ζ) * ig56
 }
 
 }

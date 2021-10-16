@@ -325,6 +325,7 @@ fn test_airy() {
       .marker(plotlib::style::PointMarker::Circle)
       .colour("#1133EE")
       .size(0.5));
+
   let tb = t.iter().map(|&(x,_,bx)|{
     let apx = airy::sf_airy_bi(r64(x)).0;(x,rel(bx,apx))})
     .collect::<Vec<_>>();
@@ -334,6 +335,7 @@ fn test_airy() {
       .marker(plotlib::style::PointMarker::Circle)
       .colour("#EE3311")
       .size(0.5));
+
   let ti = t.iter().map(|&(x,ax,_)|{
     let apx = airy::impls::airy_series__wide(ι(x)).0.hi();(x,rel(ax,apx))})
     .collect::<Vec<_>>();
@@ -343,10 +345,22 @@ fn test_airy() {
       .marker(plotlib::style::PointMarker::Circle)
       .colour("#33EE11")
       .size(0.5));
+
+  let tj = t.iter().map(|&(x,ax,_)|{
+    let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
+    .collect::<Vec<_>>();
+  let dat_j = plotlib::repr::Plot::new(tj)
+    .point_style(
+      plotlib::style::PointStyle::new()
+      .marker(plotlib::style::PointMarker::Circle)
+      .colour("#119999")
+      .size(0.75));
+
   let v = plotlib::view::ContinuousView::new()  
     .add(dat_a)
     .add(dat_b)
     .add(dat_i)
+    .add(dat_j)
     .y_range(lo, hi)
     .x_label("x")
     .y_label("Airy Ai(x),Bi(x) relative error");
@@ -2122,13 +2136,17 @@ fn main() {
 
   if true {
     println!("----- Airy -----");
+    println!("Ai(1) = {}", airy::impls::ai_integ_pos__wide(wide::Wide(1.0,0.0)));
     println!("Ai(1) = {:e}", airy::sf_airy_ai(r64(1.0)));
     println!("Ai(1) : {:e}", airy::impls::ai_integ_pos(r64(1.0)));
+    println!("Ai(5) = {}", airy::impls::ai_integ_pos__wide(wide::Wide(5.0,0.0)));
     println!("Ai(5) = {:e}", airy::sf_airy_ai(r64(5.0)));
     println!("Ai(5) : {:e}", airy::impls::ai_integ_pos(r64(5.0)));
     println!("Ai(5) ~ {:e}", airy::impls::ai_asympt_pos(r64(5.0)));
+    println!("Ai(10) = {}", airy::impls::ai_integ_pos__wide(wide::Wide(10.0,0.0)));
     println!("Ai(10) = {:e}", airy::sf_airy_ai(r64(10.0)));
     println!("Ai(10) ~ {:e}", airy::impls::ai_asympt_pos(r64(10.0)));
+    println!("Ai(20) = {}", airy::impls::ai_integ_pos__wide(wide::Wide(20.0,0.0)));
     println!("Ai(20) = {:e}", airy::sf_airy_ai(r64(20.0)));
     println!("Ai(20) ~ {:e}", airy::impls::ai_asympt_pos(r64(20.0)));
     println!();
@@ -2152,5 +2170,6 @@ fn main() {
     test_erf();
     test_gamma();
   }
+  println!("{}", "2.0e+1".parse().unwrap():wide::Wide);
 }
 
