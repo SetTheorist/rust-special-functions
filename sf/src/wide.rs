@@ -143,6 +143,26 @@ impl Wide {
     }
   }
 
+  // TODO: more efficient
+  #[inline]
+  pub fn sqr(self) -> Wide {
+    self*self
+  }
+
+  pub fn sqrt(self) -> Wide {
+    let q0 = self.0.sqrt();
+    let x = Wide::new(q0, self.1/(q0*2.0));
+    let x = (x+self/x)*0.5;
+    x
+  }
+
+  pub fn cbrt(self) -> Wide {
+    let q0 = self.0.cbrt();
+    let x = Wide::new(q0, self.1/(q0*q0*3.0));
+    let x = (x*2.0 + self/x.sqr())/3.0;
+    x
+  }
+
   #[inline]
   pub fn scale2(self, i: isize) -> Wide {
     // TODO: replace with ldexp() functionality
