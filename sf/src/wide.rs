@@ -182,6 +182,29 @@ impl Wide {
       self
     }
   }
+
+  pub fn exp(self) -> Wide {
+    if self.0 < 0.0 { return 1.0 / (-self).exp(); }
+    #[inline] fn floor0(q:Wide) -> f64 {
+      let q0f = q.0.floor();
+      if -q.1 > (q.0 - q0f) { q0f - 1.0 } else { q0f }
+    }
+    let x = self;
+    let n = floor0(x.abs() / Wide::LOG2);
+    let r = x - Wide::LOG2 * n;
+    let mut sum = Wide::one;
+    let mut t = Wide::one;
+    for i in 1..100 {
+      let old_sum = sum;
+      t *= r / (i as f64);
+      sum += t;
+      if sum == old_sum {break;}
+    }
+    sum.scale2(n as isize)
+  }
+
+  //const LOG2 : Wide = "0.6931471805599453094172321214581765680755".parse().unwrap();
+  const LOG2 : Wide = Wide(6.931471805599453e-1,2.3190468138463017e-17);
 }
 
 impl Add<Wide> for Wide {
