@@ -83,6 +83,12 @@ impl Exp for c64 {
   }
 }
 
+use crate::wide::*;
+impl Exp for Wide {
+  #[inline] fn exp(self) -> Wide { self.exp() }
+  #[inline] fn exp_m1(self) -> Wide { self.exp_m1() }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 pub mod impls {

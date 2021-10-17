@@ -232,6 +232,23 @@ impl Wide {
     }
     sum.scale2(n as isize)
   }
+
+  pub fn exp_m1(self) -> Wide {
+    if self.abs() < Wide::LOG2 {
+      let mut sum = Wide::zero;
+      let mut t = Wide::one;
+      for i in 1..100 {
+        let old_sum = sum;
+        t *= self / i;
+        sum += t;
+        if sum == old_sum {break;}
+      }
+      sum
+    } else {
+      self.exp() - Wide::one
+    }
+  }
+
 }
 
 impl Add<Wide> for Wide {
@@ -671,20 +688,31 @@ impl Classify for Wide {
 }
 
 impl Ordered for Wide {
+  #[inline]
   fn floor(self) -> Self {
     todo!()
   }
+  #[inline]
   fn ceil(self) -> Self {
     todo!()
   }
+  #[inline]
   fn round(self) -> Self {
     todo!()
   }
+  #[inline]
   fn trunc(self) -> Self {
-    todo!()
+    let t0 = self.0.trunc();
+    if t0 == self.0 {
+      Wide(t0, self.1.trunc()) // TODO: can be wrong if sign(lo)!=sign(hi)
+    } else {
+      Wide(t0, 0.0)
+    }
   }
+  #[inline]
   fn rint(self) -> isize {
-    todo!()
+    let r = self.round();
+    (r.0 as isize) + (r.1 as isize)
   }
 }
 

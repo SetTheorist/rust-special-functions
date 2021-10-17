@@ -337,7 +337,7 @@ fn test_airy() {
       .size(0.5));
 
   let ti = t.iter().map(|&(x,ax,_)|{
-    let apx = airy::impls::airy_series__wide(ι(x)).0.hi();(x,rel(ax,apx))})
+    let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
     .collect::<Vec<_>>();
   let dat_i = plotlib::repr::Plot::new(ti)
     .point_style(
@@ -1835,7 +1835,7 @@ fn main() {
     println!("{:e}", sf_exp_men(7, r64(1.0)));
     println!("{:e}", sf_exp_men(12, r64(1.0)));
   }
-  if false {
+  if true {
     print!(":"); for x in 0..(-1) {print!("<{}>", x);} println!(":");
     print!(":"); for x in (0..(-1)).step_by(2) {print!("<{}>", x);} println!(":");
     println!("{:016X}", 1.0_f64.to_bits());
@@ -2139,6 +2139,7 @@ fn main() {
     println!("Ai(1) = {}", airy::impls::ai_integ_pos__wide(wide::Wide(1.0,0.0)));
     println!("Ai(1) = {:e}", airy::sf_airy_ai(r64(1.0)));
     println!("Ai(1) : {:e}", airy::impls::ai_integ_pos(r64(1.0)));
+    println!("Ai(5) = {}", airy::impls::airy_series(wide::Wide(5.0,0.0)).0);
     println!("Ai(5) = {}", airy::impls::ai_integ_pos__wide(wide::Wide(5.0,0.0)));
     println!("Ai(5) = {:e}", airy::sf_airy_ai(r64(5.0)));
     println!("Ai(5) : {:e}", airy::impls::ai_integ_pos(r64(5.0)));
@@ -2170,13 +2171,5 @@ fn main() {
     test_erf();
     test_gamma();
   }
-  println!("{}", "2.0e+1".parse().unwrap():wide::Wide);
-  time!({for _ in 0..10{airy::impls::ai_integ_pos__wide(std::hint::black_box(wide::Wide(5.0,0.0)));()}});
-  time!({for _ in 0..10{airy::sf_airy_ai(std::hint::black_box(r64(5.0)));()}});
-
-  println!("{}", wide::Wide(2.0,0.0).sqrt_recip());
-  println!("{}", wide::Wide(2.0,0.0).cbrt_recip());
-  println!("{}", wide::Wide(2.0,0.0).nth_root(7));
-  println!("{}", wide::Wide(2.0,0.0).nth_root(-7));
 }
 
