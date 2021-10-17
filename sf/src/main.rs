@@ -2171,5 +2171,12 @@ fn main() {
     test_gamma();
   }
   println!("{}", "2.0e+1".parse().unwrap():wide::Wide);
+  time!({for _ in 0..10{airy::impls::ai_integ_pos__wide(std::hint::black_box(wide::Wide(5.0,0.0)));()}});
+  time!({for _ in 0..10{airy::sf_airy_ai(std::hint::black_box(r64(5.0)));()}});
+
+  println!("{}", wide::Wide(2.0,0.0).sqrt_recip());
+  println!("{}", wide::Wide(2.0,0.0).cbrt_recip());
+  println!("{}", wide::Wide(2.0,0.0).nth_root(7));
+  println!("{}", wide::Wide(2.0,0.0).nth_root(-7));
 }
 

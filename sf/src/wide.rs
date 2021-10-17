@@ -5,11 +5,14 @@ use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 #[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd)] // Eq,Ord
 pub struct Wide(pub f64, pub f64);
 
+impl From<r64> for Wide {
+  fn from(x:r64) -> Wide { Wide(x.0, 0.0) }
+}
 impl From<f64> for Wide {
-  fn from(x: f64) -> Wide { Wide(x, 0.0) }
+  fn from(x:f64) -> Wide { Wide(x, 0.0) }
 }
 impl From<isize> for Wide {
-  fn from(x: isize) -> Wide { Wide(x as f64, 0.0) }
+  fn from(x:isize) -> Wide { Wide(x as f64, 0.0) }
 }
 
 // requires |a|>=|b|
@@ -152,14 +155,41 @@ impl Wide {
   pub fn sqrt(self) -> Wide {
     let q0 = self.0.sqrt();
     let x = Wide::new(q0, self.1/(q0*2.0));
-    let x = (x+self/x)*0.5;
+    let x = (x+self/x)*0.5; // TODO: ldexp
+    x
+  }
+
+  pub fn sqrt_recip(self) -> Wide {
+    let q0 = self.0.sqrt().recip();
+    let x = Wide::new(q0, -q0*self.1/(self.0*2.0));
+    let x = x*(3 - self*x.sqr())*0.5; // TODO: ldexp
     x
   }
 
   pub fn cbrt(self) -> Wide {
     let q0 = self.0.cbrt();
     let x = Wide::new(q0, self.1/(q0*q0*3.0));
-    let x = (x*2.0 + self/x.sqr())/3.0;
+    let x = (x*2.0 + self/x.sqr())/3.0; // TODO: ldexp
+    x
+  }
+
+  pub fn cbrt_recip(self) -> Wide {
+    let q0 = self.0.cbrt().recip();
+    let x = Wide::new(q0, -q0*self.1/(self.0*3.0));
+    let x = x*(4.0-self*x.pow(3_isize))/3.0;
+    let x = x*(4.0-self*x.pow(3_isize))/3.0;
+    x
+  }
+
+  #[inline]
+  pub fn recip(self) -> Wide {
+    1.0 / self
+  }
+
+  pub fn nth_root(self, n:isize) -> Wide {
+    let q0 = self.0.powf((n as f64).recip());
+    let x = Wide::new(q0, q0/self.0*self.1/(n as f64));
+    let x = (x*(n-1) + self/x.pow(n-1))/n;
     x
   }
 
@@ -202,9 +232,6 @@ impl Wide {
     }
     sum.scale2(n as isize)
   }
-
-  //const LOG2 : Wide = "0.6931471805599453094172321214581765680755".parse().unwrap();
-  const LOG2 : Wide = Wide(6.931471805599453e-1,2.3190468138463017e-17);
 }
 
 impl Add<Wide> for Wide {
@@ -489,19 +516,182 @@ impl Multiplicative for Wide {}
 impl Embeds<isize> for Wide {}
 impl Embeds<f64> for Wide {}
 impl Field for Wide {}
+impl Roots for Wide {
+  #[inline]
+  fn sqrt(self) -> Self { self.sqrt() }
+  #[inline]
+  fn cbrt(self) -> Self { self.cbrt() }
+  #[inline]
+  fn nth_root(self, n: isize) -> Self { self.nth_root(n) }
+}
 
-/*
--- basic implementation: range-reduce & series
-qexp q
-  | q<0 = 1/(qexp (-q))
-  | otherwise =
-    let !nd = q / ln2_q
-        !nn = floor.hi_ $ nd
-        !r = q - ln2_q * (fromIntegral nn)
-        !s = sm r 0.0 1.0 1
-    in Wide (scaleFloat nn $ hi_ s) (scaleFloat nn $ lo_ s)
-  where sm !r !s !t !n
-          | s+t==s = s
-          | otherwise = sm r (s+t) (t*r/(fromIntegral n)) (n+1)
+impl Constants for Wide {
+  const nan: Self = Wide(f64::NAN,f64::NAN);
 
-*/
+  // $e^1$
+  // 2.7182818284590452353602874713526624977572470937000
+  const E: Self = Wide(2.718281828459045e0,1.4456468917292507e-16);
+
+  // $e^{-1}$
+  // 0.36787944117144232159552377016146086744581113103177
+  const FRAC_1_E: Self = Wide(3.6787944117144233e-1,-1.2428753672788364e-17);
+
+  // $\pi$
+  // 3.1415926535897932384626433832795028841971693993751
+  const PI: Self = Wide(3.141592653589793e0,1.224646799147354e-16);
+
+  // $1/\pi$
+  // 0.31830988618379067153776752674502872406891929148091
+  const FRAC_1_PI: Self = Wide(3.183098861837907e-1,-1.9678676675182474e-17);
+
+  // $\pi/2$
+  // 1.5707963267948966192313216916397514420985846996876
+  const FRAC_PI_2: Self = Wide(1.5707963267948966e0,6.12323399573677e-17);
+
+  // $\sqrt(\pi)$
+  // 1.7724538509055160272981674833411451827975494561224
+  const SQRTPI: Self = Wide(1.772453850905516e0,-7.666586499825807e-17);
+
+  // $\sqrt(2\pi)$
+  // 2.5066282746310005024157652848110452530069867406099
+  const SQRT2PI: Self = Wide(2.5066282746310007e0,-1.8328579980459177e-16);
+
+  // $1/\sqrt(2\pi)$
+  // 0.39894228040143267793994605993438186847585863116493
+  const FRAC_1_SQRT2PI: Self = Wide(3.989422804014327e-1,-2.4923272022777294e-17);
+
+  // $1/\sqrt(\pi)$
+  // 0.56418958354775628694807945156077258584405062932900
+  const FRAC_1_SQRTPI: Self = Wide(5.641895835477563e-1,7.667729806582931e-18);
+
+  // $\log(2)$
+  // 0.69314718055994530941723212145817656807550013436026
+  const LOG2: Self = Wide(6.931471805599453e-1,2.3190468138463017e-17);
+
+  // $1/\log(2)$
+  // 1.4426950408889634073599246810018921374266459541530
+  const FRAC_1_LOG2: Self = Wide(1.4426950408889634e0,2.035527374093102e-17);
+
+  // $\log(2\pi)/2 = \log(\sqrt{2\pi})$
+  // 0.91893853320467274178032973640561763986139747363778
+  const FRAC_LOG2PI_2: Self = Wide(9.189385332046728e-1,-3.8782941580672365e-17);
+
+  // Euler's gamma $\gamma$
+  // 0.57721566490153286060651209008240243104215933593992
+  const EULER_GAMMA: Self = Wide(5.772156649015329e-1,-4.942915152430632e-18);
+}
+
+use crate::real::r64;
+impl Normed for Wide {
+  type NT = r64;
+  const epsilon : r64 = r64::epsilon*r64::epsilon*2.0;
+  fn abs(self) -> Self::NT {
+    r64(self.0.abs())
+  }
+  fn vabs(self) -> Self {
+    if self.0 < 0.0 { -self } else { self }
+  }
+  fn fabs(self) -> f64 {
+    self.0.abs()
+  }
+  // self/|self|
+  fn signum(self) -> Self {
+    Wide(self.0.signum(), 0.0)
+  }
+  fn mu(self) -> Self::NT {
+    r64(self.0.abs())
+  }
+}
+
+impl Classify for Wide {
+  fn is_nan(self) -> bool {
+    self.0.is_nan()
+  }
+  fn is_infinite(self) -> bool {
+    self.0.is_infinite()
+  }
+  fn is_finite(self) -> bool {
+    self.0.is_finite()
+  }
+
+  fn is_zero(self) -> bool {
+    self.0 == 0.0
+  }
+  fn is_negzero(self) -> bool {
+    self.is_zero() && self.0.is_sign_negative()
+  }
+  fn is_real(self) -> bool {
+    true
+  }
+  fn is_imag(self) -> bool {
+    false
+  }
+
+  fn is_negreal(self) -> bool {
+    self.0 < 0.0
+  }
+  fn is_posreal(self) -> bool {
+    self.0 > 0.0
+  }
+  fn is_nonnegreal(self) -> bool {
+    self.0 <= 0.0
+  }
+  fn is_nonposreal(self) -> bool {
+    self.0 >= 0.0
+  }
+
+  fn is_int(self) -> bool {
+    self.trunc() == self
+  }
+  fn is_posint(self) -> bool {
+    self.is_posreal() && self.is_int()
+  }
+  fn is_negint(self) -> bool {
+    self.is_negreal() && self.is_int()
+  }
+  fn is_nonposint(self) -> bool {
+    self.is_nonposreal() && self.is_int()
+  }
+  fn is_nonnegint(self) -> bool {
+    self.is_nonnegreal() && self.is_int()
+  }
+  fn is_evenint(self) -> bool {
+    todo!()
+  }
+  fn is_oddint(self) -> bool {
+    todo!()
+  }
+
+  fn is_halfint(self) -> bool {
+    (self*2).is_int()
+  }
+
+  // upper-half complex plane (positive imag part)?
+  // positive real part?
+}
+
+impl Ordered for Wide {
+  fn floor(self) -> Self {
+    todo!()
+  }
+  fn ceil(self) -> Self {
+    todo!()
+  }
+  fn round(self) -> Self {
+    todo!()
+  }
+  fn trunc(self) -> Self {
+    todo!()
+  }
+  fn rint(self) -> isize {
+    todo!()
+  }
+}
+
+impl Bounded for Wide {
+  const MIN_VALUE: Wide = Wide(f64::MIN,0.0);
+  const MAX_VALUE: Wide = Wide(f64::MAX,0.0); // TODO: not actually the largest!
+}
+
+impl Value for Wide {}
+

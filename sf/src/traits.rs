@@ -463,4 +463,14 @@ impl Float for f64 {
   const neg_zero: Self = unsafe{std::mem::transmute(0x8000_0000_0000_0000_u64)};
 }
 
+impl Ordered for f64 {
+  #[inline] fn min(self, b:Self) -> Self { self.min(b) }
+  #[inline] fn max(self, b:Self) -> Self { self.max(b) }
+  #[inline] fn floor(self) -> Self { self.floor() }
+  #[inline] fn ceil(self) -> Self { self.ceil() }
+  #[inline] fn round(self) -> Self { self.round() }
+  #[inline] fn trunc(self) -> Self { self.trunc() }
+  #[inline] fn rint(self) -> isize { self.round() as isize }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
