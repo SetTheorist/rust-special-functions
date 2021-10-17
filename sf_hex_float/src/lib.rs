@@ -34,24 +34,22 @@ pub fn hexf(item:TokenStream) -> TokenStream {
     match it {
       Group(x) => {panic!("Unexpected group token {}", x.to_string());}
       Ident(x) => {s+=&x.to_string();}
-      Punct(x) => {s+="[";s+=&x.to_string();s+="]";}
-      Literal(x) => {s+="(";s+=&x.to_string();s+=")";}
+      Punct(x) => {s+=&x.to_string();}
+      Literal(x) => {s+=&x.to_string();}
     }
   }
+  s.retain(|c|"0123456789abcdefABCDEF+-.p".contains(c));
   let v = parse_hex_f64s(&s);
-  let mut res;
-  // TODO: clean up this garbage
-  match constructor_form {
-    Some((n,id)) => {
-      res = format!("{}(", id);
-      for i in 0..n {
-        if i != 0 { res += ","; }
-        res += &format!("{:e}", v[i]);
+  let res =
+    match constructor_form {
+      Some((n,id)) => {
+        format!("{}({})",
+          id,
+          &(v.iter().take(n).map(|x|format!("{:e}",x)).collect::<Vec<String>>().join(","))
+        )
       }
-      res += ")";
-    }
-    None => { res = format!("{:?}",v); }
-  }
+      None => { format!("{:?}",v) }
+    };
   res.parse().unwrap()
 }
 
@@ -94,26 +92,9 @@ fn hex(c:char) -> u8 {
 }
 
 // TODO: optional initial sign!
-fn parse_hex_f64s(s_in:&str) -> Vec<f64> {
+fn parse_hex_f64s(s:&str) -> Vec<f64> {
   let digits;
   let exp : isize;
-  let s;
-  let negative;
-  // TODO: this is too rigid and mostly doesn't work
-  match s_in.chars().next() {
-    Some('+') => {
-      negative = false;
-      s = &s_in[1..];
-    }
-    Some('-') => {
-      negative = true;
-      s = &s_in[1..];
-    }
-    _ => {
-      negative = false;
-      s = s_in;
-    }
-  }
   if let Some((ds,es)) = s.split_once('p') {
     exp = es.parse().unwrap();
     digits = ds;
@@ -121,7 +102,7 @@ fn parse_hex_f64s(s_in:&str) -> Vec<f64> {
     exp = 0;
     digits = s;
   }
-  let (bs,o) = string_to_bytes(digits);
+  let (bs,o,negative) = string_to_bytes(digits);
   let mut exp = exp + (o as isize) - 1;
   let mut start = 0;
   let mut fs = Vec::with_capacity(1 + o/6);
@@ -158,7 +139,8 @@ fn parse_bytes_f64(bytes:&[u8], exp:isize, start:usize) -> (f64,usize) {
 
 // isize = shift in bits from beginning of string to decimal point = starting binary exponent...
 // expects a string of the form h*(.h*)?
-fn string_to_bytes(s:&str) -> (Vec<u8>,usize) {
+fn string_to_bytes(s:&str) -> (Vec<u8>,usize,bool) {
+  let negative = s.contains('-'); // TODO: pretty hacky, negative sign can be anywhere...
   let dp = if let Some(x)=s.find('.') {x} else {s.len()};
   let (predigs,postdigs) = s.split_at(dp);
   let predigs : Vec<u8> = predigs.chars().map(|c|hex(c)).collect();
@@ -185,6 +167,6 @@ fn string_to_bytes(s:&str) -> (Vec<u8>,usize) {
       arr[pren + postn - 1] = postdigs[postdigs.len()-1] << 4;
     }
   }
-  (arr,pren*8)
+  (arr,pren*8,negative)
 }
 

@@ -1,3 +1,5 @@
+use sf_hex_float::hexf;
+
 pub trait Airy : Sized {
   fn airy_ai(self) -> Self;
   fn airy_bi(self) -> Self;
@@ -10,9 +12,18 @@ pub trait Airy : Sized {
 
 pub trait AiryConstants {
   const AI_0  : Self;  // =  sf_exp(-sf_log(3)*2/3 - sf_lngamma(2/3))
+  const AI_0_DIGITS : &'static str = 
+    "0.5ae31e589c56e17a96d7bb04e64f6da97ab1006b26f9eb6421233394220b8457047cb9557c9f3b43d25";
   const DAI_0 : Self;  // = -sf_exp(-sf_log(3)*1/3 - sf_lngamma(1/3))
+  const DAI_0_DIGITS : &'static str =
+    "-0.4241fd0adc3e2a2eba6fca5021d9ee1e6a31f0935d3a8b0fa6c28c3a9c0b546160e3c53e9e70f05d7ec";
   const BI_0  : Self;  // =  sf_exp(-sf_log(3)*1/6 - sf_lngamma(2/3))
+  const BI_0_DIGITS : &'static str =
+    "0.9d6bd4da51f54baaecb6804cf7a2ebed9295e0411ef5e1837c243549c5f62ba6b264f543ab24817a527";
   const DBI_0 : Self;  // =  sf_exp( sf_log(3)*1/6 - sf_lngamma(1/3))
+  const DBI_0_DIGITS : &'static str =
+    "0.72c3069a0322822c217efc48899a487ad1b3abb9b4b8f6e55fe15334ba584999b84b702b5d6bdcaf4bd";
+
 }
 
 pub mod impls {
@@ -42,15 +53,14 @@ impl AiryConstants for c64 {
 }
 
 impl AiryConstants for Wide {
-  // TODO: procmacro to do all this at compile time!
-  //const AI_0  : Wide =  "0.3550280538878172392600631860041831763980".parse().unwrap();
-  //const DAI_0 : Wide = "-0.2588194037928067984051835601892039634791".parse().unwrap();
-  //const BI_0  : Wide =  "0.6149266274460007351509223690936135535947".parse().unwrap();
-  //const DBI_0 : Wide =  "0.4482883573538263579148237103988283908662".parse().unwrap();
-  const AI_0  : Wide = Wide( 3.550280538878172e-1, 2.0523363243621203e-17);
-  const DAI_0 : Wide = Wide(-2.588194037928068e-1, 2.522243111610832e-17);
-  const BI_0  : Wide = Wide( 6.149266274460007e-1, 5.089920779489141e-17);
-  const DBI_0 : Wide = Wide( 4.482883573538264e-1,-2.5363237774417318e-17);
+  const AI_0 : Wide = hexf!(:2:Wide:
+    "0.5ae31e589c56e17a96d7bb04e64f6da97ab1006b26f9eb6421233394220b8457047cb9557c9f3b43d25");
+  const DAI_0 : Wide = hexf!(:2:Wide:
+    "-0.4241fd0adc3e2a2eba6fca5021d9ee1e6a31f0935d3a8b0fa6c28c3a9c0b546160e3c53e9e70f05d7ec");
+  const BI_0 : Wide = hexf!(:2:Wide:
+    "0.9d6bd4da51f54baaecb6804cf7a2ebed9295e0411ef5e1837c243549c5f62ba6b264f543ab24817a527");
+  const DBI_0 : Wide = hexf!(:2:Wide:
+    "0.72c3069a0322822c217efc48899a487ad1b3abb9b4b8f6e55fe15334ba584999b84b702b5d6bdcaf4bd");
 }
 
 // TODO: need methods for intermediate cases (and generally more accurate approach)
