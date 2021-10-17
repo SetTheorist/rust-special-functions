@@ -8,13 +8,19 @@ edition = "2018"
 once_cell = "*"
 paste = "*"
 log = "*"
+
 #for applications:
 simple_logger = "*"
 
 plotlib = "*"
-
 #plotters = "*"
 #cbindgen = "*"
+
+[dependencies.sf_hex_float]
+path = "../sf_hex_float"
+
+
+########################################
 
 #for eigenvalue calcs:
 #nalgebra = "*"

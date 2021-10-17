@@ -1,33 +1,58 @@
+#![allow(dead_code)]
 use proc_macro::TokenStream;
 use proc_macro::TokenTree::*;
 
 // TODO: rounding-modes?
 
 #[proc_macro]
-pub fn hfloats(item:TokenStream) -> TokenStream {
+// hexf!(:3:f:"3.243f6")
+// hexf!(3.243f6)
+// hexf!("3.243f6")
+pub fn hexf(item:TokenStream) -> TokenStream {
+  let mut item = item.into_iter().peekable();
+  let constructor_form;
+  if let Some(Punct(x)) = item.peek() {
+    if x.to_string() == ":" {
+      item.next(); // consume ":"
+      let n : usize = item.next().unwrap().to_string().parse().unwrap();
+      item.next(); // consume ":"
+      let id = { 
+        match item.next() {
+          Some(Ident(x)) => { x.to_string() }
+          z => { panic!("Expected id not {:?}", z); }
+        }
+      };
+      constructor_form = Some((n,id));
+    } else {
+      constructor_form = None;
+    }
+  } else {
+    constructor_form = None;
+  }
   let mut s = String::new();
   for it in item {
     match it {
       Group(x) => {panic!("Unexpected group token {}", x.to_string());}
       Ident(x) => {s+=&x.to_string();}
-      Punct(x) => {s+=&x.to_string();}
-      Literal(x) => {s+=&x.to_string();}
+      Punct(x) => {s+="[";s+=&x.to_string();s+="]";}
+      Literal(x) => {s+="(";s+=&x.to_string();s+=")";}
     }
   }
   let v = parse_hex_f64s(&s);
-  /*
-  let mut s = String::new();
-  s += "[";
-  let mut first = true;
-  for x in v.into_iter() {
-    if !first { s += ","; }
-    first = false;
-    s += &format!("{:e}", x);
+  let mut res;
+  // TODO: clean up this garbage
+  match constructor_form {
+    Some((n,id)) => {
+      res = format!("{}(", id);
+      for i in 0..n {
+        if i != 0 { res += ","; }
+        res += &format!("{:e}", v[i]);
+      }
+      res += ")";
+    }
+    None => { res = format!("{:?}",v); }
   }
-  s += "]";
-  */
-  let s = format!("f({},{})", v[0], v[1]);
-  s.parse().unwrap()
+  res.parse().unwrap()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +99,7 @@ fn parse_hex_f64s(s_in:&str) -> Vec<f64> {
   let exp : isize;
   let s;
   let negative;
+  // TODO: this is too rigid and mostly doesn't work
   match s_in.chars().next() {
     Some('+') => {
       negative = false;

@@ -235,6 +235,8 @@ mod zeta;
 use std::str::FromStr;
 use std::time::Instant;
 
+use sf_hex_float::hexf;
+
 //use crate::kahan::{*};
 //use crate::num::complex::{Complex};
 use crate::algorithm::*;
@@ -2171,5 +2173,10 @@ fn main() {
     test_erf();
     test_gamma();
   }
+
+  println!("{:?}", hexf!("3.243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89452821e638d01377be"));
+  use crate::wide::Wide;
+  const PI : Wide = hexf!(:2:Wide:"3.243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89452821e638d01377be");
+  println!("{}", PI);
 }
 

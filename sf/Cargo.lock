@@ -241,8 +241,13 @@ dependencies = [
  "once_cell",
  "paste",
  "plotlib",
+ "sf_hex_float",
  "simple_logger",
 ]
+
+[[package]]
+name = "sf_hex_float"
+version = "0.1.0"
 
 [[package]]
 name = "simple_logger"
