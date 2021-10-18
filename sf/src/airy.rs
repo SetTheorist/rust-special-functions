@@ -1,4 +1,5 @@
 use sf_hex_float::hexf;
+macro_rules! Wide { ($x:tt) => { hexf!(:2:Wide:$x) } }
 
 pub trait Airy : Sized {
   fn airy_ai(self) -> Self;
@@ -53,14 +54,14 @@ impl AiryConstants for c64 {
 }
 
 impl AiryConstants for Wide {
-  const AI_0 : Wide = hexf!(:2:Wide:
-    "0.5ae31e589c56e17a96d7bb04e64f6da97ab1006b26f9eb6421233394220b8457047cb9557c9f3b43d25");
-  const DAI_0 : Wide = hexf!(:2:Wide:
-    "-0.4241fd0adc3e2a2eba6fca5021d9ee1e6a31f0935d3a8b0fa6c28c3a9c0b546160e3c53e9e70f05d7ec");
-  const BI_0 : Wide = hexf!(:2:Wide:
-    "0.9d6bd4da51f54baaecb6804cf7a2ebed9295e0411ef5e1837c243549c5f62ba6b264f543ab24817a527");
-  const DBI_0 : Wide = hexf!(:2:Wide:
-    "0.72c3069a0322822c217efc48899a487ad1b3abb9b4b8f6e55fe15334ba584999b84b702b5d6bdcaf4bd");
+  const AI_0 : Wide =
+    Wide!("0.5ae31e589c56e17a96d7bb04e64f6da97ab1006b26f9eb6421233394220b8457047cb9557c9f3b43d25");
+  const DAI_0 : Wide =
+    Wide!("-0.4241fd0adc3e2a2eba6fca5021d9ee1e6a31f0935d3a8b0fa6c28c3a9c0b546160e3c53e9e70f05d7ec");
+  const BI_0 : Wide =
+    Wide!("0.9d6bd4da51f54baaecb6804cf7a2ebed9295e0411ef5e1837c243549c5f62ba6b264f543ab24817a527");
+  const DBI_0 : Wide =
+    Wide!("0.72c3069a0322822c217efc48899a487ad1b3abb9b4b8f6e55fe15334ba584999b84b702b5d6bdcaf4bd");
 }
 
 // TODO: need methods for intermediate cases (and generally more accurate approach)
@@ -77,7 +78,7 @@ impl Airy for r64 {
     }
   }
   fn airy_bi(self) -> Self {
-    if self >= ι(30) {
+    if self >= ι(80) {
       bi_asympt_pos(self) // TODO: (?) when is this preferred to series?
       //airy_series(self).1
     } else if self <= ι(-7) {
@@ -112,7 +113,7 @@ pub fn aibi_1<V:Value>(z:V) -> V {
     term *= z3 * (n*3-2) / ((n*3)*(n*3-1)*(n*3-2));
     let old_res = res;
     res += term;
-    if res == old_res { break; }
+    if res == old_res {break;}
   }
   res
 }
@@ -126,7 +127,7 @@ pub fn aibi_2<V:Value>(z:V) -> V {
     term *= z3 * (n*3-1) / ((n*3+1)*(n*3)*(n*3-1));
     let old_res = res;
     res += term;
-    if res == old_res { break; }
+    if res == old_res {break;}
   }
   res
 }
@@ -282,17 +283,12 @@ pub fn ai_integ_pos<V:Value+Exp>(z:V) -> V {
   sum * sf_exp(-ζ) * ζ.nth_root(-6) * ig56
 }
 
-
 pub fn ai_integ_pos__wide(z:Wide) -> Wide {
   // 1/(\sqrt{\pi} 48^{1/6} \Gamma(5/6))
-  let ig56 : Wide = "0.2621839970883229496786247788550868016857".parse().unwrap();
+  const ig56 : Wide = Wide!("0.431e7d8d0766671c5141a22d6491f3fd1dc7fc5358");
   let ζ = z*z.sqrt()*2/3;
   let mut sum = Wide::zero;
-  for (x,w) in
-    crate::integration::GAUSS_LAGUERRE_41__MINUS16_XW__STRING
-    .iter()
-    .map(|(x,w)|(x.parse().unwrap():Wide, w.parse().unwrap():Wide))
-  {
+  for (x,w) in crate::integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE {
     sum += w*(x/ζ + 2).nth_root(-6);
   }
   sum * (-ζ).exp() * ζ.nth_root(-6) * ig56

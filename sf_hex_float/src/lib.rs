@@ -42,6 +42,7 @@ pub fn hexf(item:TokenStream) -> TokenStream {
   let v = parse_hex_f64s(&s);
   let res =
     match constructor_form {
+      // TODO: if n<v.size() ...
       Some((n,id)) => {
         format!("{}({})",
           id,
@@ -96,7 +97,7 @@ fn parse_hex_f64s(s:&str) -> Vec<f64> {
   let digits;
   let exp : isize;
   if let Some((ds,es)) = s.split_once('p') {
-    exp = es.parse().unwrap();
+    exp = 4 * es.parse::<isize>().unwrap();
     digits = ds;
   } else {
     exp = 0;

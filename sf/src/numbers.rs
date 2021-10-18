@@ -53,6 +53,7 @@ pub fn sf_bernoulli_number_approx(n: usize) -> f64 {
     val
   }
 }
+
 use crate::real::r64;
 use crate::traits::*;
 use crate::zeta::sf_zeta_approx;

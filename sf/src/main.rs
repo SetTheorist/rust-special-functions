@@ -259,15 +259,19 @@ use crate::real::*;
 use crate::theta::*;
 use crate::traits::*;
 use crate::trig::*;
+use crate::wide::{Wide};
 
 fn rel(ex: f64, ap: f64) -> f64 {
   let ε = f64::EPSILON;
   let l10 = 10.0_f64.ln();
-  if ex == ap {
+  let res = if ex == ap {
     ε.ln()/l10 - 1.0
   } else {
-    ((ex - ap).abs() / (ε*ε + ex.abs())).ln() / l10
-  }
+    // TODO
+    //((ap - ex).abs() / (ε*ε + ex.abs())).ln() / l10
+    ((ap - ex).abs() / ex.abs()).ln() / l10
+  };
+  if !res.is_finite() {0.0} else {res}
 }
 
 // literate programming?〚 〛
@@ -358,14 +362,25 @@ fn test_airy() {
       .colour("#119999")
       .size(0.75));
 
+  let tk = t.iter().map(|&(x,ax,_)|{
+    let apx = airy::impls::ai_asympt_pos(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
+    .collect::<Vec<_>>();
+  let dat_k = plotlib::repr::Plot::new(tk)
+    .point_style(
+      plotlib::style::PointStyle::new()
+      .marker(plotlib::style::PointMarker::Circle)
+      .colour("#DDDD11")
+      .size(0.75));
+
   let v = plotlib::view::ContinuousView::new()  
     .add(dat_a)
     .add(dat_b)
     .add(dat_i)
     .add(dat_j)
+    .add(dat_k)
     .y_range(lo, hi)
     .x_label("x")
-    .y_label("Airy Ai(x),Bi(x) relative error");
+    .y_label("Airy Ai(x) (blue) &amp; Bi(x) (red) relative error");
   plotlib::page::Page::single(&v).save("airy_real_error.svg").expect("saving svg");
 }
 fn test_dilog() {
@@ -524,6 +539,7 @@ fn doplots() -> Result<(),Box<dyn std::error::Error>> {
 }
 */
 
+macro_rules! Wide { ($x:tt) => { hexf!(:2:Wide:$x) } }
 fn main() {
   ::simple_logger::SimpleLogger::new().init().unwrap();
 
@@ -2152,6 +2168,7 @@ fn main() {
     println!("Ai(20) = {}", airy::impls::ai_integ_pos__wide(wide::Wide(20.0,0.0)));
     println!("Ai(20) = {:e}", airy::sf_airy_ai(r64(20.0)));
     println!("Ai(20) ~ {:e}", airy::impls::ai_asympt_pos(r64(20.0)));
+    println!("Ai(20) ~ {}", airy::impls::ai_asympt_pos(Wide(20.0,0.0)));
     println!();
     println!("Ai(-1) = {:e}", airy::sf_airy_ai(r64(-1.0)));
     println!("Ai(-5) = {:e}", airy::sf_airy_ai(r64(-5.0)));
@@ -2173,9 +2190,27 @@ fn main() {
     test_erf();
     test_gamma();
   }
-  println!("{}", wide::Wide::E);
-  println!("{}", wide::Wide::FRAC_1_E);
-  println!("{}", wide::Wide::PI);
-  println!("{}", wide::Wide::FRAC_1_PI);
+  println!("{}  {}", integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[0].0, integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[0].1);
+  println!("{}  {}", integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[40].0, integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[40].1);
+  println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p1"));
+  println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p3"));
+  println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p-3"));
+  println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p-1"));
+
+  time!({for i in 0..100{airy::impls::ai_integ_pos__wide(wide::Wide(20.0+(i as f64/1024.0),0.0));}()});
+  time!({for i in 0..100{airy::impls::ai_asympt_pos(wide::Wide(20.0+(i as f64/1024.0),0.0));}()});
+
+  println!("{}", zeta::impls::zeta_series_em9(wide::Wide(2.0,0.0), Wide::epsilon));
+  println!("{}", zeta::impls::zeta_series_em9(wide::Wide(2.5,0.0), Wide::epsilon));
+  println!("{}", wide::Wide::LOG2);
+  println!("log(1/2)={}", (wide::Wide(0.5,0.0)).log());
+  println!("log(3/2)={}", (wide::Wide(1.5,0.0)).log());
+  println!("log(2)={}", (wide::Wide(2.0,0.0)).log());
+  println!("log(5)={}", (wide::Wide(5.0,0.0)).log());
+  println!("log(25)={}", (wide::Wide(25.0,0.0)).log());
+  println!("{:?}", crate::algorithm::frexp1(2.0));
+  println!("{:?}", crate::algorithm::frexp1(3.0));
+  println!("{:?}", crate::algorithm::frexp1(5.0));
+  println!("{:?}", crate::algorithm::frexp1(16.0));
 }
 

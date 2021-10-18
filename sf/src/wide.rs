@@ -1,8 +1,10 @@
 use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 use std::ops::{AddAssign, DivAssign, MulAssign, RemAssign, SubAssign};
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
-use sf_hex_float::hexf;
 
+use crate::traits::*;
+
+use sf_hex_float::hexf;
 macro_rules! Wide { ($x:tt) => { hexf!(:2:Wide:$x) } }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, PartialOrd)] // Eq,Ord
@@ -196,6 +198,11 @@ impl Wide {
     x
   }
 
+  // TODO: hack implementation
+  pub fn powf(self, e:Wide) -> Wide {
+    (e * self.log()).exp()
+  }
+
   #[inline]
   pub fn scale2(self, i: isize) -> Wide {
     // TODO: replace with ldexp() functionality
@@ -252,6 +259,12 @@ impl Wide {
     }
   }
 
+  pub fn log(self) -> Wide {
+    let (m0,e0) = crate::algorithm::frexp1(self.0);
+    let x = Wide(m0, self.1.ldexp(-e0)) - 1;
+    let terms = (2..).map(|n: isize| (x * (n>>1).sqr(), ι(n)));
+    Wide::LOG2*e0 + (x / crate::algorithm::contfrac_modlentz(ι(1), terms, Wide::epsilon))
+  }
 }
 
 impl Add<Wide> for Wide {
@@ -519,7 +532,6 @@ impl std::fmt::Display for Wide {
   }
 }
 
-use crate::traits::*;
 impl Base for Wide {}
 impl Zero for Wide {
   const zero: Wide = Wide(0.0, 0.0);
@@ -543,6 +555,11 @@ impl Roots for Wide {
   fn cbrt(self) -> Self { self.cbrt() }
   #[inline]
   fn nth_root(self, n: isize) -> Self { self.nth_root(n) }
+}
+
+impl Power for Wide {
+  #[inline]
+  fn pow(self, e:Self) -> Self { self.powf(e) }
 }
 
 impl Constants for Wide {

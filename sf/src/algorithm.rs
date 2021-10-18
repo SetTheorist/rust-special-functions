@@ -1,8 +1,22 @@
 use crate::traits::*;
 
+pub fn frexp1(x:f64) -> (f64, isize) {
+  if x.is_zero() || x.is_infinite() || x.is_nan() {
+    (x, 0)
+  } else if x.is_subnormal() {
+    // TODO: subnormals
+    todo!()
+  } else {
+    let b = x.to_bits();
+    let e = (((b>>52) & 0x7FF) as isize) - 1023;
+    let m = (b & !(0x7FF<<52)) | (1023<<52);
+    (f64::from_bits(m), e)
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
-pub fn power_u<T: Multiplication>(mut x: T, mut n: usize) -> T {
+pub fn power_u<T:Multiplication>(mut x:T, mut n:usize) -> T {
   let mut v = T::one;
   while n != 0 {
     if n % 2 == 1 {
@@ -14,7 +28,7 @@ pub fn power_u<T: Multiplication>(mut x: T, mut n: usize) -> T {
   v
 }
 
-pub fn power_i<T: Multiplication + Division>(x: T, n: isize) -> T {
+pub fn power_i<T:Multiplication+Division>(x:T, n:isize) -> T {
   if n < 0 {
     power_u(x, -n as usize).recip()
   } else {
@@ -35,7 +49,7 @@ pub fn powers<T>() -> impl Iterator<Item=T>
 */
 
 #[inline]
-pub fn cum_prods<T, I>(it: I) -> impl Iterator<Item = T>
+pub fn cum_prods<T, I>(it:I) -> impl Iterator<Item = T>
 where
   T: Multiplicative,
   I: Iterator<Item = T>,
@@ -47,7 +61,7 @@ where
 }
 
 #[inline]
-pub fn cum_prods_1<T, I>(it: I) -> impl Iterator<Item = T>
+pub fn cum_prods_1<T, I>(it:I) -> impl Iterator<Item = T>
 where
   T: Multiplicative,
   I: Iterator<Item = T>,
@@ -56,7 +70,7 @@ where
 }
 
 #[inline]
-pub fn cum_sums<T, I>(it: I) -> impl Iterator<Item = T>
+pub fn cum_sums<T, I>(it:I) -> impl Iterator<Item = T>
 where
   T: Additive,
   I: Iterator<Item = T>,
@@ -65,7 +79,7 @@ where
 }
 
 #[inline]
-pub fn cum_sums_0<T, I>(it: I) -> impl Iterator<Item = T>
+pub fn cum_sums_0<T, I>(it:I) -> impl Iterator<Item = T>
 where
   T: Additive,
   I: Iterator<Item = T>,
@@ -76,14 +90,14 @@ where
 ////////////////////////////////////////////////////////////////////////////////
 
 #[inline]
-pub fn sum_series_<T, I>(it: I, ε: T::NT) -> T
+pub fn sum_series_<T, I>(it:I, ε:T::NT) -> T
 where
   T: Field + Normed,
   I: Iterator<Item = T>,
 {
   //cum_sums(it)
   it.scan(T::zero, |s, a| { *s += a; Some(*s) })
-    .scan(ι(f64::NAN): T,
+    .scan(ι(f64::NAN):T,
       |s, t| { if μ(*s - t) <= μ(*s) * ε { None } else { *s = t; Some(t) } })
     .take(1000)
     .last()
@@ -92,7 +106,7 @@ where
 
 // TODO: "wrapped" version (generic over Kahan, e.g.)
 #[inline]
-pub fn sum_series<T, I>(it: I, ε: T::NT) -> T
+pub fn sum_series<T, I>(it:I, ε:T::NT) -> T
 where
   T: Field + Normed,
   I: Iterator<Item = T>,
@@ -113,7 +127,7 @@ where
 // b0 + a1/(b1 + a2/(b2 + a3/(b3 + ...)))
 // (based on modified Lentz)
 #[inline]
-pub fn contfrac_modlentz<T,I>(b0: T, it: I, ε: T::NT) -> T
+pub fn contfrac_modlentz<T,I>(b0:T, it:I, ε:T::NT) -> T
 where
   T: Field + Normed,
   I: IntoIterator<Item=(T,T)>,
@@ -130,7 +144,7 @@ where
     dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
-    if μ(deltaj - 1) < ε || n > 1000 { break; }
+    if μ(deltaj - 1) < ε || n > 1000 {break;}
     n += 1;
   }
   fj
