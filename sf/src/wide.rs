@@ -742,4 +742,6 @@ impl Bounded for Wide {
 }
 
 impl Value for Wide {}
+//impl RealType for Wide { type CT = c64; }
+
 

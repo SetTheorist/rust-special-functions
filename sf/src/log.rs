@@ -21,6 +21,13 @@ pub fn sf_log_1p<V: Log>(x: V) -> V { x.log_1p() }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+use crate::wide::*;
+impl Log for Wide {
+  #[inline] fn log(self) -> Self { self.log() }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 pub mod impls {
   use crate::algorithm::{contfrac_modlentz, sum_series, sum_series_};
   use crate::traits::*;

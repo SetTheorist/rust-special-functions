@@ -184,7 +184,7 @@ pub fn sf_trunc<V:Ordered>(a:V) -> V { a.trunc() }
 pub fn sf_rint<V:Ordered>(a:V) -> isize { a.rint() }
 
 pub trait Normed: Base + From<Self::NT> {
-  type NT: Field + Ordered;
+  type NT: Field + Ordered + Constants;
   const epsilon: Self::NT;
   fn abs(self) -> Self::NT;
   fn vabs(self) -> Self;
@@ -226,7 +226,7 @@ pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT>
   fn root_of_unity(n:isize) -> Self;
 }
 
-pub trait RealType: Base + Normed<NT = Self> + Ordered {
+pub trait RealType: Base + Normed + Ordered {
   type CT: ComplexValue<RT=Self>;
 }
 

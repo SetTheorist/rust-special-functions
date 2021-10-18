@@ -42,23 +42,23 @@ pub trait IncompleteGamma {
 // TODO: quick and dirty for now
 // TODO: need to get good implementation!
 use crate::real::*;
+use crate::wide::*;
 use crate::log::{sf_log, Log};
 use crate::exp::{sf_exp, Exp};
 use crate::traits::Constants;
-use crate::trig::{sf_cos, sf_sin};
+use crate::trig::*;
 impl Gamma for r64 {
   fn gamma(self) -> Self {
     if self < ι(0.5) {
       // gamma(z) = pi/(sin(pi*z) * gamma(1-z))
-      return r64::PI / (sf_sin(self * r64::PI) * (1 - self).gamma());
+      return r64::PI / (sf_sin_pix(self) * (1 - self).gamma());
     }
     //sf_exp(impls::lngamma_lanczos_15(self)) // TODO: this has terrible accuracy?!
     //sf_exp(impls::lngamma_lanczos_11(self)) // TODO: this has terrible accuracy?!
     let mut mult = r64(1.0);
     let mut x = self;
     //while x > r64(8.0)
-    while x > r64(3.0)
-    {
+    while x > r64(3.0) {
       x = x - 1.0;
       mult *= x;
     }
@@ -71,6 +71,32 @@ impl Gamma for r64 {
   }
   fn digamma(self) -> Self {
     impls::digamma(self)
+  }
+  fn beta(self, b:Self) -> Self {
+    sf_exp(self.lngamma() + b.lngamma() - (self+b).lngamma())
+  }
+}
+
+impl Gamma for Wide {
+  fn gamma(self) -> Self {
+    if self < ι(0.5) {
+      //return Wide::PI / (sf_sin_pix(self) * (1 - self).gamma());
+      todo!()
+    }
+    let mut mult = Self::one;
+    let mut x = self;
+    while x > ι(3):Wide {
+      x = x - 1.0;
+      mult *= x;
+    }
+    mult * impls::gamma_spouge(29, x)
+  }
+  fn lngamma(self) -> Self {
+    sf_log(impls::gamma_spouge(29, self)) // TODO
+  }
+  fn digamma(self) -> Self {
+    //impls::digamma(self)
+    todo!()
   }
   fn beta(self, b:Self) -> Self {
     sf_exp(self.lngamma() + b.lngamma() - (self+b).lngamma())

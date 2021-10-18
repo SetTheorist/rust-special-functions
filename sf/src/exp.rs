@@ -187,7 +187,7 @@ pub mod impls {
   #[inline]
   pub fn range_reduce_ln2<V: RealValue + Ordered>(x: V) -> (V, isize) {
     // range-reduce
-    let n: isize = (x.abs() / V::LOG2).floor().rint();
+    let n: isize = (x.abs() / V::NT::LOG2).floor().rint();
     // TODO: use Kahan/compensated idea to return 2 floats to get exact diff
     let r: V = x - V::LOG2 * n;
     (r, n)

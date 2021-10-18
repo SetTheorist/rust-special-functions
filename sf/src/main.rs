@@ -260,6 +260,7 @@ use crate::theta::*;
 use crate::traits::*;
 use crate::trig::*;
 use crate::wide::{Wide};
+use crate::zeta::*;
 
 fn rel(ex: f64, ap: f64) -> f64 {
   let ε = f64::EPSILON;
@@ -2202,15 +2203,14 @@ fn main() {
 
   println!("{}", zeta::impls::zeta_series_em9(wide::Wide(2.0,0.0), Wide::epsilon));
   println!("{}", zeta::impls::zeta_series_em9(wide::Wide(2.5,0.0), Wide::epsilon));
-  println!("{}", wide::Wide::LOG2);
-  println!("log(1/2)={}", (wide::Wide(0.5,0.0)).log());
-  println!("log(3/2)={}", (wide::Wide(1.5,0.0)).log());
-  println!("log(2)={}", (wide::Wide(2.0,0.0)).log());
-  println!("log(5)={}", (wide::Wide(5.0,0.0)).log());
-  println!("log(25)={}", (wide::Wide(25.0,0.0)).log());
-  println!("{:?}", crate::algorithm::frexp1(2.0));
-  println!("{:?}", crate::algorithm::frexp1(3.0));
-  println!("{:?}", crate::algorithm::frexp1(5.0));
-  println!("{:?}", crate::algorithm::frexp1(16.0));
+  println!("{}", sf_zeta(r64(2.5)));
+  println!("{}", sf_zeta(r64(-2.5)));
+
+  let g = Wide!("3.52c72113340e7fa44eea99d90fbb4977cab1e7e51");
+  println!("{}", g);
+  println!("{}", sf_gamma(r64(3.5)));
+  println!("{}", sf_gamma(Wide(3.5,0.0)));
+  println!("{}", sf_exp(gamma::impls::lngamma_lanczos_11(Wide(3.5,0.0))));
+  println!("{}", sf_exp(gamma::impls::lngamma_lanczos_15(Wide(3.5,0.0))));
 }
 

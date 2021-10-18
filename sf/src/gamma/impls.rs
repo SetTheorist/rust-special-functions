@@ -13,7 +13,7 @@ use super::*;
 pub fn digamma<V:RealValue+Float+Log+Trig>(z:V) -> V {
   if z.is_nonposint() {
     V::infinity
-  } else if abs(z)<=ι(10):V {
+  } else if abs(z)<=ι(10):V::NT {
     digamma_series(z)
   } else {
     digamma_asympt(z)
@@ -104,14 +104,16 @@ pub fn beta_inc_contfrac<V:RealValue+Power+Gamma>(x:V, a:V, b:V) -> V {
 //
 #[inline]
 fn spouge_c<V:Value+Exp+Power>(k: isize, a: V) -> V {
-  (ι(1):V / sf_factorial_approx((k-1) as usize)).pari(k+1) * (a-k).pow(ι(k):V - 0.5) * sf_exp(a-k)
+  (a-k).pow(k) * (a-k).sqrt_recip() * sf_exp(a-k)
 }
 pub fn gamma_spouge<V:Value+Exp+Power>(a: isize, z: V) -> V {
   let z = z - 1;
-  let res: V = (z + a).pow(z + 0.5) * sf_exp(-(z + a));
-  let mut sm: V = V::SQRT2PI;
+  let res : V = (z + a).pow(z + 0.5) * sf_exp(-(z + a));
+  let mut sm : V = V::SQRT2PI;
+  let mut fact : V = V::one;
   for k in 1..=(a - 1) {
-    sm += spouge_c(k, ι(a)):V / (z + k);
+    sm += spouge_c(k, ι(a)):V / fact / (z + k);
+    fact *= ι(-k):V;
   }
   res * sm
 }

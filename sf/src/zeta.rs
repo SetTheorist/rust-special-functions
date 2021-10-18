@@ -1,18 +1,44 @@
 use crate::traits::*;
 
-pub trait Zeta: Value {
+pub trait Zeta {
   fn zeta(self) -> Self;
   fn zeta_m1(self) -> Self;
 }
+#[inline] pub fn sf_zeta<V:Value+Zeta>(z:V) -> V { z.zeta() }
+#[inline] pub fn sf_zeta_m1<V:Value+Zeta>(z:V) -> V { z.zeta_m1() }
 
-pub trait HurwitzZeta: Value {
+pub trait HurwitzZeta {
   fn hurwitz_zeta(self, a:Self) -> Self;
 }
+#[inline] pub fn sf_hurwitz_zeta<V:Value+HurwitzZeta>(z:V, a:V) -> V { z.hurwitz_zeta(a) }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-use crate::real::r64;
-pub fn sf_zeta_approx(n: usize) -> f64 { impls::zeta_series_em9(ι(n as isize): r64, r64::epsilon).0 }
+use crate::real::*;
+use crate::gamma::*;
+use crate::trig::*;
+pub fn sf_zeta_approx(n: usize) -> f64 {
+  impls::zeta_series_em9(ι(n as isize):r64, r64::epsilon).0
+}
+
+impl Zeta for r64 {
+  fn zeta(self) -> Self {
+    let z = self;
+    if z < ι(0.5) {
+      (1-z).zeta() * 2 * (r64::PI*2).pow(z-1)*sf_sin_pix(z/2)*sf_gamma(1-z)
+    } else {
+      impls::zeta_series_em9(z, Self::epsilon)
+    }
+  }
+  fn zeta_m1(self) -> Self {
+    let z = self;
+    if z > ι(1.7) {
+      impls::zeta_m1_series_em9(z, Self::epsilon)
+    } else {
+      z.zeta() - 1.0
+    }
+  }
+}
 
 pub mod impls {
   use crate::traits::*;

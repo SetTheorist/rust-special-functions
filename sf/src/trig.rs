@@ -19,7 +19,7 @@ pub trait Trig: Value+Constants {
   // havercosine
   fn hvcos(self) -> Self{ (self/2).cos().sqr() }
   // cos(pi*x)
-  fn cos_pix(self) -> Self { (self*Self::PI).cos() }
+  fn cos_pix(self) -> Self { ((self % ι(2):Self)*Self::PI).cos() }
   // cos(x) - 1
   fn cos_m1(self) -> Self { self.cos() - 1 }
 
@@ -31,7 +31,7 @@ pub trait Trig: Value+Constants {
   // haversine
   fn hvsin(self) -> Self { (self/2).sin().sqr() }
   // sin(pi*x)
-  fn sin_pix(self) -> Self { (self*Self::PI).sin() }
+  fn sin_pix(self) -> Self { ((self % ι(2):Self)*Self::PI).sin() }
 
   fn cos_sin(self) -> (Self, Self) { (self.cos(), self.sin()) }
 
