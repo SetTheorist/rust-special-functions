@@ -209,6 +209,7 @@ mod ellint;
 mod erf;
 mod exp;
 mod expint;
+mod f128;
 mod f16;
 mod gamma;
 mod hypergeom;
@@ -247,6 +248,7 @@ use crate::dual::*;
 use crate::ellint::*;
 use crate::erf::{*};
 use crate::exp::*;
+use crate::f128::*;
 use crate::gamma::*;
 use crate::integration::Integrator;
 use crate::log::*;
@@ -2185,32 +2187,55 @@ fn main() {
     println!("Ai(-50) ~ {:e}", airy::impls::ai_asympt_neg(r64(-50.0)));
   }
 
-  if true {
+  if false {
     test_airy();
     test_dilog();
     test_erf();
     test_gamma();
   }
-  println!("{}  {}", integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[0].0, integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[0].1);
-  println!("{}  {}", integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[40].0, integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[40].1);
-  println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p1"));
-  println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p3"));
-  println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p-3"));
-  println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p-1"));
 
-  time!({for i in 0..100{airy::impls::ai_integ_pos__wide(wide::Wide(20.0+(i as f64/1024.0),0.0));}()});
-  time!({for i in 0..100{airy::impls::ai_asympt_pos(wide::Wide(20.0+(i as f64/1024.0),0.0));}()});
+  if false {
+    println!("{}  {}", integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[0].0, integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[0].1);
+    println!("{}  {}", integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[40].0, integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE[40].1);
+    println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p1"));
+    println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p3"));
+    println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p-3"));
+    println!("{}", Wide!("3.0000000000000000000000000000000000000000000000000000000000000000010p-1"));
 
-  println!("{}", zeta::impls::zeta_series_em9(wide::Wide(2.0,0.0), Wide::epsilon));
-  println!("{}", zeta::impls::zeta_series_em9(wide::Wide(2.5,0.0), Wide::epsilon));
-  println!("{}", sf_zeta(r64(2.5)));
-  println!("{}", sf_zeta(r64(-2.5)));
+    time!({for i in 0..100{airy::impls::ai_integ_pos__wide(wide::Wide(20.0+(i as f64/1024.0),0.0));}()});
+    time!({for i in 0..100{airy::impls::ai_asympt_pos(wide::Wide(20.0+(i as f64/1024.0),0.0));}()});
 
-  let g = Wide!("3.52c72113340e7fa44eea99d90fbb4977cab1e7e51");
-  println!("{}", g);
-  println!("{}", sf_gamma(r64(3.5)));
-  println!("{}", sf_gamma(Wide(3.5,0.0)));
-  println!("{}", sf_exp(gamma::impls::lngamma_lanczos_11(Wide(3.5,0.0))));
-  println!("{}", sf_exp(gamma::impls::lngamma_lanczos_15(Wide(3.5,0.0))));
+    println!("{}", zeta::impls::zeta_series_em9(wide::Wide(2.0,0.0), Wide::epsilon));
+    println!("{}", zeta::impls::zeta_series_em9(wide::Wide(2.5,0.0), Wide::epsilon));
+    println!("{}", sf_zeta(r64(2.5)));
+    println!("{}", sf_zeta(r64(-2.5)));
+
+    let g = Wide!("3.52c72113340e7fa44eea99d90fbb4977cab1e7e51");
+    println!("{}", g);
+    println!("{}", sf_gamma(r64(3.5)));
+    println!("{}", sf_gamma(Wide(3.5,0.0)));
+    println!("{}", sf_exp(gamma::impls::lngamma_lanczos_11(Wide(3.5,0.0))));
+    println!("{}", sf_exp(gamma::impls::lngamma_lanczos_15(Wide(3.5,0.0))));
+  }
+
+  if true {
+    let x = 1.0/3.0_f64;
+    let y = f128::f128::from_f64(x);
+    let z = f128::f128::to_f64(y);
+    println!("{}", x);
+    println!("{:?}", y);
+    println!("{}", z);
+    println!("{:?}", -y);
+    println!("{}", f128::f128::to_f64(-y));
+    println!("{:?}", y+y);
+    println!("{}", f128::f128::to_f64(y+y));
+    println!("{:?}", y+y+y);
+    println!("{}", f128::f128::to_f64(y+y+y));
+    println!("{:?}", (y+y)-y);
+    println!("{}", f128::f128::to_f64((y+y)-y));
+    println!("{:?}", y-(y+y));
+    println!("{}", f128::f128::to_f64(y-(y+y)));
+  }
+
 }
 
