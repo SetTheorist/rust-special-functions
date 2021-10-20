@@ -6,6 +6,8 @@ use std::ops::{Neg};
 pub struct f128(u128);
 // (1)(15)(112)
 
+////////////////////////////////////////////////////////////////////////////////
+
 const BIAS : i32 = 16384;
 const SGNB : u128 = 0x8000_0000_0000_0000__0000_0000_0000_0000;
 const EXPB : u128 = 0x7FFF_0000_0000_0000__0000_0000_0000_0000;
@@ -19,6 +21,7 @@ const NEGZERO : f128 = f128(SGNB);
 const NEGINFINITY : f128 = f128(SGNB|EXPB);
 const INFINITY : f128 = f128(EXPB);
 const NAN : f128 = f128(EXPB|(1<<111));
+const NEGNAN : f128 = f128(SGNB|EXPB|(1<<111));
 
 impl std::fmt::Debug for f128 {
   fn fmt(&self, f:&mut std::fmt::Formatter) -> std::fmt::Result {
@@ -88,6 +91,8 @@ impl f128 {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 impl Neg for f128 {
   type Output = f128;
   fn neg(self) -> f128 {
@@ -107,6 +112,47 @@ impl Sub for f128 {
   fn sub(self, rhs:f128) -> f128 {
     f128(sub(self.0, rhs.0))
   }
+}
+
+impl Mul for f128 {
+  type Output = f128;
+  fn mul(self, rhs:f128) -> f128 {
+    f128(mul(self.0, rhs.0))
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#[inline]
+fn split128(x:u128) -> (u64, u64) {
+  let hi = (x>>64) as u64;
+  let lo = x as u64;
+  (hi, lo)
+}
+
+fn mul2(a:u128, b:u128) -> (u128, u128) {
+  let (ah, al) = split128(a);
+  let (ah, al) = (ah as u128, al as u128);
+  let (bh, bl) = split128(b);
+  let (bh, bl) = (bh as u128, bl as u128);
+
+  let ahbh = ah * bh;
+  let ahbl = ah * bl;
+  let albh = al * bh;
+  let albl = al * bl;
+
+  let (mid, c) = ahbl.overflowing_add(albh);
+  let (midh, midl) = split128(mid);
+  let (midh, midl) = (midh as u128, midl as u128);
+  let hi = ahbh + (if c {1<<64} else {0});
+  let (lo,c) = albl.overflowing_add(midl<<64);
+  let hi = hi + midh + (if c {1} else {0});
+  (hi, lo)
+}
+
+#[inline]
+fn shr128(a:u128, b:u128, n:u32) -> (u128,u128) {
+  (a>>n, (b>>n)|(a<<(128-n)))
 }
 
 #[inline]
@@ -157,6 +203,10 @@ fn build(s:bool, e:i32, m:u128) -> u128 {
   } else {
     n = m & MANB;
   } 
+  if e + (15-z) + BIAS < 0 {
+    // TODO: subnormals
+    return s;
+  }
   let e = (((e + (15 - z)) + BIAS) as u128) << SHIFT;
   s | e | n
 }
@@ -186,8 +236,8 @@ pub fn neg(x:u128) -> u128 {
 #[inline]
 pub fn add(x:u128,y:u128) -> u128 {
   // TODO: cleanup the special cases
-  if x==0 { return y; }
-  if y==0 { return x; }
+  if f128(x).is_zero() { return y; }
+  if f128(y).is_zero() { return x; }
   if f128(x).is_nan() { return x; }
   if f128(y).is_nan() { return y; }
   match (f128(x).is_infinite(), f128(y).is_infinite()) {
@@ -215,8 +265,8 @@ pub fn add(x:u128,y:u128) -> u128 {
 #[inline]
 pub fn sub(x:u128,y:u128) -> u128 {
   // TODO: cleanup the special cases
-  if x==0 { return neg(y); }
-  if y==0 { return x; }
+  if f128(x).is_zero(){ return neg(y); }
+  if f128(y).is_zero(){ return x; }
   if f128(x).is_nan() { return x; }
   if f128(y).is_nan() { return neg(y); }
   match (f128(x).is_infinite(), f128(y).is_infinite()) {
@@ -255,4 +305,51 @@ pub fn sub(x:u128,y:u128) -> u128 {
   }
 }
 
+#[inline]
+pub fn mul(x:u128,y:u128) -> u128 {
+  let s = sign(x) ^ sign(y);
+
+  // TODO: cleanup the special cases
+  if f128(x).is_nan() { return x; }
+  if f128(y).is_nan() { return y; }
+  if f128(x).is_zero() {
+    if f128(y).is_infinite() {
+      return (if s {NEGNAN.0} else {NAN.0});
+    } else {
+      return (if s {SGNB} else {0});
+    }
+  }
+  if f128(y).is_zero() {
+    if f128(x).is_infinite() {
+      return (if s {NEGNAN.0} else {NAN.0});
+    } else {
+      return (if s {SGNB} else {0});
+    }
+  }
+  if f128(x).is_infinite() { return (if s {neg(x)} else {x}); }
+  if f128(y).is_infinite() { return (if s {neg(y)} else {y}); }
+
+  let mut e = exp(x) + exp(y) - 112;
+  let (mh,ml) = mul2(man(x), man(y));
+  let m;
+  if mh == 0 {
+    let z = ml.leading_zeros();
+    if z < 15-3 {
+      let n = 128 + (15-z) - 3;
+      e += (n as i32) + 3;
+      m = ml >> (15-z-3); // TODO: sticky bit!
+    } else {
+      let n = 128 + (15-z) - 3;
+      e += (n as i32) + 3;
+      m = ml << (z-15+3);
+    }
+  } else {
+    let z = mh.leading_zeros();
+    let n = (128 - z) + 15 - 3;
+    e += (n as i32) + 3;
+    (_,m) = shr128(mh,ml,n); // TODO: sticky bit!
+  }
+  let m = round(m) >> 3;
+  build(s, e, m)
+}
 

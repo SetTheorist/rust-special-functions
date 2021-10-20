@@ -2219,6 +2219,7 @@ fn main() {
   }
 
   if true {
+    println!("-----");
     let x = 1.0/3.0_f64;
     let y = f128::f128::from_f64(x);
     let z = f128::f128::to_f64(y);
@@ -2235,6 +2236,23 @@ fn main() {
     println!("{}", f128::f128::to_f64((y+y)-y));
     println!("{:?}", y-(y+y));
     println!("{}", f128::f128::to_f64(y-(y+y)));
+
+    println!("-----");
+    let x = 3.0_f64;
+    let x2 = 1.0/3.0_f64;
+    let y = f128::f128::from_f64(x);
+    let y2 = f128::f128::from_f64(x2);
+    println!("{:e}  {:?}", x, y);
+    println!("{:e}  {:?}", x2, y2);
+    let z = y * y2;
+    println!("{:?}  {:e}", z, f128::f128::to_f64(z));
+    let mut z = y2;
+    let mut yy = y2;
+    for _ in 0..60 {
+      z = z * yy;
+      yy = yy * y2;
+      println!("    {:?}  {:e}", z, f128::f128::to_f64(z));
+    }
   }
 
 }
