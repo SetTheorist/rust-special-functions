@@ -2248,11 +2248,33 @@ fn main() {
     println!("{:?}  {:e}", z, f128::f128::to_f64(z));
     let mut z = y2;
     let mut yy = y2;
-    for _ in 0..60 {
+    for _ in 0..40 {
       z = z * yy;
       yy = yy * y2;
       println!("    {:?}  {:e}", z, f128::f128::to_f64(z));
     }
+    println!("{:e}  {:?}", 1.5, f128::f128::from_f64(1.5));
+
+    let y1 = f128::f128::from_f64(10.0_f64.recip());
+    println!("{:?}", y1);
+    let y2 = f128::f128::from_f64(10.0_f64).recip();
+    println!("{:?}", y2);
+
+    let t = f128::f128::from_f64(3.0);
+    println!("{:?}", t);
+    println!("{:?}", y1*t);
+    println!("{:?}", y2*t);
+    println!("{:?}", (t+t+t)/t);
+    println!("{:?}", t/f128::f128::from_f64(7.0));
+
+    let q = (3.0_f64).sqrt();
+    let j = f128::f128::from_f64(q);
+    println!("{:?}", j);
+    println!("{:?}", t.sqrt());
+    println!("{:?}", j*j);
+    println!("{:?}", t.sqrt()*t.sqrt());
+
+    println!("{:?}", t.sqrt_recip());
   }
 
 }

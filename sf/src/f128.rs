@@ -2,13 +2,14 @@ use std::ops::{Add,Sub,Mul,Div};
 use std::ops::{AddAssign,SubAssign,MulAssign,DivAssign};
 use std::ops::{Neg};
 
+#[repr(transparent)]
 #[derive(Clone,Copy,Default)]
 pub struct f128(u128);
 // (1)(15)(112)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const BIAS : i32 = 16384;
+const BIAS : i32 = 16383;
 const SGNB : u128 = 0x8000_0000_0000_0000__0000_0000_0000_0000;
 const EXPB : u128 = 0x7FFF_0000_0000_0000__0000_0000_0000_0000;
 const MANB : u128 = 0x0000_FFFF_FFFF_FFFF__FFFF_FFFF_FFFF_FFFF;
@@ -84,10 +85,74 @@ impl f128 {
     let b = self.to_bits();
     if self.is_zero() { return if sign(b) {-0.0} else {0.0}; }
     let s = (signb(b) >> 64) as u64;
+    let e = exp(b) + 1023;
+    if e < 0 {
+      // TODO: subnormal
+      return f64::from_bits(s);
+    } else if e > 2047 {
+      return if sign(b) {f64::NEG_INFINITY} else {f64::INFINITY};
+    }
     let e = ((exp(b) + 1023) as u64) << 52;
     // TODO: rounding
     let m = ((man(b) >> 60) & 0x000F_FFFF_FFFF_FFFF) as u64;
     f64::from_bits(s|e|m)
+  }
+
+  pub fn recip(self) -> f128 {
+    f128(recip(self.0))
+  }
+
+  #[inline]
+  pub fn frexp(self) -> (f128, i32) {
+    let e = exp(self.0);
+    let f = f128((self.0&!EXPB)|((BIAS as u128)<<112));
+    (f, e)
+  }
+
+  #[inline]
+  fn mul2(self) -> f128 {
+    f128(self.0 + (1 << 112))
+  }
+  #[inline]
+  fn div2(self) -> f128 {
+    f128(self.0.wrapping_add(!0 << 112))
+  }
+
+  pub fn sqrt(self) -> f128 {
+    let (f_,e_) = self.frexp();
+    let f;
+    let e;
+    if e_%2==1 {
+      f = f_.mul2();
+      e = (e_-1)/2;
+    } else {
+      f = f_;
+      e = e_/2;
+    }
+    let z = f128::from_f64(f128::to_f64(f).sqrt());
+    let z = (z + f/z).div2();
+    let z = (z + f/z).div2();
+    let z = (z + f/z).div2();
+    f128(z.0.wrapping_add((e as u128) << 112))
+  }
+
+  pub fn sqrt_recip(self) -> f128 {
+    let three = f128(0x4000_8000_0000_0000__0000_0000_0000_0000);
+    let (f_,e_) = self.frexp();
+    let f;
+    let e;
+    if e_%2==1 {
+      f = f_.mul2();
+      e = -(e_-1)/2;
+    } else {
+      f = f_;
+      e = -e_/2;
+    }
+    let z = f128::from_f64(f128::to_f64(f).sqrt().recip());
+    let z = ((three - f*z*z)*z).div2();
+    let z = ((three - f*z*z)*z).div2();
+    let z = ((three - f*z*z)*z).div2();
+    f128(z.0.wrapping_add((e as u128) << 112))
   }
 }
 
@@ -118,6 +183,13 @@ impl Mul for f128 {
   type Output = f128;
   fn mul(self, rhs:f128) -> f128 {
     f128(mul(self.0, rhs.0))
+  }
+}
+
+impl Div for f128 {
+  type Output = f128;
+  fn div(self, rhs:f128) -> f128 {
+    f128(mul(self.0, recip(rhs.0)))
   }
 }
 
@@ -353,3 +425,20 @@ pub fn mul(x:u128,y:u128) -> u128 {
   build(s, e, m)
 }
 
+#[inline]
+// uses iteration:
+//  e = 1 - a*x
+//  f = e*e + e
+//  x' = f*x + x
+pub fn recip(x:u128) -> u128 {
+  const one : u128 = (BIAS as u128)<<112;
+  let s = sign(x);
+  let e = -exp(x);
+  let x0 = (x&MANB)|(16383<<112);
+  let f = f128::to_f64(f128(x0)).recip();
+  let z = f128::from_f64(f).0;
+  let e = sub(one, mul(x0, z));
+  let f = add(mul(e, e), e);
+  let z = add(mul(f, z), z);
+  z.wrapping_add((e as u128) << 112) | (if s {SGNB} else {0})
+}
