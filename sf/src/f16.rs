@@ -78,11 +78,25 @@ impl f16 {
         return f16(s|0b0111_1100_0000_0000);
       } else {
         // nan
+        // TODO: preserve some x mantissa bits?
+        return f16(s|0b0111_1111_1111_1111);
       }
     } else if x.is_subnormal() {
-      todo!()
+      // any f32 subnormal is f16 zero
+      return f16(s);
     }
-    let e : u16 = ((((((b>>23)&0xFF) as i16)-127)+BIAS) as u16)<<10;
+    let e : i16 = (((b>>23)&0xFF) as i16) - 127;
+    if e < -14-10 {
+      // zero
+      return f16(s);
+    } else if e < -14 {
+      // subnormal
+      todo!();
+    } else if e > 15 {
+      // inf
+      return f16(s|0b0111_1100_0000_0000);
+    }
+    let e : u16 = ((e + BIAS) as u16)<<10;
     let m : u16 = ((b&0x7FFFFF)>>10) as u16;
     let m = round(m) >> 3;
     f16(s|e|m)
