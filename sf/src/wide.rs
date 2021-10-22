@@ -47,10 +47,15 @@ fn split(a: f64) -> (f64, f64) {
 
 #[inline]
 fn ddprod(a: f64, b: f64) -> (f64, f64) {
+/*
   let (ahi, alo) = split(a);
   let (bhi, blo) = split(b);
   let p = a * b;
   let e = (((ahi * bhi - p) + ahi * blo) + alo * bhi) + alo * blo;
+  (p, e)
+*/
+  let p = a * b;
+  let e = a.mul_add(b, -p);
   (p, e)
 }
 
@@ -167,6 +172,7 @@ impl Wide {
   pub fn sqrt_recip(self) -> Wide {
     let q0 = self.0.sqrt().recip();
     let x = Wide::new(q0, -q0*self.1/(self.0*2.0));
+    //let x = x + x*(1 - self*x.sqr())*0.5; // alternative form
     let x = x*(3 - self*x.sqr())*0.5; // TODO: ldexp
     x
   }
@@ -188,6 +194,7 @@ impl Wide {
 
   #[inline]
   pub fn recip(self) -> Wide {
+    // TODO: better
     1.0 / self
   }
 

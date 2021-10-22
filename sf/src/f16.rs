@@ -17,8 +17,9 @@ const INF   : u16 = 0b0111_1100_0000_0000;
 impl std::fmt::Debug for f16 {
   fn fmt(&self, f:&mut std::fmt::Formatter) -> std::fmt::Result {
     // TODO: inf, nan, zero
-    write!(f, "[{:04X}:{}1.{:010b}p{:+}~{:e}]", self.0,
+    write!(f, "[{:04X}:{}({}).{:010b}p{:+}~{:e}]", self.0,
       if self.0&SIGNB==0{'+'}else{'-'},
+      if (self.0&EXPB)==0 {'0'} else {'1'},
       self.0&MANB,
       e(self.0),
       self.to_f32()
@@ -59,7 +60,7 @@ impl f16 {
       let n = (self.0&MANB).leading_zeros() - 6 + 1;
       let m = (((self.0&MANB << n) & MANB) as u32) << 13;
       let e = ((MINE as i32) - (n as i32) + 127) as u32;
-      return f32::from_bits(s | e<<23 | m);
+      return f32::from_bits(s | (e<<23) | m);
     }
     let e : u32 = (((((self.0&EXPB)>>10)as i16 - BIAS)+127) as u32);
     let m : u32 = ((self.0&MANB) as u32);

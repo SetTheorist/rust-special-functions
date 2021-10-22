@@ -229,6 +229,7 @@ mod solve;
 mod theta;
 mod traits;
 mod trig;
+mod twin;
 mod util;
 mod wide;
 mod zeta;
@@ -969,7 +970,7 @@ fn main() {
   // wide
   let qq = wide::Wide::new(11.0, 0.0) / 10.0;
   println!("11/10:{}", qq);
-  if false {
+  if true {
     let q_pi = wide::Wide::from_str("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
     println!("{}", q_pi.unwrap());
@@ -1856,7 +1857,7 @@ fn main() {
     println!("{:e}", sf_exp_men(7, r64(1.0)));
     println!("{:e}", sf_exp_men(12, r64(1.0)));
   }
-  if true {
+  if false {
     print!(":"); for x in 0..(-1) {print!("<{}>", x);} println!(":");
     print!(":"); for x in (0..(-1)).step_by(2) {print!("<{}>", x);} println!(":");
     println!("{:016X}", 1.0_f64.to_bits());
@@ -2101,7 +2102,7 @@ fn main() {
     println!("{:e}", pcf::impls::u_recur_dn2(r64(7.0), r64(8.0)));
   }
 
-  if true {
+  if false {
     println!("-----");
     println!("I(1/3,1/2)={:e}", sf_bessel_i(r64(1.0)/3, r64(0.5)));
     println!("I(1/3,1)={:e}", sf_bessel_i(r64(1.0)/3, r64(1.0)));
@@ -2123,7 +2124,7 @@ fn main() {
     println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), true, 100)-2.9154668224891856826e9);
   }
 
-  if true {
+  if false {
     println!("-----");
     println!("I(1,10)={:e}", sf_bessel_i(r64(1.0), r64(10.0)));
     println!("I(1,10)~{:e}", bessel::impls::bessel_i_asymp_z(r64(1.0), r64(10.0)));
@@ -2155,7 +2156,7 @@ fn main() {
     println!("{:e}", x);
   }
 
-  if true {
+  if false {
     println!("----- Airy -----");
     println!("Ai(1) = {}", airy::impls::ai_integ_pos__wide(wide::Wide(1.0,0.0)));
     println!("Ai(1) = {:e}", airy::sf_airy_ai(r64(1.0)));
@@ -2275,6 +2276,33 @@ fn main() {
     println!("{:?}", t.sqrt()*t.sqrt());
 
     println!("{:?}", t.sqrt_recip());
+  }
+
+  if true {
+    let mut x = f16::f16::from_f32(3.0);
+    println!("{:?}", x);
+    for _ in 0..20 {
+      x = x * f16::f16::from_f32(0.5);
+      println!("  {:?}", x);
+    }
+  }
+
+  if true {
+    let x = twin::Twin::new(1.0_f64, 0.0_f64);
+    let y = twin::Twin::new(10.0_f64, 0.0_f64);
+    let z = twin::Twin::new(0.1_f64, 0.0_f64);
+    println!("{:?}", x);
+    println!("{:?}", y);
+    println!("{:?}", z);
+    println!("{:?}", x/y);
+    println!("{:?}", (x/y)*y);
+    println!("{:?}", z*y);
+    println!("{:?}", twin::Twin::new(2.0_f32,0.0).sqrt());
+    println!("{:?}", twin::Twin::new(2.0_f32,0.0).sqrt().sqr());
+    println!("{:?}", twin::Twin::new(2.0_f64,0.0).sqrt());
+    println!("{:?}", twin::Twin::new(2.0_f64,0.0).sqrt().sqr());
+    println!("{:?}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt());
+    println!("{:?}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt().sqr());
   }
 
 }
