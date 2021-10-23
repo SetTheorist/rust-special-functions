@@ -17,11 +17,13 @@
 #![allow(unused_parens)]
 #![allow(unused_variables)]
 #![feature(bench_black_box)]
+#![feature(bigint_helper_methods)]
 #![feature(const_fn_floating_point_arithmetic)]
 #![feature(const_trait_impl)]
 #![feature(destructuring_assignment)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
+#![feature(unchecked_math)]
 //#![feature(marker_trait_attr)] // #[marker]
 //#![feature(never_type)]
 //#![feature(optimize_attribute)] // [#optimize(speed)]
@@ -211,6 +213,7 @@ mod exp;
 mod expint;
 mod f128;
 mod f16;
+mod farb;
 mod gamma;
 mod hypergeom;
 mod integration;
@@ -2303,6 +2306,34 @@ fn main() {
     println!("{:?}", twin::Twin::new(2.0_f64,0.0).sqrt().sqr());
     println!("{:?}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt());
     println!("{:?}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt().sqr());
+  }
+
+  if true {
+    println!("-----");
+    let x = farb::I([0x00F0, 0x0008]);
+    for i in 1..6 {
+      println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
+    }
+
+    println!("-----");
+    let i = 32;
+    println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
+    let i = 64;
+    println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
+    let i = 128;
+    println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
+
+    println!("-----");
+    let x = farb::I([0x0001, 0x0000, 0x0fe5]);
+    for i in 1..=70 {
+      println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
+    }
+    
+    let a = farb::farb { t:farb::Type::Normal, s:farb::Sign::Positive, e:0,
+      m:farb::I([0xF0000001]) };
+    let b = farb::farb { t:farb::Type::Normal, s:farb::Sign::Positive, e:0,
+      m:farb::I([0x90000004]) };
+    println!("{:?} + {:?} = {:?}", a, b, a+b);
   }
 
 }
