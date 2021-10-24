@@ -214,6 +214,7 @@ mod expint;
 mod f128;
 mod f16;
 mod farb;
+mod float;
 mod gamma;
 mod hypergeom;
 mod integration;
@@ -2306,34 +2307,48 @@ fn main() {
     println!("{:?}", twin::Twin::new(2.0_f64,0.0).sqrt().sqr());
     println!("{:?}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt());
     println!("{:?}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt().sqr());
+    println!("{:?}",
+      twin::Twin::new(twin::Twin::new(1.0_f64,0.0),twin::Twin::default())
+        / twin::Twin::new(twin::Twin::new(10.0_f64,0.0),twin::Twin::default()));
   }
 
   if true {
+    //farb::normalize(&mut farb::I([0x1234,0x5679]), true, 0);
     println!("-----");
-    let x = farb::I([0x00F0, 0x0008]);
-    for i in 1..6 {
-      println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
-    }
-
+    let x = farb::farb::<2>::from(3.5_f64);
+    let y = farb::farb::<2>::from(0.25_f64);
+    println!("x = {:?} ({:e})", x, f64::from(x));
+    println!("y = {:?} ({:e})", y, f64::from(y));
+    /*
+    println!("x+x = {:?} ({:e})", x+x, f64::from(x+x));
+    println!("x+y = {:?} ({:e})", x+y, f64::from(x+y));
+    println!("y+x = {:?} ({:e})", y+x, f64::from(y+x));
+    println!("y+y = {:?} ({:e})", y+y, f64::from(y+y));
+    println!("(x+y)-y = {:?} ({:e})", (x+y)-y, f64::from((x+y)-y));
+    */
     println!("-----");
-    let i = 32;
-    println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
-    let i = 64;
-    println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
-    let i = 128;
-    println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
-
+    let mut m = farb::I([0x12345678, 0x98765432]);
+    println!("++ {:?}", m);
+    farb::shl(&mut m, 12);
+    println!("++ {:?}", m);
+    farb::shl(&mut m, 1);
+    println!("++ {:?}", m);
     println!("-----");
-    let x = farb::I([0x0001, 0x0000, 0x0fe5]);
-    for i in 1..=70 {
-      println!("{:?} >> {} = {:?}", x, i, farb::shr(&x, i));
-    }
-    
-    let a = farb::farb { t:farb::Type::Normal, s:farb::Sign::Positive, e:0,
-      m:farb::I([0xF0000001]) };
-    let b = farb::farb { t:farb::Type::Normal, s:farb::Sign::Positive, e:0,
-      m:farb::I([0x90000004]) };
-    println!("{:?} + {:?} = {:?}", a, b, a+b);
+    let mut m = farb::I([0x12345688, 0x98765432]);
+    println!("++ {:?}", m);
+    let o = farb::shr(&mut m, 4);
+    println!("++ {:?}  {:08x}", m, o);
+    let o = farb::shr(&mut m, 32);
+    println!("++ {:?}  {:08x}", m, o);
+    let o = farb::shr(&mut m, 128);
+    println!("++ {:?}  {:08x}", m, o);
+    println!("-----");
+    let mut m = farb::I([0x44444444, 0x88888888]);
+    println!("++ {:?}", m);
+    let o = farb::shr(&mut m, 4);
+    println!("++ {:?}  {:08x}", m, o);
+    let o = farb::shr(&mut m, 36);
+    println!("++ {:?}  {:08x}", m, o);
   }
 
 }

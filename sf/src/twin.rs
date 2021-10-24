@@ -12,6 +12,7 @@ pub trait Base: Sized + Copy
   + Div<Output=Self>
   + Neg<Output=Self>
   + Default
+  //+ From
 {
   fn SPLIT() -> Self;
   fn mul_add(self, b:Self, c:Self) -> Self;
@@ -53,6 +54,8 @@ impl<F:Base> Base for Twin<F> {
   #[inline] fn ci(c:isize) -> Self { Twin::new(F::ci(c),F::default()) }
   #[inline] fn cf(c:f64) -> Self { Twin::new(F::cf(c),F::default()) }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 // requires |a|>=|b|
 #[inline]
@@ -161,12 +164,20 @@ fn qddivide<F:Base>(Twin{hi:xhi, lo:xlo}:Twin<F>, y:F) -> Twin<F> {
   Twin{hi, lo}
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 impl<F:Base> Twin<F> {
   // construction
   #[inline]
   pub fn new(a:F, b:F) -> Self {
     let (hi, lo) = ddsum(a, b);
     Twin{hi, lo}
+  }
+
+  #[inline]
+  // Does not check preconditions
+  pub unsafe fn new_raw(a:F, b:F) -> Self {
+    Twin{hi:a, lo:b}
   }
 
   // deconstruction
@@ -198,30 +209,40 @@ impl<F:Base> Twin<F> {
   }
 
   pub fn sqrt_recip(self) -> Self {
+    let z = F::default();
+    let c3 = F::ci(3);
+    let c1_2 = F::cf(0.5);
+
     let q0 = self.hi.sqrt().recip();
-    let x = Self::new(q0, F::default());
+    let x = Self::new(q0, z);
     //let x = x + x*(1 - self*x.sqr())*0.5; // alternative form
-    let x = x*(Self::new(F::ci(3),F::default()) - self*x.sqr())*Self::new(F::cf(0.5),F::default()); // TODO: ldexp
+    let x = x*(-self*x.sqr() + c3)*c1_2; // TODO: ldexp
     x
   }
 
   pub fn cbrt(self) -> Self {
+    let z = F::default();
+    let c2 = F::ci(2);
+    let c3 = F::ci(3);
     let q0 = self.hi.cbrt();
-    let x = Self::new(q0, F::default());
-    let x = (x*F::ci(2) + self/x.sqr())/Self::new(F::ci(3),F::default()); // TODO: ldexp
+    let x = Self::new(q0, z);
+    let x = (x*c2 + self/x.sqr())/c3; // TODO: ldexp
     x
   }
 
-/*
-  pub fn cbrt_recip(self) -> Wide {
+  pub fn cbrt_recip(self) -> Self {
+    let z = F::default();
+    let c3 = F::ci(3);
+    let c4 = F::ci(4);
     let q0 = self.hi.cbrt().recip();
-    let x = Self::new(q0, -q0*self.lo/(self.hi*3.0));
-    let x = x*(4.0-self*x.pow(3_isize))/3.0;
-    let x = x*(4.0-self*x.pow(3_isize))/3.0;
+    let x = Self::new(q0, z);
+    let x = x*(-self*x*x.sqr() + c4)/c3;
+    let x = x*(-self*x*x.sqr() + c4)/c3;
     x
   }
-*/
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 impl<F:Base> Neg for Twin<F> {
   type Output = Self;
@@ -260,3 +281,25 @@ impl<F:Base> Div<F> for Twin<F> {
   type Output = Self;
   fn div(self, y:F) -> Self { qddivide(self, y) }
 }
+
+/*
+// Rust restrictions block these (generic) implementation, sigh
+impl<F:Base> Add<Twin<F>> for F {
+  type Output = Twin<F>;
+  fn add(self, y:Twin<F>) -> Self { dqadd(self, y) }
+}
+impl<F:Base> Sub<Twin<F>> for F {
+  type Output = Twin<F>;
+  fn sub(self, y:Twin<F>) -> Self { dqadd(self, -y) }
+}
+impl<F:Base> Mul<Twin<F>> for F {
+  type Output = Twin<F>;
+  fn mul(self, y:Twin<F>) -> Self { dqprod(self, y) }
+}
+impl<F:Base> Div<Twin<F>> for F {
+  type Output = Twin<F>;
+  fn div(self, y:Twin<F>) -> Self { dqdivide(self, y) }
+}
+*/
+
+////////////////////////////////////////////////////////////////////////////////
