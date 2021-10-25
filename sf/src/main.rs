@@ -2280,11 +2280,17 @@ fn main() {
     println!("{:?}", t.sqrt());
     println!("{:?}", j*j);
     println!("{:?}", t.sqrt()*t.sqrt());
-
     println!("{:?}", t.sqrt_recip());
+
+    println!("---- ----");
+    let a = (2.0_f64).sqrt();
+    let x = f128::f128::from_f64(q);
+    let y = f128::f128::from_f64(2.0_f64).sqrt();
+    println!("{}", x);
+    println!("{}", y);
   }
 
-  if true {
+  if false {
     let mut x = f16::f16::from_f32(3.0);
     println!("{:?}", x);
     for _ in 0..20 {
@@ -2293,7 +2299,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     let x = twin::Twin::new(1.0_f64, 0.0_f64);
     let y = twin::Twin::new(10.0_f64, 0.0_f64);
     let z = twin::Twin::new(0.1_f64, 0.0_f64);
@@ -2314,7 +2320,7 @@ fn main() {
         / twin::Twin::new(twin::Twin::new(10.0_f64,0.0),twin::Twin::default()));
   }
 
-  if true {
+  if false {
     println!("-----");
     let mut m = farb::I([0x1234,0x5679]);
     println!("{:?}", m);

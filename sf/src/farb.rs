@@ -559,3 +559,13 @@ impl<const N:usize> Mul<u32> for farb<N> {
     farb { t, s, e, m }
   }
 }
+
+impl<const N:usize> Div<farb<N>> for farb<N>
+  where [u32;2*N] : Sized
+{
+  type Output = farb<N>;
+  fn div(self, rhs:farb<N>) -> farb<N> {
+    self * rhs.recip()
+  }
+}
+

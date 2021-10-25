@@ -1,3 +1,4 @@
+use std::cmp::{Ordering,PartialEq,PartialOrd};
 use std::ops::{Add,Sub,Mul,Div};
 use std::ops::{AddAssign,SubAssign,MulAssign,DivAssign};
 use std::ops::{Neg};
@@ -35,6 +36,39 @@ impl std::fmt::Debug for f128 {
       else {'1'},
       rawman(self.0)
       )
+  }
+}
+
+impl std::fmt::Display for f128 {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    let mut z = *self;
+    if z < ZERO {
+      z = -z;
+      write!(f, "-")?;
+    }
+    let one = f128::from_f64(1.0);
+    let ten = f128::from_f64(10.0);
+    let mut e = 0;
+    while z >= ten {
+      e += 1;
+      z = z / ten;
+    }
+    while z < one {
+      e -= 1;
+      z = z * ten;
+    }
+    for n in 0..35 {
+      if n == 1 {
+        write!(f, ".")?;
+      }
+      let d = z.to_f64().floor();
+      if d<0.0 || d>=10.0 { print!("<<>>"); }
+      let dd = ((d as u8) + b'0') as char;
+      write!(f, "{}", dd)?;
+      z = (z - f128::from_f64(d)) * ten;
+    }
+    if e != 0 { write!(f, "e{}", e)?; }
+    write!(f, "")
   }
 }
 
@@ -153,6 +187,47 @@ impl f128 {
     let z = ((three - f*z*z)*z).div2();
     let z = ((three - f*z*z)*z).div2();
     f128(z.0.wrapping_add((e as u128) << 112))
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+impl PartialEq for f128 {
+  fn eq(&self, rhs:&f128) -> bool {
+    if self.is_nan() || rhs.is_nan() {
+      false
+    } else if self.is_zero() && rhs.is_zero() {
+      true
+    } else {
+      self.0 == rhs.0
+    }
+  }
+}
+
+impl PartialOrd for f128 {
+  fn partial_cmp(&self, rhs:&f128) -> Option<Ordering> {
+    if self.is_nan() || rhs.is_nan() {
+      None
+    } else if self.is_zero() && rhs.is_zero() {
+      Some(Ordering::Equal)
+    } else if self.is_zero() {
+      if sign(rhs.0) {Some(Ordering::Greater)}
+      else {Some(Ordering::Less)}
+    } else if rhs.is_zero() {
+      if sign(self.0) {Some(Ordering::Less)}
+      else {Some(Ordering::Greater)}
+    } else {
+      let sa = sign(self.0);
+      let sb = sign(rhs.0);
+      if sa != sb {
+        if sa {Some(Ordering::Less)}
+        else {Some(Ordering::Greater)}
+      } else if sa {
+        rhs.0.partial_cmp(&self.0)
+      } else {
+        self.0.partial_cmp(&rhs.0)
+      }
+    }
   }
 }
 
