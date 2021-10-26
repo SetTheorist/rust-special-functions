@@ -24,6 +24,8 @@ const NEGINFINITY : f128 = f128(SGNB|EXPB);
 const INFINITY : f128 = f128(EXPB);
 const NAN : f128 = f128(EXPB|(1<<111));
 const NEGNAN : f128 = f128(SGNB|EXPB|(1<<111));
+const ONE : f128 = f128((BIAS as u128)<<SHIFT);
+const TEN : f128 = f128(0x4002_4000_0000_0000__0000_0000_0000_0000);
 
 impl std::fmt::Debug for f128 {
   fn fmt(&self, f:&mut std::fmt::Formatter) -> std::fmt::Result {
@@ -46,26 +48,25 @@ impl std::fmt::Display for f128 {
       z = -z;
       write!(f, "-")?;
     }
-    let one = f128::from_f64(1.0);
-    let ten = f128::from_f64(10.0);
     let mut e = 0;
-    while z >= ten {
+    while z >= TEN {
       e += 1;
-      z = z / ten;
+      z = z / TEN;
     }
-    while z < one {
+    while z < ONE {
       e -= 1;
-      z = z * ten;
+      z = z * TEN;
     }
     for n in 0..35 {
       if n == 1 {
         write!(f, ".")?;
       }
-      let d = z.to_f64().floor();
-      if d<0.0 || d>=10.0 { print!("<<>>"); }
+      let d = f128::to_f64(z.floor()); // TODO: make & use f128::rint()
+      if d<0.0 || d>=10.0 { eprintln!("<<{}>>", d); }
       let dd = ((d as u8) + b'0') as char;
       write!(f, "{}", dd)?;
-      z = (z - f128::from_f64(d)) * ten;
+      let d0 = f128::from_f64(d);
+      z = (z - d0) * TEN;
     }
     if e != 0 { write!(f, "e{}", e)?; }
     write!(f, "")
@@ -107,6 +108,9 @@ impl f128 {
 
   // TODO: all special cases!
   pub fn from_f64(x:f64) -> f128 {
+    if x.is_nan() { return if x.is_sign_negative() {NEGNAN} else {NAN}; }
+    if x.is_infinite() { return if x.is_sign_negative() {NEGINFINITY} else {INFINITY}; }
+    if x==0.0 { return if x.is_sign_negative() {NEGZERO} else {ZERO}; }
     let b = x.to_bits();
     let s = ((b & 0x8000_0000_0000_0000) as u128) << 64;
     let e = (((((b & 0x7FF0_0000_0000_0000) >> 52) as i32 - 1023) + BIAS) as u128) << 112;
@@ -126,14 +130,38 @@ impl f128 {
     } else if e > 2047 {
       return if sign(b) {f64::NEG_INFINITY} else {f64::INFINITY};
     }
-    let e = ((exp(b) + 1023) as u64) << 52;
-    // TODO: rounding
-    let m = ((man(b) >> 60) & 0x000F_FFFF_FFFF_FFFF) as u64;
+    let mut e = ((exp(b) + 1023) as u64) << 52;
+    let mb = man(b);
+    let low = mb & 0x0000_0000_0000_0000__0FFF_FFFF_FFFF_FFFF;
+    let sb = {
+        if low > 0x0000_0000_0000_0000__0800_0000_0000_0000 {1} // round-up
+        else if low < 0x0000_0000_0000_0000__0800_0000_0000_0000 {0} // round-down
+        else { (mb>>60)&1 } // round-to-even
+      };
+    let mut m0 = mb + (sb << 60);
+    if m0 & (1<<113) != 0 { m0 >>= 1; e += 1; }
+    let m = ((m0 >> 60) & 0x000F_FFFF_FFFF_FFFF) as u64;
     f64::from_bits(s|e|m)
   }
 
   pub fn recip(self) -> f128 {
     f128(recip(self.0))
+  }
+
+  pub fn ceil(self) -> f128 {
+    if self.is_nan() || self.is_infinite() || self.is_zero() { return self; }
+    if sign(self.0) { return -(-self).floor(); }
+    // TODO: this is a dumb way to do it
+    let f = self.floor();
+    if f != self { f + ONE } else { f }
+  }
+  pub fn floor(self) -> f128 {
+    if self.is_nan() || self.is_infinite() || self.is_zero() { return self; }
+    if sign(self.0) { return -(-self).ceil(); }
+    let e = exp(self.0);
+    if e < 0 { return ZERO; }
+    if e > 112 { return self; }
+    return f128(self.0 & !((1<<(112-e))-1));
   }
 
   #[inline]
@@ -153,6 +181,7 @@ impl f128 {
   }
 
   pub fn sqrt(self) -> f128 {
+    // TODO: special cases, negatives
     let (f_,e_) = self.frexp();
     let f;
     let e;
@@ -171,6 +200,7 @@ impl f128 {
   }
 
   pub fn sqrt_recip(self) -> f128 {
+    // TODO: special cases, negatives
     let three = f128(0x4000_8000_0000_0000__0000_0000_0000_0000);
     let (f_,e_) = self.frexp();
     let f;
@@ -375,6 +405,20 @@ fn round(m:u128) -> u128 {
   }
 }
 
+// shifts right n-3 bits, keeping sticky lsb
+#[inline]
+fn shr3(x:u128, n:u32) -> u128 {
+  if n >= 128+3 {
+    if x==0 {0} else {1}
+  } else if n <= 3 {
+    x << (3 - n)
+  } else {
+    let lob = x & ((1 << (n - 3))-1);
+    let s = if lob==0 {0} else {1};
+    (x >> (n - 3)) | s
+  }
+}
+
 #[inline]
 pub fn neg(x:u128) -> u128 {
   x ^ SGNB
@@ -383,8 +427,8 @@ pub fn neg(x:u128) -> u128 {
 #[inline]
 pub fn add(x:u128,y:u128) -> u128 {
   // TODO: cleanup the special cases
-  if f128(x).is_zero() { return y; }
   if f128(y).is_zero() { return x; }
+  if f128(x).is_zero() { return y; }
   if f128(x).is_nan() { return x; }
   if f128(y).is_nan() { return y; }
   match (f128(x).is_infinite(), f128(y).is_infinite()) {
@@ -397,13 +441,13 @@ pub fn add(x:u128,y:u128) -> u128 {
   if sign(x) != sign(y) {
     return sub(x, neg(y))
   }
-
+  // TODO: subnormals
   let s = sign(x);
   let ex = exp(x);
   let ey = exp(y);
   let e = ex.max(ey);
-  let mx = (man(x) << 3) >> (e - ex); // TODO: sticky bit
-  let my = (man(y) << 3) >> (e - ey); // TODO: sticky bit
+  let mx = shr3(man(x), (e-ex) as u32);
+  let my = shr3(man(y), (e-ey) as u32);
   let m = mx + my;
   let m = round(m) >> 3;
   build(s, e, m)
@@ -412,8 +456,8 @@ pub fn add(x:u128,y:u128) -> u128 {
 #[inline]
 pub fn sub(x:u128,y:u128) -> u128 {
   // TODO: cleanup the special cases
-  if f128(x).is_zero(){ return neg(y); }
   if f128(y).is_zero(){ return x; }
+  if f128(x).is_zero(){ return neg(y); }
   if f128(x).is_nan() { return x; }
   if f128(y).is_nan() { return neg(y); }
   match (f128(x).is_infinite(), f128(y).is_infinite()) {
@@ -427,13 +471,14 @@ pub fn sub(x:u128,y:u128) -> u128 {
     return add(x, neg(y))
   }
 
+  // TODO: subnormals
   if x>y {
     let s = sign(x);
     let ex = exp(x);
     let ey = exp(y);
     let e = ex.max(ey);
-    let mx = man(x) << 3;
-    let my = (man(y) << 3) >> (e - ey); // TODO: sticky bit
+    let mx = shr3(man(x), 0);
+    let my = shr3(man(y), (e-ey) as u32);
     let m = mx - my;
     let m = round(m) >> 3;
     build(s, e, m)
@@ -442,8 +487,8 @@ pub fn sub(x:u128,y:u128) -> u128 {
     let ex = exp(x);
     let ey = exp(y);
     let e = ex.max(ey);
-    let mx = (man(x) << 3) >> (e - ex); // TODO: sticky bit
-    let my = man(y) << 3;
+    let mx = shr3(man(x), (e-ex) as u32);
+    let my = shr3(man(y), 0);
     let m = my - mx;
     let m = round(m) >> 3;
     build(s, e, m)
@@ -484,7 +529,7 @@ pub fn mul(x:u128,y:u128) -> u128 {
     if z < 15-3 {
       let n = 128 + (15-z) - 3;
       e += (n as i32) + 3;
-      m = ml >> (15-z-3); // TODO: sticky bit!
+      m = shr3(ml, 15-z);
     } else {
       let n = 128 + (15-z) - 3;
       e += (n as i32) + 3;

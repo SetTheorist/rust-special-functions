@@ -974,9 +974,9 @@ fn main() {
   }
 
   // wide
-  let qq = wide::Wide::new(11.0, 0.0) / 10.0;
-  println!("11/10:{}", qq);
-  if true {
+  if false {
+    let qq = wide::Wide::new(11.0, 0.0) / 10.0;
+    println!("11/10:{}", qq);
     let q_pi = wide::Wide::from_str("3.14159265358979323846264338327950288419716939937510");
     println!("{:?}", q_pi);
     println!("{}", q_pi.unwrap());
@@ -1346,8 +1346,8 @@ fn main() {
       dbg!(n.is_oddint());
     }
   }
-  println!("{:.4e}  {:.4E}  {:.4}", r64::PI, r64::PI, r64::PI);
-  println!("{:b}  {:x}  {:X}", r64::PI, r64::PI, r64::PI);
+  //println!("{:.4e}  {:.4E}  {:.4}", r64::PI, r64::PI, r64::PI);
+  //println!("{:b}  {:x}  {:X}", r64::PI, r64::PI, r64::PI);
 
   if false {
     println!("-----");
@@ -2274,19 +2274,33 @@ fn main() {
     println!("{:?}", (t+t+t)/t);
     println!("{:?}", t/f128::f128::from_f64(7.0));
 
+    println!("---- ----");
     let q = (3.0_f64).sqrt();
     let j = f128::f128::from_f64(q);
-    println!("{:?}", j);
-    println!("{:?}", t.sqrt());
-    println!("{:?}", j*j);
-    println!("{:?}", t.sqrt()*t.sqrt());
-    println!("{:?}", t.sqrt_recip());
+    println!("{}", j);
+    println!("{}", t.sqrt());
+    println!("{}", j*j);
+    println!("{}", t.sqrt()*t.sqrt());
+    println!("{}", t.sqrt_recip());
 
     println!("---- ----");
     let a = (2.0_f64).sqrt();
-    let x = f128::f128::from_f64(q);
+    println!("{}", a);
+    let x = f128::f128::from_f64(a);
     let y = f128::f128::from_f64(2.0_f64).sqrt();
     println!("{}", x);
+    println!("{}", f128::f128::to_f64(x));
+    println!("{}", x*x);
+    println!("{}", x*x-f128::f128::from_f64(2.0_f64));
+    println!("{}", y);
+    println!("{}", f128::f128::to_f64(y));
+    println!("{}", y*y);
+    println!("{}", y*y-f128::f128::from_f64(2.0_f64));
+  }
+  if true {
+    println!("-----");
+    let y = f128::f128::from_f64(2.0_f64).sqrt();
+    println!("{}", f128::f128::to_f64(y));
     println!("{}", y);
   }
 
