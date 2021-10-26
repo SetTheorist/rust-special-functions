@@ -61,11 +61,11 @@ impl std::fmt::Display for f128 {
       if n == 1 {
         write!(f, ".")?;
       }
-      let d = f128::to_f64(z.floor()); // TODO: make & use f128::rint()
+      let d = f64::from(z.floor()); // TODO: make & use f128::rint()
       if d<0.0 || d>=10.0 { eprintln!("<<{}>>", d); }
       let dd = ((d as u8) + b'0') as char;
       write!(f, "{}", dd)?;
-      let d0 = f128::from_f64(d);
+      let d0 = f128::from(d);
       z = (z - d0) * TEN;
     }
     if e != 0 { write!(f, "e{}", e)?; }
@@ -106,44 +106,6 @@ impl f128 {
     }
   }
 
-  // TODO: all special cases!
-  pub fn from_f64(x:f64) -> f128 {
-    if x.is_nan() { return if x.is_sign_negative() {NEGNAN} else {NAN}; }
-    if x.is_infinite() { return if x.is_sign_negative() {NEGINFINITY} else {INFINITY}; }
-    if x==0.0 { return if x.is_sign_negative() {NEGZERO} else {ZERO}; }
-    let b = x.to_bits();
-    let s = ((b & 0x8000_0000_0000_0000) as u128) << 64;
-    let e = (((((b & 0x7FF0_0000_0000_0000) >> 52) as i32 - 1023) + BIAS) as u128) << 112;
-    let m = ((b & 0x000F_FFFF_FFFF_FFFF) as u128) << 60;
-    f128(s | e | m)
-  }
-
-  // TODO: no error-checking / special cases!
-  pub fn to_f64(self) -> f64 {
-    let b = self.to_bits();
-    if self.is_zero() { return if sign(b) {-0.0} else {0.0}; }
-    let s = (signb(b) >> 64) as u64;
-    let e = exp(b) + 1023;
-    if e < 0 {
-      // TODO: subnormal
-      return f64::from_bits(s);
-    } else if e > 2047 {
-      return if sign(b) {f64::NEG_INFINITY} else {f64::INFINITY};
-    }
-    let mut e = ((exp(b) + 1023) as u64) << 52;
-    let mb = man(b);
-    let low = mb & 0x0000_0000_0000_0000__0FFF_FFFF_FFFF_FFFF;
-    let sb = {
-        if low > 0x0000_0000_0000_0000__0800_0000_0000_0000 {1} // round-up
-        else if low < 0x0000_0000_0000_0000__0800_0000_0000_0000 {0} // round-down
-        else { (mb>>60)&1 } // round-to-even
-      };
-    let mut m0 = mb + (sb << 60);
-    if m0 & (1<<113) != 0 { m0 >>= 1; e += 1; }
-    let m = ((m0 >> 60) & 0x000F_FFFF_FFFF_FFFF) as u64;
-    f64::from_bits(s|e|m)
-  }
-
   pub fn recip(self) -> f128 {
     f128(recip(self.0))
   }
@@ -172,13 +134,53 @@ impl f128 {
   }
 
   #[inline]
+  // TODO: ldexp, edge cases, special cases, etc.
   fn mul2(self) -> f128 {
     f128(self.0 + (1 << 112))
   }
+
   #[inline]
+  // TODO: ldexp, edge cases, special cases, etc.
   fn div2(self) -> f128 {
     f128(self.0.wrapping_add(!0 << 112))
   }
+
+  #[inline]
+  fn sqr(self) -> f128 {
+    // TODO: can we specialize this more efficiently?
+    self*self
+  }
+
+  #[inline]
+  fn cub(self) -> f128 {
+    // TODO: can we specialize this more efficiently?
+    self.sqr()*self
+  }
+
+  #[inline]
+  fn powu(self, n:usize) -> f128 {
+    let mut n = n;
+    let mut x = self;
+    let mut v = ONE;
+    while n != 0 {
+      if n % 2 == 1 {
+        v *= x;
+      }
+      x = x.sqr();
+      n >>= 1;
+    }
+    v
+  }
+
+  #[inline]
+  fn powi(self, n:isize) -> f128 {
+    if n < 0 {
+      self.powu(-n as usize).recip()
+    } else {
+      self.powu(n as usize)
+    }
+  }
+
 
   pub fn sqrt(self) -> f128 {
     // TODO: special cases, negatives
@@ -192,7 +194,7 @@ impl f128 {
       f = f_;
       e = e_/2;
     }
-    let z = f128::from_f64(f128::to_f64(f).sqrt());
+    let z = f128::from(f64::from(f).sqrt());
     let z = (z + f/z).div2();
     let z = (z + f/z).div2();
     let z = (z + f/z).div2();
@@ -212,11 +214,124 @@ impl f128 {
       f = f_;
       e = -e_/2;
     }
-    let z = f128::from_f64(f128::to_f64(f).sqrt().recip());
+    let z = f128::from(f64::from(f).sqrt().recip());
     let z = ((three - f*z*z)*z).div2();
     let z = ((three - f*z*z)*z).div2();
     let z = ((three - f*z*z)*z).div2();
     f128(z.0.wrapping_add((e as u128) << 112))
+  }
+
+  pub fn cbrt(self) -> f128 {
+    let x = f128::from(f64::from(self).cbrt());
+    let x = (x.mul2() + self/x.sqr())/f128::from(3.0_f64);
+    let x = (x.mul2() + self/x.sqr())/f128::from(3.0_f64);
+    x
+  }
+
+  pub fn cbrt_recip(self) -> f128 {
+    const FOUR : f128 = f128(0x4001_0000_0000_0000__0000_0000_0000_0000);
+    let x = f128::from(f64::from(self).cbrt().recip());
+    let x = x*(FOUR-self*x.cub())/f128::from(3.0_f64);
+    let x = x*(FOUR-self*x.cub())/f128::from(3.0_f64);
+    x
+  }
+
+  pub fn nth_root(self, n:isize) -> f128 {
+    let x = f128::from(f64::from(self).powf((n as f64).recip()));
+    let n1 = f128::from((n-1) as f64);
+    let nn = f128::from(n as f64);
+    let x = (x*n1 + self/x.powi(n-1))/nn;
+    let x = (x*n1 + self/x.powi(n-1))/nn;
+    x
+  }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+macro_rules! from_int {
+  ($u:ty,$i:ty) => {
+    impl From<$u> for f128 {
+      fn from(x:$u) -> f128 {
+        let l = x.log2();
+        let m = ((x as u128) << (112-l)) & MANB;
+        let e = ((l as i32) + BIAS) as u128;
+        f128(m | (e<<SHIFT))
+      }
+    }
+    impl From<$i> for f128 {
+      fn from(x:$i) -> f128 {
+        let f = f128::from(x.abs() as $u);
+        if x >= 0 { f } else { -f }
+      }
+    }
+  }
+}
+from_int!{u8,i8}
+from_int!{u16,i16}
+from_int!{u32,i32}
+from_int!{u64,i64}
+from_int!{usize,isize}
+
+impl From<u128> for f128 {
+  fn from(x:u128) -> f128 {
+    let l = x.log2();
+    let m =
+      if l <= 112 {
+        (x << (112-l)) & MANB
+      } else {
+        // TODO: rounding (shifted-off bits)
+        (x >> (l-112)) & MANB
+      };
+    let e = ((l as i32) + BIAS) as u128;
+    f128(m | (e<<SHIFT))
+  }
+}
+impl From<i128> for f128 {
+  fn from(x:i128) -> f128 {
+    let f = f128::from(x.abs() as u128);
+    if x >= 0 { f } else { -f }
+  }
+}
+
+impl From<f64> for f128 {
+  fn from(x:f64) -> f128 {
+    if x.is_nan() { return if x.is_sign_negative() {NEGNAN} else {NAN}; }
+    if x.is_infinite() { return if x.is_sign_negative() {NEGINFINITY} else {INFINITY}; }
+    if x==0.0 { return if x.is_sign_negative() {NEGZERO} else {ZERO}; }
+    let b = x.to_bits();
+    let s = ((b & 0x8000_0000_0000_0000) as u128) << 64;
+    let e = (((((b & 0x7FF0_0000_0000_0000) >> 52) as i32 - 1023) + BIAS) as u128) << 112;
+    let m = ((b & 0x000F_FFFF_FFFF_FFFF) as u128) << 60;
+    f128(s | e | m)
+  }
+}
+
+impl From<f128> for f64 {
+  // TODO: no error-checking / special cases!
+  fn from(x:f128) -> f64 {
+    let b = x.to_bits();
+    if x.is_zero() { return f64::from_bits((b>>64) as u64); }
+    let s = (signb(b) >> 64) as u64;
+    let e = exp(b) + 1023;
+    if e < 0 {
+      // TODO: subnormal
+      return f64::from_bits(s);
+    } else if e > 2047 {
+      return if sign(b) {f64::NEG_INFINITY} else {f64::INFINITY};
+    }
+    let mut e = ((exp(b) + 1023) as u64) << 52;
+    let mb = man(b);
+    let low = mb & 0x0000_0000_0000_0000__0FFF_FFFF_FFFF_FFFF;
+    let sb = {
+        if low > 0x0000_0000_0000_0000__0800_0000_0000_0000 {1} // round-up
+        else if low < 0x0000_0000_0000_0000__0800_0000_0000_0000 {0} // round-down
+        else { (mb>>60)&1 } // round-to-even
+      };
+    let mut m0 = mb + (sb << 60);
+    if m0 & (1<<113) != 0 { m0 >>= 1; e += 1; }
+    let m = ((m0 >> 60) & 0x000F_FFFF_FFFF_FFFF) as u64;
+    f64::from_bits(s|e|m)
   }
 }
 
@@ -295,6 +410,29 @@ impl Div for f128 {
   type Output = f128;
   fn div(self, rhs:f128) -> f128 {
     f128(mul(self.0, recip(rhs.0)))
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+impl AddAssign for f128 {
+  fn add_assign(&mut self, rhs:f128) {
+    *self = *self + rhs;
+  }
+}
+impl SubAssign for f128 {
+  fn sub_assign(&mut self, rhs:f128) {
+    *self = *self - rhs;
+  }
+}
+impl MulAssign for f128 {
+  fn mul_assign(&mut self, rhs:f128) {
+    *self = *self * rhs;
+  }
+}
+impl DivAssign for f128 {
+  fn div_assign(&mut self, rhs:f128) {
+    *self = *self / rhs;
   }
 }
 
@@ -551,14 +689,17 @@ pub fn mul(x:u128,y:u128) -> u128 {
 //  f = e*e + e
 //  x' = f*x + x
 pub fn recip(x:u128) -> u128 {
-  const one : u128 = (BIAS as u128)<<112;
+  if f128(x).is_nan() { return x; }
+  if f128(x).is_zero() { return (x&SGNB)|INFINITY.0; }
+  if f128(x).is_infinite() { return (x&SGNB); }
+  // TODO: subnormal
   let s = sign(x);
-  let e = -exp(x);
+  let me = -exp(x);
   let x0 = (x&MANB)|(16383<<112);
-  let f = f128::to_f64(f128(x0)).recip();
-  let z = f128::from_f64(f).0;
-  let e = sub(one, mul(x0, z));
+  let f = f64::from(f128(x0)).recip();
+  let z = f128::from(f).0;
+  let e = sub(ONE.0, mul(x0, z));
   let f = add(mul(e, e), e);
   let z = add(mul(f, z), z);
-  z.wrapping_add((e as u128) << 112) | (if s {SGNB} else {0})
+  z.wrapping_add((me as u128) << 112) | (if s {SGNB} else {0})
 }

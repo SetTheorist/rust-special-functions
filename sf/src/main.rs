@@ -2228,55 +2228,55 @@ fn main() {
   if true {
     println!("-----");
     let x = 1.0/3.0_f64;
-    let y = f128::f128::from_f64(x);
-    let z = f128::f128::to_f64(y);
+    let y = f128::f128::from(x);
+    let z = f64::from(y);
     println!("{}", x);
     println!("{:?}", y);
     println!("{}", z);
     println!("{:?}", -y);
-    println!("{}", f128::f128::to_f64(-y));
+    println!("{}", f64::from(-y));
     println!("{:?}", y+y);
-    println!("{}", f128::f128::to_f64(y+y));
+    println!("{}", f64::from(y+y));
     println!("{:?}", y+y+y);
-    println!("{}", f128::f128::to_f64(y+y+y));
+    println!("{}", f64::from(y+y+y));
     println!("{:?}", (y+y)-y);
-    println!("{}", f128::f128::to_f64((y+y)-y));
+    println!("{}", f64::from((y+y)-y));
     println!("{:?}", y-(y+y));
-    println!("{}", f128::f128::to_f64(y-(y+y)));
+    println!("{}", f64::from(y-(y+y)));
 
     println!("-----");
     let x = 3.0_f64;
     let x2 = 1.0/3.0_f64;
-    let y = f128::f128::from_f64(x);
-    let y2 = f128::f128::from_f64(x2);
+    let y = f128::f128::from(x);
+    let y2 = f128::f128::from(x2);
     println!("{:e}  {:?}", x, y);
     println!("{:e}  {:?}", x2, y2);
     let z = y * y2;
-    println!("{:?}  {:e}", z, f128::f128::to_f64(z));
+    println!("{:?}  {:e}", z, f64::from(z));
     let mut z = y2;
     let mut yy = y2;
     for _ in 0..40 {
       z = z * yy;
       yy = yy * y2;
-      println!("    {:?}  {:e}", z, f128::f128::to_f64(z));
+      println!("    {:?}  {:e}", z, f64::from(z));
     }
-    println!("{:e}  {:?}", 1.5, f128::f128::from_f64(1.5));
+    println!("{:e}  {:?}", 1.5, f128::f128::from(1.5));
 
-    let y1 = f128::f128::from_f64(10.0_f64.recip());
+    let y1 = f128::f128::from(10.0_f64.recip());
     println!("{:?}", y1);
-    let y2 = f128::f128::from_f64(10.0_f64).recip();
+    let y2 = f128::f128::from(10.0_f64).recip();
     println!("{:?}", y2);
 
-    let t = f128::f128::from_f64(3.0);
+    let t = f128::f128::from(3.0);
     println!("{:?}", t);
     println!("{:?}", y1*t);
     println!("{:?}", y2*t);
     println!("{:?}", (t+t+t)/t);
-    println!("{:?}", t/f128::f128::from_f64(7.0));
+    println!("{:?}", t/f128::f128::from(7.0));
 
     println!("---- ----");
     let q = (3.0_f64).sqrt();
-    let j = f128::f128::from_f64(q);
+    let j = f128::f128::from(q);
     println!("{}", j);
     println!("{}", t.sqrt());
     println!("{}", j*j);
@@ -2286,22 +2286,28 @@ fn main() {
     println!("---- ----");
     let a = (2.0_f64).sqrt();
     println!("{}", a);
-    let x = f128::f128::from_f64(a);
-    let y = f128::f128::from_f64(2.0_f64).sqrt();
+    let x = f128::f128::from(a);
+    let y = f128::f128::from(2.0_f64).sqrt();
     println!("{}", x);
-    println!("{}", f128::f128::to_f64(x));
+    println!("{}", f64::from(x));
     println!("{}", x*x);
-    println!("{}", x*x-f128::f128::from_f64(2.0_f64));
+    println!("{}", x*x-f128::f128::from(2.0_f64));
     println!("{}", y);
-    println!("{}", f128::f128::to_f64(y));
+    println!("{}", f64::from(y));
     println!("{}", y*y);
-    println!("{}", y*y-f128::f128::from_f64(2.0_f64));
+    println!("{}", y*y-f128::f128::from(2.0_f64));
   }
   if true {
     println!("-----");
-    let y = f128::f128::from_f64(2.0_f64).sqrt();
-    println!("{}", f128::f128::to_f64(y));
+    let y = f128::f128::from(2.0_f64).sqrt();
+    println!("{}", f64::from(y));
     println!("{}", y);
+    println!("-----");
+    println!("{}", f128::f128::from(2).cbrt());
+    println!("{}", f128::f128::from(2).cbrt_recip());
+    println!("{}", f128::f128::from(2).nth_root(7));
+    println!("{}", f128::f128::from(128_u128));
+    println!("{}", f128::f128::from(1_u128<<100));
   }
 
   if false {
