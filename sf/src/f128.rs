@@ -4,7 +4,7 @@ use std::ops::{AddAssign,SubAssign,MulAssign,DivAssign};
 use std::ops::{Neg};
 
 #[repr(transparent)]
-#[derive(Clone,Copy,Default)]
+#[derive(Clone,Copy)]
 pub struct f128(u128);
 // (1)(15)(112)
 
@@ -18,14 +18,16 @@ const IMPB : u128 = 0x0001_0000_0000_0000__0000_0000_0000_0000;
 const SHIFT : u32 = 112;
 const MAXRAWEXP : u32 = 0x7FFF;
 
-const ZERO : f128 = f128(0);
-const NEGZERO : f128 = f128(SGNB);
+const ZERO        : f128 = f128(0);
+const NEGZERO     : f128 = f128(SGNB);
 const NEGINFINITY : f128 = f128(SGNB|EXPB);
-const INFINITY : f128 = f128(EXPB);
-const NAN : f128 = f128(EXPB|(1<<111));
-const NEGNAN : f128 = f128(SGNB|EXPB|(1<<111));
-const ONE : f128 = f128((BIAS as u128)<<SHIFT);
-const TEN : f128 = f128(0x4002_4000_0000_0000__0000_0000_0000_0000);
+const INFINITY    : f128 = f128(EXPB);
+const NAN         : f128 = f128(EXPB|(1<<111));
+const NEGNAN      : f128 = f128(SGNB|EXPB|(1<<111));
+const ONE         : f128 = f128((BIAS as u128)<<SHIFT);
+const THREE       : f128 = f128(0x4000_8000_0000_0000__0000_0000_0000_0000);
+const FOUR        : f128 = f128(0x4001_0000_0000_0000__0000_0000_0000_0000);
+const TEN         : f128 = f128(0x4002_4000_0000_0000__0000_0000_0000_0000);
 
 impl std::fmt::Debug for f128 {
   fn fmt(&self, f:&mut std::fmt::Formatter) -> std::fmt::Result {
@@ -106,6 +108,7 @@ impl f128 {
     }
   }
 
+  #[inline]
   pub fn recip(self) -> f128 {
     f128(recip(self.0))
   }
@@ -117,6 +120,7 @@ impl f128 {
     let f = self.floor();
     if f != self { f + ONE } else { f }
   }
+
   pub fn floor(self) -> f128 {
     if self.is_nan() || self.is_infinite() || self.is_zero() { return self; }
     if sign(self.0) { return -(-self).ceil(); }
@@ -129,20 +133,30 @@ impl f128 {
   #[inline]
   pub fn frexp(self) -> (f128, i32) {
     let e = exp(self.0);
-    let f = f128((self.0&!EXPB)|((BIAS as u128)<<112));
+    let f = f128((self.0&!EXPB)|((BIAS as u128)<<SHIFT));
     (f, e)
+  }
+
+  #[inline]
+  pub fn ldexp(self, n:i32) -> f128 {
+    if self.is_nan() { return self; }
+    if self.is_infinite() { return self; }
+    if self.is_zero() { return if n%2==0 {self} else {-self}; }
+    // TODO: overflow/underflow/etc.
+    let e = exp(self.0);
+    f128(self.0.wrapping_add((n as u128)<<SHIFT))
   }
 
   #[inline]
   // TODO: ldexp, edge cases, special cases, etc.
   fn mul2(self) -> f128 {
-    f128(self.0 + (1 << 112))
+    f128(self.0 + (1 << SHIFT))
   }
 
   #[inline]
   // TODO: ldexp, edge cases, special cases, etc.
   fn div2(self) -> f128 {
-    f128(self.0.wrapping_add(!0 << 112))
+    f128(self.0.wrapping_add(!0 << SHIFT))
   }
 
   #[inline]
@@ -163,9 +177,7 @@ impl f128 {
     let mut x = self;
     let mut v = ONE;
     while n != 0 {
-      if n % 2 == 1 {
-        v *= x;
-      }
+      if n % 2 == 1 { v *= x; }
       x = x.sqr();
       n >>= 1;
     }
@@ -203,7 +215,6 @@ impl f128 {
 
   pub fn sqrt_recip(self) -> f128 {
     // TODO: special cases, negatives
-    let three = f128(0x4000_8000_0000_0000__0000_0000_0000_0000);
     let (f_,e_) = self.frexp();
     let f;
     let e;
@@ -215,9 +226,9 @@ impl f128 {
       e = -e_/2;
     }
     let z = f128::from(f64::from(f).sqrt().recip());
-    let z = ((three - f*z*z)*z).div2();
-    let z = ((three - f*z*z)*z).div2();
-    let z = ((three - f*z*z)*z).div2();
+    let z = ((THREE - f*z*z)*z).div2();
+    let z = ((THREE - f*z*z)*z).div2();
+    let z = ((THREE - f*z*z)*z).div2();
     f128(z.0.wrapping_add((e as u128) << 112))
   }
 
@@ -229,17 +240,16 @@ impl f128 {
   }
 
   pub fn cbrt_recip(self) -> f128 {
-    const FOUR : f128 = f128(0x4001_0000_0000_0000__0000_0000_0000_0000);
     let x = f128::from(f64::from(self).cbrt().recip());
-    let x = x*(FOUR-self*x.cub())/f128::from(3.0_f64);
-    let x = x*(FOUR-self*x.cub())/f128::from(3.0_f64);
+    let x = x*(FOUR-self*x.cub())/THREE;
+    let x = x*(FOUR-self*x.cub())/THREE;
     x
   }
 
   pub fn nth_root(self, n:isize) -> f128 {
     let x = f128::from(f64::from(self).powf((n as f64).recip()));
-    let n1 = f128::from((n-1) as f64);
-    let nn = f128::from(n as f64);
+    let n1 = f128::from(n-1);
+    let nn = f128::from(n);
     let x = (x*n1 + self/x.powi(n-1))/nn;
     let x = (x*n1 + self/x.powi(n-1))/nn;
     x
@@ -252,6 +262,7 @@ impl f128 {
 macro_rules! from_int {
   ($u:ty,$i:ty) => {
     impl From<$u> for f128 {
+      #[inline]
       fn from(x:$u) -> f128 {
         let l = x.log2();
         let m = ((x as u128) << (112-l)) & MANB;
@@ -260,6 +271,7 @@ macro_rules! from_int {
       }
     }
     impl From<$i> for f128 {
+      #[inline]
       fn from(x:$i) -> f128 {
         let f = f128::from(x.abs() as $u);
         if x >= 0 { f } else { -f }
@@ -274,6 +286,7 @@ from_int!{u64,i64}
 from_int!{usize,isize}
 
 impl From<u128> for f128 {
+  #[inline]
   fn from(x:u128) -> f128 {
     let l = x.log2();
     let m =
@@ -288,6 +301,7 @@ impl From<u128> for f128 {
   }
 }
 impl From<i128> for f128 {
+  #[inline]
   fn from(x:i128) -> f128 {
     let f = f128::from(x.abs() as u128);
     if x >= 0 { f } else { -f }
@@ -337,7 +351,17 @@ impl From<f128> for f64 {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+impl Default for f128 {
+  #[inline]
+  fn default() -> f128 {
+    f128(0)
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 impl PartialEq for f128 {
+  #[inline]
   fn eq(&self, rhs:&f128) -> bool {
     if self.is_nan() || rhs.is_nan() {
       false
@@ -380,6 +404,7 @@ impl PartialOrd for f128 {
 
 impl Neg for f128 {
   type Output = f128;
+  #[inline]
   fn neg(self) -> f128 {
     f128(neg(self.0))
   }
@@ -387,6 +412,7 @@ impl Neg for f128 {
 
 impl Add for f128 {
   type Output = f128;
+  #[inline]
   fn add(self, rhs:f128) -> f128 {
     f128(add(self.0, rhs.0))
   }
@@ -394,6 +420,7 @@ impl Add for f128 {
 
 impl Sub for f128 {
   type Output = f128;
+  #[inline]
   fn sub(self, rhs:f128) -> f128 {
     f128(sub(self.0, rhs.0))
   }
@@ -401,6 +428,7 @@ impl Sub for f128 {
 
 impl Mul for f128 {
   type Output = f128;
+  #[inline]
   fn mul(self, rhs:f128) -> f128 {
     f128(mul(self.0, rhs.0))
   }
@@ -408,6 +436,7 @@ impl Mul for f128 {
 
 impl Div for f128 {
   type Output = f128;
+  #[inline]
   fn div(self, rhs:f128) -> f128 {
     f128(mul(self.0, recip(rhs.0)))
   }
@@ -416,21 +445,25 @@ impl Div for f128 {
 ////////////////////////////////////////////////////////////////////////////////
 
 impl AddAssign for f128 {
+  #[inline]
   fn add_assign(&mut self, rhs:f128) {
     *self = *self + rhs;
   }
 }
 impl SubAssign for f128 {
+  #[inline]
   fn sub_assign(&mut self, rhs:f128) {
     *self = *self - rhs;
   }
 }
 impl MulAssign for f128 {
+  #[inline]
   fn mul_assign(&mut self, rhs:f128) {
     *self = *self * rhs;
   }
 }
 impl DivAssign for f128 {
+  #[inline]
   fn div_assign(&mut self, rhs:f128) {
     *self = *self / rhs;
   }
@@ -470,38 +503,12 @@ fn shr128(a:u128, b:u128, n:u32) -> (u128,u128) {
   (a>>n, (b>>n)|(a<<(128-n)))
 }
 
-#[inline]
-fn sign(x:u128) -> bool {
-  signb(x) != 0
-}
-
-#[inline]
-fn signb(x:u128) -> u128 {
-  x & SGNB
-}
-#[inline]
-fn exp(x:u128) -> i32 {
-  (rawexp(x) as i32) - BIAS
-}
-
-#[inline]
-fn rawexp(x:u128) -> u32 {
-  ((x & EXPB) >> SHIFT) as u32
-}
-
-#[inline]
-fn rawman(x:u128) -> u128 {
-  x & MANB
-}
-
-#[inline]
-fn man(x:u128) -> u128 {
-  if rawexp(x) == 0 {
-    rawman(x)
-  } else {
-    rawman(x) | IMPB
-  }
-}
+#[inline] fn sign(x:u128) -> bool { signb(x) != 0 }
+#[inline] fn signb(x:u128) -> u128 { x & SGNB }
+#[inline] fn exp(x:u128) -> i32 { (rawexp(x) as i32) - BIAS }
+#[inline] fn rawexp(x:u128) -> u32 { ((x & EXPB) >> SHIFT) as u32 }
+#[inline] fn rawman(x:u128) -> u128 { x & MANB }
+#[inline] fn man(x:u128) -> u128 { if rawexp(x) == 0 { rawman(x) } else { rawman(x) | IMPB } }
 
 #[inline]
 // TODO: infinities, subnormals
@@ -557,10 +564,7 @@ fn shr3(x:u128, n:u32) -> u128 {
   }
 }
 
-#[inline]
-pub fn neg(x:u128) -> u128 {
-  x ^ SGNB
-}
+#[inline] pub fn neg(x:u128) -> u128 { x ^ SGNB }
 
 #[inline]
 pub fn add(x:u128,y:u128) -> u128 {
@@ -703,3 +707,4 @@ pub fn recip(x:u128) -> u128 {
   let z = add(mul(f, z), z);
   z.wrapping_add((me as u128) << 112) | (if s {SGNB} else {0})
 }
+
