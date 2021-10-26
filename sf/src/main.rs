@@ -2316,6 +2316,15 @@ fn main() {
     println!("  {}", f128::f128::from(2).cbrt().ldexp(1));
     println!("  {}", f128::f128::from(2).cbrt().ldexp(2));
     println!("  {}", f128::f128::from(2).cbrt().ldexp(3));
+    let x = f128::f128::from(3.75_f64);
+    println!("{} {}", x.frexp().0, x.frexp().1);
+    println!("{}", f128::f128::from(1).log());
+    println!("{}", f128::f128::from(2).log());
+    println!("{}", f128::f128::from(3).log());
+    println!("{}", f128::f128::from(100).log());
+    println!("{}", f128::f128::from(1).exp());
+    println!("{}", f128::f128::from(2).exp());
+    println!("{}", f128::f128::from(-1).exp());
   }
 
   if false {

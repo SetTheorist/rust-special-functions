@@ -25,9 +25,12 @@ const INFINITY    : f128 = f128(EXPB);
 const NAN         : f128 = f128(EXPB|(1<<111));
 const NEGNAN      : f128 = f128(SGNB|EXPB|(1<<111));
 const ONE         : f128 = f128((BIAS as u128)<<SHIFT);
+const ONEp        : f128 = f128(((BIAS as u128)<<SHIFT)+1);
 const THREE       : f128 = f128(0x4000_8000_0000_0000__0000_0000_0000_0000);
 const FOUR        : f128 = f128(0x4001_0000_0000_0000__0000_0000_0000_0000);
 const TEN         : f128 = f128(0x4002_4000_0000_0000__0000_0000_0000_0000);
+const LOG2        : f128 = f128(0x3ffe_62e4_2fef_a39e__f357_93c7_6730_07e6);
+const EPSILON     : f128 = f128(0x3f8f_0000_0000_0000__0000_0000_0000_0000);
 
 impl std::fmt::Debug for f128 {
   fn fmt(&self, f:&mut std::fmt::Formatter) -> std::fmt::Result {
@@ -45,19 +48,23 @@ impl std::fmt::Debug for f128 {
 
 impl std::fmt::Display for f128 {
   fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    if self.is_nan() { return write!(f, "NaN"); }
+    if self.is_infinite() { return write!(f, "{}", if sign(self.0) {"-Inf"} else {"Inf"}); }
     let mut z = *self;
     if z < ZERO {
       z = -z;
       write!(f, "-")?;
     }
     let mut e = 0;
-    while z >= TEN {
-      e += 1;
-      z = z / TEN;
-    }
-    while z < ONE {
-      e -= 1;
-      z = z * TEN;
+    if z.0&!SGNB != 0 { // don't rescale zero
+      while z >= TEN {
+        e += 1;
+        z = z / TEN;
+      }
+      while z < ONE {
+        e -= 1;
+        z = z * TEN;
+      }
     }
     for n in 0..35 {
       if n == 1 {
@@ -193,6 +200,10 @@ impl f128 {
     }
   }
 
+  #[inline]
+  pub fn abs(self) -> f128 {
+    f128(self.0 & !SGNB)
+  }
 
   pub fn sqrt(self) -> f128 {
     // TODO: special cases, negatives
@@ -254,7 +265,62 @@ impl f128 {
     let x = (x*n1 + self/x.powi(n-1))/nn;
     x
   }
+}
 
+////////////////////////////////////////////////////////////////////////////////
+
+impl f128 {
+  pub fn log(self) -> f128 {
+    if self < ZERO { return NAN; }
+    if self.is_nan() { return self; }
+    if self.is_zero() { return NEGINFINITY; }
+    if self.is_infinite() { return if sign(self.0) {NAN} else {INFINITY}; }
+
+    let (m0,e0) = self.frexp();
+    let x = m0 - ONE;
+    let terms = (2..).map(|n: isize| (x * f128::from((n>>1)*(n>>1)), f128::from(n)));
+    LOG2*f128::from(e0) + (x / contfrac_modlentz(ONE, terms))
+  }
+
+  pub fn exp(self) -> f128 {
+    if sign(self.0) { return (-self).exp().recip(); }
+    if self.is_nan() { return self; }
+    if self.is_infinite() { return if sign(self.0) {ZERO} else {INFINITY}; }
+    let x = self;
+    let n = (x / LOG2).floor();
+    let r = x - LOG2 * n;
+    let mut sum = ONE;
+    let mut t = ONE;
+    for i in 1..100 {
+      let old_sum = sum;
+      t *= r / f128::from(i);
+      sum += t;
+      if sum == old_sum {break;}
+    }
+    sum.ldexp(f64::from(n) as i32)
+  }
+}
+
+#[inline]
+fn contfrac_modlentz<I>(b0:f128, it:I) -> f128
+  where I:IntoIterator<Item=(f128,f128)>,
+{
+  let ζ = EPSILON.sqr();
+  let fix = |x:f128| if x.is_zero() {ζ} else {x};
+  let mut fj = fix(b0);
+  let mut cj = fj;
+  let mut dj = ZERO;
+  let mut n = 1;
+  for (aj, bj) in it {
+    dj = fix(bj + aj * dj);
+    cj = fix(bj + aj / cj);
+    dj = dj.recip();
+    let deltaj = cj * dj;
+    fj *= deltaj;
+    if (deltaj - ONE).abs() < EPSILON || n > 100 {break;}
+    n += 1;
+  }
+  fj
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -264,6 +330,7 @@ macro_rules! from_int {
     impl From<$u> for f128 {
       #[inline]
       fn from(x:$u) -> f128 {
+        if x==0 { return ZERO; }
         let l = x.log2();
         let m = ((x as u128) << (112-l)) & MANB;
         let e = ((l as i32) + BIAS) as u128;
