@@ -2325,6 +2325,13 @@ fn main() {
     println!("{}", f128::f128::from(1).exp());
     println!("{}", f128::f128::from(2).exp());
     println!("{}", f128::f128::from(-1).exp());
+
+    println!("- - -");
+    println!("{}", f128::f128::from(80).recip());
+    println!("{}", f128::f128::from(80).recip().exp());
+    println!("{}", f128::f128::from(80).recip().exp_m1());
+    println!("{}", f128::f128::from(80).recip().exp()-f128::f128::from(1));
+    println!("{:032x}", f128::f128::from(80).recip().exp_m1().to_bits());
   }
 
   if false {

@@ -287,7 +287,7 @@ impl f128 {
     if self.is_nan() { return self; }
     if self.is_infinite() { return if sign(self.0) {ZERO} else {INFINITY}; }
     let x = self;
-    let n = (x / LOG2).floor();
+    let n = (x / LOG2).floor(); // TODO: cleaner range-reduction
     let r = x - LOG2 * n;
     let mut sum = ONE;
     let mut t = ONE;
@@ -298,6 +298,22 @@ impl f128 {
       if sum == old_sum {break;}
     }
     sum.ldexp(f64::from(n) as i32)
+  }
+
+  pub fn exp_m1(self) -> f128 {
+    if self.abs() < LOG2 {
+      let mut sum = ZERO;
+      let mut t = ONE;
+      for i in 1..100 {
+        let old_sum = sum;
+        t *= self / f128::from(i);
+        sum += t;
+        if sum == old_sum {break;}
+      }
+      sum
+    } else {
+      self.exp() - ONE
+    }
   }
 }
 
