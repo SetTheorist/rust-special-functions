@@ -24,13 +24,17 @@ const NEGINFINITY : f128 = f128(SGNB|EXPB);
 const INFINITY    : f128 = f128(EXPB);
 const NAN         : f128 = f128(EXPB|(1<<111));
 const NEGNAN      : f128 = f128(SGNB|EXPB|(1<<111));
+const HALF        : f128 = f128(((BIAS-1) as u128)<<SHIFT);
 const ONE         : f128 = f128((BIAS as u128)<<SHIFT);
 const ONEp        : f128 = f128(((BIAS as u128)<<SHIFT)+1);
+const TWO         : f128 = f128(0x4000_0000_0000_0000__0000_0000_0000_0000);
 const THREE       : f128 = f128(0x4000_8000_0000_0000__0000_0000_0000_0000);
 const FOUR        : f128 = f128(0x4001_0000_0000_0000__0000_0000_0000_0000);
 const TEN         : f128 = f128(0x4002_4000_0000_0000__0000_0000_0000_0000);
 const LOG2        : f128 = f128(0x3ffe_62e4_2fef_a39e__f357_93c7_6730_07e6);
 const EPSILON     : f128 = f128(0x3f8f_0000_0000_0000__0000_0000_0000_0000);
+const LOG2_B10    : f128 = f128(0x3ffd_3441_3509_f79f__ef31_1f12_b358_16f9);
+const LOG10       : f128 = f128(0x4000_26bb_1bbb_5551__582d_d4ad_ac57_05a6);
 
 impl std::fmt::Debug for f128 {
   fn fmt(&self, f:&mut std::fmt::Formatter) -> std::fmt::Result {
@@ -135,6 +139,23 @@ impl f128 {
     if e < 0 { return ZERO; }
     if e > 112 { return self; }
     return f128(self.0 & !((1<<(112-e))-1));
+  }
+
+  pub fn round(self) -> f128 {
+    if self.is_nan() || self.is_infinite() || self.is_zero() { return self; }
+    if sign(self.0) { return -(-self).round(); }
+    let x = (self*TWO).floor();
+    if (f64::from(x) as usize)%2==1 { // TODO
+      (x+ONE) / TWO
+    } else {
+      x / TWO
+    }
+  }
+
+  pub fn fract(self) -> f128 {
+    if self.is_nan() || self.is_infinite() || self.is_zero() { return self; }
+    if sign(self.0) { return -(-self).fract(); }
+    self - self.floor()
   }
 
   #[inline]
@@ -265,6 +286,16 @@ impl f128 {
     let x = (x*n1 + self/x.powi(n-1))/nn;
     x
   }
+
+  #[inline]
+  pub fn clamp(self, a:f128, b:f128) -> f128 {
+    if self<a {a} else if self>b {b} else {self}
+  }
+
+  #[inline]
+  pub fn lerp(self, a:f128, b:f128) -> f128 {
+    if self<=HALF {a+(b-a)*self} else {b-(b-a)*(ONE-self)}
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -282,10 +313,40 @@ impl f128 {
     LOG2*f128::from(e0) + (x / contfrac_modlentz(ONE, terms))
   }
 
+  pub fn log2(self) -> f128 {
+    if self < ZERO { return NAN; }
+    if self.is_nan() { return self; }
+    if self.is_zero() { return NEGINFINITY; }
+    if self.is_infinite() { return if sign(self.0) {NAN} else {INFINITY}; }
+
+    let (m0,e0) = self.frexp();
+    let x = m0 - ONE;
+    let terms = (2..).map(|n: isize| (x * f128::from((n>>1)*(n>>1)), f128::from(n)));
+    f128::from(e0) + (x / contfrac_modlentz(ONE, terms))/LOG2
+  }
+
+  pub fn log10(self) -> f128 {
+    if self < ZERO { return NAN; }
+    if self.is_nan() { return self; }
+    if self.is_zero() { return NEGINFINITY; }
+    if self.is_infinite() { return if sign(self.0) {NAN} else {INFINITY}; }
+
+    let (m0,e0) = self.frexp();
+    let x = m0 - ONE;
+    let terms = (2..).map(|n: isize| (x * f128::from((n>>1)*(n>>1)), f128::from(n)));
+    LOG2_B10*f128::from(e0) + (x / contfrac_modlentz(ONE, terms))/LOG10
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+impl f128 {
   pub fn exp(self) -> f128 {
     if sign(self.0) { return (-self).exp().recip(); }
     if self.is_nan() { return self; }
     if self.is_infinite() { return if sign(self.0) {ZERO} else {INFINITY}; }
+    if self.is_zero() { return ONE; }
+
     let x = self;
     let n = (x / LOG2).floor(); // TODO: cleaner range-reduction
     let r = x - LOG2 * n;
@@ -301,6 +362,10 @@ impl f128 {
   }
 
   pub fn exp_m1(self) -> f128 {
+    if self.is_zero() { return self; }
+    if self.is_nan() { return self; }
+    if self.is_infinite() { return if sign(self.0) {-ONE} else {INFINITY}; }
+
     if self.abs() < LOG2 {
       let mut sum = ZERO;
       let mut t = ONE;
@@ -315,7 +380,33 @@ impl f128 {
       self.exp() - ONE
     }
   }
+
+  // 2^x
+  pub fn exp2(self) -> f128 {
+    if sign(self.0) { return (-self).exp2().recip(); }
+    if self.is_nan() { return self; }
+    if self.is_infinite() { return if sign(self.0) {ZERO} else {INFINITY}; }
+    if self.is_zero() { return ONE; }
+
+    let n = self.round();
+    let r = (self - n)*LOG2;
+    let mut sum = ONE;
+    let mut t = ONE;
+    for i in 1..100 {
+      let old_sum = sum;
+      t *= r / f128::from(i);
+      sum += t;
+      if sum == old_sum {break;}
+    }
+    sum.ldexp(f64::from(n) as i32)
+  }
+
+  pub fn powf(self, e:f128) -> f128 {
+    todo!()
+  }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 #[inline]
 fn contfrac_modlentz<I>(b0:f128, it:I) -> f128
@@ -333,7 +424,7 @@ fn contfrac_modlentz<I>(b0:f128, it:I) -> f128
     dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
-    if (deltaj - ONE).abs() < EPSILON || n > 100 {break;}
+    if (deltaj - ONE).abs() <= EPSILON || n > 100 {break;}
     n += 1;
   }
   fj

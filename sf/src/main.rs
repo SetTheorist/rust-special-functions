@@ -2318,13 +2318,15 @@ fn main() {
     println!("  {}", f128::f128::from(2).cbrt().ldexp(3));
     let x = f128::f128::from(3.75_f64);
     println!("{} {}", x.frexp().0, x.frexp().1);
-    println!("{}", f128::f128::from(1).log());
-    println!("{}", f128::f128::from(2).log());
-    println!("{}", f128::f128::from(3).log());
-    println!("{}", f128::f128::from(100).log());
-    println!("{}", f128::f128::from(1).exp());
-    println!("{}", f128::f128::from(2).exp());
-    println!("{}", f128::f128::from(-1).exp());
+    println!("log(1)={}", f128::f128::from(1).log());
+    println!("log(2)={}", f128::f128::from(2).log());
+    println!("log(3)={}", f128::f128::from(3).log());
+    println!("log(100)={}", f128::f128::from(100).log());
+    println!("exp(1)={}", f128::f128::from(1).exp());
+    println!("exp(2)={}", f128::f128::from(2).exp());
+    println!("exp(-1)={}", f128::f128::from(-1).exp());
+    println!("log2(3)={}", f128::f128::from(3).log2());
+    println!("log10(3)={}", f128::f128::from(3).log10());
 
     println!("- - -");
     println!("{}", f128::f128::from(80).recip());
@@ -2332,6 +2334,23 @@ fn main() {
     println!("{}", f128::f128::from(80).recip().exp_m1());
     println!("{}", f128::f128::from(80).recip().exp()-f128::f128::from(1));
     println!("{:032x}", f128::f128::from(80).recip().exp_m1().to_bits());
+
+    println!("-----");
+    println!("[0.25] = {}", f128::f128::from(0.25_f64).round());
+    println!("[0.50] = {}", f128::f128::from(0.50_f64).round());
+    println!("[0.75] = {}", f128::f128::from(0.75_f64).round());
+    println!("[1.00] = {}", f128::f128::from(1.00_f64).round());
+    println!("[1.25] = {}", f128::f128::from(1.25_f64).round());
+    println!("[1.50] = {}", f128::f128::from(1.50_f64).round());
+    println!("[1.75] = {}", f128::f128::from(1.75_f64).round());
+
+    println!("-----");
+    println!("2^(0.25) = {}", f128::f128::from(0.25_f64).exp2());
+    println!("2^(0.5) = {}", f128::f128::from(0.50_f64).exp2());
+    println!("2^(0.75) = {}", f128::f128::from(0.75_f64).exp2());
+    println!("2^(1.0) = {}", f128::f128::from(1).exp2());
+    println!("2^(2.0) = {}", f128::f128::from(2).exp2());
+    println!("2^(11.25) = {}", f128::f128::from(11.25_f64).exp2());
   }
 
   if false {
