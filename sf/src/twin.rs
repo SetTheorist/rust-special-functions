@@ -11,8 +11,8 @@ pub trait Base: Sized + Copy
   + Mul<Output=Self>
   + Div<Output=Self>
   + Neg<Output=Self>
+  + PartialOrd + PartialEq
   + Default
-  //+ From
 {
   fn SPLIT() -> Self;
   fn mul_add(self, b:Self, c:Self) -> Self;
@@ -20,8 +20,15 @@ pub trait Base: Sized + Copy
   fn recip(self) -> Self;
   fn sqrt(self) -> Self;
   fn cbrt(self) -> Self;
+  fn ceil(self) -> Self;
+  fn floor(self) -> Self;
+  fn round(self) -> Self;
+  fn trunc(self) -> Self;
+  fn abs(self) -> Self;
   fn ci(c:isize) -> Self;
   fn cf(c:f64) -> Self;
+  fn to64(self) -> f64;
+  fn epsilon() -> Self;
 }
 
 impl Base for f32 {
@@ -31,8 +38,15 @@ impl Base for f32 {
   #[inline] fn recip(self) -> Self { self.recip() }
   #[inline] fn sqrt(self) -> Self { self.sqrt() }
   #[inline] fn cbrt(self) -> Self { self.cbrt() }
+  #[inline] fn ceil(self) -> Self { self.ceil() }
+  #[inline] fn floor(self) -> Self { self.floor() }
+  #[inline] fn round(self) -> Self { self.round() }
+  #[inline] fn trunc(self) -> Self { self.trunc() }
+  #[inline] fn abs(self) -> Self { self.abs() }
   #[inline] fn ci(c:isize) -> Self { c as f32 }
   #[inline] fn cf(c:f64) -> Self { c as f32 }
+  #[inline] fn to64(self) -> f64 { self as f64 }
+  #[inline] fn epsilon() -> Self { f32::EPSILON }
 }
 impl Base for f64 {
   #[inline] fn SPLIT() -> Self { 134217729.0 }
@@ -41,8 +55,15 @@ impl Base for f64 {
   #[inline] fn recip(self) -> Self { self.recip() }
   #[inline] fn sqrt(self) -> Self { self.sqrt() }
   #[inline] fn cbrt(self) -> Self { self.cbrt() }
+  #[inline] fn ceil(self) -> Self { self.ceil() }
+  #[inline] fn floor(self) -> Self { self.floor() }
+  #[inline] fn round(self) -> Self { self.round() }
+  #[inline] fn trunc(self) -> Self { self.trunc() }
+  #[inline] fn abs(self) -> Self { self.abs() }
   #[inline] fn ci(c:isize) -> Self { c as f64 }
   #[inline] fn cf(c:f64) -> Self { c as f64 }
+  #[inline] fn to64(self) -> f64 { self }
+  #[inline] fn epsilon() -> Self { f64::EPSILON }
 }
 impl<F:Base> Base for Twin<F> {
   #[inline] fn SPLIT() -> Twin<F> { Twin::new((F::SPLIT()-F::ci(1))*(F::SPLIT()-F::ci(1)), F::ci(1)) }
@@ -51,8 +72,35 @@ impl<F:Base> Base for Twin<F> {
   #[inline] fn recip(self) -> Self { self.recip() }
   #[inline] fn sqrt(self) -> Self { self.sqrt() }
   #[inline] fn cbrt(self) -> Self { self.cbrt() }
+  #[inline] fn ceil(self) -> Self { self.ceil() }
+  #[inline] fn floor(self) -> Self { self.floor() }
+  #[inline] fn round(self) -> Self { self.round() }
+  #[inline] fn trunc(self) -> Self { self.trunc() }
+  #[inline] fn abs(self) -> Self { self.abs() }
   #[inline] fn ci(c:isize) -> Self { Twin::new(F::ci(c),F::default()) }
   #[inline] fn cf(c:f64) -> Self { Twin::new(F::cf(c),F::default()) }
+  #[inline] fn to64(self) -> f64 { self.hi.to64() }
+  #[inline] fn epsilon() -> Self {
+    Twin{hi:F::epsilon(),lo:F::default()}*Twin{hi:F::epsilon(),lo:F::default()}
+  }
+}
+use crate::f128::*;
+impl Base for f128 {
+  #[inline] fn SPLIT() -> Self { f128::from_bits(0x4037_0000_0000_0000__0100_0000_0000_0000) } // 72057594037927937
+  #[inline] fn mul_add(self, b:Self, c:Self) -> Self { unimplemented!() }
+  #[inline] fn HAS_MUL_ADD() -> bool { false }
+  #[inline] fn recip(self) -> Self { self.recip() }
+  #[inline] fn sqrt(self) -> Self { self.sqrt() }
+  #[inline] fn cbrt(self) -> Self { self.cbrt() }
+  #[inline] fn ceil(self) -> Self { self.ceil() }
+  #[inline] fn floor(self) -> Self { self.floor() }
+  #[inline] fn round(self) -> Self { self.round() }
+  #[inline] fn trunc(self) -> Self { self.trunc() }
+  #[inline] fn abs(self) -> Self { self.abs() }
+  #[inline] fn ci(c:isize) -> Self { f128::from(c) }
+  #[inline] fn cf(c:f64) -> Self { f128::from(c) }
+  #[inline] fn to64(self) -> f64 { f64::from(self) }
+  #[inline] fn epsilon() -> Self { f128::from(f64::EPSILON).sqr() }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -240,6 +288,63 @@ impl<F:Base> Twin<F> {
     let x = x*(-self*x*x.sqr() + c4)/c3;
     x
   }
+
+  pub fn floor(self) -> Self {
+    let xhi = self.hi.floor();
+    if self.hi == xhi {
+      let xlo = self.lo.floor();
+      let (hi, lo) = qtsum(xhi, xlo);
+      Twin{hi, lo}
+    } else {
+      Twin{hi:xhi, lo:F::default()}
+    }
+  }
+
+  pub fn ceil(self) -> Self {
+    let xhi = self.hi.ceil();
+    if self.hi == xhi {
+      let xlo = self.lo.ceil();
+      let (hi, lo) = qtsum(xhi, xlo);
+      Twin{hi, lo}
+    } else {
+      Twin{hi:xhi, lo:F::default()}
+    }
+  }
+
+  pub fn round(self) -> Self {
+    let xhi = self.hi.round();
+    if self.hi == xhi {
+      let xlo = self.lo.round();
+      let (hi, lo) = qtsum(xhi, xlo);
+      Twin{hi, lo}
+    } else {
+      if (xhi-self.hi).abs()==F::cf(0.5) && self.lo < F::default() {
+        Twin{hi:xhi-F::ci(1), lo:F::default()}
+      } else {
+        Twin{hi:xhi, lo:F::default()}
+      }
+    }
+  }
+
+  pub fn trunc(self) -> Self {
+    let xhi = self.hi.trunc();
+    if self.hi == xhi {
+      let xlo = self.lo.trunc();
+      let (hi, lo) = qtsum(xhi, xlo);
+      Twin{hi, lo}
+    } else {
+      Twin{hi:xhi, lo:F::default()}
+    }
+  }
+
+  #[inline]
+  pub fn abs(self) -> Self {
+    if self < Self::default() {
+      -self
+    } else {
+      self
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -303,3 +408,46 @@ impl<F:Base> Div<Twin<F>> for F {
 */
 
 ////////////////////////////////////////////////////////////////////////////////
+
+
+impl<F:Base> std::fmt::Display for Twin<F> {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    let ZERO = Self::default();
+    let ONE = Self::ci(1);
+    let TEN = Self::ci(10);
+    //if self.is_nan() { return write!(f, "NaN"); }
+    //if self.is_infinite() { return write!(f, "{}", if self<ZERO {"-Inf"} else {"Inf"}); }
+    let mut z = *self;
+    if z < ZERO {
+      z = -z;
+      write!(f, "-")?;
+    }
+    let mut e = 0;
+    if z == ZERO { // don't rescale zero
+      while z >= TEN {
+        e += 1;
+        z = z / TEN;
+      }
+      while z < ONE {
+        e -= 1;
+        z = z * TEN;
+      }
+    }
+    let digs = ((Self::epsilon().to64().recip()*1.1).log10().ceil() as isize) + 4;
+    println!("{}", digs);
+    for n in 0..digs {
+      if n == 1 {
+        write!(f, ".")?;
+      }
+      let d = z.floor().to64();
+      if d<0.0 || d>=10.0 { eprintln!("<<{}>>", d); }
+      let dd = ((d as u8) + b'0') as char;
+      write!(f, "{}", dd)?;
+      let d0 = Self::cf(d);
+      z = (z - d0) * TEN;
+    }
+    if e != 0 { write!(f, "e{}", e)?; }
+    write!(f, "")
+  }
+}
+

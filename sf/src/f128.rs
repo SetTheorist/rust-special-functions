@@ -152,6 +152,11 @@ impl f128 {
     }
   }
 
+  pub fn trunc(self) -> f128 {
+    if sign(self.0) { -(-self.floor()) }
+    else { self.floor() }
+  }
+
   pub fn fract(self) -> f128 {
     if self.is_nan() || self.is_infinite() || self.is_zero() { return self; }
     if sign(self.0) { return -(-self).fract(); }
@@ -177,30 +182,30 @@ impl f128 {
 
   #[inline]
   // TODO: ldexp, edge cases, special cases, etc.
-  fn mul2(self) -> f128 {
+  pub fn mul2(self) -> f128 {
     f128(self.0 + (1 << SHIFT))
   }
 
   #[inline]
   // TODO: ldexp, edge cases, special cases, etc.
-  fn div2(self) -> f128 {
+  pub fn div2(self) -> f128 {
     f128(self.0.wrapping_add(!0 << SHIFT))
   }
 
   #[inline]
-  fn sqr(self) -> f128 {
+  pub fn sqr(self) -> f128 {
     // TODO: can we specialize this more efficiently?
     self*self
   }
 
   #[inline]
-  fn cub(self) -> f128 {
+  pub fn cub(self) -> f128 {
     // TODO: can we specialize this more efficiently?
     self.sqr()*self
   }
 
   #[inline]
-  fn powu(self, n:usize) -> f128 {
+  pub fn powu(self, n:usize) -> f128 {
     let mut n = n;
     let mut x = self;
     let mut v = ONE;
@@ -213,7 +218,7 @@ impl f128 {
   }
 
   #[inline]
-  fn powi(self, n:isize) -> f128 {
+  pub fn powi(self, n:isize) -> f128 {
     if n < 0 {
       self.powu(-n as usize).recip()
     } else {

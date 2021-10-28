@@ -2530,5 +2530,14 @@ fn main() {
     println!("{}", x);
     println!("{:?}", x);
   }
+
+  if true {
+    println!("{:e}", f32::EPSILON.recip().log10().ceil());
+    println!("{:e}", f64::EPSILON.recip().log10().ceil());
+    println!("{}", twin::Twin::new(2.0_f32,0.0).sqrt());
+    println!("{}", twin::Twin::new(2.0_f64,0.0).sqrt());
+    println!("{}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt());
+    println!("{}", twin::Twin::new(f128::f128::from(2),f128::f128::from(0)).sqrt());
+  }
 }
 
