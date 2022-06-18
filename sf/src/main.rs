@@ -20,7 +20,6 @@
 #![feature(bigint_helper_methods)]
 #![feature(const_fn_floating_point_arithmetic)]
 #![feature(const_trait_impl)]
-#![feature(destructuring_assignment)]
 #![feature(generic_const_exprs)]
 #![feature(int_log)]
 #![feature(trait_alias)]
