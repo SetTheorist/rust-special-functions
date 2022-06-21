@@ -11,9 +11,11 @@ pub trait Log: Value {
 
   // $\log_2(x)$
   fn log2(self) -> Self { unimplemented!() } // TODO
-                                             // $\log_10(x)$
+
+  // $\log_10(x)$
   fn log10(self) -> Self { unimplemented!() } // TODO
-                                              // $\log_b(x)$
+
+  // $\log_b(x)$
   fn logb(self, _b: Self) -> Self { unimplemented!() } // TODO
 }
 pub fn sf_log<V: Log>(x: V) -> V { x.log() }

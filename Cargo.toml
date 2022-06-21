@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "scratch",
+    "sf",
+    "sf_hex_float",
+]

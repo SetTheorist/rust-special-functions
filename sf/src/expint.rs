@@ -111,18 +111,16 @@ pub fn expint_ei_real<V:RealValue+Float+Exp+Log>(z:V) -> V {
 ////////////////////////////////////////////////////////////////////////////////
 
 pub fn expint_en_real<V:RealValue+Exp+Log+Gamma>(n:isize, z:V) -> V {
-  if n < 0 {
-    V::nan
-  } else if n == 0 {
-    expint_en_0(z)
-  } else if n == 1 {
-    expint_en_1(z)
-  } else {
-    if z <= ι(1):V {
-      expint_en_series(n, z)
-    } else {
-      expint_en_contfrac(n, z)
-    }
+  match n {
+    n if n < 0 => V::nan,
+    0 => expint_en_0(z),
+    1 => expint_en_1(z),
+    _ => 
+      if z <= ι(1):V {
+        expint_en_series(n, z)
+      } else {
+        expint_en_contfrac(n, z)
+      },
   }
 }
 

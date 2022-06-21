@@ -89,7 +89,7 @@ pub fn real_branch_neg_2<V:RealValue+Exp+Float+Log>(x:V) -> V {
 fn halley_iter<V:Value+Exp>(x:V, w0:V) -> V {
   let mut w = w0;
   let mut ow = w + 1;
-  for n in 0..1000 {
+  for n in 0..100 {
     let ew = sf_exp(w);
     let oow = ow;
     ow = w;

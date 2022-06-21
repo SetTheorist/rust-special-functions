@@ -1,0 +1,16 @@
+[package]
+name = "scratch"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+simple_logger = "*"
+plotlib = "*"
+#plotters = "*"
+
+[dependencies.sf]
+path = "../sf"
+
+[dependencies.sf_hex_float]
+path = "../sf_hex_float"
+

@@ -34,7 +34,7 @@ pub mod impls {
 
   // doesn't include suggested optimizations
   pub fn dawson_rybicki<V: Value + Exp>(x: V) -> V {
-    let h: V = ι(0.1);
+    let h = ι(1):V/10;
     let terms = (1..).step_by(2).map(|n| (sf_exp(-(x - h * n).sqr()) - sf_exp(-(x + h * n).sqr())) / n);
     sum_series(terms, V::epsilon) * V::FRAC_1_SQRTPI
   }

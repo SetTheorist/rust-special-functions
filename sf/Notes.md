@@ -1,5 +1,7 @@
 Random jottings:
 
+cargo rustdoc --open -- --html-in-header katex.html
+
 ## optional config settings
 - use builtin math-functions (default true)
 - use libm where available (default false)

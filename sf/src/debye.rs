@@ -43,9 +43,7 @@ pub mod impls {
       zpow *= z2;
       let old = res;
       res += zpow * sf_bernoulli_number_scaled_approx(2 * k as usize) / (2 * k + n);
-      if res == old {
-        break;
-      }
+      if res == old { break; }
     }
     res *= z.pow(n);
     res
@@ -59,9 +57,7 @@ pub mod impls {
       zpow *= z2;
       let old = res;
       res += zpow * sf_bernoulli_number_scaled_approx(2 * k as usize) / (2 * k + n);
-      if res == old {
-        break;
-      }
+      if res == old { break; }
     }
     res *= n;
     res
@@ -72,9 +68,7 @@ pub mod impls {
     for k in 1..1000 {
       let old = res;
       res += sf_exp(-z * k) * coterm(n, k, z);
-      if old == res {
-        break;
-      }
+      if old == res { break; }
     }
     res
   }

@@ -43,42 +43,38 @@ impl Exp for r64 {
       if self.is_posreal() {
         return r64::infinity;
       } else {
-        if n == 0 {
-          return r64::zero;
-        } else if n == 1 {
-          return -r64::one;
-        } else {
-          return r64::infinity.pari(n);
+        return match n {
+          0 => r64::zero,
+          1 => -r64::one,
+          _ => r64::infinity.pari(n),
         }
       }
     }
     // TODO: check n>=0
-    if n == 0 {
-      self.exp()
-    } else if n == 1 {
-      self.exp_m1()
-    } else {
-      exp_men_contfrac(n, self)
+    match n {
+      0 => self.exp(),
+      1 => self.exp_m1(),
+      _ => exp_men_contfrac(n, self),
     }
   }
 }
 
 use crate::complex::*;
 impl Exp for c64 {
+
   #[inline]
   fn exp(self) -> c64 {
     // TODO: temporary quick implementation
     c64::polar(sf_exp(self.re), self.im)
   }
+
   #[inline] fn exp_men(self, n:isize) -> Self {
     // TODO: check n>=0
     // TODO: nan, inf, etc.
-    if n == 0 {
-      self.exp()
-    } else if n == 1 {
-      self.exp_m1()
-    } else {
-      exp_men_contfrac(n, self)
+    match n {
+      0 => self.exp(),
+      1 => self.exp_m1(),
+      _ => exp_men_contfrac(n, self),
     }
   }
 }

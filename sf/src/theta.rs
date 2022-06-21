@@ -7,14 +7,11 @@ pub trait Theta {
   fn theta_3(self, q:Self) -> Self;
   fn theta_4(self, q:Self) -> Self;
 }
-#[inline]
-pub fn sf_theta_1<V:Theta>(z:V, q:V) -> V { z.theta_1(q) }
-#[inline]
-pub fn sf_theta_2<V:Theta>(z:V, q:V) -> V { z.theta_2(q) }
-#[inline]
-pub fn sf_theta_3<V:Theta>(z:V, q:V) -> V { z.theta_3(q) }
-#[inline]
-pub fn sf_theta_4<V:Theta>(z:V, q:V) -> V { z.theta_4(q) }
+
+#[inline] pub fn sf_theta_1<V:Theta>(z:V, q:V) -> V { z.theta_1(q) }
+#[inline] pub fn sf_theta_2<V:Theta>(z:V, q:V) -> V { z.theta_2(q) }
+#[inline] pub fn sf_theta_3<V:Theta>(z:V, q:V) -> V { z.theta_3(q) }
+#[inline] pub fn sf_theta_4<V:Theta>(z:V, q:V) -> V { z.theta_4(q) }
 
 pub mod impls {
 use crate::traits::*;

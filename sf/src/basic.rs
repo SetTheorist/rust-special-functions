@@ -57,7 +57,7 @@ pub fn sqrt_newton<V:Value+InitialGuess>(x:V) -> V {
   for i in 0..6 {
     let o = v;
     v = (v + x/v)/2;
-    if o == v { print!("({})",i); break; }
+    if o == v { log::trace!("(x={},v={},i={})",x,v,i); break; }
   }
   v
 }
@@ -68,7 +68,7 @@ pub fn sqrt_halley<V:Value+InitialGuess>(x:V) -> V {
   for i in 0..11 {
     let o = v;
     v = (v + x*3/v) / (v*3 + x/v) * v;
-    if o == v { print!("[{}]",i); break; }
+    if o == v { log::trace!("(x={},v={},i={})",x,v,i); break; }
   }
   v
 }
@@ -79,7 +79,7 @@ pub fn cbrt_newton<V:Value+InitialGuess>(x:V) -> V {
   for i in 0..100 {
     let o = v;
     v = v * (v*v + x*2/v) / (v*v*2 + x/v);
-    if o == v { print!("({})",i); break; }
+    if o == v { log::trace!("(x={},v={},i={})",x,v,i); break; }
   }
   v
 }
@@ -90,7 +90,7 @@ pub fn nthrt_newton<V:Value+InitialGuess>(x:V, n:isize) -> V {
   for i in 0..100 {
     let o = v;
     v = (v*(n-1) + x/v.pow(n-1))/n;
-    if o == v { print!("({})",i); break; }
+    if o == v { log::trace!("(x={},v={},n={},i={})",x,v,n,i); break; }
   }
   v
 }
