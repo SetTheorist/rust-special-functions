@@ -1512,24 +1512,6 @@ fn main() {
   }
 
   if false {
-    let a = f16::f16(16_u16<<10);
-    println!("{:016b}  {} {}", a.0, a.to_f32(), a.to_f64());
-    println!("{:016b}  {} {}", (-a).0, (-a).to_f32(), (-a).to_f64());
-    println!("{:016b}", f16::f16::from_f32(a.to_f32()).0);
-    let b = a*a;
-    println!("{:016b}  {} {}", b.0, b.to_f32(), b.to_f64());
-    let c = b*b;
-    println!("{:016b}  {} {}", c.0, c.to_f32(), c.to_f64());
-    let a = f16::f16(0x3333);
-    println!("{:016b}  {} {}", a.0, a.to_f32(), a.to_f64());
-    let b = a*a;
-    println!("{:016b}  {} {} {}", b.0, b.to_f32(), b.to_f64(), a.to_f32()*a.to_f32());
-    let c = b*b;
-    println!("{:016b}  {} {} {}={:016b}", c.0, c.to_f32(), c.to_f64(),
-      b.to_f32()*b.to_f32(), f16::f16::from_f32(b.to_f32()*b.to_f32()).0);
-  }
-
-  if false {
     println!("-----");
     println!("Lambert");
     let x = r64(-0.1);
@@ -1971,69 +1953,6 @@ fn main() {
   }
 
   if false {
-    let x = f16::f16(0x0000);
-    println!("{:?}", x);
-    let x = f16::f16(0x5555);
-    println!("{:?}", x);
-    let x = f16::f16::from_f32(1.5);
-    println!("{:?}", x);
-    let x = f16::f16::from_f32(2.0);
-    println!("{:?}", x);
-    println!("{:?}", x*x);
-    let x = f16::f16(0x4010);
-    println!("{:?}", x);
-    println!("{:?}", x*x);
-    println!("{:?}", x*x*x);
-    println!("{:?}", x*x*x*x);
-    println!("{:?}", x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
-    println!("{:?}", x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
-    let x = f16::f16(0x4010);
-    println!("{:?}", x);
-    println!("{:?}", x+x);
-    println!("{:?}", x+x+x);
-    println!("{:?}", x+x+x+x);
-    println!("{:?}", x+x+x+x+x);
-    println!("{:?}", x+x+x+x+x+x);
-    println!("{:?}", x+x+x+x+x+x+x);
-    println!("{:?}", x+x+x+x+x+x+x+x);
-    println!("{:?}", x+x+x+x+x+x+x+x+x);
-    println!("{:?}", x+x+x+x+x+x+x+x+x+x);
-    println!("{:?}", x+x+x+x+x+x+x+x+x+x+x);
-    let x = f16::f16(0x4010);
-    println!("{:?}", x+x*x*x+x+x);
-    let x = f16::f16::from_f32(-13.125);
-    println!("{:?}", x);
-    let x = f16::f16::from_f32(3.14);
-    println!("{:?}", x);
-    println!("{:?}", x.prev());
-    println!("{:?}", x.next());
-    let x = f16::f16::from_f32(0.0);
-    println!("{:?}", x);
-    let x = f16::f16::from_f32(f32::INFINITY);
-    println!("{:?}", x);
-    let x = f16::f16::from_f32(f32::NAN);
-    println!("{:?}", x);
-    let x = f16::f16(0x7C01);
-    println!("{:?}", x);
-    let x = f16::f16::from_f32(0.5);
-    let mut y = x;
-    for _ in 0 .. 20 {
-      y = y * x;
-      println!("{:?}", y);
-    }
-  }
-  if false {
     println!("L(-2)={:e}", sf_dilog(r64(-2.0)));
     println!("L(-1)={:e}", sf_dilog(-r64::one));
     println!("L(0)={:e}", sf_dilog(r64::zero));
@@ -2348,15 +2267,6 @@ fn main() {
     println!("2^(1.0) = {}", f128::f128::from(1).exp2());
     println!("2^(2.0) = {}", f128::f128::from(2).exp2());
     println!("2^(11.25) = {}", f128::f128::from(11.25_f64).exp2());
-  }
-
-  if false {
-    let mut x = f16::f16::from_f32(3.0);
-    println!("{:?}", x);
-    for _ in 0..20 {
-      x = x * f16::f16::from_f32(0.5);
-      println!("  {:?}", x);
-    }
   }
 
   if false {
