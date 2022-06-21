@@ -189,7 +189,6 @@ pub mod erf;
 pub mod exp;
 pub mod expint;
 pub mod f128;
-pub mod f16;
 pub mod farb;
 pub mod float;
 pub mod gamma;

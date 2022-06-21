@@ -67,6 +67,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "f16"
+version = "0.1.0"
+
+[[package]]
 name = "failure"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -213,6 +217,7 @@ checksum = "7ef03e0a2b150c7a90d01faf6254c9c48a41e95fb2a8c2ac1c6f0d2b9aefc342"
 name = "scratch"
 version = "0.1.0"
 dependencies = [
+ "f16",
  "plotlib",
  "sf",
  "sf_hex_float",

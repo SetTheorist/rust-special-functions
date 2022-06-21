@@ -213,7 +213,6 @@ use sf_impl::{
   exp,
   expint,
   f128,
-  f16,
   farb,
   float,
   gamma,
@@ -2289,8 +2288,7 @@ fn main() {
     let y = f128::f128::from(2.0_f64).sqrt();
     println!("{}", x);
     println!("{}", f64::from(x));
-    println!("{}", x*x);
-    println!("{}", x*x-f128::f128::from(2.0_f64));
+	
     println!("{}", y);
     println!("{}", f64::from(y));
     println!("{}", y*y);
@@ -2541,7 +2539,6 @@ fn main() {
 
   if true {
     use sf::exp::{*};
-    println!("{:.18e} {:.18e} {:.18e}", sf_exp(1.0_f64), 1.0_f64.sf_exp(), 1.0_f64.exp())
+    println!("{:.18e} {:.18e} {:.18e}", sf_exp(1.0_f64), 1.0_f64.sf_exp(), 1.0_f64.exp());
   }
 }
-
