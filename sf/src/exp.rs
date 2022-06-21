@@ -1,5 +1,5 @@
-use crate::exp;
-use crate::real::*;
+use sf_impl::exp;
+use sf_impl::real::*;
 
 pub trait SFExp {
   fn sf_exp(self) -> Self;

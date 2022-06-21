@@ -11,6 +11,9 @@ plotlib = "*"
 [dependencies.sf]
 path = "../sf"
 
+[dependencies.sf_impl]
+path = "../sf_impl"
+
 [dependencies.sf_hex_float]
 path = "../sf_hex_float"
 

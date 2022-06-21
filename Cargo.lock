@@ -216,6 +216,7 @@ dependencies = [
  "plotlib",
  "sf",
  "sf_hex_float",
+ "sf_impl",
  "simple_logger",
 ]
 
@@ -223,15 +224,23 @@ dependencies = [
 name = "sf"
 version = "0.1.0"
 dependencies = [
- "log",
- "once_cell",
- "paste",
  "sf_hex_float",
+ "sf_impl",
 ]
 
 [[package]]
 name = "sf_hex_float"
 version = "0.1.0"
+
+[[package]]
+name = "sf_impl"
+version = "0.1.0"
+dependencies = [
+ "log",
+ "once_cell",
+ "paste",
+ "sf_hex_float",
+]
 
 [[package]]
 name = "simple_logger"

@@ -177,7 +177,6 @@ macro_rules! bench {
 pub mod agm;
 pub mod airy;
 pub mod algorithm;
-pub mod api;
 pub mod basic;
 pub mod bessel;
 pub mod complex;

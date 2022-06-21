@@ -197,52 +197,52 @@ macro_rules! bench {
 }
 */
 
-use sf::agm;
-use sf::airy;
-use sf::algorithm;
-use sf::api;
-use sf::basic;
-use sf::bessel;
-use sf::complex;
-use sf::data;
-use sf::dawson;
-use sf::debye;
-use sf::dual;
-use sf::ellint;
-use sf::erf;
-use sf::exp;
-use sf::expint;
-use sf::f128;
-use sf::f16;
-use sf::farb;
-use sf::float;
-use sf::gamma;
-use sf::hypergeom;
-use sf::integration;
-use sf::jacobi;
-use sf::kahan;
-use sf::lambert;
-use sf::log;
-use sf::numbers;
-use sf::orthopoly;
-use sf::pcf;
-use sf::poly;
-use sf::polylog;
-use sf::real;
-use sf::sievert;
-use sf::solve;
-use sf::theta;
-use sf::traits;
-use sf::trig;
-use sf::twin;
-use sf::util;
-use sf::wide;
-use sf::zeta;
+use sf_impl::{
+  agm,
+  airy,
+  algorithm,
+  basic,
+  bessel,
+  complex,
+  data,
+  dawson,
+  debye,
+  dual,
+  ellint,
+  erf,
+  exp,
+  expint,
+  f128,
+  f16,
+  farb,
+  float,
+  gamma,
+  hypergeom,
+  integration,
+  jacobi,
+  kahan,
+  lambert,
+  log,
+  numbers,
+  orthopoly,
+  pcf,
+  poly,
+  polylog,
+  real,
+  sievert,
+  solve,
+  theta,
+  traits,
+  trig,
+  twin,
+  util,
+  wide,
+  zeta,
+};
+use sf_hex_float::hexf;
 
 use std::str::FromStr;
 use std::time::Instant;
-
-use sf_hex_float::hexf;
 
 //use crate::kahan::{*};
 //use crate::num::complex::{Complex};
@@ -2537,6 +2537,11 @@ fn main() {
     println!("{}", twin::Twin::new(2.0_f64,0.0).sqrt());
     println!("{}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt());
     println!("{}", twin::Twin::new(f128::f128::from(2),f128::f128::from(0)).sqrt());
+  }
+
+  if true {
+    use sf::exp::{*};
+    println!("{:.18e} {:.18e} {:.18e}", sf_exp(1.0_f64), 1.0_f64.sf_exp(), 1.0_f64.exp())
   }
 }
 
