@@ -140,6 +140,13 @@ pub fn sin_series<V:Value>(x:V) -> V {
   sum_series(terms, V::epsilon)
 }
 
+pub fn range_reduce_pi<V:RealValue+Ordered>(x:V) -> (V,isize) {
+  // range-reduce
+  let n: isize = (x.abs() / V::NT::PI).floor().rint();
+  // TODO: use Kahan/compensated idea to return 2 floats to get exact diff
+  let r: V = x - V::PI * n;
+  (r, n)
+}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
