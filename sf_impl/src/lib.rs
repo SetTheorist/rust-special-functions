@@ -20,7 +20,7 @@
 #![feature(bigint_helper_methods)]
 #![feature(const_fn_floating_point_arithmetic)]
 #![feature(const_trait_impl)]
-#![feature(generic_const_exprs)]
+//#![feature(generic_const_exprs)]
 #![feature(int_log)]
 #![feature(trait_alias)]
 #![feature(type_ascription)]
@@ -188,7 +188,6 @@ pub mod ellint;
 pub mod erf;
 pub mod exp;
 pub mod expint;
-pub mod farb;
 pub mod float;
 pub mod gamma;
 pub mod hypergeom;

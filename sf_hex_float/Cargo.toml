@@ -2,6 +2,7 @@
 name = "sf_hex_float"
 version = "0.1.0"
 edition = "2021"
+authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
 
 [dependencies]
 

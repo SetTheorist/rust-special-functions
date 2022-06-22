@@ -1,13 +1,7 @@
 [package]
-name = "sf"
+name = "farb"
 version = "0.1.0"
 edition = "2021"
 authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
 
 [dependencies]
-
-[dependencies.sf_impl]
-path = "../sf_impl"
-
-[dependencies.sf_hex_float]
-path = "../sf_hex_float"

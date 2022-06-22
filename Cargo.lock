@@ -97,6 +97,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "farb"
+version = "0.1.0"
+
+[[package]]
 name = "gimli"
 version = "0.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -223,6 +227,7 @@ version = "0.1.0"
 dependencies = [
  "f128",
  "f16",
+ "farb",
  "plotlib",
  "sf",
  "sf_hex_float",

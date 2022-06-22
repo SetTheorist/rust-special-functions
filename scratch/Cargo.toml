@@ -3,6 +3,7 @@ name = "scratch"
 version = "0.1.0"
 edition = "2021"
 default-run = "main"
+authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
 
 [dependencies]
 simple_logger = "*"
@@ -20,6 +21,7 @@ path = "../sf_hex_float"
 
 [dependencies.f16]
 path = "../f16"
-
 [dependencies.f128]
 path = "../f128"
+[dependencies.farb]
+path = "../farb"

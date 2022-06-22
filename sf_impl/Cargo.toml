@@ -1,8 +1,8 @@
 [package]
 name = "sf_impl"
 version = "0.1.0"
-authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
 edition = "2021"
+authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
 
 [dependencies]
 once_cell = "*"
