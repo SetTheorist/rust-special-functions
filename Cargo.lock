@@ -67,6 +67,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "f128"
+version = "0.1.0"
+
+[[package]]
 name = "f16"
 version = "0.1.0"
 
@@ -217,6 +221,7 @@ checksum = "7ef03e0a2b150c7a90d01faf6254c9c48a41e95fb2a8c2ac1c6f0d2b9aefc342"
 name = "scratch"
 version = "0.1.0"
 dependencies = [
+ "f128",
  "f16",
  "plotlib",
  "sf",

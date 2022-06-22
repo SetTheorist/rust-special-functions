@@ -48,80 +48,6 @@
 //   e.g. const Wide::pi = float!(2;Wide(#0,#1);3.d4a349a4342...)
 
 
-/*
-          0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
-U+037x 	Ͱ 	ͱ 	Ͳ 	ͳ 	ʹ 	͵ 	Ͷ 	ͷ 			ͺ 	ͻ 	ͼ 	ͽ 	; 	Ϳ
-U+038x 					΄ 	΅ 	Ά 	· 	Έ 	Ή 	Ί 		Ό 		Ύ 	Ώ
-U+039x 	ΐ 	Α 	Β 	Γ 	Δ 	Ε 	Ζ 	Η 	Θ 	Ι 	Κ 	Λ 	Μ 	Ν 	Ξ 	Ο
-U+03Ax 	Π 	Ρ 		Σ 	Τ 	Υ 	Φ 	Χ 	Ψ 	Ω 	Ϊ 	Ϋ 	ά 	έ 	ή 	ί
-U+03Bx 	ΰ 	α 	β 	γ 	δ 	ε 	ζ 	η 	θ 	ι 	κ 	λ 	μ 	ν 	ξ 	ο
-U+03Cx 	π 	ρ 	ς 	σ 	τ 	υ 	φ 	χ 	ψ 	ω 	ϊ 	ϋ 	ό 	ύ 	ώ 	Ϗ
-U+03Dx 	ϐ 	ϑ 	ϒ 	ϓ 	ϔ 	ϕ 	ϖ 	ϗ 	Ϙ 	ϙ 	Ϛ 	ϛ 	Ϝ 	ϝ 	Ϟ 	ϟ
-U+03Ex 	Ϡ 	ϡ 	Ϣ 	ϣ 	Ϥ 	ϥ 	Ϧ 	ϧ 	Ϩ 	ϩ 	Ϫ 	ϫ 	Ϭ 	ϭ 	Ϯ 	ϯ
-U+03Fx 	ϰ 	ϱ 	ϲ 	ϳ 	ϴ 	ϵ 	϶ 	Ϸ 	ϸ 	Ϲ 	Ϻ 	ϻ 	ϼ 	Ͻ 	Ͼ 	Ͽ
-
-
-  	    0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
-U+040x 	Ѐ 	Ё 	Ђ 	Ѓ 	Є 	Ѕ 	І 	Ї 	Ј 	Љ 	Њ 	Ћ 	Ќ 	Ѝ 	Ў 	Џ
-U+041x 	А 	Б 	В 	Г 	Д 	Е 	Ж 	З 	И 	Й 	К 	Л 	М 	Н 	О 	П
-U+042x 	Р 	С 	Т 	У 	Ф 	Х 	Ц 	Ч 	Ш 	Щ 	Ъ 	Ы 	Ь 	Э 	Ю 	Я
-U+043x 	а 	б 	в 	г 	д 	е 	ж 	з 	и 	й 	к 	л 	м 	н 	о 	п
-U+044x 	р 	с 	т 	у 	ф 	х 	ц 	ч 	ш 	щ 	ъ 	ы 	ь 	э 	ю 	я
-U+045x 	ѐ 	ё 	ђ 	ѓ 	є 	ѕ 	і 	ї 	ј 	љ 	њ 	ћ 	ќ 	ѝ 	ў 	џ
-U+046x 	Ѡ 	ѡ 	Ѣ 	ѣ 	Ѥ 	ѥ 	Ѧ 	ѧ 	Ѩ 	ѩ 	Ѫ 	ѫ 	Ѭ 	ѭ 	Ѯ 	ѯ
-U+047x 	Ѱ 	ѱ 	Ѳ 	ѳ 	Ѵ 	ѵ 	Ѷ 	ѷ 	Ѹ 	ѹ 	Ѻ 	ѻ 	Ѽ 	ѽ 	Ѿ 	ѿ
-U+048x 	Ҁ 	ҁ 	҂ 	◌҃ 	◌҄ 	◌҅ 	◌҆ 	◌҇ 	◌҈ 	◌҉ 	Ҋ 	ҋ 	Ҍ 	ҍ 	Ҏ 	ҏ
-U+049x 	Ґ 	ґ 	Ғ 	ғ 	Ҕ 	ҕ 	Җ 	җ 	Ҙ 	ҙ 	Қ 	қ 	Ҝ 	ҝ 	Ҟ 	ҟ
-U+04Ax 	Ҡ 	ҡ 	Ң 	ң 	Ҥ 	ҥ 	Ҧ 	ҧ 	Ҩ 	ҩ 	Ҫ 	ҫ 	Ҭ 	ҭ 	Ү 	ү
-U+04Bx 	Ұ 	ұ 	Ҳ 	ҳ 	Ҵ 	ҵ 	Ҷ 	ҷ 	Ҹ 	ҹ 	Һ 	һ 	Ҽ 	ҽ 	Ҿ 	ҿ
-U+04Cx 	Ӏ 	Ӂ 	ӂ 	Ӄ 	ӄ 	Ӆ 	ӆ 	Ӈ 	ӈ 	Ӊ 	ӊ 	Ӌ 	ӌ 	Ӎ 	ӎ 	ӏ
-U+04Dx 	Ӑ 	ӑ 	Ӓ 	ӓ 	Ӕ 	ӕ 	Ӗ 	ӗ 	Ә 	ә 	Ӛ 	ӛ 	Ӝ 	ӝ 	Ӟ 	ӟ
-U+04Ex 	Ӡ 	ӡ 	Ӣ 	ӣ 	Ӥ 	ӥ 	Ӧ 	ӧ 	Ө 	ө 	Ӫ 	ӫ 	Ӭ 	ӭ 	Ӯ 	ӯ
-U+04Fx 	Ӱ 	ӱ 	Ӳ 	ӳ 	Ӵ 	ӵ 	Ӷ 	ӷ 	Ӹ 	ӹ 	Ӻ 	ӻ 	Ӽ 	ӽ 	Ӿ 	ӿ
-
-  	    0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
-U+10Ax 	Ⴀ 	Ⴁ 	Ⴂ 	Ⴃ 	Ⴄ 	Ⴅ 	Ⴆ 	Ⴇ 	Ⴈ 	Ⴉ 	Ⴊ 	Ⴋ 	Ⴌ 	Ⴍ 	Ⴎ 	Ⴏ
-U+10Bx 	Ⴐ 	Ⴑ 	Ⴒ 	Ⴓ 	Ⴔ 	Ⴕ 	Ⴖ 	Ⴗ 	Ⴘ 	Ⴙ 	Ⴚ 	Ⴛ 	Ⴜ 	Ⴝ 	Ⴞ 	Ⴟ
-U+10Cx 	Ⴠ 	Ⴡ 	Ⴢ 	Ⴣ 	Ⴤ 	Ⴥ 		Ⴧ 						Ⴭ 		
-U+10Dx 	ა 	ბ 	გ 	დ 	ე 	ვ 	ზ 	თ 	ი 	კ 	ლ 	მ 	ნ 	ო 	პ 	ჟ
-U+10Ex 	რ 	ს 	ტ 	უ 	ფ 	ქ 	ღ 	ყ 	შ 	ჩ 	ც 	ძ 	წ 	ჭ 	ხ 	ჯ
-U+10Fx 	ჰ 	ჱ 	ჲ 	ჳ 	ჴ 	ჵ 	ჶ 	ჷ 	ჸ 	ჹ 	ჺ 	჻ 	ჼ 	ჽ 	ჾ 	ჿ
-
-  	    0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
-U+16Ax 	ᚠ 	ᚡ 	ᚢ 	ᚣ 	ᚤ 	ᚥ 	ᚦ 	ᚧ 	ᚨ 	ᚩ 	ᚪ 	ᚫ 	ᚬ 	ᚭ 	ᚮ 	ᚯ
-U+16Bx 	ᚰ 	ᚱ 	ᚲ 	ᚳ 	ᚴ 	ᚵ 	ᚶ 	ᚷ 	ᚸ 	ᚹ 	ᚺ 	ᚻ 	ᚼ 	ᚽ 	ᚾ 	ᚿ
-U+16Cx 	ᛀ 	ᛁ 	ᛂ 	ᛃ 	ᛄ 	ᛅ 	ᛆ 	ᛇ 	ᛈ 	ᛉ 	ᛊ 	ᛋ 	ᛌ 	ᛍ 	ᛎ 	ᛏ
-U+16Dx 	ᛐ 	ᛑ 	ᛒ 	ᛓ 	ᛔ 	ᛕ 	ᛖ 	ᛗ 	ᛘ 	ᛙ 	ᛚ 	ᛛ 	ᛜ 	ᛝ 	ᛞ 	ᛟ
-U+16Ex 	ᛠ 	ᛡ 	ᛢ 	ᛣ 	ᛤ 	ᛥ 	ᛦ 	ᛧ 	ᛨ 	ᛩ 	ᛪ 	᛫ 	᛬ 	᛭ 	ᛮ 	ᛯ
-U+16Fx 	ᛰ 	ᛱ 	ᛲ 	ᛳ 	ᛴ 	ᛵ 	ᛶ 	ᛷ 	ᛸ
-
-  	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
-U+210x 	℀ 	℁ 	ℂ 	℃ 	℄ 	℅ 	℆ 	ℇ 	℈ 	℉ 	ℊ 	ℋ 	ℌ 	ℍ 	ℎ 	ℏ
-U+211x 	ℐ 	ℑ 	ℒ 	ℓ 	℔ 	ℕ 	№ 	℗ 	℘ 	ℙ 	ℚ 	ℛ 	ℜ 	ℝ 	℞ 	℟
-U+212x 	℠ 	℡ 	™ 	℣ 	ℤ 	℥ 	Ω 	℧ 	ℨ 	℩ 	K 	Å 	ℬ 	ℭ 	℮ 	ℯ
-U+213x 	ℰ 	ℱ 	Ⅎ 	ℳ 	ℴ 	ℵ 	ℶ 	ℷ 	ℸ 	ℹ 	℺ 	℻ 	ℼ 	ℽ 	ℾ 	ℿ
-U+214x 	⅀ 	⅁ 	⅂ 	⅃ 	⅄ 	ⅅ 	ⅆ 	ⅇ 	ⅈ 	ⅉ 	⅊ 	⅋ 	⅌ 	⅍ 	ⅎ 	⅏
-
- 	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
-U+008x 	XXX 	XXX 	BPH 	NBH 	 IND 	NEL 	SSA 	ESA 	HTS 	HTJ 	VTS 	PLD 	PLU 	 RI   	SS2 	SS3
-U+009x 	DCS 	PU1 	PU2 	STS 	CCH 	 MW  	SPA 	EPA 	SOS 	XXX 	SCI  	CSI  	 ST  	OSC 	 PM  	APC
-U+00Ax 	NBSP 	¡ 	¢ 	£ 	¤ 	¥ 	¦ 	§ 	¨ 	© 	ª 	« 	¬ 	SHY 	® 	¯
-U+00Bx 	° 	± 	² 	³ 	´ 	µ 	¶ 	· 	¸ 	¹ 	º 	» 	¼ 	½ 	¾ 	¿
-U+00Cx 	À 	Á 	Â 	Ã 	Ä 	Å 	Æ 	Ç 	È 	É 	Ê 	Ë 	Ì 	Í 	Î 	Ï
-U+00Dx 	Ð 	Ñ 	Ò 	Ó 	Ô 	Õ 	Ö 	× 	Ø 	Ù 	Ú 	Û 	Ü 	Ý 	Þ 	ß
-U+00Ex 	à 	á 	â 	ã 	ä 	å 	æ 	ç 	è 	é 	ê 	ë 	ì 	í 	î 	ï
-U+00Fx 	ð 	ñ 	ò 	ó 	ô 	õ 	ö 	÷ 	ø 	ù 	ú 	û 	ü 	ý 	þ 	ÿ
-
-  	0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	A 	B 	C 	D 	E 	F
-U+010x 	Ā 	ā 	Ă 	ă 	Ą 	ą 	Ć 	ć 	Ĉ 	ĉ 	Ċ 	ċ 	Č 	č 	Ď 	ď
-U+011x 	Đ 	đ 	Ē 	ē 	Ĕ 	ĕ 	Ė 	ė 	Ę 	ę 	Ě 	ě 	Ĝ 	ĝ 	Ğ 	ğ
-U+012x 	Ġ 	ġ 	Ģ 	ģ 	Ĥ 	ĥ 	Ħ 	ħ 	Ĩ 	ĩ 	Ī 	ī 	Ĭ 	ĭ 	Į 	į
-U+013x 	İ 	ı 	Ĳ 	ĳ 	Ĵ 	ĵ 	Ķ 	ķ 	ĸ 	Ĺ 	ĺ 	Ļ 	ļ 	Ľ 	ľ 	Ŀ
-U+014x 	ŀ 	Ł 	ł 	Ń 	ń 	Ņ 	ņ 	Ň 	ň 	ŉ 	Ŋ 	ŋ 	Ō 	ō 	Ŏ 	ŏ
-U+015x 	Ő 	ő 	Œ 	œ 	Ŕ 	ŕ 	Ŗ 	ŗ 	Ř 	ř 	Ś 	ś 	Ŝ 	ŝ 	Ş 	ş
-U+016x 	Š 	š 	Ţ 	ţ 	Ť 	ť 	Ŧ 	ŧ 	Ũ 	ũ 	Ū 	ū 	Ŭ 	ŭ 	Ů 	ů
-U+017x 	Ű 	ű 	Ų 	ų 	Ŵ 	ŵ 	Ŷ 	ŷ 	Ÿ 	Ź 	ź 	Ż 	ż 	Ž 	ž 	ſ
-*/
 
 macro_rules! time {
   ($val:expr) => {
@@ -212,7 +138,6 @@ use sf_impl::{
   erf,
   exp,
   expint,
-  f128,
   farb,
   float,
   gamma,
@@ -253,7 +178,6 @@ use crate::dual::*;
 use crate::ellint::*;
 use crate::erf::{*};
 use crate::exp::*;
-use crate::f128::*;
 use crate::gamma::*;
 use crate::integration::Integrator;
 use crate::log::*;
@@ -2142,133 +2066,6 @@ fn main() {
     println!("{}", sf_exp(gamma::impls::lngamma_lanczos_15(Wide(3.5,0.0))));
   }
 
-  if true {
-    println!("-----");
-    let x = 1.0/3.0_f64;
-    let y = f128::f128::from(x);
-    let z = f64::from(y);
-    println!("{}", x);
-    println!("{}", y);
-    println!("{}", z);
-    println!("{}", -y);
-    println!("{}", f64::from(-y));
-    println!("{}", y+y);
-    println!("{}", f64::from(y+y));
-    println!("{}", y+y+y);
-    println!("{}", f64::from(y+y+y));
-    println!("{}", (y+y)-y);
-    println!("{}", f64::from((y+y)-y));
-    println!("{}", y-(y+y));
-    println!("{}", f64::from(y-(y+y)));
-
-    println!("-----");
-    let x = 3.0_f64;
-    let x2 = 1.0/3.0_f64;
-    let y = f128::f128::from(x);
-    let y2 = f128::f128::from(x2);
-    println!("{:e}  {}", x, y);
-    println!("{:e}  {}", x2, y2);
-    let z = y * y2;
-    println!("{}  {:e}", z, f64::from(z));
-    let mut z = y2;
-    let mut yy = y2;
-    for _ in 0..40 {
-      z = z * yy;
-      yy = yy * y2;
-      println!("    {}  {:e}", z, f64::from(z));
-    }
-    println!("{:e}  {}", 1.5, f128::f128::from(1.5));
-
-    let y1 = f128::f128::from(10.0_f64.recip());
-    println!("{}", y1);
-    let y2 = f128::f128::from(10.0_f64).recip();
-    println!("{}", y2);
-
-    let t = f128::f128::from(3.0);
-    println!("{}", t);
-    println!("{}", y1*t);
-    println!("{}", y2*t);
-    println!("{}", (t+t+t)/t);
-    println!("{}", t/f128::f128::from(7.0));
-
-    println!("---- ----");
-    let q = (3.0_f64).sqrt();
-    let j = f128::f128::from(q);
-    println!("{}", j);
-    println!("{}", t.sqrt());
-    println!("{}", j*j);
-    println!("{}", t.sqrt()*t.sqrt());
-    println!("{}", t.sqrt_recip());
-
-    println!("---- ----");
-    let a = (2.0_f64).sqrt();
-    println!("{}", a);
-    let x = f128::f128::from(a);
-    let y = f128::f128::from(2.0_f64).sqrt();
-    println!("{}", x);
-    println!("{}", f64::from(x));
-	
-    println!("{}", y);
-    println!("{}", f64::from(y));
-    println!("{}", y*y);
-    println!("{}", y*y-f128::f128::from(2.0_f64));
-  }
-  if true {
-    println!("-----");
-    let y = f128::f128::from(2.0_f64).sqrt();
-    println!("{}", f64::from(y));
-    println!("{}", y);
-    println!("-----");
-    println!("{}", f128::f128::from(2).cbrt());
-    println!("{}", f128::f128::from(2).cbrt_recip());
-    println!("{}", f128::f128::from(2).nth_root(7));
-    println!("{}", f128::f128::from(128_u128));
-    println!("{}", f128::f128::from(1_u128<<100));
-    println!("- - -");
-    println!("  {}", f128::f128::from(2).cbrt().ldexp(-3));
-    println!("  {}", f128::f128::from(2).cbrt().ldexp(-2));
-    println!("  {}", f128::f128::from(2).cbrt().ldexp(-1));
-    println!("* {}", f128::f128::from(2).cbrt().ldexp(0));
-    println!("  {}", f128::f128::from(2).cbrt().ldexp(1));
-    println!("  {}", f128::f128::from(2).cbrt().ldexp(2));
-    println!("  {}", f128::f128::from(2).cbrt().ldexp(3));
-    let x = f128::f128::from(3.75_f64);
-    println!("{} {}", x.frexp().0, x.frexp().1);
-    println!("log(1)={}", f128::f128::from(1).log());
-    println!("log(2)={}", f128::f128::from(2).log());
-    println!("log(3)={}", f128::f128::from(3).log());
-    println!("log(100)={}", f128::f128::from(100).log());
-    println!("exp(1)={}", f128::f128::from(1).exp());
-    println!("exp(2)={}", f128::f128::from(2).exp());
-    println!("exp(-1)={}", f128::f128::from(-1).exp());
-    println!("log2(3)={}", f128::f128::from(3).log2());
-    println!("log10(3)={}", f128::f128::from(3).log10());
-
-    println!("- - -");
-    println!("{}", f128::f128::from(80).recip());
-    println!("{}", f128::f128::from(80).recip().exp());
-    println!("{}", f128::f128::from(80).recip().exp_m1());
-    println!("{}", f128::f128::from(80).recip().exp()-f128::f128::from(1));
-    println!("{:032x}", f128::f128::from(80).recip().exp_m1().to_bits());
-
-    println!("-----");
-    println!("[0.25] = {}", f128::f128::from(0.25_f64).round());
-    println!("[0.50] = {}", f128::f128::from(0.50_f64).round());
-    println!("[0.75] = {}", f128::f128::from(0.75_f64).round());
-    println!("[1.00] = {}", f128::f128::from(1.00_f64).round());
-    println!("[1.25] = {}", f128::f128::from(1.25_f64).round());
-    println!("[1.50] = {}", f128::f128::from(1.50_f64).round());
-    println!("[1.75] = {}", f128::f128::from(1.75_f64).round());
-
-    println!("-----");
-    println!("2^(0.25) = {}", f128::f128::from(0.25_f64).exp2());
-    println!("2^(0.5) = {}", f128::f128::from(0.50_f64).exp2());
-    println!("2^(0.75) = {}", f128::f128::from(0.75_f64).exp2());
-    println!("2^(1.0) = {}", f128::f128::from(1).exp2());
-    println!("2^(2.0) = {}", f128::f128::from(2).exp2());
-    println!("2^(11.25) = {}", f128::f128::from(11.25_f64).exp2());
-  }
-
   if false {
     let x = twin::Twin::new(1.0_f64, 0.0_f64);
     let y = twin::Twin::new(10.0_f64, 0.0_f64);
@@ -2444,11 +2241,21 @@ fn main() {
     println!("{}", twin::Twin::new(2.0_f32,0.0).sqrt());
     println!("{}", twin::Twin::new(2.0_f64,0.0).sqrt());
     println!("{}", twin::Twin::new(twin::Twin::new(2.0_f64,0.0),twin::Twin::default()).sqrt());
-    println!("{}", twin::Twin::new(f128::f128::from(2),f128::f128::from(0)).sqrt());
+    //println!("{}", twin::Twin::new(f128::f128::from(2),f128::f128::from(0)).sqrt());
   }
 
   if true {
     use sf::exp::{*};
     println!("{:.18e} {:.18e} {:.18e}", sf_exp(1.0_f64), 1.0_f64.sf_exp(), 1.0_f64.exp());
+  }
+
+  if true {
+    let x = r64(1.0);
+    let ex = sf_cos(x);
+    let ap = trig::impls::cos_series(x);
+    println!("{:.18e} {:.18e}  {:.2}", ex, ap, rel(ex.0, ap.0));
+    let ex = sf_sin(x);
+    let ap = trig::impls::sin_series(x);
+    println!("{:.18e} {:.18e}  {:.2}", ex, ap, rel(ex.0, ap.0));
   }
 }

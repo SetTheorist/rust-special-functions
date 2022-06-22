@@ -16,7 +16,7 @@ pub trait Base: Sized + Copy
 {
   fn SPLIT() -> Self;
   fn mul_add(self, b:Self, c:Self) -> Self;
-  fn HAS_MUL_ADD() -> bool;
+  const HAS_MUL_ADD : bool;
   fn recip(self) -> Self;
   fn sqrt(self) -> Self;
   fn cbrt(self) -> Self;
@@ -34,7 +34,7 @@ pub trait Base: Sized + Copy
 impl Base for f32 {
   #[inline] fn SPLIT() -> Self { 4097.0 }
   #[inline] fn mul_add(self, b:Self, c:Self) -> Self { self.mul_add(b, c) }
-  #[inline] fn HAS_MUL_ADD() -> bool { true }
+  const HAS_MUL_ADD : bool = true;
   #[inline] fn recip(self) -> Self { self.recip() }
   #[inline] fn sqrt(self) -> Self { self.sqrt() }
   #[inline] fn cbrt(self) -> Self { self.cbrt() }
@@ -51,7 +51,7 @@ impl Base for f32 {
 impl Base for f64 {
   #[inline] fn SPLIT() -> Self { 134217729.0 }
   #[inline] fn mul_add(self, b:Self, c:Self) -> Self { self.mul_add(b, c) }
-  #[inline] fn HAS_MUL_ADD() -> bool { true }
+  const HAS_MUL_ADD : bool = true;
   #[inline] fn recip(self) -> Self { self.recip() }
   #[inline] fn sqrt(self) -> Self { self.sqrt() }
   #[inline] fn cbrt(self) -> Self { self.cbrt() }
@@ -68,7 +68,7 @@ impl Base for f64 {
 impl<F:Base> Base for Twin<F> {
   #[inline] fn SPLIT() -> Twin<F> { Twin::new((F::SPLIT()-F::ci(1))*(F::SPLIT()-F::ci(1)), F::ci(1)) }
   #[inline] fn mul_add(self, b:Self, c:Self) -> Self { unimplemented!() }
-  #[inline] fn HAS_MUL_ADD() -> bool { false }
+  const HAS_MUL_ADD : bool = false;
   #[inline] fn recip(self) -> Self { self.recip() }
   #[inline] fn sqrt(self) -> Self { self.sqrt() }
   #[inline] fn cbrt(self) -> Self { self.cbrt() }
@@ -84,11 +84,13 @@ impl<F:Base> Base for Twin<F> {
     Twin{hi:F::epsilon(),lo:F::default()}*Twin{hi:F::epsilon(),lo:F::default()}
   }
 }
+
+/*
 use crate::f128::*;
 impl Base for f128 {
   #[inline] fn SPLIT() -> Self { f128::from_bits(0x4037_0000_0000_0000__0100_0000_0000_0000) } // 72057594037927937
   #[inline] fn mul_add(self, b:Self, c:Self) -> Self { unimplemented!() }
-  #[inline] fn HAS_MUL_ADD() -> bool { false }
+  const HAS_MUL_ADD : bool = false;
   #[inline] fn recip(self) -> Self { self.recip() }
   #[inline] fn sqrt(self) -> Self { self.sqrt() }
   #[inline] fn cbrt(self) -> Self { self.cbrt() }
@@ -102,6 +104,7 @@ impl Base for f128 {
   #[inline] fn to64(self) -> f64 { f64::from(self) }
   #[inline] fn epsilon() -> Self { f128::from(f64::EPSILON).sqr() }
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -132,7 +135,7 @@ fn split<F:Base>(a:F) -> (F, F) {
 
 #[inline]
 fn ddprod<F:Base>(a:F, b:F) -> (F, F) {
-  if F::HAS_MUL_ADD() {
+  if F::HAS_MUL_ADD {
     let p = a * b;
     let e = a.mul_add(b, -p);
     (p, e)

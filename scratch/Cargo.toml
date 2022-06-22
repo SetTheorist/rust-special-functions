@@ -20,3 +20,6 @@ path = "../sf_hex_float"
 
 [dependencies.f16]
 path = "../f16"
+
+[dependencies.f128]
+path = "../f128"
