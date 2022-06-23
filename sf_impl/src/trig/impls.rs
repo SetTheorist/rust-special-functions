@@ -19,6 +19,20 @@ impl Trig for r64 {
   fn atanh(self) -> Self { r64(self.0.atanh()) }
 }
 
+#[test]
+fn test_real_zeros() {
+  for i in (-10..11) {
+    assert!(((r64::PI * r64(i as f64)).sin() - 0.0).abs() < r64::epsilon*8);
+  }
+}
+
+#[test]
+fn test_real_c2s2() {
+  for x in crate::util::Grid::new(r64(-2.0),r64(2.0),32) {
+    assert!((x.cos().sqr() + x.sin().sqr() - 1.0).abs() < r64::epsilon*8);
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // TODO: quick placeholder impl
 // NB These are _really_ hacky right now!!  Caveat emptor!
@@ -76,7 +90,8 @@ impl Trig for c64 {
     sf_log(self + sf_sqrt(self*self + 1))
   }
   fn tanh(self) -> Self {
-    self.sinh() / self.cosh()
+    let (ch,sh) = self.cosh_sinh();
+    sh / ch
   }
   fn atanh(self) -> Self {
     sf_log((self + 1) / (-self + 1)) / 2

@@ -14,6 +14,7 @@ pub use impls::*;
 // exF(z) = F(z)-1
 
 // NB lots TODO here
+// auto implementations should be re-implemented in most cases
 pub trait Trig: Value+Constants {
   // cosine
   fn cos(self) -> Self; // MUST IMPLEMENT
@@ -40,7 +41,7 @@ pub trait Trig: Value+Constants {
   fn cos_sin(self) -> (Self, Self) { (self.cos(), self.sin()) }
 
   // tangent
-  fn tan(self) -> Self { self.sin() / self.cos() }
+  fn tan(self) -> Self { let (c,s) = self.cos_sin(); s / c }
   fn atan(self) -> Self; // MUST IMPLEMENT
   fn cot(self) -> Self { self.cos() / self.sin() }
 
@@ -67,8 +68,9 @@ pub trait Trig: Value+Constants {
 
   fn cosh_sinh(self) -> (Self, Self) { (self.cosh(), self.sinh()) }
 
-  fn tanh(self) -> Self; // MUST IMPLEMENT
+  fn tanh(self) -> Self { let (ch,sh) = self.cosh_sinh(); sh / ch }
   fn atanh(self) -> Self; // MUST IMPLEMENT
+  fn cotanh(self) -> Self { self.tanh().recip() }
 
   // hyperbolic secant
   fn sech(self) -> Self { self.cosh().recip() }

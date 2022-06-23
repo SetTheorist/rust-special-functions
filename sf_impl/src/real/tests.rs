@@ -195,8 +195,8 @@ fn power_ops() {
     assert_eq!(ra.sqr().sqrt(), ra);
     assert!((ra.sqrt().sqr() - ra).abs() < ra.abs() * r64::epsilon * 2);
 
-    assert!((ra.pow(3_usize).cbrt() - ra).abs() < ra.abs() * r64::epsilon);
-    assert!((ra.cbrt().pow(3_usize) - ra).abs() < ra.abs() * r64::epsilon * 3);
+    assert!((ra.pow(3_usize).cbrt() - ra).abs() < ra.abs() * r64::epsilon * 8);
+    assert!((ra.cbrt().pow(3_usize) - ra).abs() < ra.abs() * r64::epsilon * 8);
 
     assert_eq!(ra.pow(0_usize), r64::one);
     assert_eq!(ra.pow(0_isize), r64::one);
