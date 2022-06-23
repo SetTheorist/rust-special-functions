@@ -2117,19 +2117,19 @@ fn main() {
   if true {
     let x = r64(1.0);
     let ex = sf_cos(x);
-    let ap = trig::impls::cos_series(x);
+    let ap = trig::algos::cos_series(x);
     println!("{:.18e} {:.18e}  {:.2}", ex, ap, rel(ex.0, ap.0));
 
     let ex = sf_sin(x);
-    let ap = trig::impls::sin_series(x);
+    let ap = trig::algos::sin_series(x);
     println!("{:.18e} {:.18e}  {:.2}", ex, ap, rel(ex.0, ap.0));
 
     let x = r64(10.0);
-    let r = trig::impls::range_reduce_pi(x);
+    let r = trig::algos::range_reduce_pi(x);
     println!("{} {:.18e}", r.1, r.0);
 
     let x = r64(100.0);
-    let r = trig::impls::range_reduce_pi(x);
+    let r = trig::algos::range_reduce_pi(x);
     println!("{} {:.18e}", r.1, r.0);
     println!("{:.18e}  {:.18e}", sf_cos(r.0).pari(r.1), sf_sin(r.0).pari(r.1));
   }

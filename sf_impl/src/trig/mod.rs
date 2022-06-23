@@ -2,6 +2,10 @@ use crate::traits::{*};
 use crate::log::{sf_log};
 use crate::exp::{sf_exp};
 
+pub mod algos;
+pub mod impls;
+pub use impls::*;
+
 // TODO: split into Trig and TrigExtra (TrigObscure?)
 
 // verF(z) = 2 F(z/2)^2
@@ -110,106 +114,3 @@ pub trait Trig: Value+Constants {
 #[inline] pub fn sf_tanh<V:Trig>(x:V) -> V { x.tanh() }
 #[inline] pub fn sf_vcos<V:Trig>(x:V) -> V { x.vcos() }
 #[inline] pub fn sf_vsin<V:Trig>(x:V) -> V { x.vsin() }
-
-pub mod impls {
-use crate::algorithm::*;
-use crate::traits::*;
-pub fn tan_contfrac<V:Value>(z:V) -> V {
-  let z2 = -z.sqr();
-  let terms = (1..1000).map(|j|(z2,ι(2*j+1):V));
-  z / contfrac_modlentz(V::one, terms, V::epsilon)
-}
-
-pub fn cos_series<V:Value>(x:V) -> V {
-  let x2 = -x.sqr();
-  let terms = (1..).scan(V::one, move |s, n| {
-    let o = *s;
-    *s *= x2 / ((2*n-1)*(2*n));
-    Some(o)
-  });
-  sum_series(terms, V::epsilon)
-}
-
-pub fn sin_series<V:Value>(x:V) -> V {
-  let x2 = -x.sqr();
-  let terms = (1..).scan(x, move |s, n| {
-    let o = *s;
-    *s *= x2 / ((2*n)*(2*n+1));
-    Some(o)
-  });
-  sum_series(terms, V::epsilon)
-}
-
-pub fn range_reduce_pi<V:RealValue+Ordered>(x:V) -> (V,isize) {
-  // range-reduce
-  let n: isize = (x.abs() / V::NT::PI).floor().rint();
-  // TODO: use Kahan/compensated idea to return 2 floats to get exact diff
-  let r: V = x - V::PI * n;
-  (r, n)
-}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// TODO: quick placeholder impl
-use crate::real::r64;
-impl Trig for r64 {
-  fn cos(self) -> Self { r64(self.0.cos()) }
-  fn acos(self) -> Self { r64(self.0.acos()) }
-  fn sin(self) -> Self { r64(self.0.sin()) }
-  fn asin(self) -> Self { r64(self.0.asin()) }
-  fn tan(self) -> Self { r64(self.0.tan()) }
-  fn atan(self) -> Self { r64(self.0.atan()) }
-
-  fn cosh(self) -> Self { r64(self.0.cosh()) }
-  fn acosh(self) -> Self { r64(self.0.acosh()) }
-  fn sinh(self) -> Self { r64(self.0.sinh()) }
-  fn asinh(self) -> Self { r64(self.0.asinh()) }
-  fn tanh(self) -> Self { r64(self.0.tanh()) }
-  fn atanh(self) -> Self { r64(self.0.atanh()) }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// TODO: quick placeholder impl
-// NB These are _really_ hacky right now!!  Caveat emptor!
-use crate::complex::c64;
-impl Trig for c64 {
-  fn cos(self) -> Self {
-    c64 { re: ι(self.re.0.cos() * self.im.0.cosh()), im: ι(-self.re.0.sin() * self.im.0.sinh()) }
-  }
-  fn acos(self) -> Self {
-    sf_log(self + c64::I*sf_sqrt(-self*self + 1)) / c64::I
-  }
-  fn asin(self) -> Self {
-    sf_log(self*c64::I + sf_sqrt(-self*self + 1)) / c64::I
-  }
-  fn sin(self) -> Self {
-    let r = self.re;
-    let i = self.im;
-    c64 { re: r.sin()*i.cosh(), im:r.cos()*i.sinh() }
-  }
-  fn atan(self) -> Self {
-    sf_log((c64::I - self) / (c64::I + self)) / (c64::I*2)
-  }
-  fn cosh(self) -> Self {
-    (sf_exp(self) + sf_exp(-self))/2
-  }
-  fn acosh(self) -> Self {
-    sf_log(self + sf_sqrt(self*self - 1))
-  }
-  fn sinh(self) -> Self {
-    (sf_exp(self) - sf_exp(-self))/2
-  }
-  fn asinh(self) -> Self {
-    sf_log(self + sf_sqrt(self*self + 1))
-  }
-  fn tanh(self) -> Self {
-    self.sinh() / self.cosh()
-  }
-  fn atanh(self) -> Self {
-    sf_log((self + 1) / (-self + 1)) / 2
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////

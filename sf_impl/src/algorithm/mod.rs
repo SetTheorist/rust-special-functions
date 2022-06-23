@@ -146,7 +146,7 @@ where
     dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
-    if μ(deltaj - 1) < ε || n > 1000 { log::warn!("[{}]",n); break; }
+    if μ(deltaj - 1) < ε || n > 1000 { break; }
     n += 1;
   }
   fj
@@ -170,7 +170,7 @@ where
       d_cj = (bj*dj - 1)*d_cj;
       let old_cj = cj;
       cj = cj + d_cj;
-      if cj == old_cj || μ(d_cj)<ε || n >= 1000 { log::warn!("<{}>",n); break; }
+      if cj == old_cj || μ(d_cj)<ε || n >= 1000 { break; }
       n += 1;
     }
     cj
