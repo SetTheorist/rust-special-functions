@@ -1,5 +1,7 @@
 use crate::traits::*;
 
+pub mod integration;
+
 pub fn frexp1(x:f64) -> (f64, isize) {
   if x.is_zero() || x.is_infinite() || x.is_nan() {
     (x, 0)
@@ -144,28 +146,35 @@ where
     dj = dj.recip();
     let deltaj = cj * dj;
     fj *= deltaj;
-    if μ(deltaj - 1) < ε || n > 1000 {break;}
+    if μ(deltaj - 1) < ε || n > 1000 { log::warn!("[{}]",n); break; }
     n += 1;
   }
   fj
 }
 
-/*
-// TODO: Steeds (forward) cont.frac. algorithm
-sf_cf_steeds :: (Value v) => [v] -> [v] -> v
-sf_cf_steeds (a1:as) (b0:b1:bs) =
-    let !c0 = b0
-        !d1 = 1/b1
-        !delc1 = a1*d1
-        !c1 = c0 + delc1
-    in recur c1 delc1 d1 as bs
-    where
-      !eps = 5e-16
-      recur !cn' !delcn' !dn' !(an:as) !(bn:bs) = 
-        let !dn = 1/(dn'*an+bn)
-            !delcn = (bn*dn - 1)*delcn'
-            !cn = cn' + delcn
-        in if cn == cn' || (rabs delcn)<eps || is_nan cn
-           then cn
-           else (recur cn delcn dn as bs)
-*/
+#[inline]
+// Steeds (forward) cont.frac. algorithm
+pub fn contfrac_steeds<T,I>(b0:T, it:I, ε:T::NT)  -> T
+where
+  T: Field + Normed,
+  I: IntoIterator<Item=(T,T)>,
+{
+  let mut it = it.into_iter();
+  if let Some((a1,b1)) = it.next() {
+    let mut dj = b1.recip();
+    let mut d_cj = a1*dj;
+    let mut cj = b0 + d_cj;
+    let mut n = 1;
+    for (aj,bj) in it {
+      dj = (dj*aj + bj).recip();
+      d_cj = (bj*dj - 1)*d_cj;
+      let old_cj = cj;
+      cj = cj + d_cj;
+      if cj == old_cj || μ(d_cj)<ε || n >= 1000 { log::warn!("<{}>",n); break; }
+      n += 1;
+    }
+    cj
+  } else {
+    b0
+  }
+}

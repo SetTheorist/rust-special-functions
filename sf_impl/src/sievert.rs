@@ -44,7 +44,7 @@ pub fn sievert_series<V:Value+Trig>(theta:V, z:V) -> V {
 }
 */
 
-use crate::integration::{*};
+use crate::algorithm::integration::{Integrator,Trapezoidal};
 // just integrate the defining integral directly
 pub fn sievert_integrate<V:Value+Exp+Trig>(theta:V, z:V) -> V {
   // TODO: use a more sensible integration method!

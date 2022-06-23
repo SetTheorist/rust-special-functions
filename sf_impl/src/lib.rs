@@ -191,7 +191,6 @@ pub mod expint;
 pub mod float;
 pub mod gamma;
 pub mod hypergeom;
-pub mod integration;
 pub mod jacobi;
 pub mod kahan;
 pub mod lambert;

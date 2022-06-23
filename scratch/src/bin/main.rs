@@ -141,7 +141,6 @@ use sf_impl::{
   float,
   gamma,
   hypergeom,
-  integration,
   jacobi,
   kahan,
   lambert,
@@ -178,7 +177,7 @@ use crate::ellint::*;
 use crate::erf::{*};
 use crate::exp::*;
 use crate::gamma::*;
-use crate::integration::Integrator;
+use crate::algorithm::integration::Integrator;
 use crate::log::*;
 use crate::numbers::*;
 use crate::orthopoly::chebyshev_t::*;
@@ -2098,6 +2097,21 @@ fn main() {
   if true {
     use sf::exp::{*};
     println!("{:.18e} {:.18e} {:.18e}", sf_exp(1.0_f64), 1.0_f64.sf_exp(), 1.0_f64.exp());
+  }
+
+  if true {
+    for x in [1.0, 5.0, 0.1, -1.0, -5.0, 13.0].into_iter() {
+      let x = r64(x);
+      let ax1 = {
+          let terms = (1..).map(|n| if n % 2 == 0 { (x, ι(2)) } else { (-x, ι(n)) });
+          sf_impl::algorithm::contfrac_modlentz(ι(1), terms, r64::epsilon).recip()
+        };
+      let ax2 = {
+          let terms = (1..).map(|n| if n % 2 == 0 { (x, ι(2)) } else { (-x, ι(n)) });
+          sf_impl::algorithm::contfrac_steeds(ι(1), terms, r64::epsilon).recip()
+        };
+      println!("EE: ({:e}) {:.18e} | {:.18e} {:.5} | {:.18e} {:.5} | ", x, sf_exp(x), ax1, rel(sf_exp(x).0,ax1.0), ax2, rel(sf_exp(x).0,ax2.0));
+    }
   }
 
   if true {

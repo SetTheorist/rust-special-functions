@@ -247,7 +247,7 @@ pub fn ai_integ_pos<V:Value+Exp>(z:V) -> V {
   let ig56 : V = ι(0.26218399708832294968);
   let ζ = z*z.sqrt()*2/3;
   let mut sum = V::zero;
-  for (x,w) in crate::integration::GAUSS_LAGUERRE_23__MINUS16_XW.iter().map(|(x,w)|(ι(*x):V,ι(*w):V)) {
+  for (x,w) in crate::algorithm::integration::GAUSS_LAGUERRE_23__MINUS16_XW.iter().map(|(x,w)|(ι(*x):V,ι(*w):V)) {
     sum += w*(x/ζ + 2).nth_root(-6);
   }
   sum * sf_exp(-ζ) * ζ.nth_root(-6) * ig56
@@ -258,7 +258,7 @@ pub fn ai_integ_pos__wide(z:Wide) -> Wide {
   const ig56 : Wide = Wide!("0.431e7d8d0766671c5141a22d6491f3fd1dc7fc5358");
   let ζ = z*z.sqrt()*2/3;
   let mut sum = Wide::zero;
-  for (x,w) in crate::integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE {
+  for (x,w) in crate::algorithm::integration::GAUSS_LAGUERRE_41__MINUS16_XW__WIDE {
     sum += w*(x/ζ + 2).nth_root(-6);
   }
   sum * (-ζ).exp() * ζ.nth_root(-6) * ig56
