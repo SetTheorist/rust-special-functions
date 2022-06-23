@@ -25,7 +25,23 @@ impl Trig for r64 {
 use crate::complex::c64;
 impl Trig for c64 {
   fn cos(self) -> Self {
-    c64 { re: ι(self.re.0.cos() * self.im.0.cosh()), im: ι(-self.re.0.sin() * self.im.0.sinh()) }
+    let r = self.re;
+    let i = self.im;
+    c64::new(r.cos() * i.cosh(), -r.sin() * i.sinh())
+  }
+  fn sin(self) -> Self {
+    let r = self.re;
+    let i = self.im;
+    c64::new(r.sin()*i.cosh(), r.cos()*i.sinh())
+  }
+  fn cos_sin(self) -> (Self,Self) {
+    let r = self.re;
+    let i = self.im;
+    let (rc,rs) = r.cos_sin();
+    let (ich,ish) = i.cosh_sinh();
+    let cos = c64::new(rc*ich, -rs*ish);
+    let sin = c64::new(rs*ich, rc*ish);
+    (cos, sin)
   }
   fn acos(self) -> Self {
     sf_log(self + c64::I*sf_sqrt(-self*self + 1)) / c64::I
@@ -33,22 +49,28 @@ impl Trig for c64 {
   fn asin(self) -> Self {
     sf_log(self*c64::I + sf_sqrt(-self*self + 1)) / c64::I
   }
-  fn sin(self) -> Self {
-    let r = self.re;
-    let i = self.im;
-    c64 { re: r.sin()*i.cosh(), im:r.cos()*i.sinh() }
-  }
   fn atan(self) -> Self {
     sf_log((c64::I - self) / (c64::I + self)) / (c64::I*2)
   }
   fn cosh(self) -> Self {
-    (sf_exp(self) + sf_exp(-self))/2
+    let pe = sf_exp(self);
+    let me = sf_exp(-self); // pe.recip();
+    (pe + me)/2
   }
   fn acosh(self) -> Self {
     sf_log(self + sf_sqrt(self*self - 1))
   }
   fn sinh(self) -> Self {
-    (sf_exp(self) - sf_exp(-self))/2
+    let pe = sf_exp(self);
+    let me = sf_exp(-self); // pe.recip();
+    (pe - me)/2
+  }
+  fn cosh_sinh(self) -> (Self,Self) {
+    let pe = sf_exp(self);
+    let me = sf_exp(-self); // pe.recip();
+    let cosh = (pe + me)/2;
+    let sinh = (pe - me)/2;
+    (cosh, sinh)
   }
   fn asinh(self) -> Self {
     sf_log(self + sf_sqrt(self*self + 1))

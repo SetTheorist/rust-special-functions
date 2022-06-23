@@ -24,7 +24,7 @@ pub trait Trig: Value+Constants {
   fn hvcos(self) -> Self{ (self/2).cos().sqr() }
   // cos(pi*x)
   fn cos_pix(self) -> Self { ((self % ι(2):Self)*Self::PI).cos() }
-  // cos(x) - 1
+  // cos(x) - 1 (aka excos(x))
   fn cos_m1(self) -> Self { self.cos() - 1 }
 
   // sine
@@ -64,6 +64,8 @@ pub trait Trig: Value+Constants {
   fn asinh(self) -> Self; // MUST IMPLEMENT
   // sinh(x)/x
   fn sinh_mx(self) -> Self { self.sinh()/self }
+
+  fn cosh_sinh(self) -> (Self, Self) { (self.cosh(), self.sinh()) }
 
   fn tanh(self) -> Self; // MUST IMPLEMENT
   fn atanh(self) -> Self; // MUST IMPLEMENT
