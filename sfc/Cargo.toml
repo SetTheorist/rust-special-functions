@@ -1,0 +1,14 @@
+[package]
+name = "sfc"
+version = "0.1.0"
+edition = "2021"
+authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
+
+[lib]
+name = "sfc"
+crate-type = ["staticlib"]  
+
+[dependencies]
+
+[dependencies.sf]
+path = "../sf"

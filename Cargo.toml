@@ -6,4 +6,5 @@ members = [
     "sf_hex_float",
     "f16",
     "f128",
+    "sfc",
 ]
