@@ -1,6 +1,6 @@
 use crate::traits::*;
 
-pub mod impls;
+pub mod methods;
 mod tests;
 pub mod spher;
 
@@ -137,11 +137,11 @@ pub mod real_impls {
 
       // TODO: clean this up (rough sketch for now)
       if self <= ι(2) {
-        impls::bessel_j_series_int(nu, self)
+        methods::bessel_j_series_int(nu, self)
       } else if self >= ι(15) {
-        impls::bessel_j_asymp_z(ι(nu), self)
+        methods::bessel_j_asymp_z(ι(nu), self)
       } else {
-        impls::bessel_j_recur_back(20 + 2 * nu + (self.abs().rint()), nu, self)
+        methods::bessel_j_recur_back(20 + 2 * nu + (self.abs().rint()), nu, self)
       }
     }
   }
@@ -158,7 +158,7 @@ pub mod real_impls {
       }
 
       // TODO: need asymptotic, etc.
-      impls::bessel_i_series_int(nu, self)
+      methods::bessel_i_series_int(nu, self)
     }
   }
   impl BesselI<r64> for r64 {
@@ -173,7 +173,7 @@ pub mod real_impls {
         else {r64::zero}
       } else {
         // TODO: need asymptotic, etc.
-        impls::bessel_i_series(nu, self)
+        methods::bessel_i_series(nu, self)
       }
     }
   }
@@ -190,7 +190,7 @@ pub mod real_impls {
         return self.bessel_k(-nu);
       }
       // TODO: this has unacceptably low accuracy
-      impls::bessel_k_series_int(nu, self)
+      methods::bessel_k_series_int(nu, self)
     }
   }
 }

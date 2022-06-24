@@ -2,9 +2,9 @@ use crate::traits::{*};
 use crate::log::{sf_log};
 use crate::exp::{sf_exp};
 
-pub mod algos;
 pub mod impls;
 pub use impls::*;
+pub mod methods;
 
 // TODO: split into Trig and TrigExtra (TrigObscure?)
 

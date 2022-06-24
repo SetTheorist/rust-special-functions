@@ -645,9 +645,9 @@ fn main() {
         "J_{}({}) = {:.16e}  {:.16e}  {:.16e}",
         n,
         x,
-        bessel::impls::bessel_j_series(ι(n), x).0,
-        bessel::impls::bessel_j_asymp_z(ι(n), x).0,
-        bessel::impls::bessel_j_recur_back(31, n as isize, x).0
+        bessel::methods::bessel_j_series(ι(n), x).0,
+        bessel::methods::bessel_j_asymp_z(ι(n), x).0,
+        bessel::methods::bessel_j_recur_back(31, n as isize, x).0
       );
     }
     for n in 0..=5 {
@@ -656,9 +656,9 @@ fn main() {
         "J_{}({}) = {:.16e}  {:.16e}  {:.16e}",
         n,
         x,
-        bessel::impls::bessel_j_series(ι(n), x).0,
-        bessel::impls::bessel_j_asymp_z(ι(n), x).0,
-        bessel::impls::bessel_j_recur_back(51, n as isize, x).0
+        bessel::methods::bessel_j_series(ι(n), x).0,
+        bessel::methods::bessel_j_asymp_z(ι(n), x).0,
+        bessel::methods::bessel_j_recur_back(51, n as isize, x).0
       );
     }
     for n in 0..=5 {
@@ -667,9 +667,9 @@ fn main() {
         "J_{}({}) = {:.16e}  {:.16e}  {:.16e}",
         n,
         x,
-        bessel::impls::bessel_j_series(ι(n), x).0,
-        bessel::impls::bessel_j_asymp_z(ι(n), x).0,
-        bessel::impls::bessel_j_recur_back(151, n as isize, x).0
+        bessel::methods::bessel_j_series(ι(n), x).0,
+        bessel::methods::bessel_j_asymp_z(ι(n), x).0,
+        bessel::methods::bessel_j_recur_back(151, n as isize, x).0
       );
     }
     for n in 0..=5 {
@@ -678,9 +678,9 @@ fn main() {
         "J_{}({}) = {:.16e}  {:.16e}  {:.16e}",
         n,
         x,
-        bessel::impls::bessel_j_series(ι(n), x).0,
-        bessel::impls::bessel_j_asymp_z(ι(n), x).0,
-        bessel::impls::bessel_j_recur_back(301, n as isize, x).0
+        bessel::methods::bessel_j_series(ι(n), x).0,
+        bessel::methods::bessel_j_asymp_z(ι(n), x).0,
+        bessel::methods::bessel_j_recur_back(301, n as isize, x).0
       );
     }
     for n in 0..=5 {
@@ -689,9 +689,9 @@ fn main() {
         "J_{}({}) = {:.16}  {:.16}  {:.16}",
         n,
         x,
-        bessel::impls::bessel_j_series(ι(n), x),
-        bessel::impls::bessel_j_asymp_z(ι(n), x),
-        bessel::impls::bessel_j_recur_back(31, n as isize, x)
+        bessel::methods::bessel_j_series(ι(n), x),
+        bessel::methods::bessel_j_asymp_z(ι(n), x),
+        bessel::methods::bessel_j_recur_back(31, n as isize, x)
       );
     }
 
@@ -700,7 +700,7 @@ fn main() {
       for n in 0..=5 {
         println!("-");
         for m in (3..=25).step_by(3) {
-          println!("J_{}({})[{:2}] = {:.16}", n, x, m + n, bessel::impls::bessel_j_recur_back(m + n, n as isize, x));
+          println!("J_{}({})[{:2}] = {:.16}", n, x, m + n, bessel::methods::bessel_j_recur_back(m + n, n as isize, x));
         }
       }
     }
@@ -1798,34 +1798,34 @@ fn main() {
     println!("{:?}", data::parse_hex_f64s(sx));
   }
   if false {
-    println!("I31(1/2)={:e}", bessel::impls::bessel_i_series_int(31, r64(0.5)));
-    println!("I31(1/2)={:e}", bessel::impls::bessel_i_series(ι(31), r64(0.5)));
-    //println!("I31(1/2)={:e}", bessel::impls::bessel_i_order_recur(31, r64(0.5)));
-    println!("I9(1/2)={:e}", bessel::impls::bessel_i_series_int(9, r64(0.5)));
-    println!("I9(1/2)={:e}", bessel::impls::bessel_i_series(ι(9), r64(0.5)));
-    //println!("I9(1/2)={:e}", bessel::impls::bessel_i_order_recur(9, r64(0.5)));
-    println!("I1(1/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(0.5)));
-    println!("I1(1/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(0.5)));
-    //println!("I1(1/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(0.5)));
-    println!("I1(31/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(15.5)));
-    println!("I1(31/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(15.5)));
-    //println!("I1(31/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(15.5)));
-    println!("I1(401/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(200.5)));
-    println!("I1(401/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(200.5)));
-    //println!("I1(401/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(200.5)));
-    println!("I1(-1/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(-0.5)));
-    println!("I1(-1/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(-0.5)));
-    //println!("I1(-1/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(-0.5)));
-    println!("I1(-31/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(-15.5)));
-    println!("I1(-31/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(-15.5)));
-    //println!("I1(-31/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(-15.5)));
-    println!("I1(401/2)={:e}", bessel::impls::bessel_i_series_int(1, r64(-200.5)));
-    println!("I1(401/2)={:e}", bessel::impls::bessel_i_series(ι(1), r64(-200.5)));
-    //println!("I1(401/2)={:e}", bessel::impls::bessel_i_order_recur(1, r64(-200.5)));
-    println!("Y1(1/2)={:e}", bessel::impls::bessel_y_series_int(1, r64(0.5)));
-    println!("Y1(7.25)={:e}", bessel::impls::bessel_y_series_int(1, r64(7.25)));
-    println!("Y4(1/2)={:e}", bessel::impls::bessel_y_series_int(4, r64(0.5)));
-    println!("Y1(7.25)={:e}", bessel::impls::bessel_y_asymp_z(ι(1), r64(7.25)));
+    println!("I31(1/2)={:e}", bessel::methods::bessel_i_series_int(31, r64(0.5)));
+    println!("I31(1/2)={:e}", bessel::methods::bessel_i_series(ι(31), r64(0.5)));
+    //println!("I31(1/2)={:e}", bessel::methods::bessel_i_order_recur(31, r64(0.5)));
+    println!("I9(1/2)={:e}", bessel::methods::bessel_i_series_int(9, r64(0.5)));
+    println!("I9(1/2)={:e}", bessel::methods::bessel_i_series(ι(9), r64(0.5)));
+    //println!("I9(1/2)={:e}", bessel::methods::bessel_i_order_recur(9, r64(0.5)));
+    println!("I1(1/2)={:e}", bessel::methods::bessel_i_series_int(1, r64(0.5)));
+    println!("I1(1/2)={:e}", bessel::methods::bessel_i_series(ι(1), r64(0.5)));
+    //println!("I1(1/2)={:e}", bessel::methods::bessel_i_order_recur(1, r64(0.5)));
+    println!("I1(31/2)={:e}", bessel::methods::bessel_i_series_int(1, r64(15.5)));
+    println!("I1(31/2)={:e}", bessel::methods::bessel_i_series(ι(1), r64(15.5)));
+    //println!("I1(31/2)={:e}", bessel::methods::bessel_i_order_recur(1, r64(15.5)));
+    println!("I1(401/2)={:e}", bessel::methods::bessel_i_series_int(1, r64(200.5)));
+    println!("I1(401/2)={:e}", bessel::methods::bessel_i_series(ι(1), r64(200.5)));
+    //println!("I1(401/2)={:e}", bessel::methods::bessel_i_order_recur(1, r64(200.5)));
+    println!("I1(-1/2)={:e}", bessel::methods::bessel_i_series_int(1, r64(-0.5)));
+    println!("I1(-1/2)={:e}", bessel::methods::bessel_i_series(ι(1), r64(-0.5)));
+    //println!("I1(-1/2)={:e}", bessel::methods::bessel_i_order_recur(1, r64(-0.5)));
+    println!("I1(-31/2)={:e}", bessel::methods::bessel_i_series_int(1, r64(-15.5)));
+    println!("I1(-31/2)={:e}", bessel::methods::bessel_i_series(ι(1), r64(-15.5)));
+    //println!("I1(-31/2)={:e}", bessel::methods::bessel_i_order_recur(1, r64(-15.5)));
+    println!("I1(401/2)={:e}", bessel::methods::bessel_i_series_int(1, r64(-200.5)));
+    println!("I1(401/2)={:e}", bessel::methods::bessel_i_series(ι(1), r64(-200.5)));
+    //println!("I1(401/2)={:e}", bessel::methods::bessel_i_order_recur(1, r64(-200.5)));
+    println!("Y1(1/2)={:e}", bessel::methods::bessel_y_series_int(1, r64(0.5)));
+    println!("Y1(7.25)={:e}", bessel::methods::bessel_y_series_int(1, r64(7.25)));
+    println!("Y4(1/2)={:e}", bessel::methods::bessel_y_series_int(4, r64(0.5)));
+    println!("Y1(7.25)={:e}", bessel::methods::bessel_y_asymp_z(ι(1), r64(7.25)));
   }
 
   if false {
@@ -1858,11 +1858,11 @@ fn main() {
     println!("K(5,1/2)={:e}", sf_bessel_k(5, r64(0.5)));
     println!("K(6,1/2)={:e}", sf_bessel_k(6, r64(0.5)));
     println!("K(6,3+1/2)={:e}", sf_bessel_k(6, r64(3.5)));
-    println!("K(6,3+1/2)~{:e}", bessel::impls::bessel_k_asymp_z(ι(6), r64(3.5)));
-    println!("K(6,23+1/2)~{:e}", bessel::impls::bessel_k_asymp_z(ι(6), r64(23.5)));
-    println!("K(0,23+1/2)~{:e}", bessel::impls::bessel_k_asymp_z(ι(0), r64(23.5)));
-    println!("K(0,93+1/2)~{:e}", bessel::impls::bessel_k_asymp_z(ι(0), r64(93.5)));
-    println!("I(0,23+1/2)~{:e}", bessel::impls::bessel_i_asymp_z(ι(0), r64(23.5)));
+    println!("K(6,3+1/2)~{:e}", bessel::methods::bessel_k_asymp_z(ι(6), r64(3.5)));
+    println!("K(6,23+1/2)~{:e}", bessel::methods::bessel_k_asymp_z(ι(6), r64(23.5)));
+    println!("K(0,23+1/2)~{:e}", bessel::methods::bessel_k_asymp_z(ι(0), r64(23.5)));
+    println!("K(0,93+1/2)~{:e}", bessel::methods::bessel_k_asymp_z(ι(0), r64(93.5)));
+    println!("I(0,23+1/2)~{:e}", bessel::methods::bessel_i_asymp_z(ι(0), r64(23.5)));
   }
 
   if false {
@@ -1952,37 +1952,37 @@ fn main() {
     println!("I(1/3,1/2)={:e}", sf_bessel_i(r64(1.0)/3, r64(0.5)));
     println!("I(1/3,1)={:e}", sf_bessel_i(r64(1.0)/3, r64(1.0)));
     println!("I(1/3,1)={:e}", sf_bessel_i(r64(1.0)/3, r64(2.0)));
-    println!("I31(1/2)={:e}", bessel::impls::bessel_i_order_recur(31, r64(0.5), false, 10));
-    println!("I31(1/2)={:e}", bessel::impls::bessel_i_order_recur(31, r64(0.5), true, 10));
-    println!("I31(1/2)={:e}", bessel::impls::bessel_i_order_recur(31, r64(0.5), false, 100));
-    println!("I31(1/2)={:e}", bessel::impls::bessel_i_order_recur(31, r64(0.5), true, 100));
-    println!("I31(7)={:e}", bessel::impls::bessel_i_order_recur(31, r64(7.0), false, 10));
-    println!("I31(7)={:e}", bessel::impls::bessel_i_order_recur(31, r64(7.0), true, 10));
-    println!("I31(7)={:e}", bessel::impls::bessel_i_order_recur(31, r64(7.0), false, 100));
-    println!("I31(7)={:e}", bessel::impls::bessel_i_order_recur(31, r64(7.0), true, 100));
+    println!("I31(1/2)={:e}", bessel::methods::bessel_i_order_recur(31, r64(0.5), false, 10));
+    println!("I31(1/2)={:e}", bessel::methods::bessel_i_order_recur(31, r64(0.5), true, 10));
+    println!("I31(1/2)={:e}", bessel::methods::bessel_i_order_recur(31, r64(0.5), false, 100));
+    println!("I31(1/2)={:e}", bessel::methods::bessel_i_order_recur(31, r64(0.5), true, 100));
+    println!("I31(7)={:e}", bessel::methods::bessel_i_order_recur(31, r64(7.0), false, 10));
+    println!("I31(7)={:e}", bessel::methods::bessel_i_order_recur(31, r64(7.0), true, 10));
+    println!("I31(7)={:e}", bessel::methods::bessel_i_order_recur(31, r64(7.0), false, 100));
+    println!("I31(7)={:e}", bessel::methods::bessel_i_order_recur(31, r64(7.0), true, 100));
     println!("-");
-    println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), false, 10)-2.9154668224891856826e9);
-    println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), true, 10)-2.9154668224891856826e9);
-    println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), false, 20)-2.9154668224891856826e9);
-    println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), true, 20)-2.9154668224891856826e9);
-    println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), false, 100)-2.9154668224891856826e9);
-    println!("I31(37)={:e}", bessel::impls::bessel_i_order_recur(31, r64(37.0), true, 100)-2.9154668224891856826e9);
+    println!("I31(37)={:e}", bessel::methods::bessel_i_order_recur(31, r64(37.0), false, 10)-2.9154668224891856826e9);
+    println!("I31(37)={:e}", bessel::methods::bessel_i_order_recur(31, r64(37.0), true, 10)-2.9154668224891856826e9);
+    println!("I31(37)={:e}", bessel::methods::bessel_i_order_recur(31, r64(37.0), false, 20)-2.9154668224891856826e9);
+    println!("I31(37)={:e}", bessel::methods::bessel_i_order_recur(31, r64(37.0), true, 20)-2.9154668224891856826e9);
+    println!("I31(37)={:e}", bessel::methods::bessel_i_order_recur(31, r64(37.0), false, 100)-2.9154668224891856826e9);
+    println!("I31(37)={:e}", bessel::methods::bessel_i_order_recur(31, r64(37.0), true, 100)-2.9154668224891856826e9);
   }
 
   if false {
     println!("-----");
     println!("I(1,10)={:e}", sf_bessel_i(r64(1.0), r64(10.0)));
-    println!("I(1,10)~{:e}", bessel::impls::bessel_i_asymp_z(r64(1.0), r64(10.0)));
+    println!("I(1,10)~{:e}", bessel::methods::bessel_i_asymp_z(r64(1.0), r64(10.0)));
     println!("I(1,15)={:e}", sf_bessel_i(r64(1.0), r64(15.0)));
-    println!("I(1,15)~{:e}", bessel::impls::bessel_i_asymp_z(r64(1.0), r64(15.0)));
+    println!("I(1,15)~{:e}", bessel::methods::bessel_i_asymp_z(r64(1.0), r64(15.0)));
     println!("I(1,20)={:e}", sf_bessel_i(r64(1.0), r64(20.0)));
-    println!("I(1,20)~{:e}", bessel::impls::bessel_i_asymp_z(r64(1.0), r64(20.0)));
+    println!("I(1,20)~{:e}", bessel::methods::bessel_i_asymp_z(r64(1.0), r64(20.0)));
     println!("I(8,10)={:e}", sf_bessel_i(r64(8.0), r64(10.0)));
-    println!("I(8,10)~{:e}", bessel::impls::bessel_i_asymp_z(r64(8.0), r64(10.0)));
+    println!("I(8,10)~{:e}", bessel::methods::bessel_i_asymp_z(r64(8.0), r64(10.0)));
     println!("I(8,15)={:e}", sf_bessel_i(r64(8.0), r64(15.0)));
-    println!("I(8,15)~{:e}", bessel::impls::bessel_i_asymp_z(r64(8.0), r64(15.0)));
+    println!("I(8,15)~{:e}", bessel::methods::bessel_i_asymp_z(r64(8.0), r64(15.0)));
     println!("I(8,20)={:e}", sf_bessel_i(r64(8.0), r64(20.0)));
-    println!("I(8,20)~{:e}", bessel::impls::bessel_i_asymp_z(r64(8.0), r64(20.0)));
+    println!("I(8,20)~{:e}", bessel::methods::bessel_i_asymp_z(r64(8.0), r64(20.0)));
   }
 
   if false {
@@ -2117,19 +2117,19 @@ fn main() {
   if true {
     let x = r64(1.0);
     let ex = sf_cos(x);
-    let ap = trig::algos::cos_series(x);
+    let ap = trig::methods::cos_series(x);
     println!("{:.18e} {:.18e}  {:.2}", ex, ap, rel(ex.0, ap.0));
 
     let ex = sf_sin(x);
-    let ap = trig::algos::sin_series(x);
+    let ap = trig::methods::sin_series(x);
     println!("{:.18e} {:.18e}  {:.2}", ex, ap, rel(ex.0, ap.0));
 
     let x = r64(10.0);
-    let r = trig::algos::range_reduce_pi(x);
+    let r = trig::methods::range_reduce_pi(x);
     println!("{} {:.18e}", r.1, r.0);
 
     let x = r64(100.0);
-    let r = trig::algos::range_reduce_pi(x);
+    let r = trig::methods::range_reduce_pi(x);
     println!("{} {:.18e}", r.1, r.0);
     println!("{:.18e}  {:.18e}", sf_cos(r.0).pari(r.1), sf_sin(r.0).pari(r.1));
   }
