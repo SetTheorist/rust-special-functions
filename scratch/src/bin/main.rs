@@ -2133,4 +2133,14 @@ fn main() {
     println!("{} {:.18e}", r.1, r.0);
     println!("{:.18e}  {:.18e}", sf_cos(r.0).pari(r.1), sf_sin(r.0).pari(r.1));
   }
+
+  if true {
+    let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += sf_exp(x); }); println!("{:18e}", s);
+    let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series(x); }); println!("{:18e}", s);
+    let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series_(x); }); println!("{:18e}", s);
+    let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series__(x); }); println!("{:18e}", s);
+    let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series(x); }); println!("{:18e}", s);
+    let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series_(x); }); println!("{:18e}", s);
+    let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series__(x); }); println!("{:18e}", s);
+  }
 }

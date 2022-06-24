@@ -93,9 +93,7 @@ where
 
 #[inline]
 pub fn sum_series_<T, I>(it:I, ε:T::NT) -> T
-where
-  T: Field + Normed,
-  I: Iterator<Item = T>,
+where T: Field + Normed, I: Iterator<Item = T>,
 {
   //cum_sums(it)
   it.scan(T::zero, |s, a| { *s += a; Some(*s) })
@@ -108,19 +106,56 @@ where
 
 // TODO: "wrapped" version (generic over Kahan, e.g.)
 #[inline]
-pub fn sum_series<T, I>(it:I, ε:T::NT) -> T
-where
-  T: Field + Normed,
-  I: Iterator<Item = T>,
+pub fn sum_prod_series_0<T, I>(t0:T, mut it:I) -> T
+where T: Field + Normed, I: Iterator<Item = T>,
 {
-  let mut sum = ι(0); // = T::zero;
-  let mut n = 1;
-  for t in it {
-    let old = sum;
-    sum += t;
-    if μ(sum - old) <= μ(sum) * ε { break; }
-    if n > 999 { break; }
-    n += 1;
+  let mut sum = t0;
+  let mut term = t0;
+  for n in 1..1000 {
+    if let Some(t) = it.next() {
+      term *= t;
+      let old = sum;
+      sum += term;
+      if sum == old { break; }
+    } else {
+      break;
+    }
+  }
+  sum
+}
+
+// TODO: "wrapped" version (generic over Kahan, e.g.)
+#[inline]
+pub fn sum_series_0<T, I>(mut it:I) -> T
+where T: Field + Normed, I: Iterator<Item = T>,
+{
+  let mut sum = T::zero;
+  for n in 1..1000 {
+    if let Some(t) = it.next() {
+      let old = sum;
+      sum += t;
+      if sum == old { break; }
+    } else {
+      break;
+    }
+  }
+  sum
+}
+
+// TODO: "wrapped" version (generic over Kahan, e.g.)
+#[inline]
+pub fn sum_series<T, I>(mut it:I, ε:T::NT) -> T
+where T: Field + Normed, I: Iterator<Item = T>,
+{
+  let mut sum = T::zero;
+  for n in 1..1000 {
+    if let Some(t) = it.next() {
+      let old = sum;
+      sum += t;
+      if μ(sum - old) <= μ(sum) * ε { break; }
+    } else {
+      break;
+    }
   }
   sum
 }

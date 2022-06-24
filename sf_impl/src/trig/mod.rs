@@ -118,3 +118,5 @@ pub trait Trig: Value+Constants {
 #[inline] pub fn sf_tanh<V:Trig>(x:V) -> V { x.tanh() }
 #[inline] pub fn sf_vcos<V:Trig>(x:V) -> V { x.vcos() }
 #[inline] pub fn sf_vsin<V:Trig>(x:V) -> V { x.vsin() }
+#[inline] pub fn sf_cos_sin<V:Trig>(x:V) -> (V,V) { x.cos_sin() }
+#[inline] pub fn sf_cosh_sinh<V:Trig>(x:V) -> (V,V) { x.cosh_sinh() }

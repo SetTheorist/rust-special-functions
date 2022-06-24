@@ -76,11 +76,12 @@ pub fn airy_series<V:Value+AiryConstants>(z:V) -> (V,V) {
 
 // basic series
 pub fn aibi_1<V:Value>(z:V) -> V {
+  // explicit series sum (iterator versions much slower)
   let mut res = V::one;
   let mut term = V::one;
   let z3 = z*z*z;
   for n in 1..1000 {
-    term *= z3 * (n*3-2) / ((n*3)*(n*3-1)*(n*3-2));
+    term *= z3 / ((n*3)*(n*3-1));
     let old_res = res;
     res += term;
     if res == old_res {break;}
@@ -94,7 +95,7 @@ pub fn aibi_2<V:Value>(z:V) -> V {
   let mut term = z;
   let z3 = z*z*z;
   for n in 1..1000 {
-    term *= z3 * (n*3-1) / ((n*3+1)*(n*3)*(n*3-1));
+    term *= z3 / ((n*3+1)*(n*3));
     let old_res = res;
     res += term;
     if res == old_res {break;}
@@ -111,8 +112,8 @@ pub fn airy_series__combined<V:Value+AiryConstants>(z:V) -> (V,V) {
   for n in 1..1000 {
     let old_ai = ai;
     let old_bi = bi;
-    term_1 *= z3 * (n*3-2) / ((n*3)*(n*3-1)*(n*3-2));
-    term_2 *= z3 * (n*3-1) / ((n*3+1)*(n*3)*(n*3-1));
+    term_1 *= z3 / ((n*3)*(n*3-1));
+    term_2 *= z3 / ((n*3+1)*(n*3));
     ai += V::AI_0*term_1 + V::DAI_0*term_2;
     bi += V::BI_0*term_1 + V::DBI_0*term_2;
     if ai == old_ai && bi == old_bi {break;}
@@ -198,8 +199,7 @@ pub fn ai_asympt_neg<V:Value+Normed+Trig>(z:V) -> V {
 
     if sum_odd == old_sum_odd && sum_even == old_sum_even { break; }
   }
-  let cos = sf_cos(ζ - V::PI*0.25);
-  let sin = sf_sin(ζ - V::PI*0.25);
+  let (cos,sin) = sf_cos_sin(ζ - V::PI*0.25);
   V::FRAC_1_SQRTPI*z.nth_root(-4)*(cos*sum_even + sin*sum_odd)
 }
 

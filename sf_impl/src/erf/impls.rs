@@ -1,4 +1,4 @@
-use crate::algorithm::{contfrac_modlentz, sum_series};
+use crate::algorithm::{contfrac_modlentz, sum_series, sum_series_0, sum_prod_series_0};
 use crate::exp::{sf_exp, Exp};
 use crate::traits::*;
 use super::*;
@@ -10,7 +10,24 @@ pub fn erf_series<V: Value + Exp>(x: V) -> V {
     *s *= x2 / (2 * n + 1);
     Some(o)
   });
-  sf_exp(-x.sqr()) * (V::FRAC_1_SQRTPI * 2) * sum_series(terms, V::epsilon)
+  sf_exp(-x.sqr()) * (V::FRAC_1_SQRTPI * 2) * sum_series_0(terms)
+}
+pub fn erf_series__<V: Value + Exp>(x: V) -> V {
+  let x2 = x.sqr() * 2;
+  let terms = (1..).map(|n| x2/(2 * n + 1));
+  sf_exp(-x.sqr()) * (V::FRAC_1_SQRTPI * 2) * sum_prod_series_0(x, terms)
+}
+pub fn erf_series_<V: Value + Exp>(x: V) -> V {
+  let x2 = x.sqr() * 2;
+  let mut term = x;
+  let mut sum = x;
+  for n in 1..1000 {
+    term *= x2 / (2 * n + 1);
+    let old_sum = sum;
+    sum += term;
+    if sum == old_sum {break;}
+  }
+  sf_exp(-x.sqr()) * (V::FRAC_1_SQRTPI * 2) * sum
 }
 
 pub fn erfc_contfrac<V: Value + Exp>(x: V) -> V {
