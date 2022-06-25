@@ -3,7 +3,6 @@
 members = [
   "f128",
   "f16",
-  "perf",
   "scratch",
   "sf",
   "sfc",
