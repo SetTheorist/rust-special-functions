@@ -224,6 +224,7 @@ pub trait ComplexType: Base + Normed<NT = Self::RT> + Embeds<Self::RT>
     }
   }
   fn root_of_unity(n:isize) -> Self;
+  fn root_of_unity_pow(n:isize, k:isize) -> Self;
 }
 
 pub trait RealType: Base + Normed + Ordered {

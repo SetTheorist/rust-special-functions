@@ -220,7 +220,7 @@ fn test_airy() {
     .add(dat_k)
     .y_range(lo, hi)
     .x_label("x")
-    .y_label("Airy Ai(x) (blue) &amp; Bi(x) (red) relative error");
+    .y_label("Airy: Blue:Ai(x) &amp; Red:Bi(x) rel.err.; (grn:ser)(cyan:intpos)(yel:asypos)");
   plotlib::page::Page::single(&v).save("airy_real_error.svg").expect("saving svg");
 }
 fn test_dilog() {
@@ -378,3 +378,45 @@ fn doplots() -> Result<(),Box<dyn std::error::Error>> {
     Ok(())
 }
 */
+
+  /*
+    //if true { doplots(); }
+    let ch : ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
+    if true {
+      let fxrange = (-1.0,1.0);
+      let num_points = 200; // 5000;
+      let dx = (fxrange.1 - fxrange.0) / ((num_points - 1) as f64);
+      let xrange = (-1.01,1.01);
+      let yrange = (-1.05,1.05);
+      make_plot(
+        &(0..11)
+          .map(|n|
+            (BLACK, "T",
+              (0..num_points).map(|ix| (ix as f64)*dx + fxrange.0)
+                .map(|x|(x, ch.value(n,r64(x)).0)).collect::<Vec<_>>()))
+          .collect::<Vec<_>>(),
+        "chebyshev_t.svg", "Chebyshev T", xrange, yrange).unwrap();
+      /*
+      make_plot(&[
+        (GREEN, "T1",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(1,r64(x)).0)).collect::<Vec<_>>()),
+        (BLUE, "T2",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(2,r64(x)).0)).collect::<Vec<_>>()),
+        (RED, "T3",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(3,r64(x)).0)).collect::<Vec<_>>()),
+        (CYAN, "T4",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(4,r64(x)).0)).collect::<Vec<_>>()),
+        (MAGENTA, "T5",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(5,r64(x)).0)).collect::<Vec<_>>()),
+        (BLACK, "T11",
+          (0..num_points).map(|ix| (ix as f64)*dx + xrange.0)
+            .map(|x|(x, ch.value(11,r64(x)).0)).collect::<Vec<_>>()),
+        ], "chebyshev_t.svg", "Chebyshev T", xrange, yrange).unwrap();
+        */
+    }
+  */
