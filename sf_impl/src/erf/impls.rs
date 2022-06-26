@@ -121,7 +121,7 @@ pub fn erf_inv<V:RealValue+Erf+Exp+Float>(z:V) -> V {
     let f = sf_erf(r) - z;
     let df = sf_exp(-r.sqr()) * c;
     r -= f / (df + r * f);
-    if r == o {print!("<{}>",i);break;}
+    if r == o {log::trace!("{}",i);break;}
   }
   r
 }

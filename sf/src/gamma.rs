@@ -1,6 +1,7 @@
-use sf_impl::gamma;
 use sf_impl::complex::*;
 use sf_impl::real::*;
+
+use sf_impl::gamma;
 
 pub trait SFGamma {
   #[must_use] fn sf_gamma(self) -> Self;
