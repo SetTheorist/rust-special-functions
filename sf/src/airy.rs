@@ -2,8 +2,8 @@ use sf_impl::airy;
 use sf_impl::complex::*;
 use sf_impl::real::*;
 
-#[inline] fn f(num_complex::Complex{re,im}:num_complex::Complex<f64>) -> c64 { c64::new(r64(re),r64(im)) }
-#[inline] fn t(c64{re,im}:c64) -> num_complex::Complex<f64> { num_complex::Complex::new(re.0,im.0) }
+//#[inline] fn f(num_complex::Complex{re,im}:num_complex::Complex<f64>) -> c64 { c64::new(r64(re),r64(im)) }
+//#[inline] fn t(c64{re,im}:c64) -> num_complex::Complex<f64> { num_complex::Complex::new(re.0,im.0) }
 
 pub trait SFAiry : Sized {
   fn sf_airy_ai(self) -> Self;

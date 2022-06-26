@@ -9,6 +9,7 @@ name = "sfc"
 crate-type = ["staticlib"]  
 
 [dependencies]
+num-complex = "*"
 
 [dependencies.sf]
 path = "../sf"

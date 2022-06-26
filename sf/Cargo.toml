@@ -5,7 +5,6 @@ edition = "2021"
 authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
 
 [dependencies]
-criterion = "*"
 num-complex = "*"
 
 [dependencies.sf_impl]
@@ -13,3 +12,10 @@ path = "../sf_impl"
 
 [dependencies.sf_hex_float]
 path = "../sf_hex_float"
+
+[dev-dependencies]
+criterion = "*"
+
+[[bench]]
+name = "sf_benchmark"
+harness = false

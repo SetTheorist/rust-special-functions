@@ -9,11 +9,28 @@
 
 #define MUST_USE_FUNC __attribute__((warn_unused_result))
 
+typedef struct Complex {
+  double _0;
+  double _1;
+} Complex;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
 MUST_USE_FUNC double sf_exp(double x);
+
+MUST_USE_FUNC double sf_exp_m1(double x);
+
+MUST_USE_FUNC double sf_exp_m1vx(double x);
+
+MUST_USE_FUNC double sf_expn(intptr_t n, double x);
+
+MUST_USE_FUNC double sf_exp_men(intptr_t n, double x);
+
+MUST_USE_FUNC double sf_exp_menx(intptr_t n, double x);
+
+MUST_USE_FUNC struct Complex sf_exp_c(struct Complex x);
 
 #ifdef __cplusplus
 } // extern "C"

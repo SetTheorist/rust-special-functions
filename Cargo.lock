@@ -642,6 +642,7 @@ dependencies = [
 name = "sfc"
 version = "0.1.0"
 dependencies = [
+ "num-complex",
  "sf",
 ]
 
