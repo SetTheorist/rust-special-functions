@@ -37,6 +37,7 @@ use crate::real::*;
 impl Exp for r64 {
   #[inline] fn exp(self) -> Self { r64(self.0.exp()) }
   #[inline] fn exp_m1(self) -> Self { r64(self.0.exp_m1()) }
+  //#[inline] fn expn(self, n:isize) -> Self { ... }
   #[inline] fn exp_men(self, n:isize) -> Self {
     // TODO: nan, etc.
     if self.is_infinite() {
@@ -57,6 +58,7 @@ impl Exp for r64 {
       _ => exp_men_contfrac(n, self),
     }
   }
+  //#[inline] fn exp_menx(self, n:isize) -> Self { ... }
 }
 
 use crate::complex::*;
