@@ -67,6 +67,8 @@ pub fn main() {
   gen_graph_r64(polylog::sf_dilog, "./data/dilog.real.csv", "#AA3355", 0, 1, "x", "Dilog(x) rel.err.", "./accuracy/dilog.real.svg");
   gen_graph_r64(erf::sf_erf, "./data/erf.real.csv", "#AA3355", 0, 1, "x", "Erf(x) rel.err.", "./accuracy/erf.real.svg");
   gen_graph_r64(gamma::sf_gamma, "./data/gamma.real.csv", "#AA3355", 0, 1, "x", "Gamma(x) rel.err.", "./accuracy/gamma.real.svg");
+  gen_graph_r64(zeta::sf_zeta, "./data/zeta.real.csv", "#AA3355", 0, 1, "x", "Riemann zeta(x) rel.err.", "./accuracy/zeta.real.svg");
+  gen_graph_r64(zeta::sf_zeta_m1, "./data/zeta.real.csv", "#AA3355", 0, 2, "x", "Riemann zeta(x)-1 rel.err.", "./accuracy/zeta_m1.real.svg");
 
   //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
   //let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
@@ -86,8 +88,7 @@ fn gen_graph_r64<F:Fn(r64)->r64>(f:F, data:&str, color:&str, x_column:usize, f_c
   }
   let t : Vec<_> = t.into_iter().map(|(x,fx)|{ let apx = f(r64(x)).0; (x,rel(fx,apx)) }).collect();
 
-  let lo = -17.0;
-  let hi = 0.0;
+  let (lo, hi) = (-17.0, 0.0);
 
   let dat = plotlib::repr::Plot::new(t)
     .point_style(
