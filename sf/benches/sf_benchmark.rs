@@ -4,6 +4,7 @@ use sf::airy::*;
 use sf::erf::*;
 use sf::exp::*;
 use sf::gamma::*;
+use sf::zeta::*;
 
 fn benchmark(c: &mut Criterion) {
   {
@@ -49,6 +50,14 @@ fn benchmark(c: &mut Criterion) {
       group.bench_with_input(BenchmarkId::new("lngamma", x), x, |b,&x| b.iter(|| sf_lngamma(black_box(x))));
       group.bench_with_input(BenchmarkId::new("digamma", x), x, |b,&x| b.iter(|| sf_digamma(black_box(x))));
       group.bench_with_input(BenchmarkId::new("beta(5)", x), x, |b,&x| b.iter(|| sf_beta(black_box(x), 5.0)));
+    }
+  }
+
+  {
+    let mut group = c.benchmark_group("Zeta");
+    for x in [0.1, 0.5, 2.0, 5.0, 10.0, 20.0].iter() {
+      group.bench_with_input(BenchmarkId::new("zeta", x), x, |b,&x| b.iter(|| sf_zeta(black_box(x))));
+      group.bench_with_input(BenchmarkId::new("zeta_m1", x), x, |b,&x| b.iter(|| sf_zeta_m1(black_box(x))));
     }
   }
 }
