@@ -30,69 +30,23 @@
 //#![feature(optimize_attribute)] // [#optimize(speed)]
 //#![feature(specialization)]
 
+use std::io::{self,BufRead};
+
 use sf_impl::{
-  agm,
-  airy,
-  algorithm,
-  basic,
-  bessel,
-  complex,
-  data,
-  dawson,
-  debye,
-  dual,
-  ellint,
-  erf,
-  exp,
-  expint,
-  float,
-  gamma,
-  hypergeom,
-  jacobi,
-  kahan,
-  lambert,
-  log,
-  numbers,
-  orthopoly,
-  pcf,
-  poly,
-  polylog,
-  real,
-  sievert,
-  solve,
-  theta,
-  traits,
-  trig,
-  twin,
-  util,
-  wide,
+  agm, airy, algorithm, basic, bessel,
+  complex, data, dawson, debye, dual,
+  ellint, erf, exp, expint, float,
+  gamma, hypergeom, jacobi, kahan, lambert,
+  log, numbers, orthopoly, pcf, poly,
+  polylog, real, sievert, solve, theta,
+  traits, trig, twin, util, wide,
   zeta,
 };
 
-//use crate::kahan::{*};
-//use crate::num::complex::{Complex};
-use crate::algorithm::*;
-use crate::bessel::*;
 use crate::complex::*;
-use crate::dawson::*;
-use crate::dual::*;
-use crate::ellint::*;
-use crate::erf::{*};
-use crate::exp::*;
-use crate::gamma::*;
-use crate::algorithm::integration::Integrator;
-use crate::log::*;
-use crate::numbers::*;
-use crate::orthopoly::chebyshev_t::*;
-use crate::orthopoly::*;
-use crate::poly::*;
-use crate::polylog::*;
 use crate::real::*;
-use crate::theta::*;
 use crate::traits::*;
-use crate::trig::*;
 use crate::wide::{Wide};
-use crate::zeta::*;
 
 fn rel(ex: f64, ap: f64) -> f64 {
   let ε = f64::EPSILON;
@@ -108,180 +62,45 @@ fn rel(ex: f64, ap: f64) -> f64 {
 }
 
 pub fn main() {
-  if true {
-    test_airy();
-    test_dilog();
-    test_erf();
-    test_gamma();
-  }
+  gen_graph_r64(airy::sf_airy_ai, "./data/airy.real.csv", "#AA3355", 0, 1, "x", "Airy AI(x) rel.err.", "./accuracy/airy.ai.real.svg");
+  gen_graph_r64(airy::sf_airy_bi, "./data/airy.real.csv", "#AA3355", 0, 2, "x", "Airy BI(x) rel.err.", "./accuracy/airy.bi.real.svg");
+  gen_graph_r64(polylog::sf_dilog, "./data/dilog.real.csv", "#AA3355", 0, 1, "x", "Dilog(x) rel.err.", "./accuracy/dilog.real.svg");
+  gen_graph_r64(erf::sf_erf, "./data/erf.real.csv", "#AA3355", 0, 1, "x", "Erf(x) rel.err.", "./accuracy/erf.real.svg");
+  gen_graph_r64(gamma::sf_gamma, "./data/gamma.real.csv", "#AA3355", 0, 1, "x", "Gamma(x) rel.err.", "./accuracy/gamma.real.svg");
+
+  //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
+  //let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
+  //let apx = airy::impls::ai_asympt_pos(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
 }
 
-use std::io::{self,BufRead};
-fn test_gamma() {
-  let file = std::fs::File::open("./data/gamma.real.csv").unwrap();
+fn gen_graph_r64<F:Fn(r64)->r64>(f:F, data:&str, color:&str, x_column:usize, f_column:usize, x_label:&str, y_label:&str, output:&str) {
+  let file = std::fs::File::open(data).unwrap();
   let mut t = Vec::new();
   for line in io::BufReader::new(file).lines() {
     if let Ok(line) = line {
       let v = line.split(",").collect::<Vec<_>>();
-      let x : f64 = v[0].parse().unwrap();
-      let fx : f64 = v[1].parse().unwrap();
+      let x : f64 = v[x_column].parse().unwrap();
+      let fx : f64 = v[f_column].parse().unwrap();
       t.push((x,fx));
     }
   }
-  let t = t.into_iter().map(|(x,fx)|{
-    let apx = sf_gamma(r64(x)).0;(x,rel(fx,apx))})
-    .collect::<Vec<_>>();
+  let t : Vec<_> = t.into_iter().map(|(x,fx)|{ let apx = f(r64(x)).0; (x,rel(fx,apx)) }).collect();
 
   let lo = -17.0;
   let hi = 0.0;
+
   let dat = plotlib::repr::Plot::new(t)
     .point_style(
       plotlib::style::PointStyle::new()
       .marker(plotlib::style::PointMarker::Circle)
-      .colour("#113355")
-      .size(0.5));
+      .colour(color)
+      .size(1.0));
   let v = plotlib::view::ContinuousView::new()  
     .add(dat)
     .y_range(lo, hi)
-    .x_label("x")
-    .y_label("Gamma(x) relative error");
-  plotlib::page::Page::single(&v).save("gamma_real_error.svg").expect("saving svg");
-}
-fn test_airy() {
-  let file = std::fs::File::open("./data/airy.real.csv").unwrap();
-  let mut t = Vec::new();
-  for line in io::BufReader::new(file).lines() {
-    if let Ok(line) = line {
-      let v = line.split(",").collect::<Vec<_>>();
-      let x : f64 = v[0].parse().unwrap();
-      let ax : f64 = v[1].parse().unwrap();
-      let bx : f64 = v[2].parse().unwrap();
-      t.push((x,ax,bx));
-    }
-  }
-
-  let lo = -17.0;
-  let hi = 0.0;
-  let ta = t.iter().map(|&(x,ax,_)|{
-    let apx = airy::sf_airy_ai(r64(x)).0;(x,rel(ax,apx))})
-    .collect::<Vec<_>>();
-  let dat_a = plotlib::repr::Plot::new(ta)
-    .point_style(
-      plotlib::style::PointStyle::new()
-      .marker(plotlib::style::PointMarker::Circle)
-      .colour("#1133EE")
-      .size(0.5));
-
-  let tb = t.iter().map(|&(x,_,bx)|{
-    let apx = airy::sf_airy_bi(r64(x)).0;(x,rel(bx,apx))})
-    .collect::<Vec<_>>();
-  let dat_b = plotlib::repr::Plot::new(tb)
-    .point_style(
-      plotlib::style::PointStyle::new()
-      .marker(plotlib::style::PointMarker::Circle)
-      .colour("#EE3311")
-      .size(0.5));
-
-  let ti = t.iter().map(|&(x,ax,_)|{
-    let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
-    .collect::<Vec<_>>();
-  let dat_i = plotlib::repr::Plot::new(ti)
-    .point_style(
-      plotlib::style::PointStyle::new()
-      .marker(plotlib::style::PointMarker::Circle)
-      .colour("#33EE11")
-      .size(0.5));
-
-  let tj = t.iter().map(|&(x,ax,_)|{
-    let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
-    .collect::<Vec<_>>();
-  let dat_j = plotlib::repr::Plot::new(tj)
-    .point_style(
-      plotlib::style::PointStyle::new()
-      .marker(plotlib::style::PointMarker::Circle)
-      .colour("#119999")
-      .size(0.75));
-
-  let tk = t.iter().map(|&(x,ax,_)|{
-    let apx = airy::impls::ai_asympt_pos(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
-    .collect::<Vec<_>>();
-  let dat_k = plotlib::repr::Plot::new(tk)
-    .point_style(
-      plotlib::style::PointStyle::new()
-      .marker(plotlib::style::PointMarker::Circle)
-      .colour("#DDDD11")
-      .size(0.75));
-
-  let v = plotlib::view::ContinuousView::new()  
-    .add(dat_a)
-    .add(dat_b)
-    .add(dat_i)
-    .add(dat_j)
-    .add(dat_k)
-    .y_range(lo, hi)
-    .x_label("x")
-    .y_label("Airy: Blue:Ai(x) &amp; Red:Bi(x) rel.err.; (grn:ser)(cyan:intpos)(yel:asypos)");
-  plotlib::page::Page::single(&v).save("airy_real_error.svg").expect("saving svg");
-}
-fn test_dilog() {
-  let file = std::fs::File::open("./data/dilog.real.csv").unwrap();
-  let mut t = Vec::new();
-  for line in io::BufReader::new(file).lines() {
-    if let Ok(line) = line {
-      let v = line.split(",").collect::<Vec<_>>();
-      let x : f64 = v[0].parse().unwrap();
-      let fx : f64 = v[1].parse().unwrap();
-      t.push((x,fx));
-    }
-  }
-  let t = t.into_iter().map(|(x,fx)|{
-    let apx = sf_dilog(r64(x)).0;(x,rel(fx,apx))})
-    .collect::<Vec<_>>();
-
-  let lo = -17.0;
-  let hi = 0.0;
-  let dat = plotlib::repr::Plot::new(t)
-    .point_style(
-      plotlib::style::PointStyle::new()
-      .marker(plotlib::style::PointMarker::Circle)
-      .colour("#113355")
-      .size(0.5));
-  let v = plotlib::view::ContinuousView::new()  
-    .add(dat)
-    .y_range(lo, hi)
-    .x_label("x")
-    .y_label("DiLog(x) relative error");
-  plotlib::page::Page::single(&v).save("dilog_real_error.svg").expect("saving svg");
-}
-fn test_erf() {
-  let file = std::fs::File::open("./data/erf.real.csv").unwrap();
-  let mut t = Vec::new();
-  for line in io::BufReader::new(file).lines() {
-    if let Ok(line) = line {
-      let v = line.split(",").collect::<Vec<_>>();
-      let x : f64 = v[0].parse().unwrap();
-      let fx : f64 = v[1].parse().unwrap();
-      t.push((x,fx));
-    }
-  }
-  let t = t.into_iter().map(|(x,fx)|{
-    let apx = sf_erf(r64(x)).0;(x,rel(fx,apx))})
-    .collect::<Vec<_>>();
-
-  let lo = -17.0;
-  let hi = 0.0;
-  let dat = plotlib::repr::Plot::new(t)
-    .point_style(
-      plotlib::style::PointStyle::new()
-      .marker(plotlib::style::PointMarker::Circle)
-      .colour("#113355")
-      .size(0.5));
-  let v = plotlib::view::ContinuousView::new()  
-    .add(dat)
-    .y_range(lo, hi)
-    .x_label("x")
-    .y_label("Erf(x) relative error");
-  plotlib::page::Page::single(&v).save("erf_real_error.svg").expect("saving svg");
+    .x_label(x_label)
+    .y_label(y_label);
+  plotlib::page::Page::single(&v).save(output).expect("saving svg");
 }
 
 /*

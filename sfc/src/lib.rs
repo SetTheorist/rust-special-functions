@@ -6,6 +6,8 @@
 #[no_mangle]#[must_use] pub extern "C" fn sf_airy_bi(x:f64) -> f64 { sf::airy::sf_airy_bi(x) }
 //#[no_mangle]#[must_use] pub extern "C" fn sf_airy_aibi(x:f64) -> (f64,f64) { sf::airy::sf_airy_aibi(x) }
 
+#[no_mangle]#[must_use] pub extern "C" fn sf_dilog(x:f64) -> f64 { sf::polylog::sf_dilog(x) }
+
 #[no_mangle]#[must_use] pub extern "C" fn sf_erf(x:f64) -> f64 { sf::erf::sf_erf(x) }
 #[no_mangle]#[must_use] pub extern "C" fn sf_erfc(x:f64) -> f64 { sf::erf::sf_erfc(x) }
 #[no_mangle]#[must_use] pub extern "C" fn sf_erf_inv(x:f64) -> f64 { sf::erf::sf_erf_inv(x) }

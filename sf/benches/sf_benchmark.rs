@@ -4,6 +4,7 @@ use sf::airy::*;
 use sf::erf::*;
 use sf::exp::*;
 use sf::gamma::*;
+use sf::polylog::*;
 use sf::zeta::*;
 
 fn benchmark(c: &mut Criterion) {
@@ -13,6 +14,13 @@ fn benchmark(c: &mut Criterion) {
       group.bench_with_input(BenchmarkId::new("AI", x), x, |b,&x| b.iter(|| sf_airy_ai(black_box(x))));
       group.bench_with_input(BenchmarkId::new("BI", x), x, |b,&x| b.iter(|| sf_airy_bi(black_box(x))));
       group.bench_with_input(BenchmarkId::new("AIBI", x), x, |b,&x| b.iter(|| sf_airy_aibi(black_box(x))));
+    }
+  }
+
+  {
+    let mut group = c.benchmark_group("Polylog");
+    for x in [-10.0, -5.0, -1.0, -0.5, 0.0, 0.5, 0.99].iter() {
+      group.bench_with_input(BenchmarkId::new("dilog", x), x, |b,&x|b.iter(||sf_dilog(black_box(x))));
     }
   }
 
