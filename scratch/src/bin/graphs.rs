@@ -76,8 +76,8 @@ pub fn main() {
 }
 
 fn gen_graph_r64<F:Fn(r64)->r64>(f:F, data:&str, color:&str, x_column:usize, f_column:usize, x_label:&str, y_label:&str, output:&str) {
-  let file = std::fs::File::open(data).unwrap();
   let mut t = Vec::new();
+  let file = std::fs::File::open(data).unwrap();
   for line in io::BufReader::new(file).lines() {
     if let Ok(line) = line {
       let v = line.split(",").collect::<Vec<_>>();
@@ -89,18 +89,13 @@ fn gen_graph_r64<F:Fn(r64)->r64>(f:F, data:&str, color:&str, x_column:usize, f_c
   let t : Vec<_> = t.into_iter().map(|(x,fx)|{ let apx = f(r64(x)).0; (x,rel(fx,apx)) }).collect();
 
   let (lo, hi) = (-17.0, 0.0);
-
-  let dat = plotlib::repr::Plot::new(t)
-    .point_style(
-      plotlib::style::PointStyle::new()
+  let ps = plotlib::style::PointStyle::new()
       .marker(plotlib::style::PointMarker::Circle)
       .colour(color)
-      .size(1.0));
+      .size(1.0);
+  let dat = plotlib::repr::Plot::new(t).point_style(ps);
   let v = plotlib::view::ContinuousView::new()  
-    .add(dat)
-    .y_range(lo, hi)
-    .x_label(x_label)
-    .y_label(y_label);
+    .add(dat).y_range(lo, hi).x_label(x_label).y_label(y_label);
   plotlib::page::Page::single(&v).save(output).expect("saving svg");
 }
 

@@ -15,9 +15,13 @@ macro_rules! empty_type {
 }
 
 pub mod chebyshev_t;
+pub mod chebyshev_u;
+pub mod legendre;
+
 empty_type!(ChebyshevTx);
-empty_type!(ChebyshevU);
 empty_type!(ChebyshevUx);
+empty_type!(Legendrex);
+
 empty_type!(ChebyshevV);
 empty_type!(ChebyshevW);
 struct Gegenbauer<V: Value> {
@@ -32,13 +36,13 @@ struct Jacobi<V: Value> {
 struct Laguerre<V: Value> {
   alpha: V,
 }
-empty_type!(Legendre);
-empty_type!(Legendrex);
 
 // NB use nalgebra for eigenvalues ...
 
 pub trait OrthogonalPolynomial<V: Value> {
+  /// domain over which the polynomials are defined
   fn domain(&self) -> (V, V);
+  /// the k'th coefficient in the degree n polynomial
   fn coeff(&self, n: usize, k: usize) -> V;
   fn scale(&self, n: usize) -> V; // and scale_squared?
   fn value(&self, n: usize, x: V) -> V;

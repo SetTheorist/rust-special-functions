@@ -4,25 +4,23 @@ use crate::traits::*;
 
 use crate::trig::*;
 
-empty_type!(ChebyshevT);
+empty_type!(ChebyshevU);
 
-impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
+impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevU<V> {
   fn domain(&self) -> (V, V) { (ι(-1), ι(1)) }
 
   fn scale(&self, n: usize) -> V {
-    match n {
-      0 => sf_sqrt(V::PI),
-      _ => sf_sqrt(V::PI/2),
-    }
+    // \sqrt{\frac{2}{\pi}}
+    sf_sqrt(V::FRAC_1_SQRT2PI * 2)
   }
 
   fn value(&self, n: usize, x: V) -> V {
     match n {
       0 => ι(1),
-      1 => x,
+      1 => x*2,
       _ => {
         let mut vm1: V = ι(1);
-        let mut vm0: V = x;
+        let mut vm0: V = x*2;
         for _ in 2..=n {
           let vm2 = vm1;
           vm1 = vm0;
@@ -39,7 +37,7 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
       1 => Poly(vec![ι(0), ι(1)]),
       _ => {
         let mut t0: Poly<V> = Poly(vec![ι(1)]);
-        let mut t1: Poly<V> = Poly(vec![ι(0), ι(1)]);
+        let mut t1: Poly<V> = Poly(vec![ι(0), ι(2)]);
         for _ in 2..=n {
           // let t2 = t1.shift(1)*2 - t0;
           let mut t2: Poly<V> = t1.clone();
@@ -59,30 +57,32 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
 
   fn coeff(&self, n: usize, k: usize) -> V { self.coeffs(n)[k] }
 
-  fn weight(&self, n: usize, _k: usize) -> V { V::PI / (n as isize) }
+  fn weight(&self, n: usize, k: usize) -> V { self.weights(n)[k] }
 
-  fn weights(&self, n: usize) -> Vec<V> { vec![V::PI/(n as isize); n] }
+  fn weights(&self, n: usize) -> Vec<V> {
+    (1..(n+1)).map(|k|
+        sf_sin(V::PI*(k as isize)/((n+1) as isize)).sqr() * V::PI / ((n+1) as isize)
+    ).collect()
+  }
 
   fn zero(&self, n: usize, k: usize) -> V { 
     let k = (n-1-k);
     if n%2 == 1 && k==(n-1)/2 {
       V::zero
     } else {
-      let kk = (2*k+1) as isize;
-      sf_cos(V::FRAC_PI_2 * kk / (n as isize))
+      sf_cos(V::PI * ((k+1) as isize) / ((n+1) as isize))
     }
   }
 
   fn zeros(&self, n: usize) -> Vec<V> { 
     let mut res = vec![V::zero; n];
-    for k in 0..(n/2) {
-      let kk = (2*k+1) as isize;
-      let c = sf_cos(V::FRAC_PI_2 * kk / (n as isize));
+    for k in (0..(n/2)).rev() {
+      let c = sf_cos(V::PI * ((k+1) as isize) / ((n+1) as isize));
       res[k] = -c;
       res[n-1-k] = c;
     }
     res
   }
 
-  fn kernel(&self, x: V) -> V { (ι(1): V - x * x).sqrt().recip() }
+  fn kernel(&self, x: V) -> V { (ι(1): V - x * x).sqrt() }
 }

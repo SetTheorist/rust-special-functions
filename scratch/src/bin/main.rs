@@ -178,8 +178,6 @@ use crate::gamma::*;
 use crate::algorithm::integration::Integrator;
 use crate::log::*;
 use crate::numbers::*;
-use crate::orthopoly::chebyshev_t::*;
-use crate::orthopoly::*;
 use crate::poly::*;
 use crate::polylog::*;
 use crate::real::*;
@@ -188,6 +186,8 @@ use crate::traits::*;
 use crate::trig::*;
 use crate::wide::{Wide};
 use crate::zeta::*;
+
+use sf_impl::orthopoly::OrthogonalPolynomial;
 
 fn rel(ex: f64, ap: f64) -> f64 {
   let ε = f64::EPSILON;
@@ -210,7 +210,7 @@ fn main() {
   ::simple_logger::SimpleLogger::new().init().unwrap();
 
   if false {
-    let ch: ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
+    let ch: orthopoly::chebyshev_t::ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
     for i in 0..10 {
       println!("{:?}", ch.coeffs(i).iter().map(|x| x.0).collect::<Vec<_>>());
     }
@@ -1822,7 +1822,7 @@ fn main() {
     println!("{:.18e}  {:.18e}", sf_cos(r.0).pari(r.1), sf_sin(r.0).pari(r.1));
   }
 
-  if true {
+  if false {
     let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += sf_exp(x); }); println!("{:18e}", s);
     let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series(x); }); println!("{:18e}", s);
     let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series_(x); }); println!("{:18e}", s);
@@ -1830,5 +1830,54 @@ fn main() {
     let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series(x); }); println!("{:18e}", s);
     let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series_(x); }); println!("{:18e}", s);
     let mut s = r64::zero; time!(for x in util::Grid::new(r64(0.0), r64(2.0), 1000000) { s += erf::impls::erf_series__(x); }); println!("{:18e}", s);
+  }
+
+  if false {
+    println!("{}", zeta::sf_zeta(r64(-2.5)));
+    println!("{}", zeta::sf_zeta_m1(r64(-2.5)));
+    println!("{}", zeta::sf_zeta(r64(0.9)));
+    println!("{}", zeta::sf_zeta_m1(r64(0.9)));
+    println!("{}", zeta::sf_zeta(r64(1.1)));
+    println!("{}", zeta::sf_zeta_m1(r64(1.1)));
+    println!("{}", zeta::sf_zeta(r64(0.999)));
+    println!("{}", zeta::sf_zeta_m1(r64(0.999)));
+    println!("{}", zeta::sf_zeta(r64(1.001)));
+    println!("{}", zeta::sf_zeta_m1(r64(1.001)));
+  }
+
+  if true {
+    println!("====================");
+    let chebt: orthopoly::chebyshev_t::ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
+    println!("{:?}", chebt.zeros(6));
+    println!("{:?}", chebt.zeros(5));
+    for k in 0..3 { println!("{:?}", chebt.zero(5,k)); }
+    println!("{}", chebt.poly(5));
+
+    for n in (3..9) {
+      let z = chebt.zeros(n);
+      let w = chebt.weights(n);
+      let mut t = r64::zero;
+      // \int_{-1}^{+1} \cos(x)/\sqrt{1-x^2} \,dx
+      for v in (0..n).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      println!("{}  {:.18e}", n, t - 2.40393943063441299827332489259);
+    }
+  }
+  
+  if true {
+    println!("====================");
+    let chebu: orthopoly::chebyshev_u::ChebyshevU<r64> = orthopoly::chebyshev_u::ChebyshevU::<r64>::new();
+    println!("{:?}", chebu.zeros(6));
+    println!("{:?}", chebu.zeros(5));
+    for k in 0..3 { println!("{:?}", chebu.zero(5,k)); }
+    println!("{}", chebu.poly(5));
+
+    for n in (3..9) {
+      let z = chebu.zeros(n);
+      let w = chebu.weights(n);
+      let mut t = r64::zero;
+      // \int_{-1}^{+1} \cos(x)\sqrt{1-x^2} \,dx
+      for v in (0..n).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      println!("{}  {:.18e}", n, t - 1.38245968738416852576628332769);
+    }
   }
 }
