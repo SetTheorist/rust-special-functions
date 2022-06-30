@@ -9,14 +9,14 @@ empty_type!(ChebyshevT);
 impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
   fn domain(&self) -> (V, V) { (ι(-1), ι(1)) }
 
-  fn scale(&self, n: usize) -> V {
+  fn scale(&self, n: isize) -> V {
     match n {
       0 => sf_sqrt(V::PI),
       _ => sf_sqrt(V::PI/2),
     }
   }
 
-  fn value(&self, n: usize, x: V) -> V {
+  fn value(&self, n: isize, x: V) -> V {
     match n {
       0 => ι(1),
       1 => x,
@@ -33,7 +33,7 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
     }
   }
 
-  fn poly(&self, n: usize) -> Poly<V> {
+  fn poly(&self, n: isize) -> Poly<V> {
     match n {
       0 => Poly(vec![ι(1)]),
       1 => Poly(vec![ι(0), ι(1)]),
@@ -55,31 +55,31 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
     }
   }
 
-  fn coeffs(&self, n: usize) -> Vec<V> { self.poly(n).0 }
+  fn coeffs(&self, n: isize) -> Vec<V> { self.poly(n).0 }
 
-  fn coeff(&self, n: usize, k: usize) -> V { self.coeffs(n)[k] }
+  fn coeff(&self, n: isize, k: isize) -> V { self.coeffs(n)[k as usize] }
 
-  fn weight(&self, n: usize, _k: usize) -> V { V::PI / (n as isize) }
+  fn weight(&self, n: isize, _k: isize) -> V { V::PI / n }
 
-  fn weights(&self, n: usize) -> Vec<V> { vec![V::PI/(n as isize); n] }
+  fn weights(&self, n: isize) -> Vec<V> { vec![V::PI/n; n as usize] }
 
-  fn zero(&self, n: usize, k: usize) -> V { 
+  fn zero(&self, n: isize, k: isize) -> V { 
     let k = (n-1-k);
     if n%2 == 1 && k==(n-1)/2 {
       V::zero
     } else {
-      let kk = (2*k+1) as isize;
-      sf_cos(V::FRAC_PI_2 * kk / (n as isize))
+      let kk = 2*k+1;
+      sf_cos(V::FRAC_PI_2 * kk / n)
     }
   }
 
-  fn zeros(&self, n: usize) -> Vec<V> { 
-    let mut res = vec![V::zero; n];
+  fn zeros(&self, n: isize) -> Vec<V> { 
+    let mut res = vec![V::zero; n as usize];
     for k in 0..(n/2) {
-      let kk = (2*k+1) as isize;
-      let c = sf_cos(V::FRAC_PI_2 * kk / (n as isize));
-      res[k] = -c;
-      res[n-1-k] = c;
+      let kk = 2*k+1;
+      let c = sf_cos(V::FRAC_PI_2 * kk / n);
+      res[k as usize] = -c;
+      res[(n-1-k) as usize] = c;
     }
     res
   }

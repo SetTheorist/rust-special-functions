@@ -9,12 +9,12 @@ empty_type!(ChebyshevU);
 impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevU<V> {
   fn domain(&self) -> (V, V) { (ι(-1), ι(1)) }
 
-  fn scale(&self, n: usize) -> V {
+  fn scale(&self, n: isize) -> V {
     // \sqrt{\frac{2}{\pi}}
     sf_sqrt(V::FRAC_1_SQRT2PI * 2)
   }
 
-  fn value(&self, n: usize, x: V) -> V {
+  fn value(&self, n: isize, x: V) -> V {
     match n {
       0 => ι(1),
       1 => x*2,
@@ -31,7 +31,7 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevU<V> {
     }
   }
 
-  fn poly(&self, n: usize) -> Poly<V> {
+  fn poly(&self, n: isize) -> Poly<V> {
     match n {
       0 => Poly(vec![ι(1)]),
       1 => Poly(vec![ι(0), ι(1)]),
@@ -53,33 +53,33 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevU<V> {
     }
   }
 
-  fn coeffs(&self, n: usize) -> Vec<V> { self.poly(n).0 }
+  fn coeffs(&self, n: isize) -> Vec<V> { self.poly(n).0 }
 
-  fn coeff(&self, n: usize, k: usize) -> V { self.coeffs(n)[k] }
+  fn coeff(&self, n: isize, k: isize) -> V { self.coeffs(n)[k as usize] }
 
-  fn weight(&self, n: usize, k: usize) -> V { self.weights(n)[k] }
+  fn weight(&self, n: isize, k: isize) -> V { self.weights(n)[k as usize] }
 
-  fn weights(&self, n: usize) -> Vec<V> {
+  fn weights(&self, n: isize) -> Vec<V> {
     (1..(n+1)).map(|k|
-        sf_sin(V::PI*(k as isize)/((n+1) as isize)).sqr() * V::PI / ((n+1) as isize)
+        sf_sin(V::PI*k/(n+1)).sqr() * V::PI / (n+1)
     ).collect()
   }
 
-  fn zero(&self, n: usize, k: usize) -> V { 
+  fn zero(&self, n: isize, k: isize) -> V { 
     let k = (n-1-k);
     if n%2 == 1 && k==(n-1)/2 {
       V::zero
     } else {
-      sf_cos(V::PI * ((k+1) as isize) / ((n+1) as isize))
+      sf_cos(V::PI * (k+1) / (n+1))
     }
   }
 
-  fn zeros(&self, n: usize) -> Vec<V> { 
-    let mut res = vec![V::zero; n];
+  fn zeros(&self, n: isize) -> Vec<V> { 
+    let mut res = vec![V::zero; n as usize];
     for k in (0..(n/2)).rev() {
-      let c = sf_cos(V::PI * ((k+1) as isize) / ((n+1) as isize));
-      res[k] = -c;
-      res[n-1-k] = c;
+      let c = sf_cos(V::PI * (k+1) / (n+1));
+      res[k as usize] = -c;
+      res[(n-1-k) as usize] = c;
     }
     res
   }

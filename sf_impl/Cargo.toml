@@ -8,7 +8,9 @@ authors = ["Apollo Hogan <apollo.hogan@gmail.com>"]
 once_cell = "*"
 paste = "*"
 log = "*"
-#cbindgen = "*"
+#for eigenvalue calcs:
+nalgebra = "*"
+
 
 [dependencies.sf_hex_float]
 path = "../sf_hex_float"
@@ -21,14 +23,8 @@ rustdoc-args = [
 
 ########################################
 
-#for eigenvalue calcs:
-#nalgebra = "*"
-
 #fast, pure rust bigints:
 #ibig = "*"
-
-#microbenchmarking:
-#criterion = "*"
 
 #for compile-time configuration:
 #cfg_it = "*"

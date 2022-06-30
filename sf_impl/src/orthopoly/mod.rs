@@ -43,30 +43,30 @@ pub trait OrthogonalPolynomial<V: Value> {
   /// domain over which the polynomials are defined
   fn domain(&self) -> (V, V);
   /// the k'th coefficient in the degree n polynomial
-  fn coeff(&self, n: usize, k: usize) -> V;
-  fn scale(&self, n: usize) -> V; // and scale_squared?
-  fn value(&self, n: usize, x: V) -> V;
-  fn weight(&self, n: usize, k: usize) -> V;
-  fn zero(&self, n: usize, k: usize) -> V;
+  fn coeff(&self, n: isize, k: isize) -> V;
+  fn scale(&self, n: isize) -> V; // and scale_squared?
+  fn value(&self, n: isize, x: V) -> V;
+  fn weight(&self, n: isize, k: isize) -> V;
+  fn zero(&self, n: isize, k: isize) -> V;
   fn kernel(&self, x: V) -> V;
 
-  fn coeffs(&self, n: usize) -> Vec<V>;
-  fn weights(&self, n: usize) -> Vec<V>;
-  fn zeros(&self, n: usize) -> Vec<V>;
+  fn coeffs(&self, n: isize) -> Vec<V>;
+  fn weights(&self, n: isize) -> Vec<V>;
+  fn zeros(&self, n: isize) -> Vec<V>;
   // (also variants for j'th derivative)
 
-  fn poly(&self, n: usize) -> Poly<V>;
+  fn poly(&self, n: isize) -> Poly<V>;
 
   // TODO: maybe return more information...
-  //fn integrate<F:Fn(V)->V>(&self, n:usize, f:F) -> V;
+  //fn integrate<F:Fn(V)->V>(&self, n:isize, f:F) -> V;
   // TODO: maybe do this kind of thing instead?
-  //fn integrator(&self, n:usize) -> impl Integrator<V>;
+  //fn integrator(&self, n:isize) -> impl Integrator<V>;
 }
 
 /*
 // (then we can have other integration techniques with common interface...)
 trait Integrator<V> {
-  fn integrate<F:Fn(V)->V>(&self, n:usize, f:F) -> V;
+  fn integrate<F:Fn(V)->V>(&self, n:isize, f:F) -> V;
 }
 */
 

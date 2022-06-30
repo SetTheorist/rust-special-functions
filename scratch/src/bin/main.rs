@@ -1858,7 +1858,7 @@ fn main() {
       let w = chebt.weights(n);
       let mut t = r64::zero;
       // \int_{-1}^{+1} \cos(x)/\sqrt{1-x^2} \,dx
-      for v in (0..n).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      for v in (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]) { t += v; }
       println!("{}  {:.18e}", n, t - 2.40393943063441299827332489259);
     }
   }
@@ -1876,8 +1876,16 @@ fn main() {
       let w = chebu.weights(n);
       let mut t = r64::zero;
       // \int_{-1}^{+1} \cos(x)\sqrt{1-x^2} \,dx
-      for v in (0..n).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      for v in (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]) { t += v; }
       println!("{}  {:.18e}", n, t - 1.38245968738416852576628332769);
     }
+  }
+
+  if true {
+    println!("====================");
+    let leg: orthopoly::legendre::Legendre<r64> = orthopoly::legendre::Legendre::<r64>::new();
+    println!("{}", leg.poly(4));
+    println!("{}", leg.poly(5));
+    println!("{:?}", leg.value(5, r64(0.5)));
   }
 }
