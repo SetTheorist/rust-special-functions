@@ -195,6 +195,7 @@ pub mod jacobi;
 pub mod kahan;
 pub mod lambert;
 pub mod log;
+pub mod matrix;
 pub mod numbers;
 pub mod orthopoly;
 pub mod pcf;

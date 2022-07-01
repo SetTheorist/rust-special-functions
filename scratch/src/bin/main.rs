@@ -142,6 +142,7 @@ use sf_impl::{
   jacobi,
   kahan,
   lambert,
+  matrix,
   log,
   numbers,
   orthopoly,
@@ -1887,5 +1888,25 @@ fn main() {
     println!("{}", leg.poly(4));
     println!("{}", leg.poly(5));
     println!("{:?}", leg.value(5, r64(0.5)));
+    println!("{:?}", leg.zeros(5));
+    println!("{:?}", leg.weights(5));
+    //println!("{:?}", leg.zeros(21));
+    {
+      let n = 11;
+      let z = leg.zeros(n);
+      let w = leg.weights(n);
+      let mut t = r64::zero;
+      for v in (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      println!("{}  {:.18e}", n, t - 1.68294196961579301330500464326);
+    }
+  }
+
+  if true {
+    println!("====================");
+    let mut d = vec![r64(1.0), r64(1.0), r64(1.0)];
+    let mut e = vec![r64(0.5), r64(0.5), r64(0.5)];
+    println!("> d = {:.2?}   e = {:.2?}", d, e);
+    matrix::eig_symtrid(&mut d, &mut e);
+    println!("< d = {:.18?}   e = {:.2?}", d, e);
   }
 }
