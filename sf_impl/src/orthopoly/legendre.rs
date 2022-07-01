@@ -51,12 +51,11 @@ impl<V:RealValue+Trig+Float> OrthogonalPolynomial<V> for Legendre<V> {
       1 => vec![ι(1)],
       _ => {
         let zs = self.zeros(n);
-        let mut nrm : Vec<_> = (0..n).map(|k|self.scale(k)).collect();
-        nrm.push(ι(0));
+        let nrm : Vec<_> = (0..n).map(|k|self.scale(k)).collect();
         let mut res = vec![V::zero; n as usize];
         for j in 0..n {
           for k in 0..n {
-            res[k as usize] += (self.value(j, zs[k as usize]) * nrm[(j+1) as usize]).sqr();
+            res[k as usize] += (self.value(j, zs[k as usize]) * nrm[j as usize]).sqr();
           }
         }
         for j in 0..(n as usize) { res[j] = res[j].recip(); }

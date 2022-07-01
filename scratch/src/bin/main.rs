@@ -1891,8 +1891,7 @@ fn main() {
     println!("{:?}", leg.zeros(5));
     println!("{:?}", leg.weights(5));
     //println!("{:?}", leg.zeros(21));
-    {
-      let n = 11;
+    for n in (3..9) {
       let z = leg.zeros(n);
       let w = leg.weights(n);
       let mut t = r64::zero;
