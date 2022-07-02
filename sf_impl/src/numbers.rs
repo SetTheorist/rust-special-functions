@@ -9,6 +9,11 @@ pub fn sf_factorial<V:Value>(n: usize) -> V {
   (1..=(n as isize)).map(|i|ι(i):V).fold(V::one, |a,b|a*b)
 }
 
+// TODO: generalize this
+pub fn sf_pochhammer<V:Value>(z:V, n:isize) -> V {
+  (0..n).map(|k|z+k).fold(V::one, |a,b|a*b)
+}
+
 /*
 use num::bigint::BigInt;
 pub fn sf_factorial_exact(n: usize) -> BigInt {

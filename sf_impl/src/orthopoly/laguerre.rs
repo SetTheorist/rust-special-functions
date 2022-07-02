@@ -21,10 +21,12 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
   fn domain(&self) -> (V, V) {
     (ι(0), V::infinity)
   }
+
   fn scale(&self, n: isize) -> V {
     let a = self.alpha;
     sf_sqrt(sf_factorial(n as usize):V / sf_gamma(a+n+1))
   }
+
   fn value(&self, n: isize, x: V) -> V {
     let a = self.alpha;
     match n {
@@ -42,18 +44,11 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
       }
     }
   }
+
   fn kernel(&self, x: V) -> V {
     sf_exp(-x)*x.pow(self.alpha)
   }
-  fn coeff(&self, n: isize, k: isize) -> V {
-    self.coeffs(n)[k as usize]
-  }
-  fn coeffs(&self, n: isize) -> Vec<V> {
-    self.poly(n).0
-  }
-  fn weight(&self, n: isize, k: isize) -> V {
-    self.weights(n)[k as usize]
-  }
+
   fn weights(&self, n: isize) -> Vec<V> {
     match n {
       0 => vec![],
@@ -72,9 +67,7 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
       }
     }
   }
-  fn zero(&self, n: isize, k: isize) -> V {
-    self.zeros(n)[k as usize]
-  }
+
   fn zeros(&self, n: isize) -> Vec<V> {
     match n {
       0 => vec![],
@@ -98,6 +91,7 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
       }
     }
   }
+
   fn poly(&self, n: isize) -> Poly<V> {
     let a = self.alpha;
     match n {

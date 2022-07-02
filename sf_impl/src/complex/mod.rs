@@ -70,12 +70,25 @@ impl From<isize> for c64 {
 
 impl<'a> std::iter::Sum<&'a Self> for c64 {
   fn sum<I>(iter: I) -> Self where I: Iterator<Item=&'a Self> {
-    iter.fold(c64::zero, |a,b|a+*b)
+    iter.fold(c64::zero, |a,b| a + *b)
   }
 }
+
 impl std::iter::Sum<Self> for c64 {
   fn sum<I>(iter: I) -> Self where I: Iterator<Item=Self> {
-    iter.fold(c64::zero, |a,b|a+b)
+    iter.fold(c64::zero, |a,b| a + b)
+  }
+}
+
+impl<'a> std::iter::Product<&'a Self> for c64 {
+  fn product<I>(iter: I) -> Self where I: Iterator<Item=&'a Self> {
+    iter.fold(c64::one, |a,b| a * *b)
+  }
+}
+
+impl std::iter::Product<Self> for c64 {
+  fn product<I>(iter: I) -> Self where I: Iterator<Item=Self> {
+    iter.fold(c64::one, |a,b| a * b)
   }
 }
 
@@ -86,6 +99,7 @@ macro_rules! from_r64 {
     const $c:c64 = c64 { re:r64::$c, im:r64::zero };
   }
 }
+
 impl Constants for c64 {
   const nan: c64 = c64 { re: r64::nan, im: r64::nan };
   from_r64!(E);

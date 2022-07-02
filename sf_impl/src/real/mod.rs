@@ -175,12 +175,25 @@ impl ShrAssign<isize> for r64 {
 
 impl<'a> std::iter::Sum<&'a Self> for r64 {
   fn sum<I>(iter: I) -> Self where I: Iterator<Item=&'a Self> {
-    iter.fold(r64::zero, |a,b|a+*b)
+    iter.fold(r64::zero, |a,b| a + *b)
   }
 }
+
 impl std::iter::Sum<Self> for r64 {
   fn sum<I>(iter: I) -> Self where I: Iterator<Item=Self> {
-    iter.fold(r64::zero, |a,b|a+b)
+    iter.fold(r64::zero, |a,b| a + b)
+  }
+}
+
+impl<'a> std::iter::Product<&'a Self> for r64 {
+  fn product<I>(iter: I) -> Self where I: Iterator<Item=&'a Self> {
+    iter.fold(r64::one, |a,b| a * *b)
+  }
+}
+
+impl std::iter::Product<Self> for r64 {
+  fn product<I>(iter: I) -> Self where I: Iterator<Item=Self> {
+    iter.fold(r64::one, |a,b| a * b)
   }
 }
 

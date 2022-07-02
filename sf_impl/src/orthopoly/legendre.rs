@@ -33,14 +33,6 @@ impl<V:RealValue+Trig+Float> OrthogonalPolynomial<V> for Legendre<V> {
     }
   }
 
-  fn weight(&self, n: isize, k: isize) -> V {
-    self.weights(n)[k as usize]
-  }
-
-  fn zero(&self, n: isize, k: isize) -> V {
-    self.zeros(n)[k as usize]
-  }
-
   fn kernel(&self, _x: V) -> V {
     V::one
   }
@@ -85,14 +77,6 @@ impl<V:RealValue+Trig+Float> OrthogonalPolynomial<V> for Legendre<V> {
         d
       }
     }
-  }
-
-  fn coeff(&self, n: isize, k: isize) -> V {
-    self.coeffs(n)[k as usize]
-  }
-
-  fn coeffs(&self, n: isize) -> Vec<V> {
-    self.poly(n).0
   }
 
   fn poly(&self, n: isize) -> Poly<V> {

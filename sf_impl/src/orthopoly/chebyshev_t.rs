@@ -55,13 +55,13 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
     }
   }
 
-  fn coeffs(&self, n: isize) -> Vec<V> { self.poly(n).0 }
+  fn weight(&self, n: isize, _k: isize) -> V {
+    V::PI / n
+  }
 
-  fn coeff(&self, n: isize, k: isize) -> V { self.coeffs(n)[k as usize] }
-
-  fn weight(&self, n: isize, _k: isize) -> V { V::PI / n }
-
-  fn weights(&self, n: isize) -> Vec<V> { vec![V::PI/n; n as usize] }
+  fn weights(&self, n: isize) -> Vec<V> {
+    vec![V::PI/n; n as usize]
+  }
 
   fn zero(&self, n: isize, k: isize) -> V { 
     let k = (n-1-k);
@@ -84,5 +84,7 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
     res
   }
 
-  fn kernel(&self, x: V) -> V { (ι(1): V - x * x).sqrt().recip() }
+  fn kernel(&self, x: V) -> V {
+    (ι(1): V - x * x).sqrt().recip()
+  }
 }

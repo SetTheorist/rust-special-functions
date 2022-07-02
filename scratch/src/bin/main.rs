@@ -1848,6 +1848,15 @@ fn main() {
 
   if true {
     println!("====================");
+    let mut d = vec![r64(1.0), r64(1.0), r64(1.0)];
+    let mut e = vec![r64(0.5), r64(0.5), r64(0.5)];
+    println!("> d = {:.2?}   e = {:.2?}", d, e);
+    matrix::eig_symtrid(&mut d, &mut e);
+    println!("< d = {:.18?}   e = {:.2?}", d, e);
+  }
+
+  if true {
+    println!("====================");
     let chebt: orthopoly::chebyshev_t::ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
     println!("{:?}", chebt);
     println!("{:?}", chebt.zeros(6));
@@ -1922,10 +1931,19 @@ fn main() {
 
   if true {
     println!("====================");
-    let mut d = vec![r64(1.0), r64(1.0), r64(1.0)];
-    let mut e = vec![r64(0.5), r64(0.5), r64(0.5)];
-    println!("> d = {:.2?}   e = {:.2?}", d, e);
-    matrix::eig_symtrid(&mut d, &mut e);
-    println!("< d = {:.18?}   e = {:.2?}", d, e);
+    let geg: orthopoly::gegenbauer::Gegenbauer<r64> = orthopoly::gegenbauer::Gegenbauer::<r64>::new(r64(2.25));
+    println!("{:?}", geg);
+    println!("value = {}", geg.value(7, r64(0.5)));
+    println!("poly = {}", geg.poly(5));
+    println!("coeffs = {:.10?}", geg.coeffs(4));
+    println!("zeros = {:.18?}", geg.zeros(4));
+    println!("weights = {:.18?}", geg.weights(4));
+    for n in (3..32).step_by(4) {
+      let z = geg.zeros(n);
+      let w = geg.weights(n);
+      // \int_{-1}^{1} \cos(x) (1-x^2)^{2 1/4 - 1/2} \,dx
+      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
+      println!("{}  {:.18e}", n, t - ι(1):r64);
+    }
   }
 }

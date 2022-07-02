@@ -39,16 +39,27 @@ pub trait OrthogonalPolynomial<V: Value> {
   /// domain over which the polynomials are defined
   fn domain(&self) -> (V, V);
   /// the k'th coefficient in the degree n polynomial
-  fn coeff(&self, n: isize, k: isize) -> V;
   fn scale(&self, n: isize) -> V; // and scale_squared?
   fn value(&self, n: isize, x: V) -> V;
-  fn weight(&self, n: isize, k: isize) -> V;
-  fn zero(&self, n: isize, k: isize) -> V;
   fn kernel(&self, x: V) -> V;
 
-  fn coeffs(&self, n: isize) -> Vec<V>;
+  fn coeffs(&self, n: isize) -> Vec<V> {
+    self.poly(n).0
+  }
+  fn coeff(&self, n: isize, k: isize) -> V {
+    self.coeffs(n)[k as usize]
+  }
+
   fn weights(&self, n: isize) -> Vec<V>;
+  fn weight(&self, n: isize, k: isize) -> V {
+    self.weights(n)[k as usize]
+  }
+
   fn zeros(&self, n: isize) -> Vec<V>;
+  fn zero(&self, n: isize, k: isize) -> V {
+    self.zeros(n)[k as usize]
+  }
+
   // (also variants for j'th derivative)
 
   fn poly(&self, n: isize) -> Poly<V>;

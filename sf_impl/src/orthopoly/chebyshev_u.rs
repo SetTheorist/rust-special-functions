@@ -53,12 +53,6 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevU<V> {
     }
   }
 
-  fn coeffs(&self, n: isize) -> Vec<V> { self.poly(n).0 }
-
-  fn coeff(&self, n: isize, k: isize) -> V { self.coeffs(n)[k as usize] }
-
-  fn weight(&self, n: isize, k: isize) -> V { self.weights(n)[k as usize] }
-
   fn weights(&self, n: isize) -> Vec<V> {
     (1..(n+1)).map(|k|
         sf_sin(V::PI*k/(n+1)).sqr() * V::PI / (n+1)
