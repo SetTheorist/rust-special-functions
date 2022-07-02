@@ -4,7 +4,7 @@ use crate::exp::*;
 use crate::gamma::*;
 use crate::log::*;
 use crate::trig::*;
-use crate::numbers::{sf_factorial_approx};
+use crate::numbers::{sf_factorial};
 
 pub trait ExpInt {
   fn expint_ei(self) -> Self;
@@ -144,7 +144,7 @@ pub fn expint_en_1<V:Value+Log>(z:V) -> V {
 pub fn expint_en_series<V:Value+Log+Gamma>(n:isize, z:V) -> V {
   // TODO: shouldn't need to lift n to V type!
   let mut sum = (-sf_log(z) + sf_digamma(ι(n):V))
-    * (-z).pow(n-1)/sf_factorial_approx((n-1) as usize) + V::one/(n-1);
+    * (-z).pow(n-1)/sf_factorial::<V>((n-1) as usize) + V::one/(n-1);
   let mut t = V::one;
   for m in 1..1000 {
     t *= -z/m;

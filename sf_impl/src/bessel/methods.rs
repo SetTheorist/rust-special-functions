@@ -4,7 +4,7 @@ use crate::traits::*;
 use crate::trig::*;
 use crate::exp::{sf_exp,Exp};
 use crate::log::{sf_log,Log};
-use crate::numbers::{sf_factorial_approx};
+use crate::numbers::{sf_factorial};
 use super::*;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ pub fn bessel_j_series_int<V: Value + Gamma + Power>(nu:isize, z:V) -> V {
     Some(*s)
   });
   let terms = std::iter::once(ι(1)).chain(terms);
-  sum_series(terms, V::epsilon) * (z / 2).pow(nu) / sf_factorial_approx(nu as usize)
+  sum_series(terms, V::epsilon) * (z / 2).pow(nu) / sf_factorial::<V>(nu as usize)
 }
 pub fn bessel_j_series<V: Value + Gamma + Power>(nu:V, z:V) -> V {
   let z2 = -(z / 2).sqr();
@@ -115,7 +115,7 @@ pub fn bessel_j_recur_back<V: Value>(maxm: isize, n: isize, z: V) -> V {
 pub fn bessel_y_series_int<V:Value+BesselJ<isize>+Gamma+Log>(n:isize, z:V) -> V {
   let z22 = (z/2).sqr();
   let mut sum = V::FRAC_1_PI * 2 * sf_log(z/2) * sf_bessel_j(n,z);
-  let mut t = -(z/2).pow(-n) * V::FRAC_1_PI * sf_factorial_approx((n-1) as usize);
+  let mut t : V = -(z/2).pow(-n) * V::FRAC_1_PI * sf_factorial::<V>((n-1) as usize);
   for k in 0..n {
     sum += t;
     t *= z22 / (k+1) / (n-k-1);
@@ -151,7 +151,7 @@ pub fn bessel_i_series_int<V:Value+Gamma+Power>(nu:isize, z:V) -> V {
     Some(*s)
   });
   let terms = std::iter::once(ι(1)).chain(terms);
-  sum_series(terms, V::epsilon) * (z / 2).pow(nu) / sf_factorial_approx(nu as usize)
+  sum_series(terms, V::epsilon) * (z / 2).pow(nu) / sf_factorial::<V>(nu as usize)
 }
 pub fn bessel_i_series<V:Value+Gamma+Power>(nu:V, z:V) -> V {
   let z2 = (z / 2).sqr();
@@ -207,7 +207,7 @@ pub fn bessel_i_asymp_z<V:Value+Exp>(nu:V, z:V) -> V {
 pub fn bessel_k_series_int<V:Value+BesselI<isize>+Gamma+Log>(n:isize, z:V) -> V {
   let z22 = (z/2).sqr();
   let mut sum = sf_log(z/2) * sf_bessel_i(n,z).pari(n+1);
-  let mut t = if n==0 {V::one/2} else {(z/2).pow(-n)/2 * sf_factorial_approx((n-1) as usize)};
+  let mut t = if n==0 {V::one/2} else {(z/2).pow(-n)/2 * sf_factorial::<V>((n-1) as usize)};
   for k in 0..n {
     sum += t;
     t *= -z22 / (k+1) / (n-k-1);

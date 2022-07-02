@@ -195,13 +195,13 @@ pub mod impls {
 ////////////////////////////////////////////////////////////////////////////////
 
 use crate::algorithm::{contfrac_modlentz};
-use crate::numbers::{sf_factorial_approx};
+use crate::numbers::{sf_factorial};
 pub fn exp_men_contfrac<V:Value>(n:isize, z:V) -> V {
   let terms = (1..).map(|j:isize|(
     (if j.is_oddint() {z*((j+1)/2)} else {-z*(n+j/2)}),
     ι(n+1+j):V));
   let cf = contfrac_modlentz(ι(n+1):V, terms, V::epsilon);
-  z.pow(n) / ((-z/cf + 1) * sf_factorial_approx(n as usize))
+  z.pow(n) / ((-z/cf + 1) * sf_factorial::<V>(n as usize))
 }
 
 ////////////////////////////////////////////////////////////////////////////////

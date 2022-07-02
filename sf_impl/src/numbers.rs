@@ -1,7 +1,12 @@
 use crate::traits::ι;
 
-pub fn sf_factorial_approx(n: usize) -> f64 {
+fn sf_factorial_approx(n: usize) -> f64 {
   (1..=n).map(|i| i as f64).product()
+}
+
+// TODO: quick hack
+pub fn sf_factorial<V:Value>(n: usize) -> V {
+  (1..=(n as isize)).map(|i|ι(i):V).fold(V::one, |a,b|a*b)
 }
 
 /*

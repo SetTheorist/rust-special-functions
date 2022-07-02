@@ -75,6 +75,8 @@ pub fn main() {
   gen_graph_ortho_r64(orthopoly::legendre::Legendre::new(), |x|ι(1), "x", "Legendre", "./diagrams/legendre.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
   gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(0.5)), |x|ι(1), "x", "Laguerre(0.5)", "./diagrams/laguerre_0.5.svg", 6, (ι(0),ι(5)), (ι(-3.0),ι(3.0)));
   gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(0.5)), |x|exp::sf_exp(-x)*sf_sqrt(x), "x", "Laguerre(0.5) (weighted)", "./diagrams/laguerre_0.5_weighted.svg", 6, (ι(0),ι(5)), (ι(-0.75),ι(0.75)));
+  gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(1.5)), |x|ι(1), "x", "Laguerre(1.5)", "./diagrams/laguerre_1.5.svg", 6, (ι(0),ι(10)), (ι(-5.0),ι(5.0)));
+  gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(1.5)), |x|exp::sf_exp(-x)*x*sf_sqrt(x), "x", "Laguerre(1.5) (weighted)", "./diagrams/laguerre_1.5_weighted.svg", 6, (ι(0),ι(10)), (ι(-1.0),ι(1.0)));
 
   //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
   //let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})

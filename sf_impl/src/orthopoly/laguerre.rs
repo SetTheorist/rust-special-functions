@@ -2,7 +2,7 @@ use crate::orthopoly::*;
 use crate::poly::Poly;
 use crate::traits::*;
 
-use crate::numbers::{sf_factorial_approx};
+use crate::numbers::{sf_factorial};
 use crate::gamma::*;
 use crate::exp::{Exp,sf_exp};
 
@@ -22,9 +22,8 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
     (ι(0), V::infinity)
   }
   fn scale(&self, n: isize) -> V {
-    // TODO: factorial
     let a = self.alpha;
-    sf_sqrt(ι(sf_factorial_approx(n as usize)):V / sf_gamma(a+n+1))
+    sf_sqrt(sf_factorial(n as usize):V / sf_gamma(a+n+1))
   }
   fn value(&self, n: isize, x: V) -> V {
     let a = self.alpha;

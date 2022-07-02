@@ -2,7 +2,7 @@ use crate::algorithm::{contfrac_modlentz, sum_series};
 use crate::exp::{sf_exp, Exp};
 use crate::log::{sf_log, Log};
 use crate::trig::{sf_tan, Trig};
-use crate::numbers::{sf_bernoulli_number_scaled_approx, sf_bernoulli_number_approx, sf_factorial_approx};
+use crate::numbers::{sf_bernoulli_number_scaled_approx, sf_bernoulli_number_approx, sf_factorial};
 use crate::traits::*;
 
 use super::*;
