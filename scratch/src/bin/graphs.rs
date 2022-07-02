@@ -70,10 +70,11 @@ pub fn main() {
   gen_graph_r64(zeta::sf_zeta, "./data/zeta.real.csv", "#AA3355", 0, 1, "x", "Riemann zeta(x) rel.err.", "./accuracy/zeta.real.svg");
   gen_graph_r64(zeta::sf_zeta_m1, "./data/zeta.real.csv", "#AA3355", 0, 2, "x", "Riemann zeta(x)-1 rel.err.", "./accuracy/zeta_m1.real.svg");
 
-  gen_graph_ortho_r64(orthopoly::chebyshev_t::ChebyshevT::new(), "x", "Chebyshev T", "./chebyshev_t.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
-  gen_graph_ortho_r64(orthopoly::chebyshev_u::ChebyshevU::new(), "x", "Chebyshev U", "./chebyshev_u.svg", 6, (ι(-1),ι(1)), (ι(-3.0),ι(3.0)));
-  gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(0.5)), "x", "Laguerre(0.5)", "./laguerre_0.5.svg", 6, (ι(0),ι(5)), (ι(-3.0),ι(3.0)));
-  gen_graph_ortho_r64(orthopoly::legendre::Legendre::new(), "x", "Legendre", "./legendre.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
+  gen_graph_ortho_r64(orthopoly::chebyshev_t::ChebyshevT::new(), |x|ι(1), "x", "Chebyshev T", "./diagrams/chebyshev_t.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
+  gen_graph_ortho_r64(orthopoly::chebyshev_u::ChebyshevU::new(), |x|ι(1), "x", "Chebyshev U", "./diagrams/chebyshev_u.svg", 6, (ι(-1),ι(1)), (ι(-3.0),ι(3.0)));
+  gen_graph_ortho_r64(orthopoly::legendre::Legendre::new(), |x|ι(1), "x", "Legendre", "./diagrams/legendre.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
+  gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(0.5)), |x|ι(1), "x", "Laguerre(0.5)", "./diagrams/laguerre_0.5.svg", 6, (ι(0),ι(5)), (ι(-3.0),ι(3.0)));
+  gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(0.5)), |x|exp::sf_exp(-x)*sf_sqrt(x), "x", "Laguerre(0.5) (weighted)", "./diagrams/laguerre_0.5_weighted.svg", 6, (ι(0),ι(5)), (ι(-0.75),ι(0.75)));
 
   //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
   //let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
@@ -104,7 +105,7 @@ fn gen_graph_r64<F:Fn(r64)->r64>(f:F, data:&str, color:&str, x_column:usize, f_c
   plotlib::page::Page::single(&v).save(output).expect("saving svg");
 }
 
-fn gen_graph_ortho_r64<OP:orthopoly::OrthogonalPolynomial<r64>>(op:OP, x_label:&str, y_label:&str, output:&str,
+fn gen_graph_ortho_r64<F:Fn(r64)->r64, OP:orthopoly::OrthogonalPolynomial<r64>>(op:OP, scale:F, x_label:&str, y_label:&str, output:&str,
     npoly:isize, xrange:(r64,r64), yrange:(r64,r64))
 {
   let colors = [
@@ -129,7 +130,7 @@ fn gen_graph_ortho_r64<OP:orthopoly::OrthogonalPolynomial<r64>>(op:OP, x_label:&
   for n in 0..(npoly+1) {
     let mut t = Vec::new();
     for x in crate::util::Grid::new(xrange.0, xrange.1, 100) {
-      let fx = op.value(n, x);
+      let fx = op.value(n, x) * scale(x);
       t.push((x.0,fx.0));
     }
     let c = colors[n as usize];
