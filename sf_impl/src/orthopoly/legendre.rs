@@ -65,28 +65,26 @@ impl<V:RealValue+Trig+Float> OrthogonalPolynomial<V> for Legendre<V> {
   }
 
   fn zeros(&self, n: isize) -> Vec<V> {
-    if n == 0 {
-      return vec![];
-    } else if n == 1{
-      return vec![V::zero];
+    match n {
+      0 => vec![],
+      1 => vec![V::zero],
+      _ => {
+        let mut d = vec![V::zero; n as usize];
+        let mut e : Vec<_> = (0..n).map(|k| ι(k):V / sf_sqrt(ι(4*k*k-1):V)).collect();
+        crate::matrix::eig_symtrid(&mut d, &mut e);
+        //d.sort(); // TODO: sort out traits later
+        let pol = |z|{
+          let fx = self.value(n, z);
+          let gx = self.value(n-1, z);
+          let dfx = (-z*n*fx + gx*n) / (-z.sqr()+1);
+          z - fx/dfx
+        };
+        // polish zeros
+        for i in 0..n { d[i as usize] = pol(d[i as usize]); }
+        //for i in 0..n { d[i as usize] = pol(d[i as usize]); }
+        d
+      }
     }
-    //TODO: this will require integrating nalgebra traits
-    //let mut m = nalgebra::DMatrix::<V>::identity(n as usize, n as usize);
-    let mut d = vec![V::zero; n as usize];
-    let mut e : Vec<_> = (0..n).map(|k| ι(k):V / sf_sqrt(ι(4*k*k-1):V)).collect();
-    crate::matrix::eig_symtrid(&mut d, &mut e);
-    //d.sort(); // TODO: sort out traits later
-    let pol = |z|{
-      let fx = self.value(n, z);
-      let gx = self.value(n-1, z);
-      let dfx = (-z*n*fx + gx*n) / (-z.sqr()+1);
-      z - fx/dfx
-    };
-    // polish zeros
-    for i in 0..n { d[i as usize] = pol(d[i as usize]); }
-    // polish zeros (?)
-    //for i in 0..n { d[i as usize] = pol(d[i as usize]); }
-    d
   }
 
   fn coeff(&self, n: isize, k: isize) -> V {

@@ -129,7 +129,7 @@ fn gen_graph_ortho_r64<F:Fn(r64)->r64, OP:orthopoly::OrthogonalPolynomial<r64>>(
         .line_style(plotlib::style::LineStyle::new().colour("lightgray")));
   for n in 0..(npoly+1) {
     let mut t = Vec::new();
-    for x in crate::util::Grid::new(xrange.0, xrange.1, 100) {
+    for x in crate::util::Grid::new(xrange.0, xrange.1, 256) {
       let fx = op.value(n, x) * scale(x);
       t.push((x.0,fx.0));
     }

@@ -1888,11 +1888,11 @@ fn main() {
     println!("====================");
     let leg: orthopoly::legendre::Legendre<r64> = orthopoly::legendre::Legendre::<r64>::new();
     println!("{:?}", leg);
-    println!("{}", leg.poly(4));
-    println!("{}", leg.poly(5));
-    println!("{:?}", leg.value(5, r64(0.5)));
-    println!("{:?}", leg.zeros(5));
-    println!("{:?}", leg.weights(5));
+    println!("poly = {}", leg.poly(4));
+    println!("poly = {}", leg.poly(5));
+    println!("value = {:?}", leg.value(5, r64(0.5)));
+    println!("zeros = {:?}", leg.zeros(5));
+    println!("weights = {:?}", leg.weights(5));
     //println!("{:?}", leg.zeros(21));
     for n in (3..9) {
       let z = leg.zeros(n);
@@ -1907,10 +1907,17 @@ fn main() {
     println!("====================");
     let lag: orthopoly::laguerre::Laguerre<r64> = orthopoly::laguerre::Laguerre::<r64>::new(r64(1.5));
     println!("{:?}", lag);
-    println!("{}", lag.poly(5));
-    println!("{:.10?}", lag.coeffs(4));
-    for n in 0..6 {
-      println!("{}   {}", n, lag.value(n, r64(0.5)));
+    println!("poly = {}", lag.poly(5));
+    println!("coeffs = {:.10?}", lag.coeffs(4));
+    println!("zeros = {:.18?}", lag.zeros(4));
+    println!("weights = {:.18?}", lag.weights(4));
+    println!("value = {}", lag.value(7, r64(0.5)));
+    for n in (3..32).step_by(4) {
+      let z = lag.zeros(n);
+      let w = lag.weights(n);
+      let mut t = r64::zero;
+      for v in (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      println!("{}  {:.18e}", n, t - -0.213888958496842222647831977862);
     }
   }
 
