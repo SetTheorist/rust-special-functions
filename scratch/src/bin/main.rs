@@ -1877,9 +1877,8 @@ fn main() {
     for n in (3..9) {
       let z = chebu.zeros(n);
       let w = chebu.weights(n);
-      let mut t = r64::zero;
       // \int_{-1}^{+1} \cos(x)\sqrt{1-x^2} \,dx
-      for v in (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
       println!("{}  {:.18e}", n, t - 1.38245968738416852576628332769);
     }
   }
@@ -1897,8 +1896,8 @@ fn main() {
     for n in (3..9) {
       let z = leg.zeros(n);
       let w = leg.weights(n);
-      let mut t = r64::zero;
-      for v in (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      // \int_{-1}^{+1} \cos(x) \,dx
+      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
       println!("{}  {:.18e}", n, t - 1.68294196961579301330500464326);
     }
   }
@@ -1915,8 +1914,8 @@ fn main() {
     for n in (3..32).step_by(4) {
       let z = lag.zeros(n);
       let w = lag.weights(n);
-      let mut t = r64::zero;
-      for v in (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]) { t += v; }
+      // \int_{0}^{\infty} \cos(x) e^{-x} x^{3/2} \,dx
+      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
       println!("{}  {:.18e}", n, t - -0.213888958496842222647831977862);
     }
   }

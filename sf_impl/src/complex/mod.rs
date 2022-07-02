@@ -68,6 +68,19 @@ impl From<isize> for c64 {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+impl<'a> std::iter::Sum<&'a Self> for c64 {
+  fn sum<I>(iter: I) -> Self where I: Iterator<Item=&'a Self> {
+    iter.fold(c64::zero, |a,b|a+*b)
+  }
+}
+impl std::iter::Sum<Self> for c64 {
+  fn sum<I>(iter: I) -> Self where I: Iterator<Item=Self> {
+    iter.fold(c64::zero, |a,b|a+b)
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 macro_rules! from_r64 {
   ($c:ident) => {
     const $c:c64 = c64 { re:r64::$c, im:r64::zero };
