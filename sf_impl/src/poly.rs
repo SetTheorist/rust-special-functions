@@ -3,10 +3,18 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 use crate::traits::*;
 
+// TODO: this is a mess, disorganized and inefficient
+
 #[derive(Clone, Debug)]
 pub struct Poly<T>(pub Vec<T>);
 
 impl<T: Zero> Poly<T> {
+  pub fn x(&self, n: usize) -> Poly<T> {
+    let mut res = self.clone();
+    res.shift(n);
+    res
+  }
+
   pub fn shift(&mut self, n: usize) {
     self.0.reserve(n);
     for _ in 0..n {
@@ -113,6 +121,25 @@ impl<T: Subtraction> SubAssign<&Poly<T>> for Poly<T> {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+
+impl<T: Addition> Add<&Poly<T>> for Poly<T> {
+  type Output = Poly<T>;
+  fn add(mut self, rhs: &Poly<T>) -> Poly<T> {
+    self += rhs;
+    self
+  }
+}
+
+impl<T: Subtraction> Sub<&Poly<T>> for Poly<T> {
+  type Output = Poly<T>;
+  fn sub(mut self, rhs: &Poly<T>) -> Poly<T> {
+    self -= rhs;
+    self
+  }
+}
+
 impl<T: Addition + Multiplication> Mul<&Poly<T>> for &Poly<T> {
   type Output = Poly<T>;
   fn mul(self, rhs: &Poly<T>) -> Poly<T> {
@@ -162,3 +189,85 @@ impl<T: Division> DivAssign<T> for Poly<T> {
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+impl<T: Addition> Add<T> for Poly<T> {
+  type Output = Poly<T>;
+  fn add(mut self, rhs: T) -> Poly<T> {
+    self += rhs;
+    self
+  }
+}
+
+impl<T: Subtraction> Sub<T> for Poly<T> {
+  type Output = Poly<T>;
+  fn sub(mut self, rhs: T) -> Poly<T> {
+    self -= rhs;
+    self
+  }
+}
+
+impl<T: Multiplication> Mul<T> for Poly<T> {
+  type Output = Poly<T>;
+  fn mul(mut self, rhs: T) -> Poly<T> {
+    for c in self.0.iter_mut() {
+      *c *= rhs;
+    }
+    self
+  }
+}
+
+impl<T: Division> Div<T> for Poly<T> {
+  type Output = Poly<T>;
+  fn div(mut self, rhs: T) -> Poly<T> {
+    for c in self.0.iter_mut() {
+      *c /= rhs;
+    }
+    self
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+impl<T: Addition> Add<T> for &Poly<T> {
+  type Output = Poly<T>;
+  fn add(mut self, rhs: T) -> Poly<T> {
+    let mut res = self.clone();
+    res += rhs;
+    res
+  }
+}
+
+impl<T: Subtraction> Sub<T> for &Poly<T> {
+  type Output = Poly<T>;
+  fn sub(mut self, rhs: T) -> Poly<T> {
+    let mut res = self.clone();
+    res -= rhs;
+    res
+  }
+}
+
+impl<T: Multiplication> Mul<T> for &Poly<T> {
+  type Output = Poly<T>;
+  fn mul(mut self, rhs: T) -> Poly<T> {
+    let mut res = self.clone();
+    for c in res.0.iter_mut() {
+      *c *= rhs;
+    }
+    res
+  }
+}
+
+impl<T: Division> Div<T> for &Poly<T> {
+  type Output = Poly<T>;
+  fn div(mut self, rhs: T) -> Poly<T> {
+    let mut res = self.clone();
+    for c in res.0.iter_mut() {
+      *c /= rhs;
+    }
+    res
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////

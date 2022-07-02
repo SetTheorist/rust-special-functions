@@ -1849,6 +1849,7 @@ fn main() {
   if true {
     println!("====================");
     let chebt: orthopoly::chebyshev_t::ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
+    println!("{:?}", chebt);
     println!("{:?}", chebt.zeros(6));
     println!("{:?}", chebt.zeros(5));
     for k in 0..3 { println!("{:?}", chebt.zero(5,k)); }
@@ -1867,6 +1868,7 @@ fn main() {
   if true {
     println!("====================");
     let chebu: orthopoly::chebyshev_u::ChebyshevU<r64> = orthopoly::chebyshev_u::ChebyshevU::<r64>::new();
+    println!("{:?}", chebu);
     println!("{:?}", chebu.zeros(6));
     println!("{:?}", chebu.zeros(5));
     for k in 0..3 { println!("{:?}", chebu.zero(5,k)); }
@@ -1885,6 +1887,7 @@ fn main() {
   if true {
     println!("====================");
     let leg: orthopoly::legendre::Legendre<r64> = orthopoly::legendre::Legendre::<r64>::new();
+    println!("{:?}", leg);
     println!("{}", leg.poly(4));
     println!("{}", leg.poly(5));
     println!("{:?}", leg.value(5, r64(0.5)));
@@ -1897,6 +1900,17 @@ fn main() {
       let mut t = r64::zero;
       for v in (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]) { t += v; }
       println!("{}  {:.18e}", n, t - 1.68294196961579301330500464326);
+    }
+  }
+
+  if true {
+    println!("====================");
+    let lag: orthopoly::laguerre::Laguerre<r64> = orthopoly::laguerre::Laguerre::<r64>::new(r64(1.5));
+    println!("{:?}", lag);
+    println!("{}", lag.poly(5));
+    println!("{:.10?}", lag.coeffs(4));
+    for n in 0..6 {
+      println!("{}   {}", n, lag.value(n, r64(0.5)));
     }
   }
 

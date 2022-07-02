@@ -16,25 +16,21 @@ macro_rules! empty_type {
 
 pub mod chebyshev_t;
 pub mod chebyshev_u;
+pub mod gegenbauer;
+pub mod laguerre;
 pub mod legendre;
 
 empty_type!(ChebyshevTx);
 empty_type!(ChebyshevUx);
 empty_type!(Legendrex);
-
 empty_type!(ChebyshevV);
 empty_type!(ChebyshevW);
-struct Gegenbauer<V: Value> {
-  lambda: V,
-}
+
 empty_type!(HermiteH);
 empty_type!(HermiteHe);
 struct Jacobi<V: Value> {
   alpha: V,
   beta: V,
-}
-struct Laguerre<V: Value> {
-  alpha: V,
 }
 
 // NB use nalgebra for eigenvalues ...

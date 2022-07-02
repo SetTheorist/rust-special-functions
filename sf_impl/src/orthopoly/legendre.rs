@@ -78,7 +78,8 @@ impl<V:RealValue+Trig+Float> OrthogonalPolynomial<V> for Legendre<V> {
     //d.sort(); // TODO: sort out traits later
     let pol = |z|{
       let fx = self.value(n, z);
-      let dfx = (-z*n*fx + self.value(n-1, z)*n) / (-z.sqr()+1);
+      let gx = self.value(n-1, z);
+      let dfx = (-z*n*fx + gx*n) / (-z.sqr()+1);
       z - fx/dfx
     };
     // polish zeros
