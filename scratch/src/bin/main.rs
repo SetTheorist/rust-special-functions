@@ -1965,4 +1965,23 @@ fn main() {
       println!("{}  {:.18e}", n, t - 1.38038844704314297477341524673);
     }
   }
+
+  if true {
+    println!("====================");
+    let hh: orthopoly::hermite_he::HermiteHe<r64> = orthopoly::hermite_he::HermiteHe::<r64>::new();
+    println!("{:?}", hh);
+    println!("scale = {}", hh.scale(5));
+    println!("value = {}", hh.value(7, r64(0.5)));
+    println!("poly = {}", hh.poly(5));
+    println!("coeffs = {:.10?}", hh.coeffs(4));
+    println!("zeros = {:.18?}", hh.zeros(4));
+    println!("weights = {:.18?}", hh.weights(4));
+    for n in (3..16).step_by(3) {
+      let z = hh.zeros(n);
+      let w = hh.weights(n);
+      // \int_{-\infty}^{\infty} \cos(x) exp(-x^2/2) \,dx
+      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
+      println!("{}  {:.18e}", n, t - 1.52034690106628080561194014675);
+    }
+  }
 }

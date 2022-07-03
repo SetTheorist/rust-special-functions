@@ -18,16 +18,16 @@ pub mod chebyshev_t;
 pub mod chebyshev_u;
 pub mod gegenbauer;
 pub mod hermite_h;
+pub mod hermite_he;
 pub mod laguerre;
 pub mod legendre;
 
-empty_type!(ChebyshevTx);
-empty_type!(ChebyshevUx);
-empty_type!(Legendrex);
-empty_type!(ChebyshevV);
-empty_type!(ChebyshevW);
+//empty_type!(ChebyshevTx);
+//empty_type!(ChebyshevUx);
+//empty_type!(Legendrex);
+//empty_type!(ChebyshevV);
+//empty_type!(ChebyshevW);
 
-empty_type!(HermiteHe);
 struct Jacobi<V: Value> {
   alpha: V,
   beta: V,
@@ -38,15 +38,19 @@ struct Jacobi<V: Value> {
 pub trait OrthogonalPolynomial<V: Value> {
   /// domain over which the polynomials are defined
   fn domain(&self) -> (V, V);
-  /// the k'th coefficient in the degree n polynomial
+
   fn scale(&self, n: isize) -> V; // and scale_squared?
+
+  // TODO: vector of values [0..n]
   fn value(&self, n: isize, x: V) -> V;
+
   fn kernel(&self, x: V) -> V;
 
   fn coeffs(&self, n: isize) -> Vec<V> {
     self.poly(n).0
   }
 
+  /// the k'th coefficient in the degree n polynomial
   fn coeff(&self, n: isize, k: isize) -> V {
     self.coeffs(n)[k as usize]
   }
@@ -75,12 +79,14 @@ pub trait OrthogonalPolynomial<V: Value> {
   }
 
   fn zeros(&self, n: isize) -> Vec<V>;
+
   fn zero(&self, n: isize, k: isize) -> V {
     self.zeros(n)[k as usize]
   }
 
   // (also variants for j'th derivative)
 
+  // TODO: vector for [0..n]
   fn poly(&self, n: isize) -> Poly<V>;
 
   // TODO: maybe return more information...

@@ -84,6 +84,8 @@ pub fn main() {
 
   gen_graph_ortho_r64(orthopoly::hermite_h::HermiteH::new(), |x|ι(1), "x", "Hermite H", "./diagrams/hermite_h.svg", 4, (ι(-4),ι(4)), (ι(-15.0),ι(15.0)));
   gen_graph_ortho_r64(orthopoly::hermite_h::HermiteH::new(), |x|exp::sf_exp(-x*x), "x", "Hermite H (weighted)", "./diagrams/hermite_h_weighted.svg", 4, (ι(-4),ι(4)), (ι(-10.0),ι(15.0)));
+  gen_graph_ortho_r64(orthopoly::hermite_he::HermiteHe::new(), |x|ι(1), "x", "Hermite He", "./diagrams/hermite_he.svg", 6, (ι(-4),ι(4)), (ι(-25.0),ι(25.0)));
+  gen_graph_ortho_r64(orthopoly::hermite_he::HermiteHe::new(), |x|exp::sf_exp(-x*x/2)*r64::FRAC_1_SQRT2PI, "x", "Hermite He (weighted)", "./diagrams/hermite_he_weighted.svg", 6, (ι(-4),ι(4)), (ι(-7.0),ι(5.0)));
 
 
   //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
