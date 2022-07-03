@@ -232,7 +232,7 @@ impl<T: Division> Div<T> for Poly<T> {
 
 impl<T: Addition> Add<T> for &Poly<T> {
   type Output = Poly<T>;
-  fn add(mut self, rhs: T) -> Poly<T> {
+  fn add(self, rhs: T) -> Poly<T> {
     let mut res = self.clone();
     res += rhs;
     res
@@ -241,7 +241,7 @@ impl<T: Addition> Add<T> for &Poly<T> {
 
 impl<T: Subtraction> Sub<T> for &Poly<T> {
   type Output = Poly<T>;
-  fn sub(mut self, rhs: T) -> Poly<T> {
+  fn sub(self, rhs: T) -> Poly<T> {
     let mut res = self.clone();
     res -= rhs;
     res
@@ -250,7 +250,7 @@ impl<T: Subtraction> Sub<T> for &Poly<T> {
 
 impl<T: Multiplication> Mul<T> for &Poly<T> {
   type Output = Poly<T>;
-  fn mul(mut self, rhs: T) -> Poly<T> {
+  fn mul(self, rhs: T) -> Poly<T> {
     let mut res = self.clone();
     for c in res.0.iter_mut() {
       *c *= rhs;
@@ -261,7 +261,7 @@ impl<T: Multiplication> Mul<T> for &Poly<T> {
 
 impl<T: Division> Div<T> for &Poly<T> {
   type Output = Poly<T>;
-  fn div(mut self, rhs: T) -> Poly<T> {
+  fn div(self, rhs: T) -> Poly<T> {
     let mut res = self.clone();
     for c in res.0.iter_mut() {
       *c /= rhs;

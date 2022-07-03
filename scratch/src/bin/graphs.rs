@@ -78,7 +78,7 @@ pub fn main() {
   gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(1.5)), |x|ι(1), "x", "Laguerre(1.5)", "./diagrams/laguerre_1.5.svg", 6, (ι(0),ι(10)), (ι(-5.0),ι(5.0)));
   gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(1.5)), |x|exp::sf_exp(-x)*x*sf_sqrt(x), "x", "Laguerre(1.5) (weighted)", "./diagrams/laguerre_1.5_weighted.svg", 6, (ι(0),ι(10)), (ι(-1.0),ι(1.0)));
 
-  gen_graph_ortho_r64(orthopoly::gegenbauer::Gegenbauer::new(ι(2.25)), |x|ι(1), "x", "Gegenbauer(2.25)", "./diagrams/gegenbauer_2.25.svg", 6, (ι(-1),ι(1)), (ι(-10.0),ι(10.0)));
+  gen_graph_ortho_r64(orthopoly::gegenbauer::Gegenbauer::new(ι(2.25)), |x|ι(1), "x", "Gegenbauer(2.25)", "./diagrams/gegenbauer_2.25.svg", 6, (ι(-1),ι(1)), (ι(-15.0),ι(15.0)));
   gen_graph_ortho_r64(orthopoly::gegenbauer::Gegenbauer::new(ι(2.25)), |x|(r64::one-x*x).pow(r64(2.25-0.5)), "x", "Gegenbauer(2.25) (weighted)", "./diagrams/gegenbauer_2.25_weighted.svg", 6, (ι(-1),ι(1)), (ι(-5.0),ι(5.0)));
 
   //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
