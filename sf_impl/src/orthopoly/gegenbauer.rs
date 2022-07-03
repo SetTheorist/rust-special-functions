@@ -51,25 +51,6 @@ impl<V:RealValue+Float+Power+Gamma> OrthogonalPolynomial<V> for Gegenbauer<V> {
     (-x.sqr() + 1).pow(self.lambda - 0.5)
   }
 
-  fn weights(&self, n: isize) -> Vec<V> {
-    match n {
-      0 => vec![],
-      1 => vec![ι(1)],
-      _ => {
-        let zs = self.zeros(n);
-        let nrm : Vec<_> = (0..n).map(|k|self.scale(k)).collect();
-        let mut res = vec![V::zero; n as usize];
-        for j in 0..n {
-          for k in 0..n {
-            res[k as usize] += (self.value(j, zs[k as usize]) * nrm[j as usize]).sqr();
-          }
-        }
-        for j in 0..(n as usize) { res[j] = res[j].recip(); }
-        res
-      }
-    }
-  }
-
   fn zeros(&self, n: isize) -> Vec<V> {
     match n {
       0 => vec![],

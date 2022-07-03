@@ -49,25 +49,6 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
     sf_exp(-x)*x.pow(self.alpha)
   }
 
-  fn weights(&self, n: isize) -> Vec<V> {
-    match n {
-      0 => vec![],
-      1 => vec![ι(1)],
-      _ => {
-        let zs = self.zeros(n);
-        let nrm : Vec<_> = (0..n).map(|k|self.scale(k)).collect();
-        let mut res = vec![V::zero; n as usize];
-        for j in 0..n {
-          for k in 0..n {
-            res[k as usize] += (self.value(j, zs[k as usize]) * nrm[j as usize]).sqr();
-          }
-        }
-        for j in 0..(n as usize) { res[j] = res[j].recip(); }
-        res
-      }
-    }
-  }
-
   fn zeros(&self, n: isize) -> Vec<V> {
     match n {
       0 => vec![],
@@ -102,11 +83,9 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
         let mut t0 = Poly(vec![a+1,ι(-1)]);
         for k in 2..=n {
           // TODO: polynomials need ergonomics work!
-          let mut t2: Poly<V> = t1.clone();
+          let t2: Poly<V> = t1.clone();
           t1 = t0;
-          let mut t1x = t1.clone();
-          t1x.shift(1);
-          t0 = (&t1*(a+(2*k-1)) - &t1x - &(t2*(a+k-1)))/ι(k);
+          t0 = (&t1*(a+(2*k-1)) - &t1.x(1) - &(t2*(a+k-1)))/ι(k);
         }
         t0
       }

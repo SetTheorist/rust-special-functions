@@ -73,6 +73,7 @@ pub fn main() {
   gen_graph_ortho_r64(orthopoly::chebyshev_t::ChebyshevT::new(), |x|ι(1), "x", "Chebyshev T", "./diagrams/chebyshev_t.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
   gen_graph_ortho_r64(orthopoly::chebyshev_u::ChebyshevU::new(), |x|ι(1), "x", "Chebyshev U", "./diagrams/chebyshev_u.svg", 6, (ι(-1),ι(1)), (ι(-3.0),ι(3.0)));
   gen_graph_ortho_r64(orthopoly::legendre::Legendre::new(), |x|ι(1), "x", "Legendre", "./diagrams/legendre.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
+
   gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(0.5)), |x|ι(1), "x", "Laguerre(0.5)", "./diagrams/laguerre_0.5.svg", 6, (ι(0),ι(5)), (ι(-3.0),ι(3.0)));
   gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(0.5)), |x|exp::sf_exp(-x)*sf_sqrt(x), "x", "Laguerre(0.5) (weighted)", "./diagrams/laguerre_0.5_weighted.svg", 6, (ι(0),ι(5)), (ι(-0.75),ι(0.75)));
   gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(1.5)), |x|ι(1), "x", "Laguerre(1.5)", "./diagrams/laguerre_1.5.svg", 6, (ι(0),ι(10)), (ι(-5.0),ι(5.0)));
@@ -80,6 +81,10 @@ pub fn main() {
 
   gen_graph_ortho_r64(orthopoly::gegenbauer::Gegenbauer::new(ι(2.25)), |x|ι(1), "x", "Gegenbauer(2.25)", "./diagrams/gegenbauer_2.25.svg", 6, (ι(-1),ι(1)), (ι(-15.0),ι(15.0)));
   gen_graph_ortho_r64(orthopoly::gegenbauer::Gegenbauer::new(ι(2.25)), |x|(r64::one-x*x).pow(r64(2.25-0.5)), "x", "Gegenbauer(2.25) (weighted)", "./diagrams/gegenbauer_2.25_weighted.svg", 6, (ι(-1),ι(1)), (ι(-5.0),ι(5.0)));
+
+  gen_graph_ortho_r64(orthopoly::hermite_h::HermiteH::new(), |x|ι(1), "x", "Hermite H", "./diagrams/hermite_h.svg", 4, (ι(-4),ι(4)), (ι(-15.0),ι(15.0)));
+  gen_graph_ortho_r64(orthopoly::hermite_h::HermiteH::new(), |x|exp::sf_exp(-x*x), "x", "Hermite H (weighted)", "./diagrams/hermite_h_weighted.svg", 4, (ι(-4),ι(4)), (ι(-10.0),ι(15.0)));
+
 
   //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
   //let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})

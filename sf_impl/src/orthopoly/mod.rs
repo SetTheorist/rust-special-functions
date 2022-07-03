@@ -17,6 +17,7 @@ macro_rules! empty_type {
 pub mod chebyshev_t;
 pub mod chebyshev_u;
 pub mod gegenbauer;
+pub mod hermite_h;
 pub mod laguerre;
 pub mod legendre;
 
@@ -26,7 +27,6 @@ empty_type!(Legendrex);
 empty_type!(ChebyshevV);
 empty_type!(ChebyshevW);
 
-empty_type!(HermiteH);
 empty_type!(HermiteHe);
 struct Jacobi<V: Value> {
   alpha: V,
@@ -46,11 +46,30 @@ pub trait OrthogonalPolynomial<V: Value> {
   fn coeffs(&self, n: isize) -> Vec<V> {
     self.poly(n).0
   }
+
   fn coeff(&self, n: isize, k: isize) -> V {
     self.coeffs(n)[k as usize]
   }
 
-  fn weights(&self, n: isize) -> Vec<V>;
+  fn weights(&self, n: isize) -> Vec<V> {
+    match n {
+      0 => vec![],
+      1 => vec![ι(1)],
+      _ => {
+        let zs = self.zeros(n);
+        let nrm : Vec<_> = (0..n).map(|k|self.scale(k)).collect();
+        let mut res = vec![V::zero; n as usize];
+        for j in 0..n {
+          for k in 0..n {
+            res[k as usize] += (self.value(j, zs[k as usize]) * nrm[j as usize]).sqr();
+          }
+        }
+        for j in 0..(n as usize) { res[j] = res[j].recip(); }
+        res
+      }
+    }
+  }
+
   fn weight(&self, n: isize, k: isize) -> V {
     self.weights(n)[k as usize]
   }
