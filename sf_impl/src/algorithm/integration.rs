@@ -23,6 +23,27 @@ pub trait Integrator<X> {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+
+// general rule for weighted sum of points at fixed positions
+// (c.f. OrthogonalPolynomial for example)
+#[derive(Clone,Debug)]
+pub struct WeightedPoints<X> {
+  pub domain: (X,X),
+  pub points_weights: Vec<(X,X)>,
+}
+
+impl<V:Value> Integrator<V> for WeightedPoints<V> {
+  fn domain(&self) -> (V, V) {
+    self.domain
+  }
+
+  fn integrate<F>(&self, f:F) -> V where F:Fn(V)->V {
+    self.points_weights.iter().map(|&(x,w)|f(x)*w).fold(V::zero,|a,b|a+b)
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // use trapezoidal rule to integrate on interval [a,b]
 // will actually evaluate f at n+1 points
 // non-adaptive, simply computes the sum

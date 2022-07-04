@@ -83,17 +83,13 @@ pub trait OrthogonalPolynomial<V: Value> {
   // TODO: vector for [0..n]
   fn poly(&self, n: isize) -> Poly<V>;
 
-  // TODO: maybe return more information...
-  //fn integrate<F:Fn(V)->V>(&self, n:isize, f:F) -> V;
-  // TODO: maybe do this kind of thing instead?
-  //fn integrator(&self, n:isize) -> impl Integrator<V>;
+  fn integrator(&self, n:usize) -> crate::algorithm::integration::WeightedPoints<V> {
+    let domain = self.domain();
+    let points = self.zeros(n as isize);
+    let weights = self.weights(n as isize);
+    let points_weights = points.into_iter().zip(weights.into_iter()).collect::<Vec<_>>();
+    crate::algorithm::integration::WeightedPoints { domain, points_weights }
+  }
 }
-
-/*
-// (then we can have other integration techniques with common interface...)
-trait Integrator<V> {
-  fn integrate<F:Fn(V)->V>(&self, n:isize, f:F) -> V;
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1996,10 +1996,10 @@ fn main() {
     println!("zeros = {:.18?}", jac.zeros(4));
     println!("weights = {:.18?}", jac.weights(4));
     for n in (3..9) {
-      let z = jac.zeros(n);
-      let w = jac.weights(n);
-      // \int_{-\infty}^{\infty} \cos(x) (1-x)^{1/2} (1+x)^3  \,dx
-      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
+      // \int_{-1}^{1} \cos(x) (1-x)^{1/2} (1+x)^3  \,dx
+      let i = jac.integrator(n as usize);
+      //let t = i.integrate(|x:r64|sf_cos(x));
+      let t = i.integrate(sf_cos);
       println!("{}  {:.18e}", n, t - 1.93813262144117515245189603819);
     }
   }
