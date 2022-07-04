@@ -23,22 +23,22 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
   }
 
   fn scale(&self, n: isize) -> V {
-    let a = self.alpha;
-    sf_sqrt(sf_factorial(n as usize):V / sf_gamma(a+n+1))
+    let α = self.alpha;
+    sf_sqrt(sf_factorial(n as usize):V / sf_gamma(α+n+1))
   }
 
   fn value(&self, n: isize, x: V) -> V {
-    let a = self.alpha;
+    let α = self.alpha;
     match n {
       0 => ι(1),
-      1 => a + 1 - x,
+      1 => α + 1 - x,
       _ => {
         let mut x1 = ι(1);
-        let mut x0 = a + 1 - x;
+        let mut x0 = α + 1 - x;
         for k in 2..(n+1) {
           let x2 = x1;
           x1 = x0;
-          x0 = (x1*(a-x+(2*k-1)) - x2*(a+(k-1)))/k;
+          x0 = (x1*(α-x+(2*k-1)) - x2*(α+(k-1)))/k;
         }
         x0
       }
@@ -54,12 +54,12 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
       0 => vec![],
       1 => vec![V::zero],
       _ => {
-        let a = self.alpha;
-        let mut d : Vec<_> = (0..n).map(|k| a + (2*k+1)).collect();
-        let mut e : Vec<_> = (0..n).map(|k| sf_sqrt((a+k)*k)).collect();
+        let α = self.alpha;
+        let mut d : Vec<_> = (0..n).map(|k| α + (2*k+1)).collect();
+        let mut e : Vec<_> = (0..n).map(|k| sf_sqrt((α+k)*k)).collect();
         crate::matrix::eig_symtrid(&mut d, &mut e);
         //d.sort(); // TODO: sort out traits later
-        let dself = Laguerre::new(a + 1);
+        let dself = Laguerre::new(α + 1);
         let pol = |z|{
           let fx = self.value(n, z);
           let dfx = -dself.value(n-1, z);
@@ -74,18 +74,18 @@ impl<V:RealValue+Exp+Gamma+Float+Power<V>> OrthogonalPolynomial<V> for Laguerre<
   }
 
   fn poly(&self, n: isize) -> Poly<V> {
-    let a = self.alpha;
+    let α = self.alpha;
     match n {
       0 => Poly(vec![ι(1)]),
-      1 => Poly(vec![a+1,ι(-1)]),
+      1 => Poly(vec![α+1,ι(-1)]),
       _ => {
         let mut t1 = Poly(vec![ι(1)]);
-        let mut t0 = Poly(vec![a+1,ι(-1)]);
+        let mut t0 = Poly(vec![α+1,ι(-1)]);
         for k in 2..=n {
           // TODO: polynomials need ergonomics work!
           let t2: Poly<V> = t1.clone();
           t1 = t0;
-          t0 = (&t1*(a+(2*k-1)) - &t1.x(1) - &(t2*(a+k-1)))/ι(k);
+          t0 = (&t1*(α+(2*k-1)) - &t1.x(1) - &(t2*(α+k-1)))/ι(k);
         }
         t0
       }

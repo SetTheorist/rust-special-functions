@@ -19,6 +19,7 @@ pub mod chebyshev_u;
 pub mod gegenbauer;
 pub mod hermite_h;
 pub mod hermite_he;
+pub mod jacobi;
 pub mod laguerre;
 pub mod legendre;
 
@@ -27,13 +28,6 @@ pub mod legendre;
 //empty_type!(Legendrex);
 //empty_type!(ChebyshevV);
 //empty_type!(ChebyshevW);
-
-struct Jacobi<V: Value> {
-  alpha: V,
-  beta: V,
-}
-
-// NB use nalgebra for eigenvalues ...
 
 pub trait OrthogonalPolynomial<V: Value> {
   /// domain over which the polynomials are defined

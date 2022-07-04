@@ -87,6 +87,8 @@ pub fn main() {
   gen_graph_ortho_r64(orthopoly::hermite_he::HermiteHe::new(), |x|ι(1), "x", "Hermite He", "./diagrams/hermite_he.svg", 6, (ι(-4),ι(4)), (ι(-25.0),ι(25.0)));
   gen_graph_ortho_r64(orthopoly::hermite_he::HermiteHe::new(), |x|exp::sf_exp(-x*x/2)*r64::FRAC_1_SQRT2PI, "x", "Hermite He (weighted)", "./diagrams/hermite_he_weighted.svg", 6, (ι(-4),ι(4)), (ι(-7.0),ι(5.0)));
 
+  gen_graph_ortho_r64(orthopoly::jacobi::Jacobi::new(ι(0.5),ι(3)), |x|ι(1), "x", "Jacobi(0.5,3.0)", "./diagrams/jacobi_0.5_3.0.svg", 6, (ι(-1),ι(1)), (ι(-5.0),ι(5.0)));
+  gen_graph_ortho_r64(orthopoly::jacobi::Jacobi::new(ι(0.5),ι(3)), |x:r64|sf_sqrt(-x+1)*(x+1).pow(3_isize), "x", "Jacobi(0.5,3.0) (weighted)", "./diagrams/jacobi_0.5_3.0_weighted.svg", 6, (ι(-1),ι(1)), (ι(-4.0),ι(4.0)));
 
   //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
   //let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
