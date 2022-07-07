@@ -4,31 +4,28 @@ use crate::traits::*;
 
 use crate::trig::*;
 
-empty_type!(ChebyshevT);
+empty_type!(ChebyshevV);
 
-impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
+impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevV<V> {
   fn domain(&self) -> (V, V) {
     (ι(-1), ι(1))
   }
 
   fn kernel(&self, x: V) -> V {
-    (ι(1): V - x * x).sqrt().recip()
+    sf_sqrt((x+1)/(-x+1))
   }
 
   fn scale(&self, n: isize) -> V {
-    match n {
-      0 => V::SQRTPI,
-      _ => sf_sqrt(V::PI/2),
-    }
+    V::SQRTPI
   }
 
   fn value(&self, n: isize, x: V) -> V {
     match n {
       0 => ι(1),
-      1 => x,
+      1 => x*2-1,
       _ => {
         let mut vm1: V = ι(1);
-        let mut vm0: V = x;
+        let mut vm0: V = x*2-1;
         for _ in 2..=n {
           let vm2 = vm1;
           vm1 = vm0;
@@ -42,10 +39,10 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
   fn poly(&self, n: isize) -> Poly<V> {
     match n {
       0 => Poly(vec![ι(1)]),
-      1 => Poly(vec![ι(0), ι(1)]),
+      1 => Poly(vec![ι(-1), ι(2)]),
       _ => {
         let mut t0: Poly<V> = Poly(vec![ι(1)]);
-        let mut t1: Poly<V> = Poly(vec![ι(0), ι(1)]);
+        let mut t1: Poly<V> = Poly(vec![ι(-1), ι(2)]);
         for _ in 2..=n {
           let t2 = t1.x(1)*ι(2):V - &t0;
           t0 = t1;
@@ -56,32 +53,24 @@ impl<V: Value+Trig> OrthogonalPolynomial<V> for ChebyshevT<V> {
     }
   }
 
-  fn weight(&self, n: isize, _k: isize) -> V {
-    V::PI / n
+  // TODO: cleanup
+  fn weight(&self, n: isize, k: isize) -> V {
+    let xk = self.zero(n, k);
+    let k = k+1;
+    V::PI*2/(2*n+1)*(xk+1)
   }
 
   fn weights(&self, n: isize) -> Vec<V> {
-    vec![V::PI/n; n as usize]
+    (0..n).map(|k|self.weight(n,k)).collect()
   }
 
-  fn zero(&self, n: isize, k: isize) -> V { 
+  fn zero(&self, n: isize, k: isize) -> V {
     let k = (n-1-k);
-    if n%2 == 1 && k==(n-1)/2 {
-      V::zero
-    } else {
-      let kk = 2*k+1;
-      sf_cos(V::FRAC_PI_2 * kk / n)
-    }
+    let kk = 2*k+1;
+    sf_cos(V::PI * kk / (2*n+1))
   }
 
-  fn zeros(&self, n: isize) -> Vec<V> { 
-    let mut res = vec![V::zero; n as usize];
-    for k in 0..(n/2) {
-      let kk = 2*k+1;
-      let c = sf_cos(V::FRAC_PI_2 * kk / n);
-      res[k as usize] = -c;
-      res[(n-1-k) as usize] = c;
-    }
-    res
+  fn zeros(&self, n: isize) -> Vec<V> {
+    (0..n).map(|k|self.zero(n,k)).collect::<Vec<_>>()
   }
 }

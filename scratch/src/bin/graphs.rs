@@ -72,6 +72,9 @@ pub fn main() {
 
   gen_graph_ortho_r64(orthopoly::chebyshev_t::ChebyshevT::new(), |x|ι(1), "x", "Chebyshev T", "./diagrams/chebyshev_t.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
   gen_graph_ortho_r64(orthopoly::chebyshev_u::ChebyshevU::new(), |x|ι(1), "x", "Chebyshev U", "./diagrams/chebyshev_u.svg", 6, (ι(-1),ι(1)), (ι(-3.0),ι(3.0)));
+  gen_graph_ortho_r64(orthopoly::chebyshev_v::ChebyshevV::new(), |x|ι(1), "x", "Chebyshev V", "./diagrams/chebyshev_v.svg", 6, (ι(-1),ι(1)), (ι(-3.0),ι(3.0)));
+  gen_graph_ortho_r64(orthopoly::chebyshev_w::ChebyshevW::new(), |x|ι(1), "x", "Chebyshev W", "./diagrams/chebyshev_w.svg", 6, (ι(-1),ι(1)), (ι(-3.0),ι(3.0)));
+
   gen_graph_ortho_r64(orthopoly::legendre::Legendre::new(), |x|ι(1), "x", "Legendre", "./diagrams/legendre.svg", 6, (ι(-1),ι(1)), (ι(-1.1),ι(1.1)));
 
   gen_graph_ortho_r64(orthopoly::laguerre::Laguerre::new(ι(0.5)), |x|ι(1), "x", "Laguerre(0.5)", "./diagrams/laguerre_0.5.svg", 6, (ι(0),ι(5)), (ι(-3.0),ι(3.0)));

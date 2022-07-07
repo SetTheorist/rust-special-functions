@@ -16,18 +16,14 @@ macro_rules! empty_type {
 
 pub mod chebyshev_t;
 pub mod chebyshev_u;
+pub mod chebyshev_v;
+pub mod chebyshev_w;
 pub mod gegenbauer;
 pub mod hermite_h;
 pub mod hermite_he;
 pub mod jacobi;
 pub mod laguerre;
 pub mod legendre;
-
-//empty_type!(ChebyshevTx);
-//empty_type!(ChebyshevUx);
-//empty_type!(Legendrex);
-//empty_type!(ChebyshevV);
-//empty_type!(ChebyshevW);
 
 pub trait OrthogonalPolynomial<V: Value> {
   /// domain over which the polynomials are defined
@@ -36,6 +32,7 @@ pub trait OrthogonalPolynomial<V: Value> {
   fn scale(&self, n: isize) -> V; // and scale_squared?
 
   // TODO: vector of values [0..n]
+  // (or unbounded iterator?)
   fn value(&self, n: isize, x: V) -> V;
 
   fn kernel(&self, x: V) -> V;

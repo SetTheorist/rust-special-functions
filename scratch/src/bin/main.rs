@@ -1774,7 +1774,7 @@ fn main() {
         / twin::Twin::new(twin::Twin::new(10.0_f64,0.0),twin::Twin::default()));
   }
 
-  if true {
+  if false {
     println!("{:e}", f32::EPSILON.recip().log10().ceil());
     println!("{:e}", f64::EPSILON.recip().log10().ceil());
     println!("{}", twin::Twin::new(2.0_f32,0.0).sqrt());
@@ -1783,12 +1783,12 @@ fn main() {
     //println!("{}", twin::Twin::new(f128::f128::from(2),f128::f128::from(0)).sqrt());
   }
 
-  if true {
+  if false {
     use sf::exp::{*};
     println!("{:.18e} {:.18e} {:.18e}", sf_exp(1.0_f64), 1.0_f64.sf_exp(), 1.0_f64.exp());
   }
 
-  if true {
+  if false {
     for x in [1.0, 5.0, 0.1, -1.0, -5.0, 13.0].into_iter() {
       let x = r64(x);
       let ax1 = {
@@ -1803,7 +1803,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     let x = r64(1.0);
     let ex = sf_cos(x);
     let ap = trig::methods::cos_series(x);
@@ -1846,7 +1846,7 @@ fn main() {
     println!("{}", zeta::sf_zeta_m1(r64(1.001)));
   }
 
-  if true {
+  if false {
     println!("====================");
     let mut d = vec![r64(1.0), r64(1.0), r64(1.0)];
     let mut e = vec![r64(0.5), r64(0.5), r64(0.5)];
@@ -1859,10 +1859,10 @@ fn main() {
     println!("====================");
     let chebt: orthopoly::chebyshev_t::ChebyshevT<r64> = orthopoly::chebyshev_t::ChebyshevT::<r64>::new();
     println!("{:?}", chebt);
-    println!("{:?}", chebt.zeros(6));
-    println!("{:?}", chebt.zeros(5));
+    println!("zeros = {:?}", chebt.zeros(6));
+    println!("zeros = {:?}", chebt.zeros(5));
     for k in 0..3 { println!("{:?}", chebt.zero(5,k)); }
-    println!("{}", chebt.poly(5));
+    println!("poly = {}", chebt.poly(5));
 
     for n in (3..9) {
       let z = chebt.zeros(n);
@@ -1891,8 +1891,42 @@ fn main() {
       println!("{}  {:.18e}", n, t - 1.38245968738416852576628332769);
     }
   }
-
   if true {
+    println!("====================");
+    let chebv: orthopoly::chebyshev_v::ChebyshevV<r64> = orthopoly::chebyshev_v::ChebyshevV::<r64>::new();
+    println!("{:?}", chebv);
+    println!("zeros = {:?}", chebv.zeros(6));
+    println!("zeros = {:?}", chebv.zeros(5));
+    for k in 0..3 { println!("{:?}", chebv.zero(5,k)); }
+    println!("poly = {}", chebv.poly(5));
+
+    for n in (3..9) {
+      let z = chebv.zeros(n);
+      let w = chebv.weights(n);
+      // \int_{-1}^{+1} \cos(x)\sqrt{1+x}/\sqrt{1-x} \,dx
+      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
+      println!("{}  {:.18e}", n, t - 2.4039394306344129982733248925915112237848254729788);
+    }
+  }
+  if true {
+    println!("====================");
+    let chebw: orthopoly::chebyshev_w::ChebyshevW<r64> = orthopoly::chebyshev_w::ChebyshevW::<r64>::new();
+    println!("{:?}", chebw);
+    println!("zeros = {:?}", chebw.zeros(6));
+    println!("zeros = {:?}", chebw.zeros(5));
+    for k in 0..3 { println!("{:?}", chebw.zero(5,k)); }
+    println!("poly = {}", chebw.poly(5));
+
+    for n in (3..9) {
+      let z = chebw.zeros(n);
+      let w = chebw.weights(n);
+      // \int_{-1}^{+1} \cos(x)\sqrt{1-x}/\sqrt{1+x} \,dx
+      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
+      println!("{}  {:.18e}", n, t - 2.4039394306344129982733248925915112237848254729788);
+    }
+  }
+
+  if false {
     println!("====================");
     let leg: orthopoly::legendre::Legendre<r64> = orthopoly::legendre::Legendre::<r64>::new();
     println!("{:?}", leg);
@@ -1911,7 +1945,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("====================");
     let lag: orthopoly::laguerre::Laguerre<r64> = orthopoly::laguerre::Laguerre::<r64>::new(r64(1.5));
     println!("{:?}", lag);
@@ -1929,7 +1963,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("====================");
     let geg: orthopoly::gegenbauer::Gegenbauer<r64> = orthopoly::gegenbauer::Gegenbauer::<r64>::new(r64(2.25));
     println!("{:?}", geg);
@@ -1947,7 +1981,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("====================");
     let hh: orthopoly::hermite_h::HermiteH<r64> = orthopoly::hermite_h::HermiteH::<r64>::new();
     println!("{:?}", hh);
@@ -1966,7 +2000,7 @@ fn main() {
     }
   }
 
-  if true {
+  if false {
     println!("====================");
     let hh: orthopoly::hermite_he::HermiteHe<r64> = orthopoly::hermite_he::HermiteHe::<r64>::new();
     println!("{:?}", hh);
@@ -1977,15 +2011,13 @@ fn main() {
     println!("zeros = {:.18?}", hh.zeros(4));
     println!("weights = {:.18?}", hh.weights(4));
     for n in (3..16).step_by(3) {
-      let z = hh.zeros(n);
-      let w = hh.weights(n);
       // \int_{-\infty}^{\infty} \cos(x) exp(-x^2/2) \,dx
-      let t : r64 = (0..(n as usize)).map(|i|sf_cos(z[i])*w[i]).sum();
+      let t = hh.integrator(n as usize).integrate(sf_cos);
       println!("{}  {:.18e}", n, t - 1.52034690106628080561194014675);
     }
   }
 
-  if true {
+  if false {
     println!("====================");
     let jac: orthopoly::jacobi::Jacobi<r64> = orthopoly::jacobi::Jacobi::<r64>::new(r64(0.5),r64(3.0));
     println!("{:?}", jac);
@@ -1997,9 +2029,7 @@ fn main() {
     println!("weights = {:.18?}", jac.weights(4));
     for n in (3..9) {
       // \int_{-1}^{1} \cos(x) (1-x)^{1/2} (1+x)^3  \,dx
-      let i = jac.integrator(n as usize);
-      //let t = i.integrate(|x:r64|sf_cos(x));
-      let t = i.integrate(sf_cos);
+      let t = jac.integrator(n as usize).integrate(sf_cos);
       println!("{}  {:.18e}", n, t - 1.93813262144117515245189603819);
     }
   }
