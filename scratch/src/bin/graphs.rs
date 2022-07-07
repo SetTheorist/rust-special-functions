@@ -47,6 +47,7 @@ use crate::complex::*;
 use crate::real::*;
 use crate::traits::*;
 use crate::wide::{Wide};
+use sf_impl::orthopoly::OrthogonalPolynomial;
 
 fn rel(ex: f64, ap: f64) -> f64 {
   let ε = f64::EPSILON;
@@ -60,6 +61,21 @@ fn rel(ex: f64, ap: f64) -> f64 {
   };
   if !res.is_finite() {0.0} else {res}
 }
+
+static COLORS : [&'static str; 12] = [
+  "black",
+  "red",
+  "blue",
+  "green",
+  "purple",
+  "darkblue",
+  "mediumorchid",
+  "brown",
+  "palegreen",
+  "cornflowerblue",
+  "indigo",
+  "slategrey",
+];
 
 pub fn main() {
   gen_graph_r64(airy::sf_airy_ai, "./data/airy.real.csv", "#AA3355", 0, 1, "x", "Airy AI(x) rel.err.", "./accuracy/airy.ai.real.svg");
@@ -93,6 +109,8 @@ pub fn main() {
   gen_graph_ortho_r64(orthopoly::jacobi::Jacobi::new(ι(0.5),ι(3)), |x|ι(1), "x", "Jacobi(0.5,3.0)", "./diagrams/jacobi_0.5_3.0.svg", 6, (ι(-1),ι(1)), (ι(-5.0),ι(5.0)));
   gen_graph_ortho_r64(orthopoly::jacobi::Jacobi::new(ι(0.5),ι(3)), |x:r64|sf_sqrt(-x+1)*(x+1).pow(3_isize), "x", "Jacobi(0.5,3.0) (weighted)", "./diagrams/jacobi_0.5_3.0_weighted.svg", 6, (ι(-1),ι(1)), (ι(-4.0),ι(4.0)));
 
+  ortho_poly_comparison_chebyshev();
+
   //let apx = airy::impls::airy_series(ι(x):wide::Wide).0.hi();(x,rel(ax,apx))})
   //let apx = airy::impls::ai_integ_pos__wide(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
   //let apx = airy::impls::ai_asympt_pos(wide::Wide(x,0.0)).0;(x,rel(ax,apx))})
@@ -122,23 +140,9 @@ fn gen_graph_r64<F:Fn(r64)->r64>(f:F, data:&str, color:&str, x_column:usize, f_c
   plotlib::page::Page::single(&v).save(output).expect("saving svg");
 }
 
-fn gen_graph_ortho_r64<F:Fn(r64)->r64, OP:orthopoly::OrthogonalPolynomial<r64>>(op:OP, scale:F, x_label:&str, y_label:&str, output:&str,
+fn gen_graph_ortho_r64<F:Fn(r64)->r64, OP:OrthogonalPolynomial<r64>>(op:OP, scale:F, x_label:&str, y_label:&str, output:&str,
     npoly:isize, xrange:(r64,r64), yrange:(r64,r64))
 {
-  let colors = [
-    "black",
-    "red",
-    "blue",
-    "green",
-    "purple",
-    "darkblue",
-    "mediumorchid",
-    "brown",
-    "palegreen",
-    "cornflowerblue",
-    "indigo",
-    "slategrey",
-  ];
   let mut v = plotlib::view::ContinuousView::new()
       .y_range(yrange.0.0, yrange.1.0).x_label(x_label).y_label(y_label);
   v = v.add(
@@ -150,7 +154,7 @@ fn gen_graph_ortho_r64<F:Fn(r64)->r64, OP:orthopoly::OrthogonalPolynomial<r64>>(
       let fx = op.value(n, x) * scale(x);
       t.push((x.0,fx.0));
     }
-    let c = colors[n as usize];
+    let c = COLORS[n as usize];
     let ls = plotlib::style::LineStyle::new()
       .colour(c)
       .linejoin(plotlib::style::LineJoin::Round);
@@ -164,6 +168,47 @@ fn gen_graph_ortho_r64<F:Fn(r64)->r64, OP:orthopoly::OrthogonalPolynomial<r64>>(
     v = v.add(dat);
   }
   plotlib::page::Page::single(&v).save(output).expect("saving svg");
+}
+
+fn ortho_poly_comparison_chebyshev() {
+  let mut v = plotlib::view::ContinuousView::new()
+      .y_range(-3.0, 3.0).x_label("x").y_label("y");
+  v = v.add(
+      plotlib::repr::Plot::new(vec![(-1.0,1.0),(1.0,1.0)])
+        .line_style(plotlib::style::LineStyle::new().colour("lightgray")));
+  v = v.add(
+      plotlib::repr::Plot::new(vec![(-1.0,-1.0),(1.0,-1.0)])
+        .line_style(plotlib::style::LineStyle::new().colour("lightgray")));
+  v = v.add(
+      plotlib::repr::Plot::new(vec![(-1.0,0.0),(1.0,0.0)])
+        .line_style(plotlib::style::LineStyle::new().colour("darkgray")));
+  
+  let ops : [Box<dyn OrthogonalPolynomial<r64>>;4] = [
+      Box::new(orthopoly::chebyshev_t::ChebyshevT::new()),
+      Box::new(orthopoly::chebyshev_u::ChebyshevU::new()),
+      Box::new(orthopoly::chebyshev_v::ChebyshevV::new()),
+      Box::new(orthopoly::chebyshev_w::ChebyshevW::new()),
+      ];
+  for (n,op) in ops.into_iter().enumerate() {
+    let mut t = Vec::new();
+    for x in crate::util::Grid::new(r64(-1.0), r64(1.0), 256) { t.push((x.0, op.value(8 as isize,x).0)); }
+    let c = COLORS[n as usize];
+    let ls = plotlib::style::LineStyle::new()
+      .colour(c)
+      .linejoin(plotlib::style::LineJoin::Round);
+    let dat = plotlib::repr::Plot::new(t)
+      .line_style(ls);
+      //.point_style(ps);
+    v = v.add(dat);
+
+    /*
+    let ps = plotlib::style::PointStyle::new()
+      .marker(plotlib::style::PointMarker::Circle)
+      .colour(c)
+      .size(1.0);
+    */
+  }
+  plotlib::page::Page::single(&v).save("./diagrams/comparison_chebyshev.svg").expect("saving svg");
 }
 
 /*
