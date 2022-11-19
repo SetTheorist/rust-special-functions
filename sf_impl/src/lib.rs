@@ -186,6 +186,7 @@ pub mod debye;
 pub mod dual;
 pub mod ellint;
 pub mod erf;
+pub mod error;
 pub mod exp;
 pub mod expint;
 pub mod float;
