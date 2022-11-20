@@ -351,10 +351,22 @@ Exponential function:
 \[ \F{exp}(z) = e^z \]
 \[ \F{exp\_m1}(z) = e^z-1 \]
 \[ \F{exp\_m1\_dx}(z) = \frac{e^z-1}{z} \]
-$2^x$, $10^x$, $e^z-1-z$, $\frac{e^z-1-z}{z^2}$,
-$e_N(x)=\sum_{n=0}^N\frac{x^n}{n!}$, $e^z - e_N(z)$, $\frac{e^z - e_N(z)}{z^{N+1}}$
+\[ \F{e\_n}(z) = e_{n}(z) = \sum_{j=0}^n\frac{z^j}{j!} \]
+\[ \F{ex}(z,n) = e^z - e_{n-1}(z) = \sum_{j=n}^\infty \frac{z^j}{j!} \]
+\[ \F{exd}(z,n) = \F{ex}(z,n)\frac{n!}{z^n} = \sum_{j=n}^\infty\frac{n!}{j!}z^{j-n} = \sum_{k=0}^\infty\frac{n!}{(n+k)!}z^k = \sum_{k=0}^\infty\frac{x^k}{(n+1)_k} \]
+Other useful functions: $2^x$, $10^x$, $e^z-1-z$, $\frac{e^z-1-z}{z^2}$, $\frac{ex(z,n)}{z^{n}}$
 
 Remark: $e^{x+y\ii} = e^x\cos y + \ii e^x\sin y$ for $x,y\in\RR$.
+
+Continued fraction expansions:
+\[ e^z = \frac{1}{1-{}} \frac{z}{1+{}} \frac{z}{2-{}} \frac{z}{3+{}} \frac{z}{2-{}} \frac{z}{5+{}} \cdots\]
+(The following might be useful for computing $(e^z-1)/z$?)
+\[ e^z = 1+\frac{z}{1-} \frac{z}{2+} \frac{z}{3-} \frac{z}{2+} \frac{z}{5-} \frac{z}{2+} \frac{z}{7-} \cdots \]
+\[ e^z = 1+\frac{z}{1-(z/2)+} \frac{z^2/(4\cdot3)}{1+} \frac{z^2/(4\cdot15)}{1+} \frac{z^2/(4\cdot35)}{1+} \cdots \frac{z^2/(4(4n^2-1))}{1+} \cdots \]
+\[ \F{ex}(z,n) = \frac{z^n}{n!-{}} \frac{n! z}{(n+1)+{}} \frac{z}{(n+2)-{}} \frac{(n+1)z}{(n+3)+{}} \frac{2z}{(n+4)-{}} \frac{(n+2)z}{(n+5)+{}} \frac{3z}{\cdots} \]
+The following works well:
+\[ \F{exd}(z,n) = \frac{1}{1-} \frac{z}{(n+1)+} \frac{z}{(n+2)-} \frac{(n+1)z}{(n+3)+} \frac{2z}{(n+4)+} \frac{(n+2)z}{(n+5)-} \frac{3z}{(n+6)+} \cdots\]
+
 
 \begin{implementation}
 Implementation notes for $\exp(z)$ for $z\in\RR$:
@@ -369,6 +381,8 @@ Implementation notes for $\exp(z)$ for $z\in\RR$:
   \[ e^{-z} = (1+z)^{-1} \Hyper{1}{1}{z}{2+z}{-z} = \frac{1}{1+z}\sum_{k=0}^\infty \frac{(-z)^k}{k!} \frac{(z)_k}{(2+z)_k} \]
   (If $\al_n$ is the $n$th term in the sum, then $\al_{n+1}=-\al_{n}\frac{z(z+n)}{(n+1)(z+n+2)}$.)
 \item Another idea: write $z=(\ln2)^N\xi$ so that $e^z=2^N e^\xi$
+\item Idea: use high-precision range-reduction to extract multiples of $\ln 2$, for better results
+\item For double-precision, note that $e^{710}=\infty$ already, so in $e^{2^n f} = (e^f)^{2^n}$, we have~$n<10$.
 \end{itemize}
 
 Implementation notes for $\exp(z)-1$ for $z\in\RR$:
@@ -403,6 +417,17 @@ partial series, etc.
 
 Remark: $\ln x+y\ii = \ln r + \theta\ii$, where $x,y\in\RR$, $x+y\ii=r e^{\theta\ii}$, thus
 $r=|x+y\ii|=\sqrt{x^2+y^2}$ and $\theta=\arg x+y\ii = \O{atan2}(y,x)$.
+
+\[ \log(1+z) = \sum_{n=1}^\infty (-)^{n-1} \frac{z^n}{n} \qquad |z|\leq1, z\neq-1 \]
+\[ \log(z) = 2\sum_{n=1}^\infty\left(\frac{z-1}{z}\right)^n\frac{1}{n} \qquad \Re z\geq\frac12 \]
+\[ \log(\frac{z+1}{z-1}) = 2\sum_{n=0}^\infty\frac{z^{-2n-1}}{2n+1} \qquad |z|\geq1, z\neq\pm1 \]
+\[ \log(z) = 2\sum_{n=0}^\infty\left(\frac{z-1}{z+1}\right)^{2n+1} \frac{1}{2n+1} \qquad \Re z\geq0, z\neq0 \]
+\[ \log(z+a) = \log(a) + 2\sum_{n=0}^\infty \left(\frac{z}{2a+z}\right)^{2n+1} \frac{1}{2n+1} \qquad a>0, \Re z\geq-a, z\neq-a \]
+
+Continued fraction for $z\in\CC\setminus(-\infty,-1]$:
+\[ \log(1+z) = \frac{z}{1+} \frac{z}{2+} \frac{z}{3+} \frac{4z}{4+} \frac{4z}{5+} \frac{9z}{6+} \cdots \]
+Continued fraction on slit-plane:
+\[ \log(\frac{1+z}{1-z}) = \frac{2z}{1-} \frac{z^2}{3-} \frac{4z^2}{5-} \frac{9z^2}{7-} \cdots \]
 
 \begin{implementation}
 Implementation notes for $\log(z)$ for $z>0$:
@@ -1121,9 +1146,11 @@ Note $\O{ker}_\nu(z) \pm \ii\O{kei}_\nu(z) = \ii^{\mp\nu}\O{K}_\nu(\ii^{\pm1/2}z
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Struve functions}
-\[ \Ob{H}_\nu(z) = \sum_{n=0}^\infty (-)^n \frac{(z/2)^{2n+\nu+1}}{(n+1/2)!(n+\nu+1/2)!} \]
-\[ \Ob{L}_\nu(z) = -\ii e^{-\ii\nu\pi/2}\O{\mathbf{H}}_\nu(\ii z) = \sum_{n=0}^\infty \frac{(z/2)^{2n+\nu+1}}{(n+1/2)!(n+\nu+1/2)!} \]
+\[ \Ob{H}_\nu(z) = \sum_{n=0}^\infty (-)^n \frac{(z/2)^{2n+\nu+1}}{\Gamma(n+3/2)\Gamma(n+\nu+3/2)} \]
+\[ \Ob{L}_\nu(z) = -\ii e^{-\ii\nu\pi/2}\O{\mathbf{H}}_\nu(\ii z) = \sum_{n=0}^\infty \frac{(z/2)^{2n+\nu+1}}{\Gamma(n+3/2)\Gamma(n+\nu+3/2)} \]
 {\tt Struve\_Hn, d\_Struve\_Hn, ..., Ln, Integrate\_Struve\_Hn, ...}
+
+(Note: series/Bessel series + asymptotic-in-$z$ seems to do well, whereas asymptotic-in-$\nu$ does poorly).
 
 From A\&S~\cite{a&s}:
 
@@ -1144,13 +1171,15 @@ We have the recurrence
 ((upward recursion is unstable... power-series seems quite robust enough (for $|x|<20$...)))
 
 And we have the asymptotic expansion for large $z$ with $|\arg z|<\pi$
-\[ \Ob{H}_\nu(z) - \O{Y}_\nu(z) = \frac{1}{\pi}\sum_{k=0}^{m-1}\frac{\Gam(k+1/2)}{\Gam(\nu-k+1/2)(z/2)^{2k-\nu+1}} + R_m \]
+\[ \Ob{K}_\nu(z) = \Ob{H}_\nu(z) - \O{Y}_\nu(z) = \frac{1}{\pi}\sum_{k=0}^{m-1}\frac{\Gam(k+1/2)}{\Gam(\nu-k+1/2)(z/2)^{2k-\nu+1}} + R_m \DEF{$\Ob{K}_\nu(z)$} \]
 with $R_m=O(|z|^{\nu-2m-1})$; if $\nu$ is real, $z$ positive, and $m-\nu+\tfrac12\geq0$, the remainder after $m$ terms is of the
 same sign and numerically less than the first term neglected.
 
 The modified Struve function is
 \[ \Ob{L}_\nu(z) = -\ii e^{-\ii\nu\pi/2} \Ob{H}_\nu(\ii z)
     = \left(\frac{z}{2}\right)^{\nu+1}\sum_{k=0}^\infty\frac{(z/2)^{2k}}{\Gam(k+3/2)\Gam(k+\nu+3/2)} \]
+
+\[ \Ob{M}_\nu(z) = \Ob{L}_\nu(z) - I_\nu(z) \]
 
 Other miscellaneous notes:
 \[ \Ob{H}_\nu' = \frac{\Ob{H}_{\nu-1} - \Ob{H}_{\nu+1}}{2} + \frac{(z/2)^\nu}{2\sqrt{\pi} \Gamma(\nu+3/2)} \]
@@ -2189,6 +2218,8 @@ We have
 and
 \[ \Ob{E}_\nu(z) = -\O{Y}_\nu(z) + \frac{1+\cos\nu\pi}{\pi}s_{0,\nu}(z) - \nu\frac{1-\cos\nu\pi}{\pi z^2}s_{-1,\nu}(z) \]
 [CHECK THE DENOMINATOR ON THE FIRST FRACTION IN THE PREVIOUS EQUATION! (compare with Anger function...)]
+
+\[ \Ob{E}_\nu(0) = \frac{\cos(\pi/\nu) - 1}{\nu\pi} \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Howland integrals}
