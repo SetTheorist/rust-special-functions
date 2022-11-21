@@ -460,7 +460,7 @@ sinc, sinc\_a}
 \subsubsection{Circular}
 \[ \cos(z) = \sum_{n=0}^\infty (-)^n\frac{z^{2n}}{(2n)!} \]
 \[ \sin(z) = \sum_{n=0}^\infty (-)^n\frac{z^{2n+1}}{(2n+1)!} \]
-\[ \tan(z) = \frac{\sin z}{\cos z} = \]
+\[ \tan(z) = \frac{\sin z}{\cos z} \]
 \[ \sec(z) = \frac{1}{\cos z} \]
 \[ \cot(z) = \frac{1}{\tan z} = \frac{\cos z}{\sin z} \]
 \[ \csc(z) = \frac{1}{\sin z} \]
@@ -470,7 +470,7 @@ $\sin x+y\ii = \sin x \cosh y + \ii \cos x \sinh y$, when $x,y\in\RR$.
 
 \begin{implementation}
 \begin{itemize}
-\item continued fraction $\tan z = \frac{z}{1-} \frac{z}{3-} \frac{z}{5-} \cdots$
+\item continued fraction $\tan z = \frac{z}{1-} \frac{z}{3-} \frac{z}{5-} \cdots$, ($z\neq\frac\pi2\pm n\pi$)
 \item $\cot z = \frac12 + 2z\sum_{k=1}^\infty\frac{1}{z^2 - k^2\pi^2}$
 \item $\asin z = z + \frac{1}{2}\frac{z^3}{3} + \frac{1\cdot3}{2\cdot4}\frac{z^5}{5} + \frac{1\cdot3\cdot5}{2\cdot4\cdot6}\frac{z^7}{7} + \cdots$
 \item continued fraction$\frac{\asin z}{\sqrt{1 - z^2}} = \frac{z}{1 - } \frac{1\cdot2 z^2}{3-} \frac{1\cdot2 z^2}{5-} \frac{3\cdot4 z^2}{7-} \frac{3\cdot4 z^2}{9-} \cdots$
@@ -484,6 +484,11 @@ $\sin x+y\ii = \sin x \cosh y + \ii \cos x \sinh y$, when $x,y\in\RR$.
 \end{itemize}
 \end{implementation}
 
+Remarks:
+\[ 1-\cos(z)=2\sin^2(z/2) \qquad\text{since $\sin(z/2)=\pm\sqrt{(1-\cos(z))/2}$} \]
+\[ 1+\cos(z)=2\cos^2(z/2) \qquad\text{since $\cos(z/2)=\pm\sqrt{(1+\cos(z))/2}$} \]
+\[ \tan(z/2) = \pm\sqrt{\frac{1-\cos z}{1+\cos z}} = \frac{1-\cos z}{\sin z} = \frac{\sin z}{1+\cos z} \]
+
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Hyperbolic}
 \[ \cosh(z) = \cos(\ii z) = \sum_{n=0}^\infty \frac{z^{2n}}{(2n)!} = \frac{e^{z} + e^{-z}}{2} \]
@@ -492,18 +497,45 @@ $\sin x+y\ii = \sin x \cosh y + \ii \cos x \sinh y$, when $x,y\in\RR$.
 \[ \O{sech}(z) = \frac{1}{\cosh z} \]
 \[ \O{coth}(z) = \frac{1}{\tanh z} = \frac{\cosh z}{\sinh z} \]
 \[ \O{csch}(z) = \frac{1}{\sinh z} \]
+Power series:
+\[ \cosh(z) = \sum_{n=0}^\infty\frac{z^{2n}}{(2n)!} \]
+\[ \sinh(z) = \sum_{n=0}^\infty\frac{z^{2n+1}}{(2n+1)!} \]
+Continued fraction:
+\[ \tanh(z) = \frac{z}{1+} \frac{z^2}{3+} \frac{z^2}{5+} \frac{z^2}{7+} \cdots \qquad z\neq\frac\pi2\ii\pm n\pi\ii \]
+
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Inverse Circular}
 \[ \acos(z) = \rho \text{\quad s.t.\quad} \cos\rho = z \]
 \[ \asin(z) = \rho \text{\quad s.t.\quad} \sin\rho = z \]
 \[ \atan(z) = \rho \text{\quad s.t.\quad} \tan\rho = z \qquad \rho\in(-\pi/2, +\pi/2) \]
 \[ \O{atan2}(y,x) = \atan(y/x) \text{\quad s.t. correct for $x\sim0$ and signs} \]
+Power series:
+\[ \asin(z) = \sum_{n=0}^\infty z^{2n+1} \frac{1\cdot3\cdot5\cdots(2n-1)}{(2n+1)\cdot2\cdot4\cdot6\cdots(2n)} \qquad |z|<1 \]
+\[ \atan(z) = \sum_{n=0}^\infty(-)^n\frac{z^{2n+1}}{2n+1} \qquad |z|\leq1, z^2\neq-1 \]
+\[ \atan(z) = \frac{\pi}{2} - \sum_{n=0}^\infty(-)^n\frac{z^{-2n-1}}{2n+1} \qquad |z|>1 \]
+Continued fraction:
+\[ \atan(z) = \frac{z}{1+} \frac{z^2}{3+} \frac{4z^2}{5+} \frac{9z^2}{7+} \frac{16z^2}{9+} \cdots
+  \qquad z\notin (-\ii\infty,-\ii]\cup[\ii,\ii\infty) \]
+\[ \frac{\asin(z)}{\sqrt{1-z^2}} = \frac{z}{1-} \frac{1\cdot2\cdot z^2}{3-} \frac{1\cdot2\cdot z^2}{5-} \frac{3\cdot4\cdot z^2}{7-} \frac{3\cdot4\cdot z^2}{9-} \cdots
+  \qquad z\notin (-\infty,-1]\cup[1,\infty) \]
 
 Remark: $\acos x+y\ii = \acos\beta + \ii\O{sign}_+(y)\ln(\al+\sqrt{\al^2-1})$ and
 $\asin x+y\ii = \asin\beta + \ii\O{sign}_+(y)\ln(\al+\sqrt{\al^2-1})$;
 where $x,y\in\RR$, $\al = \frac{\sqrt{(x+1)^2+y^2} + \sqrt{(x-1)^2+y^2}}{2}$,
 $\beta = \frac{\sqrt{(x+1)^2+y^2} - \sqrt{(x-1)^2+y^2}}{2}$,
 and \[\O{sign}_+(y) = \begin{cases}+1&y\geq0\\-1&y<0\end{cases}\]
+
+For $z\notin(-\infty,-1]\cup[1,\infty)$,
+\[ \acos(z) = \frac{\pi}{2} - \asin(z) = -\ii \O{Log}(z + \ii(1-z^2)^{1/2}) \]
+and
+\[ \asin(z) = -\ii \O{Log}((1-z^2)^{1/2} + \ii z) \]
+We also have
+\[ \O{acsc}(z)=\asin(1/z) \qquad z\notin[-1,1] \]
+and $\O{asec}(z)$ is defined for $z\notin[-1,1]$ with $\O{asec}(z)+\O{acsc}(z)=\pi/2$.
+
+For $z\notin(-\infty\ii,-\ii]\cup[\ii,\ii\infty)$, we have
+\[ \atan(z) = \frac{\ii}{2}\O{Log}(\frac{1-\ii z}{1+\ii z}) = \frac{\ii}{2}\O{Log}(\frac{\ii+z}{\ii-z}) \]
+We also have $\O{acot}(z) = \atan(1/z)$ defined for $z\notin[-\ii,\ii]$, and $\atan(z)+\O{acot}(z)=\O{sign}_+(z)\pi/2$.
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Inverse Hyperbolic}
@@ -513,7 +545,9 @@ and \[\O{sign}_+(y) = \begin{cases}+1&y\geq0\\-1&y<0\end{cases}\]
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Misc}
-\[ \O{gud}(z) = 2\atan e^{z} - \frac\pi2 \qquad\text{Gudermannian} \DEF{$\O{gud}(z)$}\]
+\[ \O{gud}(z) = 2\atan(e^{z}) - \frac\pi2 \qquad\text{Gudermannian} \DEF{$\O{gud}(z)$}\]
+\[ \O{gud}^{-1}(z) = \log(\tan(\frac{\pi}{4}+\frac{z}{2})) = \log(\sec(z) + \tan(z)) \]
+
 Note: for a function $\O{F}(z)$, we define
 $\O{verF}(z) = 2 \O{F}(z/2)^2$, 
 $\O{coF}(z) = \O{F}(\tfrac{\pi}{2} - z)$, 
@@ -579,6 +613,12 @@ Binet function:
 \[ \F{gamma\_inv}(z) = 1/\Gam(z) \]
 log-gamma+sign also
 
+We have, for $\nu\in(-1,1)$
+\[ \log(\Gam(1+\nu)) = -\gam\nu + \frac12\log(\frac{\pi\nu(1-\nu)}{(1+\nu)\sin(\pi\nu)}) - \sum_{j=3,5,7,\cdots}\frac{\zeta(j)-1}{j}\nu^j\]
+but initial testing gives mediocre results.
+
+\[ \log(\Gam(1+\nu)) = -\gam\nu + \sum_{j=2}^\infty\frac{\zeta(j)}{j}(-\nu)^j \qquad \nu\in(-1,1] \]
+
 Amusing fact: $\zeta(3) = \lim_{\eps\to0}\frac{1}{2\eps^3}\frac{\Gam^3(1+\eps)\Gam(1-\eps)}{\Gam(1+\eps)}$ with error~$\sim2\eps$.
 
 Spouge's approximation (a modification of Stirling's):
@@ -629,29 +669,33 @@ integer/general pochhammers, etc.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Incomplete gamma functions}
 
-\[ \gam(z,\xi) = \int_0^\xi t^{z-1}e^{-t}\,dt   \DEF{$\gam(z,\xi)$}\]
-\[ \gam^*(z,\xi) = z^{\dots}\gam(z,\xi) \]
-\[ \O{P}(z,\xi) = \frac{\gam(z,\xi)}{\Gam(z)}   \DEF{$\O{P}(z,\xi)$}\]
-\[ \O{Q}(z,\xi) = 1 - \O{P}(z,\xi) = \frac{\Gam(z,\xi)}{\Gam(z)}    \DEF{$\O{Q}(z,\xi)$}\]
-\[ \Gam(z,\xi) = \Gam(z) - \gam(z,\xi) = \int_\xi^\infty t^{z-1}e^{-t}\,dt \DEF{$\Gam(z,\xi)$}\]
-For a fixed $\xi$, $\gamma(z,\xi)$ is a meromorphic function of $z$ with simple poles at $z=0,-1,-2,\dots$,
-while $\Gam(z,\xi)$ is an entire function of~$z$.
+\[ \gam(\al,z) = \int_0^z t^{\al-1}e^{-t}\,dt   \DEF{$\gam(\al,z)$}\]
+\[ \gam^*(\al,z) = \al^{\dots}\gam(\al,z) \]
+\[ \O{P}(\al,z) = \frac{\gam(\al,z)}{\Gam(\al)}   \DEF{$\O{P}(\al,z)$}\]
+\[ \O{Q}(\al,z) = 1 - \O{P}(\al,z) = \frac{\Gam(\al,z)}{\Gam(\al)}    \DEF{$\O{Q}(\al,z)$}\]
+\[ \Gam(\al,z) = \Gam(\al) - \gam(\al,z) = \int_z^\infty t^{\al-1}e^{-t}\,dt \DEF{$\Gam(\al,z)$}\]
+For a fixed $z$, $\gamma(\al,z)$ is a meromorphic function of $\al$ with simple poles at $\al=0,-1,-2,\dots$,
+while $\Gam(\al,z)$ is an entire function of~$\al$.
+
+Remarks: $\gam(\al,-z)=\int_0^{-z}t^{\al-1}e^{-t}\,dt$, $\Gam(\al,-z)=\int_{-z}^\infty t^{\al-1}e^{-t}\,dt$
+\[ \gam(\al,x) = \frac{x^\al}{\al} e^{-x} \Hyper{1}{1}{1}{1+\al}{x} = \frac{x^\al}{\al}\Hyper{1}{1}{\al}{1+\al}{-x} \]
+Recalling that $M(a,b,z)=e^{z} M(b-a,b,-z)$ and $\Hyper{1}{1}{1}{1+\al}{x}=e^{x}\Hyper{1}{1}{\al}{1+\al}{-x}$.
 
 Inverse functions ...
 
 \begin{implementation}
 Various potentially useful relations
 \begin{itemize}
-\item[\bf(A)] For $a\neq-1,-2,\dots$,
-\[ \Gam(a,z) = \Gam(a) - \sum_{n=0}^\infty\frac{\Gam(a)e^{-z}z^{n+a}}{\Gam(a+n+1)} = \Gam(a) - \sum_{n=0}^\infty\frac{(-)^nz^{n+a}}{(a+n)n!} \]
+\item[\bf(A)] For $\al\neq-1,-2,\dots$,
+\[ \Gam(\al,z) = \Gam(\al) - \sum_{n=0}^\infty\frac{\Gam(\al)e^{-z}z^{n+\al}}{\Gam(\al+n+1)} = \Gam(\al) - \sum_{n=0}^\infty\frac{(-)^nz^{n+\al}}{(\al+n)n!} \]
 \item[\bf(B)] As $z\to\infty$,
-\[ \Gam(a,z)\sim z^{a-1}e^{-z}\sum_{n=0}^\infty\frac{\Gam(a)}{\Gam(a-n)z^n} \]
-\item[\bf(C)] Continued fraction expansion: (best when $a>>z$)
-\[ \Gam(a,z) = \frac{e^{-z}z^a}{z+} \frac{1-a}{1+} \frac{1}{z+} \frac{2-a}{1+} \frac{2}{z+} \cdots \]
+\[ \Gam(\al,z)\sim z^{\al-1}e^{-z}\sum_{n=0}^\infty\frac{\Gam(\al)}{\Gam(\al-n)z^n} \]
+\item[\bf(C)] Continued fraction expansion: (best when $\al>>z$ ?? should this be $z>>\al$ instead??)
+\[ \Gam(\al,z) = \frac{e^{-z}z^\al}{z+} \frac{1-\al}{1+} \frac{1}{z+} \frac{2-\al}{1+} \frac{2}{z+} \cdots \]
 \item[\bf(C')] Equivalent fraction (converges for $\Re z>0$), where $v=z^{-1}$
-\[ e^{z}z^{1-a}\Gam(a,z) = \frac{1}{1+} \frac{(1-a)v}{1+} \frac{v}{1+} \frac{(2-a)v}{1+} \frac{2v}{1+} \cdots \]
-\item[\bf(D)] For $n\geq0$; (though claimed to be of limited use unless $a\sim-n$)
-\[ \Gam(a+n+1, z) = \Gam(a+n, z) + \frac{\Gam(a)\exp(-z) z^{n+a}}{\Gam(a+n+1)} \]
+\[ e^{z}z^{1-\al}\Gam(\al,z) = \frac{1}{1+} \frac{(1-\al)v}{1+} \frac{v}{1+} \frac{(2-\al)v}{1+} \frac{2v}{1+} \cdots \]
+\item[\bf(D)] For $n\geq0$; (though claimed to be of limited use unless $\al\sim-n$)
+\[ \Gam(\al+n+1, z) = \Gam(\al+n, z) + \frac{\Gam(\al)e^{-z}z^{n+\al}}{\Gam(\al+n+1)} \]
 \end{itemize}
 \end{implementation}
 
@@ -660,6 +704,16 @@ Various potentially useful relations
 The digamma function is defined via
 \[ \psi(z) = \frac{d}{dz}\log\Gam(z) = \frac{\Gam'(z)}{\Gam(z)}   \DEF{$\psi(z)$}\]
 meromorphic with simple poles at $z=0,-1,-2,\dots$
+
+Series expansion:
+\[ \psi(z) = -\gam - \frac1z + \sum_{n=1}^\infty\frac{z}{n(n+z)} = -\gam+\sum_{n=0}^\infty\left(\frac{1}{n+1}-\frac{1}{n+z}\right) \]
+
+Asymptotic:
+\[ \psi(z) \sim \log(z) - \frac{1}{2z} - \sum_{m=1}^\infty \frac{B_{2m}}{2m} z^{-2m} \qquad\text{as $z\to\infty$, $|\arg z|<\pi$} \]
+
+Notes on Euler-Maclaurin expansion:
+\[ \sum_{n=a}^\infty \frac{z}{n(n+z)} \approx \log(\frac{a+z}{z}) - \frac{z}{z(a)(a+z)} - \sum_{j=2}^k \frac{B_j}{j!} f^{(j-1)}(a) \]
+where we note that $f^{(k)}(n) = (-1)(-2)\cdots(-k)(n^{-k-1}-(n+z)^{-k-1})$.  This expansion works well in testing.
 
 And the polygamma function (for $n=1,2,3,\dots$)
 \[ \psi^{(n)}(z) = \frac{d^n}{dz^n}\psi(z) = \frac{d^{n+1}}{dz^{n+1}}\ln\Gam(z)
@@ -1092,15 +1146,37 @@ where $F(\zeta) = \sum_{k=0}^\infty (-)^k c_{2k} / \zeta^{2k}$ and $G(\zeta) = \
 (In practice, he solves for $F, G$ in terms of $\O{Ai}, \O{Bi}$ and computes a rational approximation to them.)
 \end{implementation}
 
+Discussion based on Gil {\it et al.}:
+For scaling purposes, convenient to define $\widetilde{\O{Ai}}(z) = e^{\zeta}\O{Ai}(z)$ where $\zeta=\frac23 z^{3/2}$.
+To compute $\O{Ai}(z),\O{Bi}(z)$ for complex $z=x+y\ii$, we divide into regions:
+\begin{enumerate}
+  \item[(A)] Use a series when $|y|<3$ and $-2.6<x<1.3$
+  \item[(B)] Use asymptotic expansion for $|z|>15$
+  \item[(C)] Use Gauss-Legendre integration when $|z|<15$ (and not case (A))
+  \item[Note:] For cases (B),(C) compute normally when $|\arg z|\leq2\pi/3$, otherwise use
+    \[ \O{Ai}(z) = -e^{-2\pi\ii/3}\O{Ai}(e^{-2\pi\ii/3}z) -e^{2\pi\ii/3}\O{Ai}(e^{2\pi\ii/3}z) \]
+\end{enumerate}
+The integral for case (C) is
+\[ \O{Ai}(z) = a(z) \int_0^\infty (2+t/\zeta)^{-1/6} t^{-1/6} e^{-t} \,dt \]
+where
+\[ a(z) = \frac{e^{-\zeta}\zeta^{-1/6}}{\sqrt{\pi} 48^{1/6} \Gam(5/6)} \]
+note for $z\neq0$, $|\arg\zeta|<\pi$.
+Similarly,
+\[ \O{Ai}'(z) = b(z) \int_0^\infty (2+t/\zeta)^{1/6} t^{1/6} e^{-t} \,dt \]
+where
+\[ b(z) = \frac{-z e^{-\zeta}}{\sqrt{3\pi} 2^{2/3} \Gam(7/6)\sqrt\zeta} \]
+
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Scorer functions}
 \[ \O{Gi}(z) \text{\ is solution of inhomogeneous Airy DE $y''-z y = -\frac1\pi$ with $\O{Gi}(0)=\O{Bi}(0)/3$, $\O{Gi}'(0)=\O{Bi}'(0)/3$, }
   \DEF{$\O{Gi}(z)$} \]
+Note that $\O{Gi}(0) = \frac{1}{3^{7/6}\Gam(2/3)}$ and $\O{Gi}'(0) = \frac{1}{3^{5/6}\Gam(1/3)}$.
 \[ \O{Hi}(z) \text{\ is solution of inhomogeneous Airy DE $y''-z y = +\frac1\pi$ with $\O{Hi}(0)=2\O{Bi}(0)/3$, $\O{Hi}'(0)=2\O{Bi}'(0)/3$, }
   \DEF{$\O{Hi}(z)$} \]
+Similarly, $\O{Hi}(0) = \frac{2}{3^{7/6}\Gam(2/3)}$ and $\O{Hi}'(0) = \frac{2}{3^{5/6}\Gam(1/3)}$.
 
-\[ \O{Gi}(z) = \O{Bi}(z)\int_z^\infty\O{Ai})(t)\,dt + \O{Ai}(z)\int_0^z\O{Bi}(t)\,dt \]
-\[ \O{Hi}(z) = \O{Bi}(z)\int_{-\infty}^z\O{Ai})(t)\,dt - \O{Ai}(z)\int_{-\infty}^z\O{Bi}(t)\,dt \]
+\[ \O{Gi}(z) = \O{Bi}(z)\int_z^\infty\O{Ai}(t)\,dt + \O{Ai}(z)\int_0^z\O{Bi}(t)\,dt \]
+\[ \O{Hi}(z) = \O{Bi}(z)\int_{-\infty}^z\O{Ai}(t)\,dt - \O{Ai}(z)\int_{-\infty}^z\O{Bi}(t)\,dt \]
 
 For small $|z|$ we can use series
 \[ \O{Gi}(z) = \frac{3^{-2/3}}{\pi}\sum_{k=0}^\infty \cos(\pi\tfrac{2k-1}{3})\Gam(\tfrac{k+1}{3})\frac{(3^{1/3} z)^k}{k!} \]
@@ -2470,6 +2546,26 @@ where $p$ is prime and $B_n$ is a Bell number.  $e^{e^x-1} = \sum_{n=0}^\infty B
 Bell polynomials --- Dobinski's formula: $B_n(x) = e^{-x}\sum_{k=0}^\infty k^n \frac{x^k}{k!}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Harmonic numbers}
+
+\[ H_n = \sum_{k=1}^n \frac{1}{k} \]
+We have the asymptotic expansion
+\[ H_n \sim \log(n) + \gam + \frac{1}{2n} - \sum_{k=1}^\infty\frac{B_{2k}}{2k n^{2k}}
+  = \log(n) + \gam + \frac{1}{2n} - \frac{1}{12n^2} + \frac{1}{120 n^4} - \cdots \]
+(This expansion to $n^{-4}$ works perfectly for $n>1111$ in double-precision.)
+
+We can also define one form of generalized harmonic numbers
+\[ H^{(m)}_n = \sum_{k=1}^n \frac{1}{k^m} \]
+
+Another generalization is given, for $\al\in\RR$, by
+\[ H_{\al} = \int_0^1 \frac{1-x^\al}{1-x}\,dx \qquad \al\in(0,1) \]
+and
+\[ H_{\al} = H_{\al-1} + \frac{1}{\al} \]
+\[ H_{1-\al} - H_{\al} = \pi\cot(\pi\al) - \frac{1}{\al} + \frac{1}{1-\al} \]
+Note that we have, for $x>0$,
+\[ H_x = x\sum_{k=1}^\infty\frac{1}{k(x+k)} \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Bernoulli numbers, polynomials}
 
 \[ \frac{t}{e^t-1} = \sum_{n=0}^\infty \frac{t^n}{n!} B_n \]
@@ -2804,6 +2900,22 @@ Can also use the partial sums $s_m=\sum_{k=0}^{m-1}(-)^k a_k$ (rather than the i
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Halley's method}
 \[ x_{n+1} = x_n - \frac{2f(x_n)f'(x_n)}{2f'(x_n)^2 - f(x_n)f''(x_n)} \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quasi-random sequences}
+
+Sobol' sequence, ...
+
+Faure: use largest prime $p$ greater than the number of dimensions, scramble, ...
+
+Halton sequences:
+\begin{itemize}
+  \item $1/2,1/4,3/4,1/8,3/8,5/8,7/8,\dots$
+  \item $1/3,2/3,1/9,2/9,4/9,5/9,7/9,8/9,\dots$
+  \item $1/5,2/5,3/5,4/5,1/25,2/25,\dots$
+\end{itemize}
+Use a different prime for each dimension.
+Let $n=\sum_{k=0}^{l-1}d_k b^k$ be the base-$b$ expansion of $n\geq1$ then generate $\sum_{k=0}^{l-1} d_k b^{-k-1}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Notes on implementations}
