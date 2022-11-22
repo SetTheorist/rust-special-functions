@@ -1251,6 +1251,13 @@ And we have the asymptotic expansion for large $z$ with $|\arg z|<\pi$
 with $R_m=O(|z|^{\nu-2m-1})$; if $\nu$ is real, $z$ positive, and $m-\nu+\tfrac12\geq0$, the remainder after $m$ terms is of the
 same sign and numerically less than the first term neglected.
 
+Claimed: for large $|z|$ with $|\arg z|\leq\pi-\delta$, $\nu$ fixed, that
+\[ \Ob{K}_\nu(z) \sim \frac{1}{\pi} \sum_{k=0}^\infty \frac{\Gam(k+1/2)(z/2)^{\nu-2k-1}}{\Gam(\nu+1/2-k)} \]
+For large $\nu$ with $|\arg\nu|\leq\pi/2-\delta$, fixed $\lam=z/\nu>0$,
+\[ \Ob{K}_\nu(\lam\nu) \sim \frac{(\lam\nu/2)^{\nu-1}}{\sqrt{\pi}\Gam(\nu+1/2)} \sum_{k=0}^\infty \frac{k! c_k(\lam)}{\nu^k} \]
+where $c_0=1$, $c_1=2\lam^{-2}$, $c_2=6\lam^{-4}-\frac12\lam^{-2}$, $c_3=20\lam^{-6}-4\lam^{-4}$,
+$c_4=70\lam^{-8}-\frac{45}{2}\lam^{-6}+\frac{3}{8}\lam^{-4}$, etc.
+
 The modified Struve function is
 \[ \Ob{L}_\nu(z) = -\ii e^{-\ii\nu\pi/2} \Ob{H}_\nu(\ii z)
     = \left(\frac{z}{2}\right)^{\nu+1}\sum_{k=0}^\infty\frac{(z/2)^{2k}}{\Gam(k+3/2)\Gam(k+\nu+3/2)} \]
@@ -1267,6 +1274,13 @@ Other miscellaneous notes:
     = \left(\frac{z}{2}\right)^{\nu+2}\sum_{k=0}^\infty\frac{(-)^k(z/2)^{2k}}{(2k+2+\nu)\Gamma(k+3/2)\Gamma(\nu+k+3/2)} \]
 \[ \int_0^z \Ob{H}_0(t)\,dt = \frac{2}{\pi}\left(\frac{z^2}{2} - \frac{z^4}{1^2\cdot3^2\cdot4} + \frac{z^6}{1^2\cdot3^2\cdot5^2\cdot6} - \cdots\right) \]
 (just integrate term-by-term the power-series expansion)
+
+Strategy:
+\begin{itemize}
+  \item series/Bessel-series for small to moderate $|z|$
+  \item $z$-asymptotics for large $|z|$
+  \item ?? use $\nu$-asymptotics by using $\nu$-recurrence to get large $\nu$?  (Recur down from large $\nu$-asymptotic values)
+\end{itemize}
 
 \begin{implementation}
 From~\cite{atlas:thompson}:
@@ -1287,8 +1301,13 @@ From~\cite{zj}:
 \item for $\Ob{H}_\nu(x)$, ($\nu$ arbitrary), use power-series for $x<20$, asymptotic o.w.
 \item *OR* use
     \[ \Ob{H}_{-n-1/2}(z) = (-)^nJ_{n+1/2}(z) \]
-    \[ \Ob{H}_{\nu}(z) = \frac{1}{\Gam(\nu+1/2)}\sum_{k=0}^\infty \frac{(z/2)^{k+\nu+1/2}}{k!(\nu+k+1/2)}J_{k+1/2}(z) \]
-    and note that the $J_{n+1/2}$ are easy to evaluate
+    \[ \Ob{H}_{\nu}(z) = \frac{1}{\Gam(\nu+1/2)}\sum_{k=0}^\infty \frac{(z/2)^{k+\nu+1/2}}{k!(\nu+k+1/2)}J_{k+1/2}(z)
+        = \left(\frac{z}{2\pi}\right)^{1/2} \sum_{k=0}^\infty \frac{(z/2)^k}{k!(k+1/2)} J_{k+\nu+1/2}(z) \]
+    and note that the $J_{n+1/2}$ are easy to evaluate using the recurrence for Bessel functions,
+    $J_{\nu-1}(z)+J_{\nu+1}(z)=\frac{2\nu}{z}J_{nu}(z)$ and $J_\nu(z)\sim\frac{1}{\sqrt{2\pi\nu}}(\frac{ez}{2\nu})^\nu$.
+    (We can even get a recurrence for the full term in the summand.)
+\item We also have the following, for $\nu\neq-1,-2,-3,\dots$, (which seems to work the best), 
+    \[ \Ob{H}_{\nu}(z) = \frac{4}{\sqrt\pi \Gam(\nu+1/2)} \sum_{k=0}^\infty \frac{2k+\nu+1}{(2k+1)(2k+2\nu+1)} \frac{\Gam(k+\nu+1)}{k!} J_{2k+\nu+1}(z) \]
 \end{itemize}
 \end{implementation}
 
@@ -1434,6 +1453,8 @@ Second kind: ($x=\sin\phi$), $0\leq k\leq 1$
 Third kind: ($x=\sin\phi$), $0\leq k\leq 1$
 \[ \O{\Pi}(\phi,k,c) = \int_0^\phi\frac{d\theta}{(1-c\sin^2\theta)\sqrt{1-k^2\sin^2\theta}} = \int_0^x\frac{dt}{(1-ct^2)\sqrt{(1-t^2)(1-k^2t^2)}} \]
 
+(In Mathematica notation, $n=c$, $m=k^2$).
+
 Special case:
 \[ \O{\Pi}(\phi,0,k) = \int_0^\phi\frac{d\theta}{1 - \xi\sin^2\theta} = \frac{\atan(\sqrt{1-\xi} \tan(\phi))}{\sqrt{1-\xi}} \]
 
@@ -1488,6 +1509,17 @@ To compute $\O{R}_C(x,y)$ for $x,y\in\RR$, we simply use the closed-form express
     \[ \O{R}_C(x,y) = \sqrt{\frac{x}{x-y}} \O{R}_C(x-y,-y) = \frac{1}{\sqrt{x-y}}\atanh\sqrt\frac{x}{x-y} = \frac{1}{\sqrt{x-y}}\ln\frac{\sqrt{x}+\sqrt{x-y}}{\sqrt{-y}} \]
 \end{itemize}
 \end{implementation}
+
+Let $s(t)=\sqrt{t+x}\sqrt{t+y}\sqrt{t+z}$, $x,y,z\in\CC\setminus(-\infty,0]$, and $p\neq0$, then
+\[ \O{R}_F(x,y,z) = \frac{1}{2} \int_0^\infty \frac{dt}{s(t)} \]
+\[ \O{R}_J(x,y,z,p) = \frac{3}{2} \int_0^\infty \frac{dt}{s(t)(t+p)} \]
+\[ \O{R}_G(x,y,z) = \frac{1}{4\pi} \int_0^{2\pi}\int_0^\pi
+  \left\{ x\sin^2\theta \cos^2\theta + y\sin^2\theta\sin^2\phi + z\cos^2\theta \right\}^{1/2}\sin\theta\,d\theta\,d\phi \]
+\[ \O{R}_D(x,y,z) = \O{R}_J(x,y,z,z) \]
+\[ \O{R}_C(x,y) = \O{R}_F(x,y,y) \]
+and
+\[ \O{R}_{-a}(\vec{b}; \vec{z}) = \O{R}_{-a}(b_1,\dots,b_n; z_1,\dots,z_n) = \frac{1}{B(a,a')}\int_0^\infty t^{a'-1} \prod_{j=1}^n(t+z_j)^{-b_j}\,dt \]
+where $a' = -a + \sum_{j=1}^n b_j$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Jacobian elliptic functions}
