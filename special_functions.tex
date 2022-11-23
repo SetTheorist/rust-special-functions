@@ -756,6 +756,19 @@ n & \frac{(-)^n}{\csc(x)^{n+1}}\frac{d^n}{dx^n}\cot(x) \\\hline
 \end{array}\]
 }
 
+Remarks on polygamma function
+\begin{itemize}
+  \item Definition, $k=1,2,\dots$, $z\neq0,-1,-2,\dots$
+    \[ \psi^{(m)}(z) = (-)^{m+1} m! \sum_{k=0}^\infty \frac{1}{(z+k)^{m+1}} \]
+  \item Euler-Maclaurin:
+    \[ \sum_{k=a}^\infty \frac{1}{(z+k)^{m+1}} = \frac{(z+a)^{-m}}{m} - \frac{(z+a)^{-m-1}}{2}
+        - \sum_{j=2}^\infty \frac{B_j}{j!}(z+a)^{-m-j}(-m-1)(-m-2)\cdots(-m-(j-1)) \]
+  \item Asymptotic as $z\to\infty$ for $|\arg z|<\pi$, $k\geq1$,
+    \[ \psi^{(m)}(z) \sim (-)^{m-1}\left(\frac{(m-1)!}{z^m} + \frac{m!}{2 z^{m+1}} + z^{-2}\sum_{k=0}^\infty \frac{B_{2k+2}}{(2k+2)!}(2k+m+1)! z^{-(2k+m)} \right)\]
+  \item Reflection, $k=1,2,3,\dots$
+    \[ \psi^{(m)}(1-z) + (-)^{m+1}\psi^{(m)}(z) = (-)^m \pi \frac{d^k}{dz^k} \cot(\pi z) \]
+\end{itemize}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Beta functions}
 
@@ -1522,6 +1535,22 @@ and
 where $a' = -a + \sum_{j=1}^n b_j$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Bulirsch's elliptic integrals}
+For $a,b,p\in\RR$, $p\neq0$, $k_c\neq0$,
+\[ \O{cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a \cos^2\theta + b\sin^2\theta}{\cos^2\theta + p\sin^2\theta} \frac{1}{\sqrt{\cos^2\theta+k_c\sin^2\theta}}\,d\theta \]
+\[ \O{el}_2(x,k_c,a,b) = \int_0^{\atan x} \frac{a+b\tan^2\theta}{\sqrt{(1+\tan^2\theta)(1+k_c\tan^2\theta)}},d\theta \]
+Noting $k_c=k'$, $p=1-\al^2$, $x=\tan\phi$, then
+\[ \O{el}_1(x,k_c) = F(\phi,k) \]
+If $x^2\neq-1/p$,
+\[ \O{el}_3(x,k_c,p) = \int_0^{\atan x}\frac{d\theta}{(\cos^2\theta+p\sin^2\theta)\sqrt{\cos^2\theta+k_c^2\sin^2\theta}} = \Pi(\phi, \al^2, k) \]
+
+Let $r=1/x^2$, then
+\[ \O{cel}(k_c,p,a,b) = a \O{R}_F(0,k_c^2,1) + \frac13(b-p a)\O{R}_J(0,k_c^2,1,p) \]
+\[ \O{el}_1(x,k_c) = \O{R}_F(r, r+k_c^2, r+1) \]
+\[ \O{el}_2(x,k_c,a,b) = a \O{el}_1(x,k_c) + \frac13(b-a)\O{R}_D(r,r+k_c^2,r+1) \]
+\[ \O{el}_3(x,k_c,p) = \O{el}_1(x,k_c) + \frac13(1-p)\O{R}_J(r,r+k_c^2,r+1,r+p) \]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Jacobian elliptic functions}
 We have implicit parameter $k$ in the following
 \[ \O{sn}(u) = x \text{\quad s.t.\quad} u = F(k,x) = \int_0^x \frac{dt}{\sqrt{(1-t^2)(1-k^2t^2)}} \]
@@ -1787,6 +1816,32 @@ s&\text{raw series}&\text{2-terms + n=0}&\text{2-terms + n=1}&\text{2-terms + n=
 40 & 8/full & 8/full & 8/full & 8/full & 8/full & 9/full & 8/full
 \end{array}\]
 }
+
+Alternative approach for computation of Riemann zeta function.
+First, define $\zeta_N(s) = \sum_{r=1}^{N-1} r^{-s}$, then we have
+\[ \zeta(s) = \zeta_N(s) + \frac{N^{1-s}}{s-1} + \frac{N^{-s}}{2} + \sum_{j=1}^K T_j(N,s) + R(N,K,s) \]
+where we have
+\[ T_j(N,s) = \frac{B_{2j}}{(2j)!} \frac{s(s+1)\cdots(s+2j-2)}{N^{s+2j-1}} \]
+Then we define our algorithm for computation of $\zeta(s;\epsilon)$ (with accuracy $\epsilon>0$) via:
+\begin{itemize}
+  \item if $s=0$ then return $-1/2$
+  \item else if $s=1$ then return $\infty$
+  \item else if $\Re(s)<0$, then return $2(2\pi)^{s-1} \sin(s\pi/2) \Gamma(1-s) \zeta(1-s;\epsilon)$
+  \item else
+  \begin{itemize}
+    \item let $\al=q/p$ where $p$ is the cost of computing $T_j(N,s)$ and $q$ is the cost of $j^{-s}$
+    \item let $k$ be the positive integer closets to the solution of $\frac{d}{dk} H_\al(k)=0$
+    \item let $n=\lceil n(k) \rceil$
+    \item return $\zeta_n(s) + \frac{n^{1-s}}{s-1} + \frac{n^{-s}}{2} + \sum_{j=1}^k T_j(n,s)$
+  \end{itemize}
+\end{itemize}
+Now, we have $H_\al(k) = \al\cdot n(k) + k$ with $\al>0$, where $n(k)=H_r(k)$ for $s\in\RR$ and $n(k)=H_c(k)$ for $s\in\CC\setminus\RR$,
+with
+\[ H_r(k) = \left( \frac{2}{\epsilon\Gam(s)} \frac{\Gam(s+2k-1)}{(2\pi)^{2k}} \right)^{1/(s+2k-1)} + k \]
+and if $s=\sigma+\ii\tau$,
+\[ H_c(k) = \frac{|s+2k-1}{e} \left(\frac{2\sqrt{2\pi}}{\epsilon|\Gam(s)|e^{\tau\arg(s)}} \frac{\sqrt{|s+2k-1|}}{(2\pi e)^{2k}}\right)^{1/(\sigma+2k-1)}  + k
+  \qquad\text{??}\]
+This should work very well.  From the paper [????] (TODO: add reference here!)
 
 \begin{implementation}
 Notes on the Dirichlet Beta function $\beta(\nu)$:
@@ -2612,6 +2667,14 @@ Compute: $B_n$, $B_n/n!$, $\ln|B_n|$, etc.
 \[ B_n(x) = \sum_{k=0}^n\binom{n}{k}B_k x^{n-k} \]
 \[ B_n(1-x) = (-)^n B_n(x) \]
 \[ B_n(x+1) - B_n(x) = n x^{n-1} \]
+
+Another approach for Bernoulli numbers (due to Ramanujan?):
+\[ B_n = frac{a_n - s_n}{\binom{n+3}{n}} \]
+where
+\[ a_n = \begin{cases}\frac{n+3}{2} & n\cong0,2(6) \\ -\frac{n+3}{6} & n\cong4(6)\end{cases} \]
+and
+\[ s_n = \sum_{k=1}^{\lfloor n/6\rfloor} \binom{n+3}{n-6k} B_{n-6k} \]
+Note that the case $n=1$ requires a special case.)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Euler numbers, polynomials}
