@@ -399,6 +399,23 @@ Note that for $z\in\CC$ there can be cancellation of the real-part away from $z=
 (in particular when $(\Re z)\cos(\Im z)\sim 1$ ...)
 \end{implementation}
 
+Alternative notes:
+For approximating $e^x$, we define $g(x)=\frac{e^x-1}{e^x+1}$ so that $e^x=\frac{1+g(x)}{1-g(x)} = 1+\frac{2g(x)}{1-g(x)}$.
+Remark: $g(x)$ is an odd function, so that $g(x)=x f(x^2)$.  Suppose that $g(x)=p(x)/q(x)$, then $e^x = 1+\frac{2p(x)}{q(x)-p(x)}$.
+One such approximation which gives (nearly) double-precision accuracy for $x\in(-0.45,0.45)$ is given by
+\begin{eqnarray*}
+  e^x &\approx& 1+2\frac{x p(x^2)}{q(x^2) - xp(x^2)} \\
+  p(y) &=& \frac{1}{2} + \frac{y}{72} + \frac{y^2}{30240} = \frac{1}{2}\left(1+\frac{y}{72}\left(1+\frac{y}{420}\right)\right) \\
+  q(y) &=& 1+\frac{y}{9}+\frac{y^2}{1008} = \left(\frac{y}{112}+1\right)\frac{y}{9} + 1
+\end{eqnarray*}
+Another approximation covering $x\in(-1.2,1.2)$ is given by
+\begin{eqnarray*}
+  p(y) &=& \frac{1}{2} + \frac{5}{312}y + \frac{1}{11440}y^2 + \frac{1}{17297280}y^3 \\
+  q(y) &=& 1 + \frac{3}{26}y + \frac{5}{3432}y^2 + \frac{1}{308880}y^3
+\end{eqnarray*}
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Logarithms}
 
@@ -1096,6 +1113,17 @@ For scaling in recurrence, can use:
 \[ \sum_{n=0}^\infty (2n+1)\O{j}_n^2(z) = 1 \]
 (or can use, for example, $\O{j}_0(z)=\sin z / z$.)
 
+%Additional notes: for $\O{j}_n(z) = \sqrt{\pi/(2z)} \O{J}_{n+1/2}(z)$, we have
+%\[ \O{j}_n(z) = \sin(z-n\frac{\pi}{2})\sum_{k=0}^{\lfloor n/2 \rfloor}(-)^k \frac{a_{2k}(n+1/2)}{z^{2k+1}}
+%            + \cos(z-n\frac{\pi}{2})\sum_{k=0}^{\lfloor(n-1)/2\rfloor}(-)^k\frac{a_{2k+1}(n+1/2)}{z^{2k+2}} \]
+%where
+%\[ a_k(n+1/2) = \begin{cases} \frac{(n+k)!}{2^k k! (n-k)!} & k=0,1,2,\dots,n \\ 0 & k=n+1,n+2,\dots \end{cases} \]
+Perhaps it makes sense to define
+\[ \widetilde{\O{J}}_{n+1/2}(z) = z^{n+1/2} \O{J}_{n+1/2}(z) \]
+Then
+\[ \widetilde{\O{J}}_{n+1/2}(z) = \sqrt{\frac2\pi}\sin(z-n\frac{\pi}{2})\sum_{k=0}^{\lfloor n/2 \rfloor}(-)^k a_{2k}(n+1/2)z^{n-2k}
+            + \sqrt{\frac2\pi}\cos(z-n\frac{\pi}{2})\sum_{k=0}^{\lfloor(n-1)/2\rfloor}(-)^k a_{2k+1}(n+1/2)z^{n-2k-1} \]
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Integral Bessel functions}
 
@@ -1702,8 +1730,38 @@ not necessarily a full 15 digits (with $a=-20$, looks like only 13 digits, even 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Lambert functions}
+The Lambert $W$ function is defined to be a solution to $W(z)e^{W(z)}=z$, i.e.
 \[ \O{W}(z) = \rho \text{\quad s.t.\quad} \rho e^\rho = z \]
+Taking logarithms gives $\log(W(z))) + W(z) = \log(z)$, that is, to solve $y+\log y=z$
+we can take $y=W(-e^z)$.
+%Similarly to solve $x\log x=z$, take $x=W(e^z)$. %% I DON'T THINK THIS IS CORRECT
 \[ \O{W}_{[k]}(z) = \text{$k$'th branch} \]
+The related ``tree function'' is given by
+\[ T(v) = -W(-v) = \sum_{n=1}^\infty \frac{n^{n-1} v^n}{n!} \]
+
+The Lambert function has two real branches $W_{[0]}:[-1/e,\infty)\to[-1,\infty)$
+and $W_{[1]}:[-1/2,0)\to(-\infty,-1]$.
+
+For the principal branch we have the following power-series (with radius of convergence $1/e$)
+\[ W_{[0]}(z) = \sum_{n=1}\frac{(-n)^{n-1}}{n!} z^n \]
+
+Note that the derivative satisfies (where $x\neq0$ for the second equality),
+\[ W'(x) = \frac{1}{e^{W(x)}(1+W(x))} = \frac{W(x)}{x(1+W(x))} \]
+More generally, we have, for $n\geq1$,
+\[ \frac{d^n}{dx^n} W(x) = \frac{e^{n W(x)}}{(1+W(x))^{2n-1}} p_n(W(x)) \]
+where $p_1(w)=1$ and
+\[ p_{n+1}(w) = (-nw + 3n-1) p_{n}(w) + (1+w)p_n'(w) \]
+
+For the integral, we have
+\[ \int W(x)\,dx = (W^2(x) - W(x) + 1)e^{W(x)} + C = x(W(x)-1+\frac{1}{W(x)})+C \]
+
+Using Halley's method for solving $we^w=z$, we use the iteration
+\[ w' = w - \frac{w e^w - z}{e^w(w+1)- \frac{(w+2)(we^w-z)}{2w+2}} \]
+
+Asymptotics for all non-principal branches, both at $0$ and $\infty$ are given by:
+\[ W(z) = \O{Log} z - \log\O{Log} z + \sum_{k=0}^\infty\sum_{m=1}^\infty c_{km} (\log\O{Log} z)^m (\O{Log} z)^{-k-m} \]
+where we have (with Stirling cycle numbers)
+\[ c_{km} = \frac{(-)^k}{m!}\begin{bmatrix}k+m\\k+1\end{bmatrix} \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Hypergeometric, Meijer G functions}
@@ -2014,6 +2072,16 @@ Finally we have the properties
 and
 \[ \O{Li}_s(e^{2\pi\ii a}) + e^{\pi\ii s}\O{Li}_s(e^{-2\pi\ii a}) = \frac{(2\pi)^s e^{\pi\ii s/2}}{\Gam(s)}\zeta(1-s, a) \]
 valid when $\Re s>0$, $\Im a>0$; or $\Re s>1$, $\Im a=0$.
+
+We can derive the Euler-Maclaurin expansion as follows:
+\begin{eqnarray*}
+  \sum_{n=a}^\infty\frac{z^n}{n^s}
+    &=& \int_a^\infty\frac{z^t}{t^s}\,dt - \frac{z^a}{2a^s}
+      + \sum_{i=2}^\infty\frac{B_i}{i!}\left[-\frac{d^{i-1}}{dn^{i-1}} \frac{z^n}{n^s}\right|_{n=a} \\
+    &=& -a^{1-s}\Gam(1-s,a\log z)(-a\log z)^{s-1} -\frac{z^a}{2a^s}
+      - z^a\sum_{m=1}^\infty\frac{B_{2m}}{(2m)!}\left[ \sum_{k=0}^{2m-1}(-)^k (s)_k a^{-s-k} (\log z)^{2m-1-k} \right]
+\end{eqnarray*}
+
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Fermi-Dirac and Bose-Einstein integrals}
