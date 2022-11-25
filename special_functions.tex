@@ -344,6 +344,24 @@ Remark: to transform a general monic quadratic $x^4 + bx^3 + cx^2 + dx + e$ to a
 \subsubsection{polynomial\_value}
 \[ \F{polynomial\_value}(\vec{a},n,z) = \sum_{k=0}^{n}a^{n-k}z^k \qquad \vec{a}\in\RR^{n+1}, z\in\RR \]
 
+%%%%%%%%%%%%%%%%%%%%
+\subsubsection{general notes on root-finding for basic functions}
+This technique can be useful for implementing basic functions, especially for new types.
+Starting from an initial, easily computed, approximation, you refine via Newton's method, $x'=x-f(x)/f'(x)$ to get the desired precision.
+One can also use Halley's method for theoretically improved convergence rate, but in practice, for a given precision, Newton's method may
+actually provide better performance.
+\begin{itemize}
+  \item For $\sqrt{a}$, we use $f(x)=x^2-a$, then
+    \[ x' = \frac12(x+a/x) \]
+  \item For $1/\sqrt{a}$, we use $f(x)=x^{-2}-a$, then
+    \[ x' = \frac{x}2(3-a x^2) \]
+  \item For $\sqrt[n]{a}$, we use $f(x)=x^n-a$, then
+    \[ x' = \frac1n((n-1)x+a/x^{n-1}) \]
+  \item For $1/\sqrt[n]{a}$, we use $f(x)=x^{-n}-a$, then
+    \[ x' = \frac{x}n((n+1) - a x^n) \]
+\end{itemize}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Exponentials}
 Exponential function:
@@ -909,8 +927,8 @@ We have the series expansions
     = \sum_{n=0}^\infty \O{j}_{2n}(z^2\pi/2) \]
 \[ \O{S}(z) = \sum_{n=0}^\infty(-)^n\frac{(\pi/2)^{2n+1}}{(2n+1)!(4n+3)}z^{4n+3}
     = \sum_{n=0}^\infty \O{j}_{2n+1}(z^2\pi/2) \]
-(for using the spherical bessel expansions, should extract the whole sequence of needed values for efficiency...)
-Note that DLMF and A\&S include a $z$ multiplier on the bessel expansions but numeric tests seem to indicate that that
+(for using the spherical Bessel expansions, should extract the whole sequence of needed values for efficiency...)
+Note that DLMF and A\&S include a $z$ multiplier on the Bessel expansions but numeric tests seem to indicate that that
 is wrong!
 \begin{implementation}
 Use the two series above as well as asymptotic expansion...
@@ -1054,6 +1072,22 @@ Hyperbolic or modified Bessel function (of the first kind), regular at~$0$:
 \[ \O{I}_\nu(z) = e^{-\nu\pi\ii/2} \O{J}_\nu(\ii z) \qquad z\in\CC, \nu\in\CC \]
 Hyperbolic or modified Bessel function (of the third kind), irregular at~$0$, also called Bassett's function or Macdonald's function:
 \[ \O{K}_\nu(z) = xxx \qquad z\in\CC\setminus\RR_{\leq0}, \nu\in\CC \]
+
+Notes sketching one approach for computation of $I_m(z)$:
+\[ I_n(x) = \frac{1}{\pi} \int_0^\pi e^{z\cos\theta} \cos(n\theta)\,d\theta \]
+\[ e^{x} = \frac12 c_0 + \sum_{k=1}^\infty c_k T_k(x) \qquad x\in(-1,1), c_k = I_k(1) \]
+\[ I_n(z) \sim \frac{1}{\sqrt{2\pi n}}\left(\frac{ez}{2n}\right)^n \qquad\text{as $n\to\infty$, fixed $z$} \]
+\[ I_{n-1}(z) - I_{n+1}(z) = \frac{2n}{z} I_n(z) \qquad\text{(15 steps enough)} \]
+\[ \left(\frac{z}{2}\right)^{\nu} = \sum_{k=0}^\infty(-)^k \frac{(\nu+2k)\Gam(\nu+k)}{k!} I_{\nu+2k}(z) \]
+\[ e^{z(t+1/t)/2} = \sum_{m=-\infty}^\infty t^m I_m(z) \]
+\[ \text{therefore\ } e^1 = \sum_{m=-\infty}^\infty I_m(z) \]
+\[ T_0(x) = 1, T_1(x) = x, T_{n+1}(x) = (2-\delta_{n,0})x T_{n}(x) - T_{n-1}(x) \]
+
+Misc. notes on $I_\nu(z)$:
+\[ I_\nu(z) = \left(\frac{z}{2}\right)^\nu \sum_{k=0}^\infty \frac{(z/2)^{2k}}{k! \Gam(\nu+k+1)} \]
+\[ I_\nu(0) = \begin{cases} 1 & \nu=0\\ 0 & \nu\in\ZZ, n\neq0\\ 0 & \nu>0,\nu\notin\ZZ\\ \infty & \nu<0,\nu\notin\ZZ\end{cases} \]
+\[ I_{-n}(z) = I_{n}(z) \qquad n\in\ZZ \]
+\[ I_{-\nu}(z) = I_{\nu}(z) + \frac{2}{\pi} \sin(\nu\pi) K_{\nu}(z) \qquad \nu\notin\ZZ \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Incomplete Bessel functions}
