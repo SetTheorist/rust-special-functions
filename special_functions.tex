@@ -115,7 +115,10 @@ For example, Exp, Exp\_m1, StruveH, StruveH\_ddx; double underscore for internal
 \begin{itemize}
 \item Pi%
   \[ \pi = 3.1415926535897932384626433\dots  \DEF{$\pi$}\]
-  \[ \frac1\pi = 12\sum_{k=0}^\infty(-)^k\frac{(6k)!(13591409+545140134k)}{(3k)!(k!)^3640320^{3k+3/2}} \qquad\text{Chudnovsky algorithm}\]
+  \[ \pi = \sum_{k=0}^\infty \frac1{16^k}\left(\frac4{8k+1}-\frac2{8k+4}-\frac1{8k+5}-\frac1{8k+6}\right)
+      \qquad\text{get 1--2 digits per sum, say 12 for double-precision} \]
+  The following gives around 14 digits per summand!
+  \[ \frac1\pi = 12\sum_{k=0}^\infty(-)^k\frac{(6k)!(13591409+545140134k)}{(3k)!(k!)^{3}640320^{3k+3/2}} \qquad\text{Chudnovsky algorithm}\]
 \item Euler's gamma%
   \[ \gam = \lim_{n\to\infty}\left(\sum_{k=1}^n\frac1k - \log n)\right) = -\int_0^\infty e^{-t}\ln t\,dt = 0.57721566490153286060\dots
       \DEF{$\gam$}\]
@@ -1073,21 +1076,57 @@ Hyperbolic or modified Bessel function (of the first kind), regular at~$0$:
 Hyperbolic or modified Bessel function (of the third kind), irregular at~$0$, also called Bassett's function or Macdonald's function:
 \[ \O{K}_\nu(z) = xxx \qquad z\in\CC\setminus\RR_{\leq0}, \nu\in\CC \]
 
-Notes sketching one approach for computation of $I_m(z)$:
-\[ I_n(x) = \frac{1}{\pi} \int_0^\pi e^{z\cos\theta} \cos(n\theta)\,d\theta \]
-\[ e^{x} = \frac12 c_0 + \sum_{k=1}^\infty c_k T_k(x) \qquad x\in(-1,1), c_k = I_k(1) \]
-\[ I_n(z) \sim \frac{1}{\sqrt{2\pi n}}\left(\frac{ez}{2n}\right)^n \qquad\text{as $n\to\infty$, fixed $z$} \]
-\[ I_{n-1}(z) - I_{n+1}(z) = \frac{2n}{z} I_n(z) \qquad\text{(15 steps enough)} \]
-\[ \left(\frac{z}{2}\right)^{\nu} = \sum_{k=0}^\infty(-)^k \frac{(\nu+2k)\Gam(\nu+k)}{k!} I_{\nu+2k}(z) \]
-\[ e^{z(t+1/t)/2} = \sum_{m=-\infty}^\infty t^m I_m(z) \]
-\[ \text{therefore\ } e^1 = \sum_{m=-\infty}^\infty I_m(z) \]
+Notes sketching one approach for computation of $\O{I}_m(z)$:
+\[ \O{I}_n(x) = \frac{1}{\pi} \int_0^\pi e^{z\cos\theta} \cos(n\theta)\,d\theta \]
+\[ e^{x} = \frac12 c_0 + \sum_{k=1}^\infty c_k T_k(x) \qquad x\in(-1,1), c_k = \O{I}_k(1) \]
+\[ \O{I}_n(z) \sim \frac{1}{\sqrt{2\pi n}}\left(\frac{ez}{2n}\right)^n \qquad\text{as $n\to\infty$, fixed $z$} \]
+\[ \O{I}_{n-1}(z) - \O{I}_{n+1}(z) = \frac{2n}{z} \O{I}_n(z) \qquad\text{(15 steps enough)} \]
+\[ \left(\frac{z}{2}\right)^{\nu} = \sum_{k=0}^\infty(-)^k \frac{(\nu+2k)\Gam(\nu+k)}{k!} \O{I}_{\nu+2k}(z) \]
+\[ e^{z(t+1/t)/2} = \sum_{m=-\infty}^\infty t^m \O{I}_m(z) \]
+\[ \text{therefore\ } e^1 = \sum_{m=-\infty}^\infty \O{I}_m(z) \]
 \[ T_0(x) = 1, T_1(x) = x, T_{n+1}(x) = (2-\delta_{n,0})x T_{n}(x) - T_{n-1}(x) \]
 
-Misc. notes on $I_\nu(z)$:
-\[ I_\nu(z) = \left(\frac{z}{2}\right)^\nu \sum_{k=0}^\infty \frac{(z/2)^{2k}}{k! \Gam(\nu+k+1)} \]
-\[ I_\nu(0) = \begin{cases} 1 & \nu=0\\ 0 & \nu\in\ZZ, n\neq0\\ 0 & \nu>0,\nu\notin\ZZ\\ \infty & \nu<0,\nu\notin\ZZ\end{cases} \]
-\[ I_{-n}(z) = I_{n}(z) \qquad n\in\ZZ \]
-\[ I_{-\nu}(z) = I_{\nu}(z) + \frac{2}{\pi} \sin(\nu\pi) K_{\nu}(z) \qquad \nu\notin\ZZ \]
+Misc. notes on $\O{I}_\nu(z)$:
+\[ \O{I}_\nu(z) = \left(\frac{z}{2}\right)^\nu \sum_{k=0}^\infty \frac{(z/2)^{2k}}{k! \Gam(\nu+k+1)} \]
+\[ \O{I}_\nu(0) = \begin{cases} 1 & \nu=0\\ 0 & \nu\in\ZZ, n\neq0\\ 0 & \nu>0,\nu\notin\ZZ\\ \infty & \nu<0,\nu\notin\ZZ\end{cases} \]
+\[ \O{I}_{-n}(z) = \O{I}_{n}(z) \qquad n\in\ZZ \]
+\[ \O{I}_{-\nu}(z) = \O{I}_{\nu}(z) + \frac{2}{\pi} \sin(\nu\pi) K_{\nu}(z) \qquad \nu\notin\ZZ \]
+\[ \O{I}_0(z) = \frac1\pi \int_0^\pi \cosh(z \cos\theta)\,d\theta = \frac1\pi \int_0^\pi e^{\pm z \cos\theta}\,d\theta \]
+\[ \O{I}_n(z) = \frac1\pi \int_0^\pi e^{z\cos\theta} \cos(\theta)\,d\theta \qquad n\in\ZZ \]
+\[ \O{I}_\nu(z) = \frac1\pi \int_0^\pi e^{z\cos\theta} \cos(\nu\theta)\,d\theta - \frac{\sin(\nu\pi)}{\pi} \int_0^\infty e^{-z\cosh t - \nu t}\,dt \]
+\[ \O{I}'_0(z) = \O{I}_1(z) \]
+\[ \O{I}_{\nu-1}(z) - \O{I}_{\nu+1}(z) = \frac{2\nu}{z} \O{I}_{\nu}(z) \]
+\[ \O{I}'_{nu}(z) = \O{I}_{\nu-1}(z) - \frac{\nu}{z}\O{I}_{\nu}(z) = \O{I}_{\nu+1}(z) + \frac{\nu}{z} \O{I}_{\nu}(z) \]
+\[ \O{I}_{\mu}(z) \O{I}_{\nu}(z) = (z/2)^{\mu+\nu} \sum_{k=0}^\infty \frac{(\mu+\nu+k+1)_k (z/2)^{2k}}{k! \Gam(\mu+k+1) \Gam(\nu+k+1)} \]
+(Convert power-series to continued fraction?  Use backward recursion with $\nu$-asymptotic.  There is a sum-$\O{I}$ method for normalization, but complicated.
+Provide function for product directly.)
+\[ \frac{\O{I}_{\nu}(z)}{\O{I}_{\nu-1}(z)} = \frac{1}{2\nu/z+{}}\ \frac{1}{2(\nu+1)/z+{}}\ \frac{1}{2(\nu+2)/z+{}}\ \cdots \qquad z\neq0\]
+\[ \frac{\O{I}_{nu}(z)}{\O{I}_{\nu-1}(z)} = \frac{(z/2)/\nu}{1+{}}\ \frac{(z/2)^2/(\nu(\nu+1))}{1+{}}\ \frac{(z/2)^2/((\nu+1)(\nu+2))}{1+{}}\ \cdots
+  \qquad\nu\neq0,-1,-2,\dots \]
+Asymptotics
+\[ \O{I}_\nu(z) \sim (z/2)^\nu/\Gam(\nu+1) \qquad\text{as $z\to0$, $\nu$ fixed} \]
+\[ \O{I}_\nu(z) \sim e^z/\sqrt{2\pi z} \qquad\text{as $z\to\infty$, $\nu$ fixed, $|\arg z|\leq\pi/2-\delta$} \]
+\[ \O{I}_\nu(z) \sim \frac{e^z}{\sqrt{2\pi z}} \sum_{k=0}^\infty(-)^k \frac{a_k(\nu)}{z^k} \qquad z\to\infty, |\arg z|\leq\pi/2-\delta \]
+\[ a_k(\nu) = \frac{(4\nu^2-1)(4\nu^2-3^2)\cdots(4\nu^2-(2k-1)^2)}{k! 8^k} = \frac{(1/2-k)_k(1/2+k)_k}{(-2)^k k!} \]
+
+Another implementation approach (based on continued fraction expansion):
+\begin{itemize}
+  \item Assuming $\O{I}_{\nu-1}(x)\neq0$ we have $\O{I}_\nu(x)/\O{I}_{\nu-1}(x) = \frac{1}{2\nu/x+} \frac{1}{2(\nu+1)/x+} \frac{1}{2(\nu+2)/x+}\cdots$
+  \item Let $R_\nu(x) = \O{I}_{\nu+1}(x)/\O{I}_{\nu}(x)$
+  \item Then $R_{\nu-1}(x) = \frac{1}{R_\nu(x)+2\nu/x}$
+  \item Then with $J>>n$ (use $R_j\approx 2(J+1)/x$)
+    \[ \O{I}_n(x) \approx \frac{R_{n-1}R_{n-2}\cdots R_1 R_0 e^x}{(((((\cdots(R_J+1)R_{J-1}+1)R_{J-2}+1)\cdots+1)R_2+1)R_1+1)2R_0+1} \]
+  \item Rough justification follows:
+  \item $e^x = \sum_{j=-\infty}{\infty} \O{I}_j(x) = \O{I}_0(x) + 2\sum_{j=1}^\infty \O{I}_j(x)$
+  \item For $\nu\to\infty$, $\O{I}_\nu(z) \sim 1/\sqrt{2\pi\nu} (ez/2\nu)^\nu$, hence
+    \[ R_\nu(z) \sim \sqrt{\frac{\nu}{\nu+1}}\frac{ez}{2} \frac{\nu^\nu}{(\nu+1)^{\nu+1}} = \frac{ez}{2}\frac{\nu^{\nu+1/2}}{(\nu+1)^{\nu+1+1/2}} \sim \frac{z}{2\nu} \]
+  \item Then
+    \[ R_{n-1}R_{n-2}\cdots R_1 R_0 = \frac{\O{I}_n}{\O{I}_{n-1}}\frac{\O{I}_{n-1}}{\O{I}_{n-2}}\cdots\frac{\O{I}_2}{\O{I}_1}\frac{\O{I}_1}{\O{I}_0}
+        = \frac{\O{I}_n}{\O{I}_0} \]
+  \item And also
+    \[ 1+2R_0(1+R_1(1+R_2(1+\cdots)\cdots)) = 1+2\frac{\O{I}_1}{\O{I}_0}(1+\frac{\O{I}_2}{\O{I}_1}(1+\cdots)) = 1+\frac{2}{\O{I}_0}(\O{I}_1+(\O{I}_2+\cdots))
+        = \frac{e^x}{\O{I}_0} \]
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Incomplete Bessel functions}
@@ -1909,6 +1948,9 @@ s&\text{raw series}&\text{2-terms + n=0}&\text{2-terms + n=1}&\text{2-terms + n=
 \end{array}\]
 }
 
+Euler-Maclaurin expansion for Riemann zeta function, correctino term is:
+\[ \sum_{n=a}^\infty \frac{1}{n^s} = \frac{a^{1-s}}{s-1} - \frac{a^{-s}}{2} + \sum_{j=1}^k \frac{B_{2j}}{2j}\binom{s+2j-1}{2j-2} a^{-s-2j+1} \]
+
 Alternative approach for computation of Riemann zeta function.
 First, define $\zeta_N(s) = \sum_{r=1}^{N-1} r^{-s}$, then we have
 \[ \zeta(s) = \zeta_N(s) + \frac{N^{1-s}}{s-1} + \frac{N^{-s}}{2} + \sum_{j=1}^K T_j(N,s) + R(N,K,s) \]
@@ -1976,6 +2018,9 @@ We have the following Euler-Maclaurin-type expansions
 \[ \zeta(s,a) = \sum_{n=0}^N(n+a)^{-s} + \frac{(N+a)^{1-s}}{s-1} - s\int_N^\infty \cdots \]
 \[ \zeta(s,a) = a^{-s}(\frac12 + \frac{a}{s-1}) - s(s+1)\int_0^\infty \cdots \]
 \[ \zeta(s,a) = a^{-s} + (1+a)^{-s}(\frac12 + \frac{1+a}{s-1}) + \sum_{k=1}^\infty\binom{s+2k-2}{2k-1}\frac{B_{2k}}{2k} \frac{1}{(1+a)^{s+2k-1}} - R\cdots \]
+Alternative
+\[ \sum_{n=a}^\infty\frac{1}{(n+\beta)^s} = \frac{(a+\beta)^{1-s}}{s-1} - \frac{(a+\beta)^{-s}}{2}
+    + \sum_{j=1}^k \frac{B_{2j}}{2j} \binom{s+2j-1}{2j-2} (a+\beta)^{-s-2j+1} + R \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Lerch's transcendent}
@@ -2029,6 +2074,12 @@ f^{(4)}(n) &=& \frac{z^n}{n^2}\left( (\ln z)^4 - 8\frac{(\ln z)^3}{n} + 36\frac{
 f^{(5)}(n) &=& \frac{z^n}{n^2}\left( (\ln z)^5 - 10\frac{(\ln z)^4}{n} + 60\frac{(\ln z)^3}{n^2}
     - 240\frac{(\ln z)^2}{n^3} + 600\frac{\ln z}{n^4} - \frac{720}{n^5} \right)
 \end{eqnarray*}
+
+Other notes:
+\[ \O{Li}_2(z) = \sum_{0\leq n\neq1} \zeta(2-n)\frac{\log^n z}{n!} + \log(z)(1-\log(-1\log(z))) \]
+and note that $\zeta(2-n) = -\frac{B_{n-1}}{n-1}$ for $n\geq3$ hence
+\[ \O{Li}_2(z) = \log(z)(1-\log(-1\log(z))) + \frac{\pi^2}{12} - \sum_{n\geq3, \text{odd}} \frac{B_{n-1}}{n-1}\frac{\log^n z}{n!} \]
+
 
 \begin{implementation}
 Many identities are useful:
@@ -2115,6 +2166,14 @@ We can derive the Euler-Maclaurin expansion as follows:
     &=& -a^{1-s}\Gam(1-s,a\log z)(-a\log z)^{s-1} -\frac{z^a}{2a^s}
       - z^a\sum_{m=1}^\infty\frac{B_{2m}}{(2m)!}\left[ \sum_{k=0}^{2m-1}(-)^k (s)_k a^{-s-k} (\log z)^{2m-1-k} \right]
 \end{eqnarray*}
+
+Notes:
+For integer $k\geq0$ and $|\log z|<2\pi$, we have (where $\O{H}_k=\sum_m=1^k m^{-1}$, the harmonic numbers)
+\[ \O{Li}_{k+1}(z) = \sum_{0\leq n\neq k} \zeta(k+1-n) \frac{\log^n z}{n!} + \frac{\log^k z}{k!}\left( \O{H}_k - \log(-\log z) \right)\]
+If $s$ is not a positive integer, then
+\[ \O{Li}_s(z) = \sum_{n\geq0}\zeta(s-n)\frac{\log^n z}{n!} + \Gam(1-s)(-\log z)^{s-1} \]
+And specifically, if $n=0,-1,-2,\dots$ and any $z\in\CC$ we have
+\[ \O{Li}_n(z) = (-n)!(-\log z)^{n-1} - \sum_{k=0}^\infty \frac{B_{k-n+1}}{k!(k-n+1)} \log^k z \]
 
 
 %%%%%%%%%%%%%%%%%%%%
@@ -2637,6 +2696,14 @@ Another series (from wikipedia)
 
 Relation:
 \[ \O{C}(\pi-\theta) = \O{C}(\theta) - \frac12\O{C}(2\theta) \qquad (0\leq\theta\leq\pi/2) \]
+
+\subsubsection{Generalization}
+Define
+\[ \O{Cl}_s(x) = \sum_{n=1}^\infty \frac{\sin n x}{n^s} = \frac{1}{2\ii}\left(\O{Li}_s(e^{\ii x})-\O{Li}_s(e^{-\ii x})\right)\]
+For $|t|<2\pi$ we have
+\[ \O{Cl}_2(x) = t(1-\frac12\log(t)^2) + \sum_{n\geq3, \text{odd}} (-)^{(n-3)/2} \frac{B_{n-1}}{n-1} \frac{t^n}{n!} \]
+and
+\[ \frac12 \O{Cl}_2(2\theta) = \O{Cl}_2(\theta) - \O{Cl}_2(\pi-\theta) \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Voigt (plasma dispersion) function}
