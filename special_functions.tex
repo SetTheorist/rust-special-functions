@@ -161,101 +161,29 @@ test of continued fraction typesetting:
 \[ e^{a+b} = e^{a}e^{b} = e^{a}(1+(e^{b}-1)) = e^{a} + e^{a}(e^{b}-1) \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Existing systems}
-
-[Check Matlab special function support!]
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Octave}
-
-IDEA: build out the special function support for Octave!?  Issue is lack of
-long double type to help with getting full precision.
-(Can create objects + overloading to maybe create double-double types?)
-
-Note that Octave includes a gsl package for GSL bindings (but GSL generally has poor support for complex numbers...)
-And, the statistics package includes various probability distributions.
-
+\section{Notes on data-types}
+Floating-point types
+\begin{tabular}{lrrr|r|rr|r}
+         & s &  e &       m &   bias &    mine &    maxe &  dec \\
+  \hline\\
+  f16    & 1 &  5 &  10(+1) &     15 &     -14 &     +15 &  3.3 \\
+  f32    & 1 &  8 &  23(+1) &    127 &    -126 &    +127 &  7.2 \\
+  f64    & 1 & 11 &  52(+1) &   1023 &   -1022 &   +1023 & 16.0 \\
+  f128   & 1 & 15 & 112(+1) &  16383 &  -16382 &  +16383 & 34.0 \\
+  f256   & 1 & 19 & 236(+1) & 262143 & -262142 & +262143 & 71.3 \\
+  f80    & 1 & 15 &    1+63 &  16383 &  -16382 &  +16383 & 19.3 \\
+  bfloat & 1 &  8 &   7(+1) &    127 &    -126 &    +127 &  2.4 \\
+\end{tabular}
 \begin{itemize}
-\item Built-in {\tt version 3.6.2}:
-  \begin{itemize}
-  \item {\tt [a,ierr] = airy(k,z,opt)} --- $\O{Ai}(z), \O{Ai}'(z), \O{Bi}(z), \O{Bi}'(z)$ with optional scaling; $z$ can be real or complex
-  \item {\tt [r,ierr] = besselj(alpha,x,opt)/bessely/besseli/besselk/besselh} --- Bessel functions
-      $\O{J}_\al(x)$, $\O{Y}_\al(x)$, $\O{I}_\al(x)$, $\O{K}_\al(x)$, $\O{H}_\al(x)$ with optional scaling; $\al$ must be real, $x$ can be complex
-  \item {\tt beta(a,b), betaln(a,b)} --- Beta function $B(a,b)$ or natural logarithm of Beta function $\ln(B(a,b))$; with $a, b$ real
-  \item {\tt betainc(x,a,b)} --- incomplete Beta function with $x, a, b$ real
-  \item {\tt bincoeff(n,k)} --- binomial coefficient; $n, k$ integers;
-      [accepts some non-integers but returns suspicious values]
-  \item {\tt erf(z), erfc(z), erfcx(z)} --- error function $\O{erf}(z)$, complementary error function $\O{erfc}(z) = 1-\O{erf}(z)$,
-      scaled complementary error function $e^{z^2}\O{erfc}(z)$; $z$ real
-  \item {\tt erfinv(x)} --- inverse error function; $x$ real
-  \item {\tt gamma(z), lgamma(z)/gammaln(z)} --- gamma function $\Gam(z)$ or natural logarithm of gamma function $\ln\Gam(z)$; $z$ real;
-      [looks like iffy/low precision implementation: {\tt gamma(6)=119.99999999999997}]
-  \item {\tt gammainc(x,a,opt)} --- normalized incomplete gamma function $P(a,x)$ or complementary version; $x, a$ real
-  \item {\tt legendre(n,x,opt)} --- Legendre functions of degree $n$ and order $m=0\dots n$, $P^m_n(x)$ optionally normalized
-  \item elementary functions; $x, y$ real, $z$ real or complex
-    \begin{itemize}
-    \item {\tt exp(z)}, {\tt expm1(z)}, {\tt log(z)}, {\tt reallog(z)}, {\tt log1p(z)}, {\tt log10(z)}, {\tt log2(z)}
-    \item {\tt pow2(z)}, {\tt pow2(f,e)}, {\tt nextpow2(x)}, {\tt realpow(x,y)}, {\tt sqrt(z)}, {\tt cbrt(x)}, {\tt nthroot(x,n)}
-    \item {\tt cos(z)}, {\tt sin(z)}, {\tt tan(z)}, {\tt cosh(z)}, {\tt sinh(z)}, {\tt tanh(z)},
-        {\tt sec(z)}, {\tt csc(z)}, {\tt cot(z)}, {\tt sech(z)}, {\tt csch(z)}, {\tt coth(z)}
-    \item {\tt acos(z)}, {\tt asin(z)}, {\tt atan(z)}, {\tt acosh(z)}, {\tt asinh(z)}, {\tt atanh(z)},
-        {\tt asec(z)}, {\tt acsc(z)}, {\tt acot(z)}, {\tt asech(z)}, {\tt acsch(z)}, {\tt acoth(z)}
-    \item {\tt atan2(y,x)}, {\tt abs(z)}, {\tt arg(z)}, {\tt conj(z)}, {\tt real(z)}, {\tt imag(z)}
-    \item {\tt sind(z)}, {\tt cosd(z)}, {\tt tand(z)}, {\tt secd(z)}, {\tt cscd(z)}, {\tt cotd(z)},
-        {\tt asind(z)}, {\tt acosd(z)}, {\tt atand(z)}, {\tt asecd(z)}, {\tt acscd(z)}, {\tt acotd(z)}
-    \item {\tt ceil(z)}, {\tt fix(z)}, {\tt floor(z)}, {\tt round(z)}, {\tt roundb(z)},
-        {\tt max(z1...zn)}, {\tt min(z1...zn)}, {\tt hypot(z1...zn)}
-    \end{itemize}
-  \end{itemize}
-\item Package {\tt specfun-1.1.0}
-  \begin{itemize}
-  \item {\tt cosint(z) = Ci(z)} --- cosine integral function $\O{Ci}(z)=\int_x^\infty\frac{\cos(t)}{t}\,dt$; $z$ real or complex;
-      [uses expression in terms of exponential integrals $\O{E}_1$ or $\O{Ei}$]
-      [iffy for some cases: {\tt Ci(0) = NaN - NaN*i}]
-  \item {\tt sinint(z) = Si(z)} --- sine integral function $\O{Si}(z)=\int_0^x\frac{\sin(t)}{t}\,dt$; $z$ real or complex;
-      [uses summation of Bessel $\O{J}$ functions]
-      [iffy for some cases: {\tt Si(Inf) = Si(1e10) = NaN + NaN*i}]
-  \item {\tt heaviside(x,threshhold)} --- Heaviside function; $z$ real or complex
-      (but poor behaviour for complex (all non-real give 1) --- this raises the question of what {\it should} be the extension of
-      the heaviside to $\CC$?)
-  \item {\tt dirac(z)} --- Dirac delta function: {\tt Inf} iff $x=0$ else {\tt 0}; $z$ real or complex
-  \item {\tt zeta(z)} --- Riemann zeta function; $z$ real or complex;
-      [uses quadrature $\int_0^\infty\frac{x^{z-1}}{\Gam(z)(e^{x}-1)}\,dx$ for real $z>1$;
-      summation $\frac{1}{1-2^{1-z}}\sum_{k=1}^\infty \frac{(-)^{k-1}}{k^{z}}$ for values with $\Re z\geq0$;
-      and otherwise recursively computes $2^{z}\pi^{z-1}\sin(\pi z/2)\Gam(1-z)\zeta(1-z)$]
-  \item {\tt lambertw(b,z)} --- computes Lambert W function $\O{W}(z)$ for branch $b$; $z$ real or complex, $b$ integer;
-      [uses series around $-1/e$ and asymptotic expansion at $0$ and $\infty$ to get initial guess, then
-      Halley iteration to refine]
-  \item {\tt psi(x)} --- computes $\tfrac{d}{dx}\ln\Gam(x)$; real $x$;
-      [does simple finite centered difference approximation]
-  \item {\tt expint(z)=expint\_E1(z), } --- computes exponential integral $\int_x^\infty e^{t}/t\,dt$; $z$ real or complex;
-      [uses {\tt expint\_Ei(-z)+C}]
-  \item {\tt expint\_Ei(z)} --- computes exponential integral $-\int_{-x}^\infty e^{t}/t\,dt$; $z$ real or complex;
-      [uses quadrature for real $z>2$ or $z<0$; if $|z|\geq10$, $\Im z\leq0$ uses asympotic expansion (with conjugation for $\Im z>0$);
-      otherwise uses series expansion]
-  \item {\tt erfcinv(z)} --- inverse complementary error function; $z$ real or complex;
-      [simply returns {\tt erfinv(1-x)} --- which will have precision issues for $x\sim1$]
-  \item {\tt [y,p] = laguerre(z,n)} --- computes the Laguerre polynomial of order $n$ at $z$; $z$ real or complex, $n>0$ integer;
-      [computes polynomial coefficients via recursion and then evaluates resulting polynomial at $z$;
-      sounds iffy to me...]
-  \item {\tt [k,e] = ellipke(m)} --- returns complete elliptic integrals of first $\O{K}(m)$ and second $\O{E}(m)$ kind; real $m\leq1$;
-      [uses AGM algorithm and a transform for $m<0$]
-  \end{itemize}
-\item Package {\tt miscellaneous-1.1.0}
-  \begin{itemize}
-  \item {\tt chebyshevpoly(kind,order,z)} --- computes first $T_n(x)$ or second $U_n(x)$ Chebyshev polymials
-      (coefficients or value at $z$); $z$ real or complex;
-      [uses recursion for coefficients; value is evaluated from polymomial; seems iffy to me]
-  \item {\tt hermitepoly(order,z)} --- computes Hermite polynomials $H_n(z)$ (coefficients or value at $z$); $z$ real or complex;
-      [uses low-precision (8-digits) table for $0\leq\text{order}\leq50$; otherwise uses recursion to compute polynomial
-      coefficients; value is evaluated from polynomial coefficients; seems iffy]
-  \item {\tt laguerrepoly(order,z)} --- computes Laguerre polynomials $L_n(z)$ (coefficients or value at $z$); $z$ real or complex;
-      [uses recursion to compute polynomial coefficients; value is evaluated from polynomial coefficients; seems iffy]
-  \item {\tt legendrepoly(order,z)} --- computes Legendre polynomials $L_n(z)$ (coefficients or value at $z$); $z$ real or complex;
-      [uses recursion to compute polynomial coefficients; value is evaluated from polynomial coefficients; seems iffy]
-  \end{itemize}
+  \item floating-point: standard, small, large
+  \item fixed-point
+  \item bcd/decimal
+  \item arbitrary-precision fixed/floating, decimal? (c.f. Maple)
+  \item wide/``compensated'' variants
+  \item complex variants
+  \item error-tracking variants
+  \item ``dual''-number variants (computing (partial) derivatives automatically)
 \end{itemize}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Elementary functions}
@@ -793,6 +721,12 @@ n & \frac{(-)^n}{\csc(x)^{n+1}}\frac{d^n}{dx^n}\cot(x) \\\hline
  12 & 325024572 \cos (x)+132636948 \cos (3 x)+20375370 \cos (5 x)+956542 \cos (7 x)+8166 \cos (9 x)+2 \cos (11 x) \\
 \end{array}\]
 }
+\begin{eqnarray*}
+  \frac{d^n}{dz^n}\cot(az) &=& \frac{a^n}{\pi^{n+1}}\left( (-)^n\psi^{(n)}(-\frac{az}{\pi}) - \psi^{(n)}(1+\frac{az}{\pi}) \right) \\
+  &=& (-)^{(n-1)/2}(2a)^n \csc^2(az)\sum_{k=0}^n\frac{1}{2^k}\sum_{m=1}^k (-)^m \binom{k}{m} m^n
+      \times \sum_{p=0}^{(k+\gam-2)/2}(-)^p \binom{k-1}{2p-\gam+1} \cot^{2p-\gam+1}(az) \\
+  && \text{where $\gam=(1-(-1)^n)/2$}
+\end{eqnarray*}
 
 Remarks on polygamma function
 \begin{itemize}
@@ -1128,6 +1062,13 @@ Another implementation approach (based on continued fraction expansion):
         = \frac{e^x}{\O{I}_0} \]
 \end{itemize}
 
+\[ \O{I}_\nu(z) = \frac{e^z}{\Gam(\nu+1/2)\sqrt{2\pi z}} \sum_{k=0}^\infty \frac{(1/2-\nu)_k}{k! (2z)^k}\int_0^{2z}e^{-t}t^{\nu+k-1/2}\,dt \]
+with (absolute?) error $\sim N^{-\nu-1/2}$ when truncated after $N$ terms, (though numerical testing looks worse as $\nu$ increases, rather than improving?)
+Note that in terms of incomplete gamma functions, we have
+\[ \int_0^{2z}e^{-t}t^{\nu+k-1/2}\,dt = \gam(\nu+k+1/2, 2z) = \Gam(\nu+k+1/2) - \Gam(\nu+k+1/2,2z) \]
+In practice, it seems that around 25 terms give machine precision for $z>20$ (and $\nu<20$).
+For $\nu=33$, 25 terms only suffices for $z>150$ and looks like numerical error is building up.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Incomplete Bessel functions}
 
@@ -1279,6 +1220,17 @@ Similarly,
 \[ \O{Ai}'(z) = b(z) \int_0^\infty (2+t/\zeta)^{1/6} t^{1/6} e^{-t} \,dt \]
 where
 \[ b(z) = \frac{-z e^{-\zeta}}{\sqrt{3\pi} 2^{2/3} \Gam(7/6)\sqrt\zeta} \]
+
+Note:
+for $|\arg z|<\pi$, we have
+\[ \O{Ai}(z) = a(z)\int_0^\infty (2+t/3)^{-1/6}t^{-1/6} e^{-t}\,dt \]
+where
+\[ a(z) = \frac{e^{-\zeta}\zeta^{-1/6}}{\sqrt{\pi} 48^{1/6} \Gam(5/6)} \qquad \zeta=\frac23 z^{3/2} \]
+then use (generalized) Gauss-Laguerre quadrature
+\[ \O{Ai}(z) \approx a(z)\sum_{i=1}^{N} w_i f(x_i) \qquad f(t) = (2+t/3)^{-1/6} \]
+Testing, $N=13$ seems good for $x>3.5$, $N=25$ for $x>2$ (and out to 30 or 100 or so), maybe 22 points is reasonable?
+Gautschi recommends 36 points for $x>1$.
+Also, implement ``scaled'' version $\widetilde{\O{Ai}}(z) = e^\zeta \O{Ai}(z)$ where $\zeta=\frac23 z^{3/2}$.
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Scorer functions}
@@ -1499,6 +1451,14 @@ Implementation notes for $\O{E}_n(x)$:
   disappointing results - works only when $x>>n$
 \end{itemize}
 \end{implementation}
+
+Misc. notes
+\[ \O{E}_1(x) = \int_1^\infty\frac{e^{-zt}}{t}\,dt = \int_z^\infty\frac{e^{-t}}{t}\,dt
+  = -\gam-\log z-\sum_{n=1}^\infty\frac{(-)^n}{n}\frac{z^n}{n!} \qquad |\arg z|<\pi \]
+\[ \O{E}_1(z) = e^{-z} \frac{1}{z+}\ \frac{1}{1+}\ \frac{1}{z+}\ \frac{2}{1+}\ \frac{2}{z+}\ \frac{3}{1+}\ \frac{3}{z+} \dots \qquad |\arg z|<\pi \]
+\[ \O{E}_n(z) = e^{-z} \frac{1}{z+}\ \frac{n}{1+}\ \frac{1}{z+}\ \frac{n+1}{1+}\ \frac{2}{z+}\ \frac{n+2}{1+}\ \frac{3}{z+} \dots \qquad |\arg z|<\pi \]
+\[ \O{E}_1(x) \sim \frac{e^{-z}}{z}\left(1-\frac{1}{z} + \frac{2!}{z^2} - \frac{3!}{z^3} + \cdots \right) \qquad |\arg z|<3\pi/2 \]
+\[ \O{E}_n(x) \sim \frac{e^{-z}}{z}\left(1 - \frac{n}{z} + \frac{n(n+1)}{z^2} - \frac{n(n+1)(n+2)}{z^3} + \cdots \right) \qquad |\arg z|<3\pi/2 \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Wave equation solutions}
@@ -2365,6 +2325,8 @@ $\O{T}_n(z)$
 \item $\O{T}_n(x) = \cos(n \acos x)$.
 \end{itemize}
 Shifted: $\O{T}^*_n(x) = T_n(2x-1)$ on $(0,1)$ with weight $(x(1-x))^{-1/2}$
+
+Log-time computation approach? Based on $T_{2n} = \frac{(T_{n+1}-T_{n-1})^2}{2(x^2-1)+1}$?
 
 %%%%%%%%%%%%%%%%%%%%
 \subsubsection{Second kind}
@@ -3233,6 +3195,104 @@ tolerance, accuracy, error estimate (max, expected), iterations, time, cost (mul
 \end{enumerate}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Existing systems}
+
+[Check Matlab special function support!]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Octave}
+
+IDEA: build out the special function support for Octave!?  Issue is lack of
+long double type to help with getting full precision.
+(Can create objects + overloading to maybe create double-double types?)
+
+Note that Octave includes a gsl package for GSL bindings (but GSL generally has poor support for complex numbers...)
+And, the statistics package includes various probability distributions.
+
+\begin{itemize}
+\item Built-in {\tt version 3.6.2}:
+  \begin{itemize}
+  \item {\tt [a,ierr] = airy(k,z,opt)} --- $\O{Ai}(z), \O{Ai}'(z), \O{Bi}(z), \O{Bi}'(z)$ with optional scaling; $z$ can be real or complex
+  \item {\tt [r,ierr] = besselj(alpha,x,opt)/bessely/besseli/besselk/besselh} --- Bessel functions
+      $\O{J}_\al(x)$, $\O{Y}_\al(x)$, $\O{I}_\al(x)$, $\O{K}_\al(x)$, $\O{H}_\al(x)$ with optional scaling; $\al$ must be real, $x$ can be complex
+  \item {\tt beta(a,b), betaln(a,b)} --- Beta function $B(a,b)$ or natural logarithm of Beta function $\ln(B(a,b))$; with $a, b$ real
+  \item {\tt betainc(x,a,b)} --- incomplete Beta function with $x, a, b$ real
+  \item {\tt bincoeff(n,k)} --- binomial coefficient; $n, k$ integers;
+      [accepts some non-integers but returns suspicious values]
+  \item {\tt erf(z), erfc(z), erfcx(z)} --- error function $\O{erf}(z)$, complementary error function $\O{erfc}(z) = 1-\O{erf}(z)$,
+      scaled complementary error function $e^{z^2}\O{erfc}(z)$; $z$ real
+  \item {\tt erfinv(x)} --- inverse error function; $x$ real
+  \item {\tt gamma(z), lgamma(z)/gammaln(z)} --- gamma function $\Gam(z)$ or natural logarithm of gamma function $\ln\Gam(z)$; $z$ real;
+      [looks like iffy/low precision implementation: {\tt gamma(6)=119.99999999999997}]
+  \item {\tt gammainc(x,a,opt)} --- normalized incomplete gamma function $P(a,x)$ or complementary version; $x, a$ real
+  \item {\tt legendre(n,x,opt)} --- Legendre functions of degree $n$ and order $m=0\dots n$, $P^m_n(x)$ optionally normalized
+  \item elementary functions; $x, y$ real, $z$ real or complex
+    \begin{itemize}
+    \item {\tt exp(z)}, {\tt expm1(z)}, {\tt log(z)}, {\tt reallog(z)}, {\tt log1p(z)}, {\tt log10(z)}, {\tt log2(z)}
+    \item {\tt pow2(z)}, {\tt pow2(f,e)}, {\tt nextpow2(x)}, {\tt realpow(x,y)}, {\tt sqrt(z)}, {\tt cbrt(x)}, {\tt nthroot(x,n)}
+    \item {\tt cos(z)}, {\tt sin(z)}, {\tt tan(z)}, {\tt cosh(z)}, {\tt sinh(z)}, {\tt tanh(z)},
+        {\tt sec(z)}, {\tt csc(z)}, {\tt cot(z)}, {\tt sech(z)}, {\tt csch(z)}, {\tt coth(z)}
+    \item {\tt acos(z)}, {\tt asin(z)}, {\tt atan(z)}, {\tt acosh(z)}, {\tt asinh(z)}, {\tt atanh(z)},
+        {\tt asec(z)}, {\tt acsc(z)}, {\tt acot(z)}, {\tt asech(z)}, {\tt acsch(z)}, {\tt acoth(z)}
+    \item {\tt atan2(y,x)}, {\tt abs(z)}, {\tt arg(z)}, {\tt conj(z)}, {\tt real(z)}, {\tt imag(z)}
+    \item {\tt sind(z)}, {\tt cosd(z)}, {\tt tand(z)}, {\tt secd(z)}, {\tt cscd(z)}, {\tt cotd(z)},
+        {\tt asind(z)}, {\tt acosd(z)}, {\tt atand(z)}, {\tt asecd(z)}, {\tt acscd(z)}, {\tt acotd(z)}
+    \item {\tt ceil(z)}, {\tt fix(z)}, {\tt floor(z)}, {\tt round(z)}, {\tt roundb(z)},
+        {\tt max(z1...zn)}, {\tt min(z1...zn)}, {\tt hypot(z1...zn)}
+    \end{itemize}
+  \end{itemize}
+\item Package {\tt specfun-1.1.0}
+  \begin{itemize}
+  \item {\tt cosint(z) = Ci(z)} --- cosine integral function $\O{Ci}(z)=\int_x^\infty\frac{\cos(t)}{t}\,dt$; $z$ real or complex;
+      [uses expression in terms of exponential integrals $\O{E}_1$ or $\O{Ei}$]
+      [iffy for some cases: {\tt Ci(0) = NaN - NaN*i}]
+  \item {\tt sinint(z) = Si(z)} --- sine integral function $\O{Si}(z)=\int_0^x\frac{\sin(t)}{t}\,dt$; $z$ real or complex;
+      [uses summation of Bessel $\O{J}$ functions]
+      [iffy for some cases: {\tt Si(Inf) = Si(1e10) = NaN + NaN*i}]
+  \item {\tt heaviside(x,threshhold)} --- Heaviside function; $z$ real or complex
+      (but poor behaviour for complex (all non-real give 1) --- this raises the question of what {\it should} be the extension of
+      the heaviside to $\CC$?)
+  \item {\tt dirac(z)} --- Dirac delta function: {\tt Inf} iff $x=0$ else {\tt 0}; $z$ real or complex
+  \item {\tt zeta(z)} --- Riemann zeta function; $z$ real or complex;
+      [uses quadrature $\int_0^\infty\frac{x^{z-1}}{\Gam(z)(e^{x}-1)}\,dx$ for real $z>1$;
+      summation $\frac{1}{1-2^{1-z}}\sum_{k=1}^\infty \frac{(-)^{k-1}}{k^{z}}$ for values with $\Re z\geq0$;
+      and otherwise recursively computes $2^{z}\pi^{z-1}\sin(\pi z/2)\Gam(1-z)\zeta(1-z)$]
+  \item {\tt lambertw(b,z)} --- computes Lambert W function $\O{W}(z)$ for branch $b$; $z$ real or complex, $b$ integer;
+      [uses series around $-1/e$ and asymptotic expansion at $0$ and $\infty$ to get initial guess, then
+      Halley iteration to refine]
+  \item {\tt psi(x)} --- computes $\tfrac{d}{dx}\ln\Gam(x)$; real $x$;
+      [does simple finite centered difference approximation]
+  \item {\tt expint(z)=expint\_E1(z), } --- computes exponential integral $\int_x^\infty e^{t}/t\,dt$; $z$ real or complex;
+      [uses {\tt expint\_Ei(-z)+C}]
+  \item {\tt expint\_Ei(z)} --- computes exponential integral $-\int_{-x}^\infty e^{t}/t\,dt$; $z$ real or complex;
+      [uses quadrature for real $z>2$ or $z<0$; if $|z|\geq10$, $\Im z\leq0$ uses asympotic expansion (with conjugation for $\Im z>0$);
+      otherwise uses series expansion]
+  \item {\tt erfcinv(z)} --- inverse complementary error function; $z$ real or complex;
+      [simply returns {\tt erfinv(1-x)} --- which will have precision issues for $x\sim1$]
+  \item {\tt [y,p] = laguerre(z,n)} --- computes the Laguerre polynomial of order $n$ at $z$; $z$ real or complex, $n>0$ integer;
+      [computes polynomial coefficients via recursion and then evaluates resulting polynomial at $z$;
+      sounds iffy to me...]
+  \item {\tt [k,e] = ellipke(m)} --- returns complete elliptic integrals of first $\O{K}(m)$ and second $\O{E}(m)$ kind; real $m\leq1$;
+      [uses AGM algorithm and a transform for $m<0$]
+  \end{itemize}
+\item Package {\tt miscellaneous-1.1.0}
+  \begin{itemize}
+  \item {\tt chebyshevpoly(kind,order,z)} --- computes first $T_n(x)$ or second $U_n(x)$ Chebyshev polymials
+      (coefficients or value at $z$); $z$ real or complex;
+      [uses recursion for coefficients; value is evaluated from polymomial; seems iffy to me]
+  \item {\tt hermitepoly(order,z)} --- computes Hermite polynomials $H_n(z)$ (coefficients or value at $z$); $z$ real or complex;
+      [uses low-precision (8-digits) table for $0\leq\text{order}\leq50$; otherwise uses recursion to compute polynomial
+      coefficients; value is evaluated from polynomial coefficients; seems iffy]
+  \item {\tt laguerrepoly(order,z)} --- computes Laguerre polynomials $L_n(z)$ (coefficients or value at $z$); $z$ real or complex;
+      [uses recursion to compute polynomial coefficients; value is evaluated from polynomial coefficients; seems iffy]
+  \item {\tt legendrepoly(order,z)} --- computes Legendre polynomials $L_n(z)$ (coefficients or value at $z$); $z$ real or complex;
+      [uses recursion to compute polynomial coefficients; value is evaluated from polynomial coefficients; seems iffy]
+  \end{itemize}
+\end{itemize}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{General mathematical library}
 \begin{enumerate}
 \item Data-types
@@ -3419,6 +3479,10 @@ mathematics}, Addison-Wesley, Reading, MA, 1989.
 \bibitem[ZetaE]{edwards-zeta}
   Edwards ...
   \emph{Riemann Zeta Function}.
+\bibitem[Brychkov]{brychkov}
+  Y. Brychkov,
+  \emph{Handbook of Special Functions: Derivatives, Integrals, Series and other Formulas},
+  CRC Press.
 \end{thebibliography}
 
 
