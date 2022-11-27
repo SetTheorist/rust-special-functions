@@ -622,6 +622,22 @@ For $x<0$ we use {\bf(A)} to transform to a positive value, but naive implementa
 Note that the above relations apply for complex $z$ also, so can be the basis for complex $\Gam$ implementation.
 \end{implementation}
 
+Lanczos approximation method:
+\[ \Gam(z+1) = \sqrt{2\pi} (z+r+1/2)^{z+1/2} S_r(z) \qquad \Re(z+r)>0, z\neq-1,-2,\dots \]
+where
+\[ S_r(z) = a_0(r)\frac{1}{2} + a_1(r)\frac{z}{z+1} + a_2(r)\frac{z(z-1)}{(z+1)(z+2)} + \cdots \]
+heuristically truncate at about $k\approx r$ term.
+
+Spouge approximation method:
+\[ \Gam(z+1) = (z+a)^{z+1/2} e^{-(z+a)} \sqrt{2\pi}\left\{ c_0 + \sum_{k=1}^{N} \frac{c_k}{z+k} + \epsilon(z) \right\} \]
+where $N=\lceil a \rceil - 1$, $c_0=1$, and $c_k$ is the residue of $\Gam(z+1)(z+a)^{-(z+1/2)} e^{z+a}(2\pi)^{-1/2}$ at $z=-k$:
+\[ c_k = (-)^{k+1}\frac{e^{a-k} (a-k)^{k-1/2}}{\sqrt{2\pi}(k-1)!} = -\frac{e^a}{\sqrt{2\pi(a-k)}(k-1)!}\left(\frac{k-a}{e}\right)^k \]
+There are uniform error bounds for this approximation method which are easily computed, though there is a lot of cancellation error,
+so that the numerical error can be significantly higher than the theoretical bound.
+For $a=11$, the accuracy is $\sim12$ digits.  For $a=15$, theoretically one should get $>16$ digits of precision, but computing with
+standard double-precision, the accuracy is worse than at $a=11$.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Factorial, Pochammer symbol}
 \[ n! = \Gam(n+1) \]
@@ -817,6 +833,20 @@ $f_n(x,y) = 2x - 2x\cosh(ny)\cos(2xy) + n\sinh(ny)\sin(2xy)$ and
 $g_n(x,y) = 2x\cosh(ny)\sin(2xy) + n\sinh(ny)\cos(2xy)$.
 This seems to work pretty well for small(ish) $z$, but gives NaN for, say, $z=17(1+\ii)$.  (Note that $x=0$ is bad, though
 this case reduces to...)
+
+Misc. notes:
+\[ \erf(z) = \frac{2}{\sqrt{\pi}} e^{-z^2} \sum_{n=0}^\infty \frac{2^n z^{2n+1}}{1\cdot3\cdot5\cdots(2n+1)} \]
+\[ \erfc(z) = 1 - \erf(z)\]
+\[ \erf(-z) = -\erf(z) \]
+\[ \erfc(-z) = 2 - \erfc(z) \]
+\[ \erf(z) = \frac{2z}{\sqrt{\pi}} \sum_{n=0}^\infty (-)^n \left(\O{i}_{2n}^{(1)}(z^2) - \O{i}_{2n+1}^{(1)}(z^2)\right) \]
+\[ \erf(az) = \frac{2z}{\sqrt{\pi}} e^{(1/2-a^2)z^2} \sum_{n=0}^\infty T_{2n+1}(a) \O{i}_{n}^{(1)}(z^2/2) \qquad a\in[-1,1] \]
+\[ \frac{d^{n+1}}{dz^n}\erf(z) = (-)^n\frac{2}{\sqrt\pi} H_n(z) e^{-z^2} \qquad n=0,1,2,\dots \]
+\[ \erf^{(n+2)}(z) = -2z\erf^{(n+1)}(z) - 2n\erf^{(n)}(z) \qquad n\geq0 \]
+\[ \erfc(z) = \frac{2}{\pi} e^{-z^2}\int_0^\infty \frac{e^{z^2 t^2}}{t^2+1}\,dt \qquad |\arg z|\leq\pi/4 \]
+\[ \erfc(\sqrt{a} z) = \sqrt{\frac{a}{\pi}} e^{-a z^2} \int_0^\infty \frac{e^{-at}}{\sqrt{t^2+a^2}}\,dt \qquad \Re a>0, \Re z>0 \]
+\[ \sqrt\pi e^{z^2} \erfc(z) = \frac{z}{z^2+}\ \frac{1/2}{1+}\ \frac{1}{z^2+}\ \frac{3/2}{1+}\ \frac{2}{z^2+}\ \dots \qquad \Re z>0, 1<|z|<2 \]
+\[ \sqrt\pi e^{z^2} \erfc(z) = \frac{2z}{2z^2+1-}\ \frac{1\cdot2}{2z^2+5-}\ \frac{3\cdot4}{2z^2+9-}\ \dots \qquad \Re z>0, |z|>2 \]
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
