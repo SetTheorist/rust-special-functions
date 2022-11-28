@@ -847,6 +847,11 @@ Misc. notes:
 \[ \erfc(\sqrt{a} z) = \sqrt{\frac{a}{\pi}} e^{-a z^2} \int_0^\infty \frac{e^{-at}}{\sqrt{t^2+a^2}}\,dt \qquad \Re a>0, \Re z>0 \]
 \[ \sqrt\pi e^{z^2} \erfc(z) = \frac{z}{z^2+}\ \frac{1/2}{1+}\ \frac{1}{z^2+}\ \frac{3/2}{1+}\ \frac{2}{z^2+}\ \dots \qquad \Re z>0, 1<|z|<2 \]
 \[ \sqrt\pi e^{z^2} \erfc(z) = \frac{2z}{2z^2+1-}\ \frac{1\cdot2}{2z^2+5-}\ \frac{3\cdot4}{2z^2+9-}\ \dots \qquad \Re z>0, |z|>2 \]
+\[ \erfc(z) \sim \frac{e^{-z^2}}{\sqrt{\pi} z} \sum_{m=0}^\infty \frac{1\cdot3\cdot5\cdots(2m-1)}{(2z^2)^m} \qquad z\to\infty, |\arg z|\leq3\pi/4-\delta \]
+When $|\arg z|\leq \pi/4$, then the error is bounded by the first neglected term, while when $|\arg z|<\pi/2$, then the
+error is bounded by $\csc(2|\arg z|)$ times the first neglected term.
+And,
+\[ \erfc(-z) \sim 2 - \frac{e^{-z^2}}{\sqrt{\pi} z} \sum_{m=0}^\infty \frac{1\cdot3\cdot5\cdots(2m-1)}{(2z^2)^m} \]
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -858,6 +863,11 @@ Generalized Dawson's integral:
 
 Fadeeva's integral:
 \[ \O{w}(z) = e^{-z^2}\erfc(-\ii z) = e^{-z^2}(1 + \frac{2\ii}{\sqrt\pi}\int_0^z e^{t^2}\,dt \]
+\[ \O{w}{-z} = 2e^{-z^2} - w(z) \]
+
+Goodwin-Staton integral: 
+\[ G(z) = \int_0^\infty \frac{e^{-t^2}}{t+z}\,dt \qquad |\arg z|<\pi \]
+\[ G(x) = \sqrt\pi \O{F}(x) - \frac{e^{-x^2}}{2}\O{Ei}(x^2) \qquad x>0 \]
 
 Series:
 \begin{eqnarray*}
@@ -865,6 +875,7 @@ Series:
          &=& x\sum_{k=0}^\infty (-)^k \frac{x^{2k}}{(3/2)_k} \\
          &=& \sum_{n=0}^\infty (-)^n \frac{2^n x^{2n+1}}{(2n+1)!!}
 \end{eqnarray*}
+\[ \O{w}(z) = \sum_{n=0}^\infty \frac{(\ii z)^n}{\Gam(1+n/2)} \]
 
 Series of spherical Bessel functions
 \begin{eqnarray*}
@@ -881,6 +892,10 @@ which is good for $|z|$ smaller.
 \[ F(z) = \frac{z}{1+2z^2-} \frac{4z^2}{3+2z^2-} \frac{8z^2}{5+2z^2-} \frac{12z^2}{7+2z^2-} \cdots \]
 which is good for $|z|$ larger.
 
+Misc. notes
+\[ \O{w}'(z) = -2z \O{w}(z) + \frac{2\ii}{\sqrt\pi} \]
+\[ \O{w}(z) = \frac{1}{\pi\ii} \int_{-\infty}^\infty \frac{e^{-t^2}}{t-z}\,dt = \frac{2z}{\pi\ii} \int_0^\infty \frac{e^{-t^2}}{t^2-z^2}\,dt \qquad \Im z>0 \]
+\[ \O{F}(z) = \frac{\sqrt\pi}{2}\ii\left(e^{-z^2} - \O{w}(z)\right) = -\ii\frac{\sqrt\pi}{2} e^{-z^2}\erf(\ii z) \]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Fresnel integrals}
@@ -1436,6 +1451,8 @@ and the associated Legendre functions of the first/second kind {\em for the inte
 \[ \O{P}^m_\nu(x) = (-)^m(1-x^2)^{m/2} \frac{d^m}{dx^m} \O{P}_\nu(x) \]
 \[ \O{Q}^m_\nu(x) = (-)^m(1-x^2)^{m/2} \frac{d^m}{dx^m} \O{Q}_\nu(x) \]
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exponential integrals}
 
@@ -1624,6 +1641,51 @@ Let $s(t)=\sqrt{t+x}\sqrt{t+y}\sqrt{t+z}$, $x,y,z\in\CC\setminus(-\infty,0]$, an
 and
 \[ \O{R}_{-a}(\vec{b}; \vec{z}) = \O{R}_{-a}(b_1,\dots,b_n; z_1,\dots,z_n) = \frac{1}{B(a,a')}\int_0^\infty t^{a'-1} \prod_{j=1}^n(t+z_j)^{-b_j}\,dt \]
 where $a' = -a + \sum_{j=1}^n b_j$.
+
+Computation of $\O{R}_F$:
+\begin{itemize}
+  \item Let $\lam = \sqrt{xy}+\sqrt{yz}+\sqrt{zx}$
+  \item Then
+    \[ \O{R}_F(x,y,z) = 2\O{R}_F(x+\lam,y+\lam,z+\lam) = \O{R}_F(\frac{x+\lam}{4},\frac{y+\lam}{4},\frac{z+\lam}{4}) \]
+  \item Iterate this until $x\sim y\sim z$ (test $\max(1-x/\mu,1-y/\mu,1-z/mu)\sim\eps$ where $\mu=(x+y+z)/3$)
+  \item Then use $\O{R}_F(x,x,x)=x^{-1/2}$
+  \item Or, more precisely, $\O{R}_F \sim \mu^{-1/2}\left(1+S_2/5+S_3/7+S_2 S_3 3/11\right)$
+  \item Where $S_2 = \left( (1-x/\mu)^2+(1-y/\mu)^2+(1-z/\mu)^2\right)/4$
+  \item and $S_3 = \left((1-x/\mu)^3+(1-y/\mu)^3+(1-z/\mu)^3\right)/6$
+\end{itemize}
+
+Computation of $\O{R}_D$:
+\begin{itemize}
+  \item Use
+    \[ \O{R}_D(x,yz,) = 2 \O{R}_D(x+\lam,y+\lam,z+\lam) + \frac{3}{\sqrt{z}(z+\lam)}
+      = \O{R}_D(\frac{x+\lam}{2^{2/3}},\frac{y+\lam}{2^{2/3}},\frac{z+\lam}{2^{2/3}}) + \frac{3}{\sqrt{z}(z+\lam)}\]
+  \item where $\O{R}_D(x,x,x) = x^{-3/2}$
+\end{itemize}
+
+Computation of $\O{R}_G$:
+\begin{itemize}
+  \item Use
+    \[ \O{R}_G(x,yz,) = \cdots \]
+  \item where $\O{R}_G(x,x,x) = x^{1/2}$
+\end{itemize}
+
+Computation of $\O{R}_J$:
+\begin{itemize}
+  \item Use
+    \[ \O{R}_J(x,y,z,p) = 2 \O{R}_J(x+\lam,y+\lam,z+\lam,p+\lam) + 3\O{R}_C(\al^2,\beta^2) = \cdots\]
+  \item Where $\al=p(\sqrt{x}+\sqrt{y}+\sqrt{z}) + \sqrt{xyz}$, $\beta=\sqrt{p}(p+\lam)$
+  \item and using $\O{R}_J(x,x,x,x) = x^{-3/2}$
+  \item But using scaling by $\mu=(x+y+z+p)/4$ at each step
+\end{itemize}
+
+Scaling laws:
+\begin{itemize}
+  \item $\O{R}_F(\lam x,\lam y, \lam z) = \lam^{-1/2} \O{R}_F(x,y,z)$
+  \item $\O{R}_G(\lam x,\lam y, \lam z) = \lam^{1/2} \O{R}_G(x,y,z)$
+  \item $\O{R}_J(\lam x,\lam y, \lam z, \lam p) = \lam^{-3/2} \O{R}_J(x,y,z,p)$
+  \item $\O{R}_D(\lam x,\lam y, \lam z) = \lam^{-3/2} \O{R}_D(x,y,z)$
+  \item $\O{R}_C(\lam x,\lam y) = \lam^{-1/2} \O{R}_C(x,y)$
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Bulirsch's elliptic integrals}
@@ -2334,6 +2396,8 @@ An alternative symmetric matrix (whose eigenvalues give roots) is given by
     &     &     &       0 & \al_{n-1} & \beta_{n-1}
 \end{pmatrix}\]
 (for details see NR4SF book...)
+
+Weights are $\mu_0(\vec{v_i}(1))^2/\|\vec{v_i}\|$ for the eigenvectors corresponding to the eigenvalues (=roots).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Chebyshev polynomials}
