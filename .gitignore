@@ -1,3 +1,7 @@
 target/
 *.swp
 .~lock.*
+*.aux
+*.dvi
+*.log
+*.toc
