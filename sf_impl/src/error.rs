@@ -41,7 +41,7 @@ impl std::fmt::Display for err64 {
     write!(f, "ρ")?;
     std::fmt::Display::fmt(&self.0, f)?;
     write!(f, "+?")?;
-    std::fmt::Display::fmt(&self.1, f)
+    std::fmt::LowerExp::fmt(&self.1, f)
   }
 }
 
@@ -192,12 +192,72 @@ impl ShrAssign<isize> for err64 {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-fn sqrt(x:err64) -> err64 {
-  let z = x.0.sqrt();
-  let num = x.1 + (-z).mul_add(z, x.0);
-  let den = z + z;
-  let d = num / den;
-  err64(z, d)
+/*
+ Note on estimating error for "inverse" functions:
+ If $g = f^{-1}$, then for an approximation to $g(u)=x$ (so $u=f(x)$), $\hat{g}(u)=x+\epsilon$,
+ then $f(\hat{g}(u)) = f(x+\epsilon) \approx f(x) + \epsilon f'(x)$
+ thus $\epsilon \approx \frac{f(\hat{g}(u)) - u}{f'(x)}$,
+ but $g'(u) = 1/f'(x)$, so $\epsilon \approx [f(\hat{g}(u)) - u]g'(u)$.
+
+ For other functions we use a very crude estimate by bumping by 1ulp and using difference in computed values.
+ (Much more accurate would be to compute at higher precision.)
+*/
+
+impl err64 {
+
+  pub fn sqrt(self) -> err64 {
+    let z = self.0.sqrt();
+    let num = self.1 + (-z).mul_add(z, self.0);
+    let den = z + z;
+    let d = num / den;
+    err64(z, d)
+  }
+
+  pub fn cbrt(self) -> err64 {
+    let z = self.0.cbrt();
+    let z2 = z * z;
+    let num = self.1 - z2.mul_add(z, self.0);
+    let den = 3.0*z2;
+    let d = num / den;
+    err64(z, d)
+  }
+
+  pub fn nth_root(self, n:isize) -> err64 {
+    let z = self.0.powf(1.0/(n as f64));
+    let zn1 = z.powi((n-1) as i32);
+    let num = self.1 - zn1.mul_add(z, self.0);
+    let den = (n as f64) * zn1;
+    let d = num / den;
+    err64(z, d)
+  }
+
+  pub fn exp(self) -> err64 {
+    let z = self.0.exp();
+    let bump = self.0.next_up().exp() - z; // An overestimate of the error
+    let d = bump + z*self.1.exp_m1();
+    err64(z, d)
+  }
+
+  pub fn ln(self) -> err64 {
+    let z = self.0.ln();
+    let bump = self.0.next_up().ln() - z; // An overestimate of the error
+    let d = bump + self.1/self.0;
+    err64(z, d)
+  }
+
+  pub fn cos(self) -> err64 {
+    let z = self.0.cos();
+    let bump = self.0.next_up().cos() - z; // An overestimate of the error
+    let d = bump - self.1 * self.0.sin();
+    err64(z, d)
+  }
+
+  pub fn sin(self) -> err64 {
+    let z = self.0.sin();
+    let bump = self.0.next_up().sin() - z; // An overestimate of the error
+    let d = bump + self.1 * self.0.cos();
+    err64(z, d)
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -238,10 +298,9 @@ impl Bounded for err64 {
   const MAX_VALUE: err64 = err64(f64::MAX, 0.0);
 }
 impl Roots for err64 {
-  fn sqrt(self) -> Self { sqrt(self) }
-  fn cbrt(self) -> Self { err64(self.0.cbrt(),0.0) } // TODO
-  #[inline]
-  fn nth_root(self, n: isize) -> Self { err64(self.0.powf(1.0 / (n as f64)), 0.0) } // TODO
+  #[inline] fn sqrt(self) -> Self { self.sqrt() }
+  #[inline] fn cbrt(self) -> Self { self.cbrt() }
+  #[inline] fn nth_root(self, n: isize) -> Self { self.nth_root(n) }
 }
 impl Value for err64 {}
 

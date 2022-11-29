@@ -103,6 +103,7 @@ ldexp: ...  Guard/Round/Sticky ...
 - check Debye functions
 - separate performance testing (criterion crate) into completely separated crate (to eliminate a lot of dependencies)
 - separate plotting / graphing into a separate crate also
+- nalgebra/SymmetricEigen
 
 **Structure**
 - theory

@@ -134,6 +134,7 @@ use sf_impl::{
   dual,
   ellint,
   erf,
+  error,
   exp,
   expint,
   float,
@@ -2032,5 +2033,14 @@ fn main() {
       let t = jac.integrator(n as usize).integrate(sf_cos);
       println!("{}  {:.18e}", n, t - 1.93813262144117515245189603819);
     }
+  }
+
+  if true {
+    println!("====================");
+    let w = Wide(1.0,0.0).exp();
+    let e = error::err64(1.0,0.0).exp();
+    println!("{}", w);
+    println!("{}", e);
+    println!("{}", w - e.0);
   }
 }
